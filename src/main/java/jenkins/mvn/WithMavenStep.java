@@ -146,7 +146,7 @@ public class WithMavenStep extends AbstractStepImpl {
 
         public ListBoxModel doFillMavenInstallationItems() {
             ListBoxModel r = new ListBoxModel();
-            r.add("");
+            r.add("--- Use system default Maven ---",null);
             for (MavenInstallation installation : getMavenDescriptor().getInstallations()) {
                 r.add(installation.getName());
             }
@@ -159,7 +159,7 @@ public class WithMavenStep extends AbstractStepImpl {
 
         public ListBoxModel doFillJdkItems() {
             ListBoxModel r = new ListBoxModel();
-            r.add("");
+            r.add("--- Use system default JDK ---",null);
             for (JDK installation : getJDKDescriptor().getInstallations()) {
                 r.add(installation.getName());
             }
@@ -169,7 +169,7 @@ public class WithMavenStep extends AbstractStepImpl {
         public ListBoxModel doFillMavenSettingsConfigItems() {
             ExtensionList<MavenSettingsConfigProvider> providers = Jenkins.getInstance().getExtensionList(MavenSettingsConfigProvider.class);
             ListBoxModel r = new ListBoxModel();
-            r.add("");
+            r.add("--- Use system default settings or file path ---",null);
             for (ConfigProvider provider : providers) {
                 for(Config config:provider.getAllConfigs()){
                     r.add(config.name, config.id);
