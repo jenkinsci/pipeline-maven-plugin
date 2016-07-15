@@ -97,7 +97,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
     private transient Launcher launcher;
     @StepContextParameter
     private transient EnvVars env;
-    private transient EnvVars envOverride = new EnvVars();
+    private transient EnvVars envOverride;
     @StepContextParameter
     private transient Run<?, ?> build;
 
@@ -114,6 +114,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
     @Override
     public boolean start() throws Exception {
+        envOverride = new EnvVars();
         console = listener.getLogger();
 
         if (LOGGER.isLoggable(Level.FINE)) {
@@ -150,7 +151,9 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
      * does is decorate the launcher and excute the command with a <tt>docker run</tt> which means that the inherited
      * environment from the OS will be totally different eg: MAVEN_HOME, JAVA_HOME, PATH, etc.
      * 
-     * @see <a href="https://github.com/jenkinsci/docker-workflow-plugin/blob/master/src/main/java/org/jenkinsci/plugins/docker/workflow/WithContainerStep.java#L213">WithContainerStep</a>
+     * @see <a href=
+     * "https://github.com/jenkinsci/docker-workflow-plugin/blob/master/src/main/java/org/jenkinsci/plugins/docker/workflow/WithContainerStep.java#L213">
+     * WithContainerStep</a>
      * @return true if running inside docker container with <tt>docker.image()</tt>
      */
     private boolean detectWithContainer() {
@@ -232,7 +235,8 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
         String mavenName = step.getMavenInstallation();
         if (withContainer && !StringUtils.isEmpty(mavenName)) {
-            console.println("WARNING: Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. You have specified Maven installation, which will be skipped.");
+            console.println(
+                    "WARNING: Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. You have specified Maven installation, which will be skipped.");
             LOGGER.fine("Ignoring Maven Installation parameter: " + mavenName);
         }
 
@@ -259,7 +263,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         }
 
         if (mi != null) {
-            console.println("Using Maven Installation "+mi.getName());
+            console.println("Using Maven Installation " + mi.getName());
             mi = mi.forNode(computer.getNode(), listener).forEnvironment(env);
             mi.buildEnvVars(envOverride);
             mvnExecPath = mi.getExecutable(launcher);
@@ -282,7 +286,8 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
                     mi.buildEnvVars(envOverride);
                     mvnExecPath = mi.getExecutable(launcher);
                 }
-            } else { // in case of docker.image we need to execute a command through the decorated launcher and get the output.
+            } else { // in case of docker.image we need to execute a command through the decorated launcher and get the
+                     // output.
                 LOGGER.fine("Calling printenv on docker container...");
                 String mavenHome = readFromProcess("printenv", MAVEN_HOME);
                 if (mavenHome == null) {
@@ -308,7 +313,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         }
 
         LOGGER.fine("Found exec for maven on: " + mvnExecPath);
-        console.println("Using maven exec: "+mvnExecPath);
+        console.println("Using maven exec: " + mvnExecPath);
         return mvnExecPath;
     }
 
@@ -347,11 +352,11 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
     private String mavenWrapperContent(FilePath mvnExec, String settingsFile, String mavenLocalRepo) {
 
         ArgumentListBuilder argList = new ArgumentListBuilder(mvnExec.getRemote());
-        
-        boolean isUnix=computer.isUnix();
-        
-        String lineSep=isUnix?"\n":"\n\r";
-        
+
+        boolean isUnix = computer.isUnix();
+
+        String lineSep = isUnix ? "\n" : "\n\r";
+
         if (!StringUtils.isEmpty(settingsFile)) {
             argList.add("--settings", settingsFile);
         }
@@ -362,20 +367,20 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
         argList.add("--batch-mode");
         argList.add("--show-version");
-        
-        StringBuffer c=new StringBuffer();
-        
-        if (isUnix){
+
+        StringBuffer c = new StringBuffer();
+
+        if (isUnix) {
             c.append("#!/bin/sh -e").append(lineSep);
-        }else{
+        } else {
             c.append("@echo off").append(lineSep);
         }
-        
+
         c.append("echo ----- withMaven Wrapper script -----").append(lineSep);
-        c.append(argList.toString()).append(computer.isUnix()?" \"$@\"":" %*").append(lineSep);
-        
-        String content=c.toString();
-        LOGGER.fine("Generated wrapper:"+content);
+        c.append(argList.toString()).append(computer.isUnix() ? " \"$@\"" : " %*").append(lineSep);
+
+        String content = c.toString();
+        LOGGER.fine("Generated wrapper:" + content);
         return content;
     }
     
@@ -391,9 +396,9 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
     private FilePath createShellScript(FilePath tempBinDir, String name, String content) throws IOException, InterruptedException {
         FilePath scriptFile = tempBinDir.child(name);
 
-        scriptFile.write(content,computer.getDefaultCharset().name());
+        scriptFile.write(content, computer.getDefaultCharset().name());
         scriptFile.chmod(0755);
-        
+
         return scriptFile;
     }
 
@@ -415,9 +420,9 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
     }
 
     /**
-     * Obtains the selected setting file, and initializes MVN_SETTINGS
-     * When the selected file is an absolute path, the file existence is checked on the build agent, if not found, it will be checked and copied from the master.
-     * The file will be generated/copied to the workspace temp folder to make sure docker container can access it.
+     * Obtains the selected setting file, and initializes MVN_SETTINGS When the selected file is an absolute path, the
+     * file existence is checked on the build agent, if not found, it will be checked and copied from the master. The
+     * file will be generated/copied to the workspace temp folder to make sure docker container can access it.
      * 
      * @return the settings file path on the agent
      * @throws InterruptedException when processing remote calls
@@ -425,18 +430,18 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
      */
     private String setupSettingFile() throws IOException, InterruptedException {
         final FilePath settingsDest = tempBinDir.child("settings.xml");
-        
+
         // Settings from Config File Provider
         if (!StringUtils.isEmpty(step.getMavenSettingsConfig())) {
-            settingsFromConfig(step.getMavenSettingsConfig(),settingsDest);
+            settingsFromConfig(step.getMavenSettingsConfig(), settingsDest);
             envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
-        }else if (!StringUtils.isEmpty(step.getMavenSettingsFilePath())) {
+        } else if (!StringUtils.isEmpty(step.getMavenSettingsFilePath())) {
             String settingsPath = envOverride.expand(env.expand(step.getMavenSettingsFilePath()));
             FilePath settings;
             console.println("Setting up settings file " + settingsPath);
             // file from agent
-            if ((settings = new FilePath(ws.getChannel(), settingsPath)).exists()) { 
+            if ((settings = new FilePath(ws.getChannel(), settingsPath)).exists()) {
                 console.println("Using settings from: " + settingsPath + " on build agent");
                 LOGGER.log(Level.FINE, "Copying file from build agent {0} to {1}", new Object[] { settings, settingsDest });
                 settings.copyTo(settingsDest);
@@ -486,7 +491,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
                         List<String> tempFiles = new ArrayList<String>();
                         fileContent = CredentialsHelper.fillAuthentication(fileContent, isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
                     }
-                    
+
                     settingsFile.write(fileContent, computer.getDefaultCharset().name());
                     LOGGER.log(Level.FINE, "Created config file {0}", new Object[] { settingsFile });
                 } catch (Exception e) {
@@ -552,25 +557,28 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
         @Override
         protected void finished(StepContext context) throws Exception {
-           /* try {
+            try {
                 tempBinDir.deleteRecursive();
             } catch (IOException | InterruptedException e) {
                 try {
                     TaskListener listener = context.get(TaskListener.class);
                     if (e instanceof IOException) {
-                        Util.displayIOException((IOException) e, listener); //Better IOException display on windows
+                        Util.displayIOException((IOException) e, listener); // Better IOException display on windows
                     }
                     e.printStackTrace(listener.fatalError("Error deleting temporary files"));
                 } catch (Throwable t) {
                     t.printStackTrace();
                 }
-            }*/
+            }
         }
 
         private static final long serialVersionUID = 1L;
     }
 
-    public static MavenInstallation[] getMavenInstallations() {
+    /**
+     * @return maven installations on this instance
+     */
+    private static MavenInstallation[] getMavenInstallations() {
         return Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class).getInstallations();
     }
 
@@ -583,6 +591,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
     /**
      * Gets the computer for the current launcher.
+     * 
      * @return the computer
      * @throws AbortException in case of error.
      */
@@ -630,6 +639,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
     /**
      * Calculates a temporary dir path
+     * 
      * @param ws current workspace
      * @return the temporary dir
      */
