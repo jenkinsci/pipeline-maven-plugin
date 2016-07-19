@@ -184,7 +184,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             } else { // see #detectWithContainer()
                 LOGGER.fine("Ignoring JDK Installation parameter: " + step.getJdk());
                 console.println(
-                        "WARNING: Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. You have specified JDK installation, which will be skipped.");
+                        "WARNING: Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. You have specified a JDK installation, which will be ignored.");
             }
         }
     }
@@ -236,7 +236,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         String mavenName = step.getMavenInstallation();
         if (withContainer && !StringUtils.isEmpty(mavenName)) {
             console.println(
-                    "WARNING: Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. You have specified Maven installation, which will be skipped.");
+                    "WARNING: Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. You have specified a Maven installation, which will be ignored.");
             LOGGER.fine("Ignoring Maven Installation parameter: " + mavenName);
         }
 
