@@ -32,6 +32,7 @@ import java.io.PrintStream;
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,7 +208,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         FilePath mvnExec = new FilePath(ws.getChannel(), mvnExecPath);
         String content = mavenWrapperContent(mvnExec, setupSettingFile(), setupMavenLocalRepo());
 
-        createShellScript(tempBinDir, mvnExec.getName(), content);
+        createWrapperScript(tempBinDir, mvnExec.getName(), content);
 
         // Maven Ops
         if (!StringUtils.isEmpty(step.getMavenOpts())) {
@@ -278,7 +279,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
                     mavenHome = agentEnv.get(M2_HOME);
                 }
                 if (mavenHome != null) {
-                    LOGGER.fine("Found maven installation on " + mavenHome);
+                    LOGGER.log(Level.FINE, "Found maven installation on {0}", mavenHome);
                     // Resort to maven installation to get the executable and build environment
                     mi = new MavenInstallation("Mave Auto-discovered", mavenHome, null);
                     mi.buildEnvVars(envOverride);
@@ -293,25 +294,31 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
                 }
 
                 if (mavenHome != null) {
-                    LOGGER.fine("Found maven installation on " + mavenHome);
+                    LOGGER.log(Level.FINE, "Found maven installation on {0}", mavenHome);
                     mvnExecPath = mavenHome + "/bin/mvn"; // we can safely assume *nix
                 }
             }
         }
 
-        // if at this point mvnExecPath is still null try to use which command to find a maven executable
-        // this approach is only executed if on unix
-        if (mvnExecPath == null && computer.isUnix()) {
+        // if at this point mvnExecPath is still null try to use which/where command to find a maven executable
+        if (mvnExecPath == null) {
             LOGGER.fine("No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which command");
-            mvnExecPath = readFromProcess("/bin/sh", "-c", "which mvn");
+            if (computer.isUnix()) {
+                mvnExecPath = readFromProcess("/bin/sh", "-c", "which mvn");
+            } else {
+                mvnExecPath = readFromProcess("where","mvn.cmd");
+                if (mvnExecPath == null) {
+                    mvnExecPath = readFromProcess("where","mvn.bat");
+                }
+            }
         }
 
         if (mvnExecPath == null) {
             throw new AbortException("Could not find maven executable, please set up a Maven Installation or configure MAVEN_HOME environment variable");
         }
 
-        LOGGER.fine("Found exec for maven on: " + mvnExecPath);
-        console.println("Using maven exec: " + mvnExecPath);
+        LOGGER.log(Level.FINE, "Found exec for maven on: {0}", mvnExecPath);
+        console.printf("Using maven exec: %s\n", mvnExecPath);
         return mvnExecPath;
     }
 
@@ -334,14 +341,14 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
                 return null;
             }
         } catch (IOException e) {
-            console.format("Error executing command '{0}'on docker image: {1}", args.toString(), e.getMessage());
-            e.printStackTrace(console);
+            e.printStackTrace(console.format("Error executing command '%s' : %s\n", Arrays.toString(args), e.getMessage()));
         }
         return null;
     }
 
     /**
-     * Generates the content of the maven wrapper script that works 
+     * Generates the content of the maven wrapper script that works
+     * 
      * @param mvnExec maven executable location
      * @param settingsFile settings file
      * @param mavenLocalRepo maven local repo location
@@ -353,7 +360,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
         boolean isUnix = computer.isUnix();
 
-        String lineSep = isUnix ? "\n" : "\n\r";
+        String lineSep = isUnix ? "\n" : "\r\n";
 
         if (!StringUtils.isEmpty(settingsFile)) {
             argList.add("--settings", settingsFile);
@@ -366,7 +373,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         argList.add("--batch-mode");
         argList.add("--show-version");
 
-        StringBuffer c = new StringBuffer();
+        StringBuilder c = new StringBuilder();
 
         if (isUnix) {
             c.append("#!/bin/sh -e").append(lineSep);
@@ -381,9 +388,10 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         LOGGER.fine("Generated wrapper:" + content);
         return content;
     }
-    
+
     /**
-     * Creates the actual shell/cmd script file and sets the permissions.
+     * Creates the actual wrapper script file and sets the permissions.
+     * 
      * @param tempBinDir dir to create the script file on
      * @param name the script file name
      * @param content contents of the file
@@ -391,7 +399,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
      * @throws InterruptedException when processing remote calls
      * @throws IOException when reading files
      */
-    private FilePath createShellScript(FilePath tempBinDir, String name, String content) throws IOException, InterruptedException {
+    private FilePath createWrapperScript(FilePath tempBinDir, String name, String content) throws IOException, InterruptedException {
         FilePath scriptFile = tempBinDir.child(name);
 
         scriptFile.write(content, computer.getDefaultCharset().name());
@@ -401,7 +409,8 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
     }
 
     /**
-     * Sets the maven repo ocation according to the provided parameter on the agent
+     * Sets the maven repo location according to the provided parameter on the agent
+     * 
      * @return path on the build agent to the repo
      * @throws InterruptedException when processing remote calls
      * @throws IOException when reading files

@@ -1,21 +1,16 @@
 <div>
-  Especify a custom local repository path. "src/main/resources/jenkins/mvn/WithMavenStep/help-mavenOpts.html"
-  Shell-like environment variable expansions work in this field, by using the ${VARIABLE} syntax.
+  Specify a custom local repository path.
+  Shell-like environment variable expansions work with this field, by using the ${VARIABLE} syntax.
   
-  Normally, Jenkins uses the local Maven repository as determined by Maven &mdash; the exact process
-  seems to be undocumented, but it's <tt>~/.m2/repository</tt> and can be overridden by
-  &lt;localRepository> in <tt>~/.m2/settings.xml</tt> (see <a  href="http://maven.apache.org/settings.html">the reference</a> for more details.)
+  Normally, Jenkins uses the local Maven repository as determined by Maven, by default <tt>~/.m2/repository</tt> and can be overridden by
+  &lt;localRepository> in <tt>~/.m2/settings.xml</tt> (see <a href="https://maven.apache.org/guides/mini/guide-configuring-maven.html#Configuring_your_Local_Repository">Configuring your Local Repository</a>)) 
 
   <p>
   This normally means that all the jobs that are executed on the same node shares a single Maven repository.
-  The upside of this is that you can save the disk space, but the downside of this is that sometimes those
-  builds could interfere with each other. For example, you might end up having builds incorrectly succeed,
+  The upside of this is that you can save the disk space, the downside is that the repository is not multi process safe and having multiple builds run concurrently can corrupt it.
+  Additionally builds could interfere with each other by sharing incorrect or partially built artifacts. For example, you might end up having builds incorrectly succeed,
   just because your have all the dependencies in your local repository, despite that fact that none of the
   repositories in POM might have them.
-
-  <p>
-  There are also some reported problems regarding having concurrent Maven processes trying to use the same local
-  repository.
 
   <p>
   By using this option, Jenkins will tell Maven to use a custom path for the build as the local Maven repository by using <tt>-Dmaven.repo.local</tt>
