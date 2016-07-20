@@ -233,15 +233,10 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         LOGGER.fine("Setting up maven");
 
         String mavenName = step.getMavenInstallation();
-        if (withContainer && !StringUtils.isEmpty(mavenName)) {
-            console.println(
-                    "WARNING: Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. You have specified a Maven installation, which will be ignored.");
-            LOGGER.fine("Ignoring Maven Installation parameter: " + mavenName);
-        }
 
-        if (!withContainer) {
-            LOGGER.fine("Maven Installation parameter: " + mavenName);
-            if (!StringUtils.isEmpty(mavenName)) {
+        if (!StringUtils.isEmpty(mavenName)) {
+            if (!withContainer) {
+                LOGGER.fine("Maven Installation parameter: " + mavenName);
                 for (MavenInstallation i : getMavenInstallations()) {
                     if (mavenName != null && mavenName.equals(i.getName())) {
                         mi = i;
@@ -253,11 +248,9 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
                     throw new AbortException("Could not find '" + mavenName + "' maven installation.");
                 }
             } else {
-                LOGGER.fine("Trying first installation from Maven Installations...");
-                MavenInstallation[] installations = getMavenInstallations();
-                if (installations.length > 0) {
-                    mi = installations[0];
-                }
+                console.println(
+                        "WARNING: Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. You have specified a Maven installation, which will be ignored.");
+                LOGGER.fine("Ignoring Maven Installation parameter: " + mavenName);
             }
         }
 
