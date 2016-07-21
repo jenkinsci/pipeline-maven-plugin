@@ -1,4 +1,4 @@
-package jenkins.mvn.WithMavenStep
+package org.jenkinsci.plugins.pipeline.maven.WithMavenStep
 def f = namespace(lib.FormTagLib) as lib.FormTagLib
 
 f.entry(field: 'mavenInstallation', title: _('Maven Installation')) {
