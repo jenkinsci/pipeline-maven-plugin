@@ -41,7 +41,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.configprovider.model.Config;
@@ -132,7 +132,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         setupJDK();
         setupMaven();
 
-        MavenConsoleFilter consFilter = new MavenConsoleFilter(computer.getDefaultCharset().name());
+        MavenConsoleFilter consFilter = new MavenConsoleFilter(getComputer().getDefaultCharset().name());
         EnvironmentExpander envEx = EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), new ExpanderImpl(envOverride));
 
         body = getContext().newBodyInvoker().withContexts(envEx, consFilter).withCallback(new Callback(tempBinDir)).start();
@@ -175,11 +175,11 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         JDK jdk;
         if (!StringUtils.isEmpty(step.getJdk())) {
             if (!withContainer) {
-                jdk = Jenkins.getInstance().getJDK(step.getJdk());
+                jdk = Jenkins.getActiveInstance().getJDK(step.getJdk());
                 if (jdk == null) {
                     throw new AbortException("Could not find the JDK: " + step.getJdk() + ". Make sure it is configured on the Global Tool Configuration page");
                 }
-                jdk = jdk.forNode(computer.getNode(), listener).forEnvironment(env);
+                jdk = jdk.forNode(getComputer().getNode(), listener).forEnvironment(env);
                 jdk.buildEnvVars(envOverride);
             } else { // see #detectWithContainer()
                 LOGGER.log(Level.FINE, "Ignoring JDK Installation parameter: {0}", step.getJdk());
@@ -257,7 +257,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
         if (mi != null) {
             console.println("Using Maven Installation " + mi.getName());
-            mi = mi.forNode(computer.getNode(), listener).forEnvironment(env);
+            mi = mi.forNode(getComputer().getNode(), listener).forEnvironment(env);
             mi.buildEnvVars(envOverride);
             mvnExecPath = mi.getExecutable(launcher);
         } else {
@@ -266,7 +266,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             LOGGER.fine("Searching for Maven on MAVEN_HOME and M2_HOME...");
             if (!withContainer) { // if not on docker we can use the computer environment
                 LOGGER.fine("Using computer environment...");
-                EnvVars agentEnv = computer.getEnvironment();
+                EnvVars agentEnv = getComputer().getEnvironment();
                 LOGGER.log(Level.FINE, "Agent env: {0}", agentEnv);
                 String mavenHome = agentEnv.get(MAVEN_HOME);
                 if (mavenHome == null) {
@@ -297,7 +297,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         // if at this point mvnExecPath is still null try to use which/where command to find a maven executable
         if (mvnExecPath == null) {
             LOGGER.fine("No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which/where command");
-            if (computer.isUnix()) {
+            if (getComputer().isUnix()) {
                 mvnExecPath = readFromProcess("/bin/sh", "-c", "which mvn");
             } else {
                 mvnExecPath = readFromProcess("where", "mvn.cmd");
@@ -330,7 +330,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             Proc p = launcher.launch(ps.cmds(args).stdout(baos));
             int exitCode = p.join();
             if (exitCode == 0) {
-                return baos.toString(computer.getDefaultCharset().name()).replaceAll("[\t\r\n]+", " ").trim();
+                return baos.toString(getComputer().getDefaultCharset().name()).replaceAll("[\t\r\n]+", " ").trim();
             } else {
                 return null;
             }
@@ -347,12 +347,13 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
      * @param settingsFile settings file
      * @param mavenLocalRepo maven local repo location
      * @return wrapper script content
+     * @throws AbortException when problems creating content
      */
-    private String mavenWrapperContent(FilePath mvnExec, String settingsFile, String mavenLocalRepo) {
+    private String mavenWrapperContent(FilePath mvnExec, String settingsFile, String mavenLocalRepo) throws AbortException {
 
         ArgumentListBuilder argList = new ArgumentListBuilder(mvnExec.getRemote());
 
-        boolean isUnix = computer.isUnix();
+        boolean isUnix = getComputer().isUnix();
 
         String lineSep = isUnix ? "\n" : "\r\n";
 
@@ -376,7 +377,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         }
 
         c.append("echo ----- withMaven Wrapper script -----").append(lineSep);
-        c.append(argList.toString()).append(computer.isUnix() ? " \"$@\"" : " %*").append(lineSep);
+        c.append(argList.toString()).append(isUnix ? " \"$@\"" : " %*").append(lineSep);
 
         String content = c.toString();
         LOGGER.log(Level.FINE, "Generated wrapper: {0}", content);
@@ -396,7 +397,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
     private FilePath createWrapperScript(FilePath tempBinDir, String name, String content) throws IOException, InterruptedException {
         FilePath scriptFile = tempBinDir.child(name);
 
-        scriptFile.write(content, computer.getDefaultCharset().name());
+        scriptFile.write(content, getComputer().getDefaultCharset().name());
         scriptFile.chmod(0755);
 
         return scriptFile;
@@ -493,7 +494,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
                         fileContent = CredentialsHelper.fillAuthentication(fileContent, isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
                     }
 
-                    settingsFile.write(fileContent, computer.getDefaultCharset().name());
+                    settingsFile.write(fileContent, getComputer().getDefaultCharset().name());
                     LOGGER.log(Level.FINE, "Created config file {0}", new Object[] { settingsFile });
                 } catch (Exception e) {
                     throw new IllegalStateException("the settings.xml could not be supplied for the current build: " + e.getMessage(), e);
@@ -535,7 +536,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         private ExpanderImpl(EnvVars overrides) {
             LOGGER.log(Level.FINE, "Overrides: " + overrides.toString());
             this.overrides = new HashMap<String, String>();
-            for (Entry<String,String> entry : overrides.entrySet()) {
+            for (Entry<String, String> entry : overrides.entrySet()) {
                 this.overrides.put(entry.getKey(), entry.getValue());
             }
         }
@@ -580,7 +581,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
      * @return maven installations on this instance
      */
     private static MavenInstallation[] getMavenInstallations() {
-        return Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class).getInstallations();
+        return Jenkins.getActiveInstance().getDescriptorByType(Maven.DescriptorImpl.class).getInstallations();
     }
 
     @Override
@@ -596,37 +597,32 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
      * @return the computer
      * @throws AbortException in case of error.
      */
-    private @CheckForNull Computer getComputer() throws AbortException {
+    private @Nonnull Computer getComputer() throws AbortException {
+        if (computer != null) {
+            return computer;
+        }
+
         String node = null;
+        Jenkins j = Jenkins.getActiveInstance();
+
+        for (Computer c : j.getComputers()) {
+            if (c.getChannel() == launcher.getChannel()) {
+                node = c.getName();
+                break;
+            }
+        }
+
+        if (node == null) {
+            throw new AbortException("Could not find computer for the job");
+        }
+
+        computer = j.getComputer(node);
         if (computer == null) {
-            Jenkins j = Jenkins.getInstance();
-            if (j == null) {
-                LOGGER.fine("Jenkins is not running");
-                return null;
-            }
-            for (Computer c : j.getComputers()) {
-                if (c.getChannel() == launcher.getChannel()) {
-                    node = c.getName();
-                    break;
-                }
-            }
+            throw new AbortException("No such computer " + node);
+        }
 
-            if (node == null) {
-                LOGGER.log(Level.FINE, "could not find comuter for this job");
-                return null;
-            }
-
-            computer = j.getComputer(node);
-            if (computer == null) {
-                LOGGER.log(Level.FINE, "no such computer {0}", node);
-                return null;
-            }
-
-            if (computer.isOffline()) {
-                LOGGER.log(Level.FINE, "{0} is offline", node);
-                return null;
-            }
-
+        if (computer.isOffline()) {
+            throw new AbortException(node+" is offline");
         }
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.log(Level.FINE, "Computer: {0}", computer.getName());
