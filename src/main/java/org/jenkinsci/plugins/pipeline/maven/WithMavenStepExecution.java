@@ -117,11 +117,11 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         console = listener.getLogger();
 
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Maven Installation:" + step.getMavenInstallation());
-            LOGGER.fine("Jdk:" + step.getJdk());
-            LOGGER.fine("MavenOpts:" + step.getMavenOpts());
-            LOGGER.fine("Settings Config:" + step.getMavenSettingsConfig());
-            LOGGER.fine("Settings FilePath:" + step.getMavenSettingsFilePath());
+            LOGGER.log(Level.FINE, "Maven Installation: {0}", step.getMavenInstallation());
+            LOGGER.log(Level.FINE, "Jdk: {0}", step.getJdk());
+            LOGGER.log(Level.FINE, "MavenOpts: {0}", step.getMavenOpts());
+            LOGGER.log(Level.FINE, "Settings Config: {0}", step.getMavenSettingsConfig());
+            LOGGER.log(Level.FINE, "Settings FilePath: {0}", step.getMavenSettingsFilePath());
         }
 
         getComputer();
@@ -181,7 +181,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
                 jdk = jdk.forNode(computer.getNode(), listener).forEnvironment(env);
                 jdk.buildEnvVars(envOverride);
             } else { // see #detectWithContainer()
-                LOGGER.fine("Ignoring JDK Installation parameter: " + step.getJdk());
+                LOGGER.log(Level.FINE, "Ignoring JDK Installation parameter: {0}", step.getJdk());
                 console.println(
                         "WARNING: Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. You have specified a JDK installation, which will be ignored.");
             }
@@ -199,7 +199,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         // set the path to our script
         envOverride.put("PATH+MAVEN", tempBinDir.getRemote());
 
-        LOGGER.fine("Using temp dir:" + tempBinDir.getRemote());
+        LOGGER.log(Level.FINE, "Using temp dir: {0}", tempBinDir.getRemote());
 
         if (mvnExecPath == null) {
             throw new AbortException("Couldn\u2019t find any maven executable");
@@ -236,11 +236,11 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
         if (!StringUtils.isEmpty(mavenName)) {
             if (!withContainer) {
-                LOGGER.fine("Maven Installation parameter: " + mavenName);
+                LOGGER.log(Level.FINE, "Maven Installation parameter: {0}", mavenName);
                 for (MavenInstallation i : getMavenInstallations()) {
                     if (mavenName != null && mavenName.equals(i.getName())) {
                         mi = i;
-                        LOGGER.fine("Found maven installation on " + mi.getHome());
+                        LOGGER.log(Level.FINE, "Found maven installation on {0}", mi.getHome());
                         break;
                     }
                 }
@@ -250,7 +250,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             } else {
                 console.println(
                         "WARNING: Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. You have specified a Maven installation, which will be ignored.");
-                LOGGER.fine("Ignoring Maven Installation parameter: " + mavenName);
+                LOGGER.log(Level.FINE, "Ignoring Maven Installation parameter: {0}", mavenName);
             }
         }
 
@@ -266,7 +266,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             if (!withContainer) { // if not on docker we can use the computer environment
                 LOGGER.fine("Using computer environment...");
                 EnvVars agentEnv = computer.getEnvironment();
-                LOGGER.fine("Agent env:" + agentEnv);
+                LOGGER.log(Level.FINE, "Agent env: {0}", agentEnv);
                 String mavenHome = agentEnv.get(MAVEN_HOME);
                 if (mavenHome == null) {
                     mavenHome = agentEnv.get(M2_HOME);
@@ -295,13 +295,13 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
         // if at this point mvnExecPath is still null try to use which/where command to find a maven executable
         if (mvnExecPath == null) {
-            LOGGER.fine("No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which command");
+            LOGGER.fine("No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which/where command");
             if (computer.isUnix()) {
                 mvnExecPath = readFromProcess("/bin/sh", "-c", "which mvn");
             } else {
-                mvnExecPath = readFromProcess("where","mvn.cmd");
+                mvnExecPath = readFromProcess("where", "mvn.cmd");
                 if (mvnExecPath == null) {
-                    mvnExecPath = readFromProcess("where","mvn.bat");
+                    mvnExecPath = readFromProcess("where", "mvn.bat");
                 }
             }
         }
@@ -378,7 +378,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         c.append(argList.toString()).append(computer.isUnix() ? " \"$@\"" : " %*").append(lineSep);
 
         String content = c.toString();
-        LOGGER.fine("Generated wrapper:" + content);
+        LOGGER.log(Level.FINE, "Generated wrapper: {0}", content);
         return content;
     }
 
@@ -442,11 +442,11 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             console.println("Setting up settings file " + settingsPath);
             // file from agent
             if ((settings = new FilePath(ws.getChannel(), settingsPath)).exists()) {
-                console.println("Using settings from: " + settingsPath + " on build agent");
+                console.format("Using settings from: %s on build agent\n", settingsPath);
                 LOGGER.log(Level.FINE, "Copying file from build agent {0} to {1}", new Object[] { settings, settingsDest });
                 settings.copyTo(settingsDest);
             } else if ((settings = new FilePath(new File(settingsPath))).exists()) { // File from the master
-                console.println("Using settings from: " + settingsPath + " on master");
+                console.format("Using settings from: %s on master\n", settingsPath);
                 LOGGER.log(Level.FINE, "Copying file from master to build agent {0} to {1}", new Object[] { settings, settingsDest });
                 settings.copyTo(settingsDest);
             } else {
@@ -628,9 +628,9 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
         }
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.fine("Computer:" + computer.getName());
+            LOGGER.log(Level.FINE, "Computer: {0}", computer.getName());
             try {
-                LOGGER.fine("Env:" + computer.getEnvironment());
+                LOGGER.log(Level.FINE, "Env: {0}", computer.getEnvironment());
             } catch (IOException | InterruptedException e) {// ignored
             }
         }

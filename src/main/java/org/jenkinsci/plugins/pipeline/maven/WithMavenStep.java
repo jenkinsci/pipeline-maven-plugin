@@ -140,7 +140,7 @@ public class WithMavenStep extends AbstractStepImpl {
             return true;
         }
 
-        @Restricted(NoExternalUse.class)
+        @Restricted(NoExternalUse.class) // Only for UI calls
         public SettingsProvider getDefaultSettingsProvider() {
             return GlobalMavenConfig.get().getSettingsProvider();
         }
@@ -149,7 +149,7 @@ public class WithMavenStep extends AbstractStepImpl {
             return Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class);
         }
 
-        @Restricted(NoExternalUse.class)
+        @Restricted(NoExternalUse.class) // Only for UI calls
         public ListBoxModel doFillMavenInstallationItems() {
             ListBoxModel r = new ListBoxModel();
             r.add("--- Use system default Maven ---",null);
@@ -163,7 +163,7 @@ public class WithMavenStep extends AbstractStepImpl {
             return Jenkins.getInstance().getDescriptorByType(JDK.DescriptorImpl.class);
         }
 
-        @Restricted(NoExternalUse.class)
+        @Restricted(NoExternalUse.class) // Only for UI calls
         public ListBoxModel doFillJdkItems() {
             ListBoxModel r = new ListBoxModel();
             r.add("--- Use system default JDK ---",null);
@@ -173,7 +173,7 @@ public class WithMavenStep extends AbstractStepImpl {
             return r;
         }
         
-        @Restricted(NoExternalUse.class)
+        @Restricted(NoExternalUse.class) // Only for UI calls
         public ListBoxModel doFillMavenSettingsConfigItems() {
             ExtensionList<MavenSettingsConfigProvider> providers = Jenkins.getInstance().getExtensionList(MavenSettingsConfigProvider.class);
             ListBoxModel r = new ListBoxModel();
