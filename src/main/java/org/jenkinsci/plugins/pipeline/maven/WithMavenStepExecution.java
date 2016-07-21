@@ -622,7 +622,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         }
 
         if (computer.isOffline()) {
-            throw new AbortException(node+" is offline");
+            throw new AbortException(node + " is offline");
         }
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.log(Level.FINE, "Computer: {0}", computer.getName());
