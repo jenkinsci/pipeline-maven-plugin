@@ -33,7 +33,7 @@
   </parent>
 
   <artifactId>pipeline-maven</artifactId>
-  <version>0.1</version>
+  <version>0.1-beta</version>
   <packaging>hpi</packaging>
 
   <name>Pipeline Maven Integration Plugin</name>
