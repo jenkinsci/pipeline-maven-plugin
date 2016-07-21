@@ -36,6 +36,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -311,7 +312,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         }
 
         LOGGER.log(Level.FINE, "Found exec for maven on: {0}", mvnExecPath);
-        console.printf("Using maven exec: %s\n", mvnExecPath);
+        console.printf("Using maven exec: %s%n", mvnExecPath);
         return mvnExecPath;
     }
 
@@ -329,12 +330,12 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             Proc p = launcher.launch(ps.cmds(args).stdout(baos));
             int exitCode = p.join();
             if (exitCode == 0) {
-                return baos.toString().replaceAll("[\t\r\n]+", " ").trim();
+                return baos.toString(computer.getDefaultCharset().name()).replaceAll("[\t\r\n]+", " ").trim();
             } else {
                 return null;
             }
         } catch (IOException e) {
-            e.printStackTrace(console.format("Error executing command '%s' : %s\n", Arrays.toString(args), e.getMessage()));
+            e.printStackTrace(console.format("Error executing command '%s' : %s%n", Arrays.toString(args), e.getMessage()));
         }
         return null;
     }
@@ -442,11 +443,11 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             console.println("Setting up settings file " + settingsPath);
             // file from agent
             if ((settings = new FilePath(ws.getChannel(), settingsPath)).exists()) {
-                console.format("Using settings from: %s on build agent\n", settingsPath);
+                console.format("Using settings from: %s on build agent%n", settingsPath);
                 LOGGER.log(Level.FINE, "Copying file from build agent {0} to {1}", new Object[] { settings, settingsDest });
                 settings.copyTo(settingsDest);
             } else if ((settings = new FilePath(new File(settingsPath))).exists()) { // File from the master
-                console.format("Using settings from: %s on master\n", settingsPath);
+                console.format("Using settings from: %s on master%n", settingsPath);
                 LOGGER.log(Level.FINE, "Copying file from master to build agent {0} to {1}", new Object[] { settings, settingsDest });
                 settings.copyTo(settingsDest);
             } else {
@@ -534,8 +535,8 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         private ExpanderImpl(EnvVars overrides) {
             LOGGER.log(Level.FINE, "Overrides: " + overrides.toString());
             this.overrides = new HashMap<String, String>();
-            for (String key : overrides.keySet()) {
-                this.overrides.put(key, overrides.get(key));
+            for (Entry<String,String> entry : overrides.entrySet()) {
+                this.overrides.put(entry.getKey(), entry.getValue());
             }
         }
 
