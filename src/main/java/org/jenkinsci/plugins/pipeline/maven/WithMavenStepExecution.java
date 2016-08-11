@@ -58,6 +58,7 @@ import org.jenkinsci.plugins.workflow.steps.StepContextParameter;
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.google.inject.Inject;
 
+import antlr.Utils;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.FilePath;
@@ -69,6 +70,7 @@ import hudson.console.ConsoleLogFilter;
 import hudson.model.AbstractBuild;
 import hudson.model.Computer;
 import hudson.model.JDK;
+import hudson.model.Node;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.slaves.WorkspaceList;
@@ -179,7 +181,11 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
                 if (jdk == null) {
                     throw new AbortException("Could not find the JDK: " + step.getJdk() + ". Make sure it is configured on the Global Tool Configuration page");
                 }
-                jdk = jdk.forNode(getComputer().getNode(), listener).forEnvironment(env);
+                Node node = getComputer().getNode();
+                if (node == null){
+                    throw new AbortException("Could not obtain the Node for the computer: " + getComputer().getName());    
+                }
+                jdk = jdk.forNode(node, listener).forEnvironment(env);
                 jdk.buildEnvVars(envOverride);
             } else { // see #detectWithContainer()
                 LOGGER.log(Level.FINE, "Ignoring JDK Installation parameter: {0}", step.getJdk());
@@ -257,7 +263,12 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
         if (mi != null) {
             console.println("Using Maven Installation " + mi.getName());
-            mi = mi.forNode(getComputer().getNode(), listener).forEnvironment(env);
+            
+            Node node = getComputer().getNode();
+            if (node == null){
+                throw new AbortException("Could not obtain the Node for the computer: " + getComputer().getName());    
+            }
+            mi = mi.forNode(node, listener).forEnvironment(env);
             mi.buildEnvVars(envOverride);
             mvnExecPath = mi.getExecutable(launcher);
         } else {
@@ -297,7 +308,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         // if at this point mvnExecPath is still null try to use which/where command to find a maven executable
         if (mvnExecPath == null) {
             LOGGER.fine("No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which/where command");
-            if (getComputer().isUnix()) {
+            if (Boolean.TRUE.equals(getComputer().isUnix())) {
                 mvnExecPath = readFromProcess("/bin/sh", "-c", "which mvn");
             } else {
                 mvnExecPath = readFromProcess("where", "mvn.cmd");
@@ -353,7 +364,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
         ArgumentListBuilder argList = new ArgumentListBuilder(mvnExec.getRemote());
 
-        boolean isUnix = getComputer().isUnix();
+        boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
 
         String lineSep = isUnix ? "\n" : "\r\n";
 
