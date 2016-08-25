@@ -54,7 +54,7 @@ public class WithMavenStep extends AbstractStepImpl {
 
     private String mavenSettingsConfig;
     private String mavenSettingsFilePath;
-    private String mavenInstallation;
+    private String maven;
     private String mavenOpts;
     private String jdk;
     private String mavenLocalRepo; 
@@ -82,13 +82,13 @@ public class WithMavenStep extends AbstractStepImpl {
         this.mavenSettingsFilePath = mavenSettingsFilePath;
     }
 
-    public String getMavenInstallation() {
-        return mavenInstallation;
+    public String getMaven() {
+        return maven;
     }
 
     @DataBoundSetter
-    public void setMavenInstallation(String mavenInstallation) {
-        this.mavenInstallation = mavenInstallation;
+    public void setMaven(String maven) {
+        this.maven = maven;
     }
 
     public String getMavenOpts() {
@@ -150,7 +150,7 @@ public class WithMavenStep extends AbstractStepImpl {
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
-        public ListBoxModel doFillMavenInstallationItems() {
+        public ListBoxModel doFillMavenItems() {
             ListBoxModel r = new ListBoxModel();
             r.add("--- Use system default Maven ---",null);
             for (MavenInstallation installation : getMavenDescriptor().getInstallations()) {

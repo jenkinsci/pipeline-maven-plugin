@@ -58,7 +58,6 @@ import org.jenkinsci.plugins.workflow.steps.StepContextParameter;
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.google.inject.Inject;
 
-import antlr.Utils;
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.FilePath;
@@ -120,7 +119,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         console = listener.getLogger();
 
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.log(Level.FINE, "Maven Installation: {0}", step.getMavenInstallation());
+            LOGGER.log(Level.FINE, "Maven: {0}", step.getMaven());
             LOGGER.log(Level.FINE, "Jdk: {0}", step.getJdk());
             LOGGER.log(Level.FINE, "MavenOpts: {0}", step.getMavenOpts());
             LOGGER.log(Level.FINE, "Settings Config: {0}", step.getMavenSettingsConfig());
@@ -179,7 +178,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             if (!withContainer) {
                 jdk = Jenkins.getActiveInstance().getJDK(step.getJdk());
                 if (jdk == null) {
-                    throw new AbortException("Could not find the JDK: " + step.getJdk() + ". Make sure it is configured on the Global Tool Configuration page");
+                    throw new AbortException("Could not find the JDK installation: " + step.getJdk() + ". Make sure it is configured on the Global Tool Configuration page");
                 }
                 Node node = getComputer().getNode();
                 if (node == null){
@@ -188,7 +187,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
                 jdk = jdk.forNode(node, listener).forEnvironment(env);
                 jdk.buildEnvVars(envOverride);
             } else { // see #detectWithContainer()
-                LOGGER.log(Level.FINE, "Ignoring JDK Installation parameter: {0}", step.getJdk());
+                LOGGER.log(Level.FINE, "Ignoring JDK installation parameter: {0}", step.getJdk());
                 console.println(
                         "WARNING: Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. You have specified a JDK installation, which will be ignored.");
             }
@@ -239,7 +238,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
         LOGGER.fine("Setting up maven");
 
-        String mavenName = step.getMavenInstallation();
+        String mavenName = step.getMaven();
 
         if (!StringUtils.isEmpty(mavenName)) {
             if (!withContainer) {
