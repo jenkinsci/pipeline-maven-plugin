@@ -227,10 +227,6 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             }
             envOverride.put(MAVEN_OPTS, mavenOpts.replaceAll("[\t\r\n]+", " "));
         }
-
-        // just as a precaution
-        // see http://maven.apache.org/continuum/faqs.html#how-does-continuum-detect-a-successful-build
-        envOverride.put("MAVEN_TERMINATE_CMD", "on");
     }
 
     private String obtainMavenExec() throws AbortException, IOException, InterruptedException {
