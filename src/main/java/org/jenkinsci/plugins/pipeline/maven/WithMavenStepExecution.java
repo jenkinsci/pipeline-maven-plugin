@@ -51,6 +51,7 @@ import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepExecutionImpl;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
 import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
+import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
 import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepContextParameter;
@@ -133,7 +134,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         setupJDK();
         setupMaven();
 
-        MavenConsoleFilter consFilter = new MavenConsoleFilter(getComputer().getDefaultCharset().name());
+        ConsoleLogFilter consFilter = BodyInvoker.mergeConsoleLogFilters(getContext().get(ConsoleLogFilter.class), new MavenConsoleFilter(getComputer().getDefaultCharset().name()));
         EnvironmentExpander envEx = EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), new ExpanderImpl(envOverride));
 
         body = getContext().newBodyInvoker().withContexts(envEx, consFilter).withCallback(new Callback(tempBinDir)).start();
