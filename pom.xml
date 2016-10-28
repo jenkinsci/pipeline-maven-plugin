@@ -33,7 +33,7 @@
   </parent>
 
   <artifactId>pipeline-maven</artifactId>
-  <version>0.3-SNAPSHOT</version>
+  <version>0.3</version>
   <packaging>hpi</packaging>
 
   <name>Pipeline Maven Integration Plugin</name>
@@ -62,7 +62,7 @@
     <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
-    <tag>HEAD</tag>
+    <tag>pipeline-maven-0.3</tag>
   </scm>
 
   <properties>
