@@ -45,6 +45,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.configprovider.model.Config;
+import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
 import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
@@ -67,18 +68,13 @@ import hudson.Launcher.ProcStarter;
 import hudson.Proc;
 import hudson.Util;
 import hudson.console.ConsoleLogFilter;
-import hudson.model.AbstractBuild;
-import hudson.model.Computer;
-import hudson.model.JDK;
-import hudson.model.Node;
-import hudson.model.Run;
-import hudson.model.TaskListener;
+import hudson.model.*;
 import hudson.slaves.WorkspaceList;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
 import hudson.tasks._maven.MavenConsoleAnnotator;
 import hudson.util.ArgumentListBuilder;
-import jenkins.model.Jenkins;
+import jenkins.model.*;
 
 public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
@@ -125,6 +121,8 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             LOGGER.log(Level.FINE, "MavenOpts: {0}", step.getMavenOpts());
             LOGGER.log(Level.FINE, "Settings Config: {0}", step.getMavenSettingsConfig());
             LOGGER.log(Level.FINE, "Settings FilePath: {0}", step.getMavenSettingsFilePath());
+            LOGGER.log(Level.FINE, "Global settings Config: {0}", step.getGlobalMavenSettingsConfig());
+            LOGGER.log(Level.FINE, "Global settings FilePath: {0}", step.getGlobalMavenSettingsFilePath());
         }
 
         getComputer();
@@ -213,7 +211,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         }
 
         FilePath mvnExec = new FilePath(ws.getChannel(), mvnExecPath);
-        String content = mavenWrapperContent(mvnExec, setupSettingFile(), setupMavenLocalRepo());
+        String content = mavenWrapperContent(mvnExec, setupSettingFile(), setupGlobalSettingFile(), setupMavenLocalRepo());
 
         createWrapperScript(tempBinDir, mvnExec.getName(), content);
 
@@ -352,11 +350,12 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
      * 
      * @param mvnExec maven executable location
      * @param settingsFile settings file
+     * @param globalSettingsFile global settings file
      * @param mavenLocalRepo maven local repo location
      * @return wrapper script content
      * @throws AbortException when problems creating content
      */
-    private String mavenWrapperContent(FilePath mvnExec, String settingsFile, String mavenLocalRepo) throws AbortException {
+    private String mavenWrapperContent(FilePath mvnExec, String settingsFile, String globalSettingsFile, String mavenLocalRepo) throws AbortException {
 
         ArgumentListBuilder argList = new ArgumentListBuilder(mvnExec.getRemote());
 
@@ -366,6 +365,10 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
         if (!StringUtils.isEmpty(settingsFile)) {
             argList.add("--settings", settingsFile);
+        }
+
+        if (!StringUtils.isEmpty(globalSettingsFile)) {
+            argList.add("--global-settings", globalSettingsFile);
         }
 
         if (!StringUtils.isEmpty(mavenLocalRepo)) {
@@ -465,6 +468,43 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             return settingsDest.getRemote();
         }
         return null;
+    }    /**
+     * Obtains the selected global setting file, and initializes GLOBAL_MVN_SETTINGS When the selected file is an absolute path, the
+     * file existence is checked on the build agent, if not found, it will be checked and copied from the master. The
+     * file will be generated/copied to the workspace temp folder to make sure docker container can access it.
+     *
+     * @return the global settings file path on the agent
+     * @throws InterruptedException when processing remote calls
+     * @throws IOException when reading files
+     */
+    private String setupGlobalSettingFile() throws IOException, InterruptedException {
+        final FilePath settingsDest = tempBinDir.child("globalSettings.xml");
+
+        // Settings from Config File Provider
+        if (!StringUtils.isEmpty(step.getGlobalMavenSettingsConfig())) {
+            globalSettingsFromConfig(step.getGlobalMavenSettingsConfig(), settingsDest);
+            envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
+            return settingsDest.getRemote();
+        } else if (!StringUtils.isEmpty(step.getGlobalMavenSettingsFilePath())) {
+            String settingsPath = envOverride.expand(env.expand(step.getGlobalMavenSettingsFilePath()));
+            FilePath settings;
+            console.println("Setting up global settings file " + settingsPath);
+            // file from agent
+            if ((settings = new FilePath(ws.getChannel(), settingsPath)).exists()) {
+                console.format("Using global settings from: %s on build agent%n", settingsPath);
+                LOGGER.log(Level.FINE, "Copying file from build agent {0} to {1}", new Object[] { settings, settingsDest });
+                settings.copyTo(settingsDest);
+            } else if ((settings = new FilePath(new File(settingsPath))).exists()) { // File from the master
+                console.format("Using global settings from: %s on master%n", settingsPath);
+                LOGGER.log(Level.FINE, "Copying file from master to build agent {0} to {1}", new Object[] { settings, settingsDest });
+                settings.copyTo(settingsDest);
+            } else {
+                throw new AbortException("Could not find file '" + settingsPath + "' on the build agent nor the master");
+            }
+            envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
+            return settingsDest.getRemote();
+        }
+        return null;
     }
 
     /**
@@ -511,6 +551,53 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
             }
         } else {
             throw new AbortException("Could not find the Maven settings.xml config file id:" + settingsConfigId + ". Make sure it exists on Managed Files");
+        }
+    }
+
+    /**
+     * Reads the global config file from Config File Provider, expands the credentials and stores it in a file on the temp
+     * folder to use it with the maven wrapper script
+     *
+     * @param globalSettingsConfigId global config file id from Config File Provider
+     * @param globalSettingsFile path to write te content to
+     * @return the {@link FilePath} to the settings file
+     * @throws AbortException in case of error
+     */
+    private void globalSettingsFromConfig(String globalSettingsConfigId, FilePath globalSettingsFile) throws AbortException {
+        Config c = Config.getByIdOrNull(globalSettingsConfigId);
+        if (c != null) {
+            GlobalMavenSettingsConfig config;
+            if (c instanceof GlobalMavenSettingsConfig) {
+                config = (GlobalMavenSettingsConfig) c;
+            } else {
+                config = new GlobalMavenSettingsConfig(c.id, c.name, c.comment, c.content, MavenSettingsConfig.isReplaceAllDefault, null);
+            }
+
+            final Boolean isReplaceAll = config.getIsReplaceAll();
+            console.println("Using global settings config with name " + config.name);
+            console.println("Replacing all maven server entries not found in credentials list is " + isReplaceAll);
+            if (StringUtils.isNotBlank(config.content)) {
+                try {
+                    String fileContent = config.content;
+
+                    final List<ServerCredentialMapping> serverCredentialMappings = config.getServerCredentialMappings();
+                    final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
+
+                    if (!resolvedCredentials.isEmpty()) {
+                        List<String> tempFiles = new ArrayList<String>();
+                        fileContent = CredentialsHelper.fillAuthentication(fileContent, isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
+                    }
+
+                    globalSettingsFile.write(fileContent, getComputer().getDefaultCharset().name());
+                    LOGGER.log(Level.FINE, "Created global config file {0}", new Object[] { globalSettingsFile });
+                } catch (Exception e) {
+                    throw new IllegalStateException("the settings.xml could not be supplied for the current build: " + e.getMessage(), e);
+                }
+            } else {
+                throw new AbortException("Could not create Global Maven settings.xml config file id:" + globalSettingsConfigId + ". Content of the file is empty");
+            }
+        } else {
+            throw new AbortException("Could not find the Global Maven settings.xml config file id:" + globalSettingsConfigId + ". Make sure it exists on Managed Files");
         }
     }
 

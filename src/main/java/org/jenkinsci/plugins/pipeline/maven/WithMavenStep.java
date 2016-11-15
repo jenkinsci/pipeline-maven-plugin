@@ -26,6 +26,7 @@ package org.jenkinsci.plugins.pipeline.maven;
 
 import org.jenkinsci.lib.configprovider.ConfigProvider;
 import org.jenkinsci.lib.configprovider.model.Config;
+import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig.GlobalMavenSettingsConfigProvider;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig.MavenSettingsConfigProvider;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
 import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
@@ -54,6 +55,8 @@ public class WithMavenStep extends AbstractStepImpl {
 
     private String mavenSettingsConfig;
     private String mavenSettingsFilePath;
+    private String globalMavenSettingsConfig;
+    private String globalMavenSettingsFilePath;
     private String maven;
     private String mavenOpts;
     private String jdk;
@@ -80,6 +83,24 @@ public class WithMavenStep extends AbstractStepImpl {
     @DataBoundSetter
     public void setMavenSettingsFilePath(String mavenSettingsFilePath) {
         this.mavenSettingsFilePath = mavenSettingsFilePath;
+    }
+
+    public String getGlobalMavenSettingsConfig() {
+        return globalMavenSettingsConfig;
+    }
+
+    @DataBoundSetter
+    public void setGlobalMavenSettingsConfig(String globalMavenSettingsConfig) {
+        this.globalMavenSettingsConfig = globalMavenSettingsConfig;
+    }
+
+    public String getGlobalMavenSettingsFilePath() {
+        return globalMavenSettingsFilePath;
+    }
+
+    @DataBoundSetter
+    public void setGlobalMavenSettingsFilePath(String globalMavenSettingsFilePath) {
+        this.globalMavenSettingsFilePath = globalMavenSettingsFilePath;
     }
 
     public String getMaven() {
@@ -176,6 +197,19 @@ public class WithMavenStep extends AbstractStepImpl {
         @Restricted(NoExternalUse.class) // Only for UI calls
         public ListBoxModel doFillMavenSettingsConfigItems() {
             ExtensionList<MavenSettingsConfigProvider> providers = Jenkins.getActiveInstance().getExtensionList(MavenSettingsConfigProvider.class);
+            ListBoxModel r = new ListBoxModel();
+            r.add("--- Use system default settings or file path ---",null);
+            for (ConfigProvider provider : providers) {
+                for(Config config:provider.getAllConfigs()){
+                    r.add(config.name, config.id);
+                }
+            }
+            return r;
+        }
+
+        @Restricted(NoExternalUse.class) // Only for UI calls
+        public ListBoxModel doFillGlobalMavenSettingsConfigItems() {
+            ExtensionList<GlobalMavenSettingsConfigProvider> providers = Jenkins.getActiveInstance().getExtensionList(GlobalMavenSettingsConfigProvider.class);
             ListBoxModel r = new ListBoxModel();
             r.add("--- Use system default settings or file path ---",null);
             for (ConfigProvider provider : providers) {
