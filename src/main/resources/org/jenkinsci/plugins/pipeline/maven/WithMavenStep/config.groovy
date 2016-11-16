@@ -17,6 +17,14 @@ f.entry(field: 'mavenSettingsFilePath', title: _('Maven Settings File Path')) {
     f.textbox()
 }
 
+f.entry(field: 'globalMavenSettingsConfig', title: _('Global Maven Settings Config')) {
+    f.select()
+}
+
+f.entry(field: 'globalMavenSettingsFilePath', title: _('Global Maven Settings File Path')) {
+    f.textbox()
+}
+
 f.entry(field: 'mavenOpts', title: _('Maven JVM Opts')) {
     f.textbox()
 }
