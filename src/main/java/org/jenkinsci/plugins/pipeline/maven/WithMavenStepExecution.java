@@ -591,7 +591,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
                     globalSettingsFile.write(fileContent, getComputer().getDefaultCharset().name());
                     LOGGER.log(Level.FINE, "Created global config file {0}", new Object[] { globalSettingsFile });
                 } catch (Exception e) {
-                    throw new IllegalStateException("the settings.xml could not be supplied for the current build: " + e.getMessage(), e);
+                    throw new IllegalStateException("the globalSettings.xml could not be supplied for the current build: " + e.getMessage(), e);
                 }
             } else {
                 throw new AbortException("Could not create Global Maven settings.xml config file id:" + globalSettingsConfigId + ". Content of the file is empty");
