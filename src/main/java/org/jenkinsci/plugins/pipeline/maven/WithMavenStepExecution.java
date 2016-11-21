@@ -45,6 +45,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.configprovider.model.Config;
+import org.jenkinsci.plugins.configfiles.ConfigFiles;
 import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
@@ -517,7 +518,16 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
      * @throws AbortException in case of error
      */
     private void settingsFromConfig(String settingsConfigId, FilePath settingsFile) throws AbortException {
-        Config c = Config.getByIdOrNull(settingsConfigId);
+
+        Config c = null;
+        Executor executor = Executor.currentExecutor();
+        if (executor != null) {
+            Queue.Executable currentExecutable = executor.getCurrentExecutable();
+            if (currentExecutable != null) {
+                c = ConfigFiles.getByIdOrNull((Run<?, ?>) currentExecutable, settingsConfigId);
+            }
+        }
+
         if (c != null) {
             MavenSettingsConfig config;
             if (c instanceof MavenSettingsConfig) {
@@ -564,7 +574,16 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
      * @throws AbortException in case of error
      */
     private void globalSettingsFromConfig(String globalSettingsConfigId, FilePath globalSettingsFile) throws AbortException {
-        Config c = Config.getByIdOrNull(globalSettingsConfigId);
+
+        Config c = null;
+        Executor executor = Executor.currentExecutor();
+        if (executor != null) {
+            Queue.Executable currentExecutable = executor.getCurrentExecutable();
+            if (currentExecutable != null) {
+                c = ConfigFiles.getByIdOrNull((Run<?, ?>) currentExecutable, globalSettingsConfigId);
+            }
+        }
+
         if (c != null) {
             GlobalMavenSettingsConfig config;
             if (c instanceof GlobalMavenSettingsConfig) {
