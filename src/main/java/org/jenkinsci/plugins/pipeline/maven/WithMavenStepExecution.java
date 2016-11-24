@@ -519,48 +519,50 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
      */
     private void settingsFromConfig(String settingsConfigId, FilePath settingsFile) throws AbortException {
 
-        Config c = null;
         Executor executor = Executor.currentExecutor();
-        if (executor != null) {
-            Queue.Executable currentExecutable = executor.getCurrentExecutable();
-            if (currentExecutable != null) {
-                c = ConfigFiles.getByIdOrNull((Run<?, ?>) currentExecutable, settingsConfigId);
-            }
+        if (executor == null) {
+            throw new AbortException("Executor.currentExecutor() is NULL, probably not desired");
         }
 
-        if (c != null) {
-            MavenSettingsConfig config;
-            if (c instanceof MavenSettingsConfig) {
-                config = (MavenSettingsConfig) c;
-            } else {
-                config = new MavenSettingsConfig(c.id, c.name, c.comment, c.content, MavenSettingsConfig.isReplaceAllDefault, null);
-            }
+        Queue.Executable currentExecutable = executor.getCurrentExecutable();
+        if (currentExecutable == null) {
+            throw new AbortException("Executor.currentExecutor().getCurrentExecutable() is NULL, probably not desired");
+        }
 
-            final Boolean isReplaceAll = config.getIsReplaceAll();
-            console.println("Using settings config with name " + config.name);
-            console.println("Replacing all maven server entries not found in credentials list is " + isReplaceAll);
-            if (StringUtils.isNotBlank(config.content)) {
-                try {
-                    String fileContent = config.content;
-
-                    final List<ServerCredentialMapping> serverCredentialMappings = config.getServerCredentialMappings();
-                    final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
-
-                    if (!resolvedCredentials.isEmpty()) {
-                        List<String> tempFiles = new ArrayList<String>();
-                        fileContent = CredentialsHelper.fillAuthentication(fileContent, isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
-                    }
-
-                    settingsFile.write(fileContent, getComputer().getDefaultCharset().name());
-                    LOGGER.log(Level.FINE, "Created config file {0}", new Object[] { settingsFile });
-                } catch (Exception e) {
-                    throw new IllegalStateException("the settings.xml could not be supplied for the current build: " + e.getMessage(), e);
-                }
-            } else {
-                throw new AbortException("Could not create Maven settings.xml config file id:" + settingsConfigId + ". Content of the file is empty");
-            }
-        } else {
+        Config c = ConfigFiles.getByIdOrNull((Run<?, ?>) currentExecutable, settingsConfigId);
+        if (c == null) {
             throw new AbortException("Could not find the Maven settings.xml config file id:" + settingsConfigId + ". Make sure it exists on Managed Files");
+        }
+        if (StringUtils.isBlank(c.content)) {
+            throw new AbortException("Could not create Maven settings.xml config file id:" + settingsConfigId + ". Content of the file is empty");
+        }
+
+        MavenSettingsConfig config;
+        if (c instanceof MavenSettingsConfig) {
+            config = (MavenSettingsConfig) c;
+        } else {
+            config = new MavenSettingsConfig(c.id, c.name, c.comment, c.content, MavenSettingsConfig.isReplaceAllDefault, null);
+        }
+
+        final Boolean isReplaceAll = config.getIsReplaceAll();
+        console.println("Using settings config with name " + config.name);
+        console.println("Replacing all maven server entries not found in credentials list is " + isReplaceAll);
+
+        try {
+            String fileContent = config.content;
+
+            final List<ServerCredentialMapping> serverCredentialMappings = config.getServerCredentialMappings();
+            final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
+
+            if (!resolvedCredentials.isEmpty()) {
+                List<String> tempFiles = new ArrayList<String>();
+                fileContent = CredentialsHelper.fillAuthentication(fileContent, isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
+            }
+
+            settingsFile.write(fileContent, getComputer().getDefaultCharset().name());
+            LOGGER.log(Level.FINE, "Created config file {0}", new Object[]{settingsFile});
+        } catch (Exception e) {
+            throw new IllegalStateException("the settings.xml could not be supplied for the current build: " + e.getMessage(), e);
         }
     }
 
