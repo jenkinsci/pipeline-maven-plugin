@@ -140,6 +140,11 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
         return false;
     }
 
+    @Override
+    public void onResume() {
+        // TODO JENKINS-39134 do not call: super.onResume();
+    }
+
     /**
      * Detects if this step is running inside <tt>docker.image()</tt>
      * 
