@@ -519,17 +519,7 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
      */
     private void settingsFromConfig(String settingsConfigId, FilePath settingsFile) throws AbortException {
 
-        Executor executor = Executor.currentExecutor();
-        if (executor == null) {
-            throw new AbortException("Executor.currentExecutor() is NULL, probably not desired");
-        }
-
-        Queue.Executable currentExecutable = executor.getCurrentExecutable();
-        if (currentExecutable == null) {
-            throw new AbortException("Executor.currentExecutor().getCurrentExecutable() is NULL, probably not desired");
-        }
-
-        Config c = ConfigFiles.getByIdOrNull((Run<?, ?>) currentExecutable, settingsConfigId);
+        Config c = ConfigFiles.getByIdOrNull(build, settingsConfigId);
         if (c == null) {
             throw new AbortException("Could not find the Maven settings.xml config file id:" + settingsConfigId + ". Make sure it exists on Managed Files");
         }
