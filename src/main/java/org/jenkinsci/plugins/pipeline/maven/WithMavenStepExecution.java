@@ -56,6 +56,7 @@ import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import hudson.AbortException;
 import hudson.EnvVars;
@@ -74,6 +75,7 @@ import hudson.util.ArgumentListBuilder;
 import jenkins.model.*;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 
+@SuppressFBWarnings(value="SE_TRANSIENT_FIELD_NOT_RESTORED", justification="Contextual fields used only in start(); no onResume needed")
 class WithMavenStepExecution extends StepExecution {
 
     private static final long serialVersionUID = 1L;
