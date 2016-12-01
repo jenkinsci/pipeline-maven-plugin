@@ -24,12 +24,12 @@
 
 package org.jenkinsci.plugins.pipeline.maven;
 
+import com.google.common.collect.ImmutableSet;
+import hudson.EnvVars;
 import org.jenkinsci.lib.configprovider.ConfigProvider;
 import org.jenkinsci.lib.configprovider.model.Config;
 import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig.GlobalMavenSettingsConfigProvider;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig.MavenSettingsConfigProvider;
-import org.jenkinsci.plugins.workflow.steps.AbstractStepDescriptorImpl;
-import org.jenkinsci.plugins.workflow.steps.AbstractStepImpl;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -37,20 +37,29 @@ import org.kohsuke.stapler.DataBoundSetter;
 
 import hudson.Extension;
 import hudson.ExtensionList;
+import hudson.FilePath;
+import hudson.Launcher;
 import hudson.model.JDK;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
 import hudson.util.ListBoxModel;
+import java.util.Set;
 import jenkins.model.Jenkins;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.mvn.SettingsProvider;
+import org.jenkinsci.plugins.workflow.steps.Step;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
+import org.jenkinsci.plugins.workflow.steps.StepExecution;
 
 /**
  * Configures maven environment to use within a pipeline job by calling <tt>sh mvn</tt> or <tt>bat mvn</tt>.
  * The selected maven installation will be configured and prepended to the path.
  *
  */
-public class WithMavenStep extends AbstractStepImpl {
+public class WithMavenStep extends Step {
 
 
     private String mavenSettingsConfig;
@@ -139,12 +148,13 @@ public class WithMavenStep extends AbstractStepImpl {
         this.mavenLocalRepo = mavenLocalRepo;
     }
 
-    @Extension
-    public static class DescriptorImpl extends AbstractStepDescriptorImpl {
+    @Override
+    public StepExecution start(StepContext context) throws Exception {
+        return new WithMavenStepExecution(context, this);
+    }
 
-        public DescriptorImpl() {
-            super(WithMavenStepExecution.class);
-        }
+    @Extension
+    public static class DescriptorImpl extends StepDescriptor {
 
         @Override
         public String getFunctionName() {
@@ -159,6 +169,11 @@ public class WithMavenStep extends AbstractStepImpl {
         @Override
         public boolean takesImplicitBlockArgument() {
             return true;
+        }
+
+        @Override
+        public Set<Class<?>> getRequiredContext() {
+            return ImmutableSet.of(TaskListener.class, FilePath.class, Launcher.class, EnvVars.class, Run.class);
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
