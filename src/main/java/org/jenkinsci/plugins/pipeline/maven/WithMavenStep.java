@@ -54,13 +54,13 @@ public class WithMavenStep extends AbstractStepImpl {
 
 
     private String mavenSettingsConfig;
-    private String mavenSettingsFilePath;
+    private String mavenSettingsFilePath = "";
     private String globalMavenSettingsConfig;
-    private String globalMavenSettingsFilePath;
+    private String globalMavenSettingsFilePath = "";
     private String maven;
-    private String mavenOpts;
+    private String mavenOpts = "";
     private String jdk;
-    private String mavenLocalRepo; 
+    private String mavenLocalRepo = "";
 
     @DataBoundConstructor
     public WithMavenStep() {
