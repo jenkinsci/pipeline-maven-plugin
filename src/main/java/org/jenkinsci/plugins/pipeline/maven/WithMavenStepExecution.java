@@ -50,16 +50,14 @@ import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
 import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
-import org.jenkinsci.plugins.workflow.steps.AbstractStepExecutionImpl;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
 import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
 import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
 import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
-import org.jenkinsci.plugins.workflow.steps.StepContextParameter;
 
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
-import com.google.inject.Inject;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import hudson.AbortException;
 import hudson.EnvVars;
@@ -76,8 +74,10 @@ import hudson.tasks.Maven.MavenInstallation;
 import hudson.tasks._maven.MavenConsoleAnnotator;
 import hudson.util.ArgumentListBuilder;
 import jenkins.model.*;
+import org.jenkinsci.plugins.workflow.steps.StepExecution;
 
-public class WithMavenStepExecution extends AbstractStepExecutionImpl {
+@SuppressFBWarnings(value="SE_TRANSIENT_FIELD_NOT_RESTORED", justification="Contextual fields used only in start(); no onResume needed")
+class WithMavenStepExecution extends StepExecution {
 
     private static final long serialVersionUID = 1L;
     private static final String MAVEN_HOME = "MAVEN_HOME";
@@ -86,19 +86,13 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
 
     private static final Logger LOGGER = Logger.getLogger(WithMavenStepExecution.class.getName());
 
-    @Inject(optional = true)
-    private transient WithMavenStep step;
-    @StepContextParameter
-    private transient TaskListener listener;
-    @StepContextParameter
-    private transient FilePath ws;
-    @StepContextParameter
-    private transient Launcher launcher;
-    @StepContextParameter
-    private transient EnvVars env;
+    private final transient WithMavenStep step;
+    private final transient TaskListener listener;
+    private final transient FilePath ws;
+    private final transient Launcher launcher;
+    private final transient EnvVars env;
     private transient EnvVars envOverride;
-    @StepContextParameter
-    private transient Run<?, ?> build;
+    private final transient Run<?, ?> build;
 
     private transient Computer computer;
     private transient FilePath tempBinDir;
@@ -110,6 +104,17 @@ public class WithMavenStepExecution extends AbstractStepExecutionImpl {
     private boolean withContainer;
 
     private transient PrintStream console;
+
+    WithMavenStepExecution(StepContext context, WithMavenStep step) throws Exception {
+        super(context);
+        this.step = step;
+        // Or just delete these fields and inline:
+        listener = context.get(TaskListener.class);
+        ws = context.get(FilePath.class);
+        launcher = context.get(Launcher.class);
+        env = context.get(EnvVars.class);
+        build = context.get(Run.class);
+    }
 
     @Override
     public boolean start() throws Exception {
