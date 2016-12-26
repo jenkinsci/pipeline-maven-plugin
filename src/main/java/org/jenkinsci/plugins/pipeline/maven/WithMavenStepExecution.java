@@ -41,12 +41,16 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
+import jenkins.mvn.GlobalMavenConfig;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.configprovider.model.Config;
 import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
+import org.jenkinsci.plugins.configfiles.maven.job.MvnSettingsProvider;
 import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
 import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
@@ -55,7 +59,6 @@ import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
 import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
-import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import hudson.AbortException;
@@ -445,35 +448,48 @@ class WithMavenStepExecution extends StepExecution {
      * @throws InterruptedException when processing remote calls
      * @throws IOException when reading files
      */
+    @CheckForNull
     private String setupSettingFile() throws IOException, InterruptedException {
         final FilePath settingsDest = tempBinDir.child("settings.xml");
 
         // Settings from Config File Provider
-        if (!StringUtils.isEmpty(step.getMavenSettingsConfig())) {
+        if (StringUtils.isNotEmpty(step.getMavenSettingsConfig())) {
             settingsFromConfig(step.getMavenSettingsConfig(), settingsDest);
-            envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
-            return settingsDest.getRemote();
-        } else if (!StringUtils.isEmpty(step.getMavenSettingsFilePath())) {
-            String settingsPath = envOverride.expand(env.expand(step.getMavenSettingsFilePath()));
-            FilePath settings;
-            console.println("Setting up settings file " + settingsPath);
-            // file from agent
-            if ((settings = new FilePath(ws.getChannel(), settingsPath)).exists()) {
-                console.format("Using settings from: %s on build agent%n", settingsPath);
-                LOGGER.log(Level.FINE, "Copying file from build agent {0} to {1}", new Object[] { settings, settingsDest });
-                settings.copyTo(settingsDest);
-            } else if ((settings = new FilePath(new File(settingsPath))).exists()) { // File from the master
-                console.format("Using settings from: %s on master%n", settingsPath);
-                LOGGER.log(Level.FINE, "Copying file from master to build agent {0} to {1}", new Object[] { settings, settingsDest });
-                settings.copyTo(settingsDest);
-            } else {
-                throw new AbortException("Could not find file '" + settingsPath + "' on the build agent nor the master");
-            }
+            console.format("Using Maven settings.xml provided by the Jenkins Config File provider %s copied as %s%n", step.getMavenSettingsConfig(), settingsDest);
             envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         }
-        return null;
-    }    /**
+
+        // settings provided by the file path
+        if (StringUtils.isNotEmpty(step.getMavenSettingsFilePath())) {
+            String settingsPathAsString = envOverride.expand(env.expand(step.getMavenSettingsFilePath()));
+            FilePath settingsPath;
+            // file from agent
+            if ((settingsPath = new FilePath(ws.getChannel(), settingsPathAsString)).exists()) { // File from agent
+                console.format("Using Maven settings.xml from build agent %s copied as %s%n", settingsPath, settingsDest);
+            } else if ((settingsPath = new FilePath(new File(settingsPathAsString))).exists()) { // File from the master
+                console.format("Using Maven settings.xml from build master %s copied as %s%n", settingsPath, settingsDest);
+            } else {
+                throw new AbortException("Could not find file '" + settingsPathAsString + "' on the build agent nor the master");
+            }
+            settingsPath.copyTo(settingsDest);
+            envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
+            return settingsDest.getRemote();
+        }
+
+        // settings provided by the global maven configuration
+        FilePath settings = GlobalMavenConfig.get().getSettingsProvider().supplySettings(this.build, this.ws, this.listener);
+        if (settings == null) {
+            return null;
+        } else {
+            console.format("Using Maven settings.xml provided by Jenkins Global configuration %s copied as %s%n", settings, settingsDest);
+            settings.copyTo(settingsDest);
+            envOverride.put("MVN_SETTINGS", settings.getRemote());
+            return settingsDest.getRemote();
+        }
+    }
+
+    /**
      * Obtains the selected global setting file, and initializes GLOBAL_MVN_SETTINGS When the selected file is an absolute path, the
      * file existence is checked on the build agent, if not found, it will be checked and copied from the master. The
      * file will be generated/copied to the workspace temp folder to make sure docker container can access it.
@@ -483,25 +499,25 @@ class WithMavenStepExecution extends StepExecution {
      * @throws IOException when reading files
      */
     private String setupGlobalSettingFile() throws IOException, InterruptedException {
-        final FilePath settingsDest = tempBinDir.child("globalSettings.xml");
+        final FilePath settingsDest = tempBinDir.child("settings.xml");
 
         // Settings from Config File Provider
-        if (!StringUtils.isEmpty(step.getGlobalMavenSettingsConfig())) {
+        if (StringUtils.isNotEmpty(step.getGlobalMavenSettingsConfig())) {
             globalSettingsFromConfig(step.getGlobalMavenSettingsConfig(), settingsDest);
+            console.format("Using Maven global settings.xml provided by the Jenkins Config File provider %s copied as %s%n", step.getGlobalMavenSettingsConfig(), settingsDest);
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
-        } else if (!StringUtils.isEmpty(step.getGlobalMavenSettingsFilePath())) {
+        }
+
+        if (StringUtils.isNotEmpty(step.getGlobalMavenSettingsFilePath())) {
             String settingsPath = envOverride.expand(env.expand(step.getGlobalMavenSettingsFilePath()));
             FilePath settings;
-            console.println("Setting up global settings file " + settingsPath);
             // file from agent
             if ((settings = new FilePath(ws.getChannel(), settingsPath)).exists()) {
-                console.format("Using global settings from: %s on build agent%n", settingsPath);
-                LOGGER.log(Level.FINE, "Copying file from build agent {0} to {1}", new Object[] { settings, settingsDest });
+                console.format("Using Maven global settings.xml from build agent %s copied as %s%n", settingsPath, settingsDest);
                 settings.copyTo(settingsDest);
             } else if ((settings = new FilePath(new File(settingsPath))).exists()) { // File from the master
-                console.format("Using global settings from: %s on master%n", settingsPath);
-                LOGGER.log(Level.FINE, "Copying file from master to build agent {0} to {1}", new Object[] { settings, settingsDest });
+                console.format("Using Maven global settings.xml from build master %s copied as %s%n", settingsPath, settingsDest);
                 settings.copyTo(settingsDest);
             } else {
                 throw new AbortException("Could not find file '" + settingsPath + "' on the build agent nor the master");
@@ -509,7 +525,16 @@ class WithMavenStepExecution extends StepExecution {
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         }
-        return null;
+
+        // global settings provided by the global maven configuration
+        FilePath settings = GlobalMavenConfig.get().getGlobalSettingsProvider().supplySettings(this.build, this.ws, this.listener);
+        if (settings == null) {
+            return null;
+        } else {
+            envOverride.put("GLOBAL_MVN_SETTINGS", settings.getRemote());
+            console.format("Using Maven global settings.xml provided by Jenkins Global configuration %s copied as %s%n", settings, settingsDest);
+            return settings.getRemote();
+        }
     }
 
     /**
