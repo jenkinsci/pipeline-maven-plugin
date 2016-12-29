@@ -45,6 +45,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.configprovider.model.Config;
+import org.jenkinsci.plugins.configfiles.ConfigFiles;
 import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
@@ -522,40 +523,41 @@ class WithMavenStepExecution extends StepExecution {
      * @throws AbortException in case of error
      */
     private void settingsFromConfig(String settingsConfigId, FilePath settingsFile) throws AbortException {
-        Config c = Config.getByIdOrNull(settingsConfigId);
-        if (c != null) {
-            MavenSettingsConfig config;
-            if (c instanceof MavenSettingsConfig) {
-                config = (MavenSettingsConfig) c;
-            } else {
-                config = new MavenSettingsConfig(c.id, c.name, c.comment, c.content, MavenSettingsConfig.isReplaceAllDefault, null);
-            }
 
-            final Boolean isReplaceAll = config.getIsReplaceAll();
-            console.println("Using settings config with name " + config.name);
-            console.println("Replacing all maven server entries not found in credentials list is " + isReplaceAll);
-            if (StringUtils.isNotBlank(config.content)) {
-                try {
-                    String fileContent = config.content;
-
-                    final List<ServerCredentialMapping> serverCredentialMappings = config.getServerCredentialMappings();
-                    final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
-
-                    if (!resolvedCredentials.isEmpty()) {
-                        List<String> tempFiles = new ArrayList<String>();
-                        fileContent = CredentialsHelper.fillAuthentication(fileContent, isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
-                    }
-
-                    settingsFile.write(fileContent, getComputer().getDefaultCharset().name());
-                    LOGGER.log(Level.FINE, "Created config file {0}", new Object[] { settingsFile });
-                } catch (Exception e) {
-                    throw new IllegalStateException("the settings.xml could not be supplied for the current build: " + e.getMessage(), e);
-                }
-            } else {
-                throw new AbortException("Could not create Maven settings.xml config file id:" + settingsConfigId + ". Content of the file is empty");
-            }
-        } else {
+        Config c = ConfigFiles.getByIdOrNull(build, settingsConfigId);
+        if (c == null) {
             throw new AbortException("Could not find the Maven settings.xml config file id:" + settingsConfigId + ". Make sure it exists on Managed Files");
+        }
+        if (StringUtils.isBlank(c.content)) {
+            throw new AbortException("Could not create Maven settings.xml config file id:" + settingsConfigId + ". Content of the file is empty");
+        }
+
+        MavenSettingsConfig config;
+        if (c instanceof MavenSettingsConfig) {
+            config = (MavenSettingsConfig) c;
+        } else {
+            config = new MavenSettingsConfig(c.id, c.name, c.comment, c.content, MavenSettingsConfig.isReplaceAllDefault, null);
+        }
+
+        final Boolean isReplaceAll = config.getIsReplaceAll();
+        console.println("Using settings config with name " + config.name);
+        console.println("Replacing all maven server entries not found in credentials list is " + isReplaceAll);
+
+        try {
+            String fileContent = config.content;
+
+            final List<ServerCredentialMapping> serverCredentialMappings = config.getServerCredentialMappings();
+            final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
+
+            if (!resolvedCredentials.isEmpty()) {
+                List<String> tempFiles = new ArrayList<String>();
+                fileContent = CredentialsHelper.fillAuthentication(fileContent, isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
+            }
+
+            settingsFile.write(fileContent, getComputer().getDefaultCharset().name());
+            LOGGER.log(Level.FINE, "Created config file {0}", new Object[]{settingsFile});
+        } catch (Exception e) {
+            throw new IllegalStateException("the settings.xml could not be supplied for the current build: " + e.getMessage(), e);
         }
     }
 
@@ -569,40 +571,40 @@ class WithMavenStepExecution extends StepExecution {
      * @throws AbortException in case of error
      */
     private void globalSettingsFromConfig(String globalSettingsConfigId, FilePath globalSettingsFile) throws AbortException {
-        Config c = Config.getByIdOrNull(globalSettingsConfigId);
-        if (c != null) {
-            GlobalMavenSettingsConfig config;
-            if (c instanceof GlobalMavenSettingsConfig) {
-                config = (GlobalMavenSettingsConfig) c;
-            } else {
-                config = new GlobalMavenSettingsConfig(c.id, c.name, c.comment, c.content, MavenSettingsConfig.isReplaceAllDefault, null);
-            }
 
-            final Boolean isReplaceAll = config.getIsReplaceAll();
-            console.println("Using global settings config with name " + config.name);
-            console.println("Replacing all maven server entries not found in credentials list is " + isReplaceAll);
-            if (StringUtils.isNotBlank(config.content)) {
-                try {
-                    String fileContent = config.content;
+        Config c = ConfigFiles.getByIdOrNull(build, globalSettingsConfigId);
+        if (c == null) {
+            throw new AbortException("Could not find the Maven global settings.xml config file id:" + globalSettingsFile + ". Make sure it exists on Managed Files");
+        }
+        if (StringUtils.isBlank(c.content)) {
+            throw new AbortException("Could not create Maven global settings.xml config file id:" + globalSettingsFile + ". Content of the file is empty");
+        }
 
-                    final List<ServerCredentialMapping> serverCredentialMappings = config.getServerCredentialMappings();
-                    final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
-
-                    if (!resolvedCredentials.isEmpty()) {
-                        List<String> tempFiles = new ArrayList<String>();
-                        fileContent = CredentialsHelper.fillAuthentication(fileContent, isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
-                    }
-
-                    globalSettingsFile.write(fileContent, getComputer().getDefaultCharset().name());
-                    LOGGER.log(Level.FINE, "Created global config file {0}", new Object[] { globalSettingsFile });
-                } catch (Exception e) {
-                    throw new IllegalStateException("the globalSettings.xml could not be supplied for the current build: " + e.getMessage(), e);
-                }
-            } else {
-                throw new AbortException("Could not create Global Maven settings.xml config file id:" + globalSettingsConfigId + ". Content of the file is empty");
-            }
+        GlobalMavenSettingsConfig config;
+        if (c instanceof GlobalMavenSettingsConfig) {
+            config = (GlobalMavenSettingsConfig) c;
         } else {
-            throw new AbortException("Could not find the Global Maven settings.xml config file id:" + globalSettingsConfigId + ". Make sure it exists on Managed Files");
+            config = new GlobalMavenSettingsConfig(c.id, c.name, c.comment, c.content, MavenSettingsConfig.isReplaceAllDefault, null);
+        }
+
+        final Boolean isReplaceAll = config.getIsReplaceAll();
+        console.println("Using global settings config with name " + config.name);
+        console.println("Replacing all maven server entries not found in credentials list is " + isReplaceAll);
+        try {
+            String fileContent = config.content;
+
+            final List<ServerCredentialMapping> serverCredentialMappings = config.getServerCredentialMappings();
+            final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
+
+            if (!resolvedCredentials.isEmpty()) {
+                List<String> tempFiles = new ArrayList<String>();
+                fileContent = CredentialsHelper.fillAuthentication(fileContent, isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
+            }
+
+            globalSettingsFile.write(fileContent, getComputer().getDefaultCharset().name());
+            LOGGER.log(Level.FINE, "Created global config file {0}", new Object[]{globalSettingsFile});
+        } catch (Exception e) {
+            throw new IllegalStateException("the globalSettings.xml could not be supplied for the current build: " + e.getMessage(), e);
         }
     }
 

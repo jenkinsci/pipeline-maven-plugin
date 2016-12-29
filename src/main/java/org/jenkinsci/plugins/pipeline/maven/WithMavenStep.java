@@ -26,12 +26,15 @@ package org.jenkinsci.plugins.pipeline.maven;
 
 import com.google.common.collect.ImmutableSet;
 import hudson.EnvVars;
+import hudson.model.ItemGroup;
 import org.jenkinsci.lib.configprovider.ConfigProvider;
 import org.jenkinsci.lib.configprovider.model.Config;
+import org.jenkinsci.plugins.configfiles.ConfigFiles;
 import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig.GlobalMavenSettingsConfigProvider;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig.MavenSettingsConfigProvider;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
@@ -210,27 +213,21 @@ public class WithMavenStep extends Step {
         }
         
         @Restricted(NoExternalUse.class) // Only for UI calls
-        public ListBoxModel doFillMavenSettingsConfigItems() {
-            ExtensionList<MavenSettingsConfigProvider> providers = Jenkins.getActiveInstance().getExtensionList(MavenSettingsConfigProvider.class);
+        public ListBoxModel doFillMavenSettingsConfigItems(@AncestorInPath ItemGroup context) {
             ListBoxModel r = new ListBoxModel();
             r.add("--- Use system default settings or file path ---",null);
-            for (ConfigProvider provider : providers) {
-                for(Config config:provider.getAllConfigs()){
-                    r.add(config.name, config.id);
-                }
+            for (Config config : ConfigFiles.getConfigsInContext(context, MavenSettingsConfigProvider.class)) {
+                r.add(config.name, config.id);
             }
             return r;
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
-        public ListBoxModel doFillGlobalMavenSettingsConfigItems() {
-            ExtensionList<GlobalMavenSettingsConfigProvider> providers = Jenkins.getActiveInstance().getExtensionList(GlobalMavenSettingsConfigProvider.class);
+        public ListBoxModel doFillGlobalMavenSettingsConfigItems(@AncestorInPath ItemGroup context) {
             ListBoxModel r = new ListBoxModel();
             r.add("--- Use system default settings or file path ---",null);
-            for (ConfigProvider provider : providers) {
-                for(Config config:provider.getAllConfigs()){
-                    r.add(config.name, config.id);
-                }
+            for (Config config : ConfigFiles.getConfigsInContext(context, GlobalMavenSettingsConfigProvider.class)) {
+                r.add(config.name, config.id);
             }
             return r;
         }
