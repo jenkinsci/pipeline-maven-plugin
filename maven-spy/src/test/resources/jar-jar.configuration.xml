@@ -1,0 +1,18 @@
+<configuration>
+    <archive>
+        <manifest>
+            <mainClass>${start-class}</mainClass>
+            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+        </manifest>
+    </archive>
+    <classesDirectory default-value="${project.build.outputDirectory}"/>
+    <classifier default-value="">${maven.jar.classifier}</classifier>
+    <defaultManifestFile default-value="${project.build.outputDirectory}/META-INF/MANIFEST.MF"/>
+    <finalName default-value="${project.build.finalName}">${jar.finalName}</finalName>
+    <forceCreation default-value="false">${jar.forceCreation}</forceCreation>
+    <outputDirectory default-value="${project.build.directory}"/>
+    <project default-value="${project}"/>
+    <session default-value="${session}"/>
+    <skipIfEmpty default-value="false">${jar.skipIfEmpty}</skipIfEmpty>
+    <useDefaultManifestFile default-value="false">${jar.useDefaultManifestFile}</useDefaultManifestFile>
+</configuration>

@@ -1,0 +1,69 @@
+<configuration>
+    <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
+    <argLine>${argLine}</argLine>
+    <basedir default-value="${basedir}"/>
+    <childDelegation default-value="false">${childDelegation}</childDelegation>
+    <classesDirectory default-value="${project.build.outputDirectory}"/>
+    <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
+    <debugForkedProcess>${maven.surefire.debug}</debugForkedProcess>
+    <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
+    <disableXmlReport default-value="false">${disableXmlReport}</disableXmlReport>
+    <enableAssertions default-value="true">${enableAssertions}</enableAssertions>
+    <excludedGroups>${excludedGroups}</excludedGroups>
+    <excludes>
+        <exclude>**/Abstract*.java</exclude>
+    </excludes>
+    <failIfNoSpecifiedTests>${surefire.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
+    <failIfNoTests>${failIfNoTests}</failIfNoTests>
+    <forkCount default-value="1">${forkCount}</forkCount>
+    <forkMode default-value="once">${forkMode}</forkMode>
+    <forkedProcessTimeoutInSeconds>${surefire.timeout}</forkedProcessTimeoutInSeconds>
+    <groups>${groups}</groups>
+    <includes>
+        <include>**/*Tests.java</include>
+        <include>**/*Test.java</include>
+    </includes>
+    <junitArtifactName default-value="junit:junit">${junitArtifactName}</junitArtifactName>
+    <jvm>${jvm}</jvm>
+    <localRepository default-value="${localRepository}"/>
+    <objectFactory>${objectFactory}</objectFactory>
+    <parallel>${parallel}</parallel>
+    <parallelMavenExecution default-value="${session.parallel}"/>
+    <parallelOptimized default-value="true">${parallelOptimized}</parallelOptimized>
+    <parallelTestsTimeoutForcedInSeconds>${surefire.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
+    <parallelTestsTimeoutInSeconds>${surefire.parallel.timeout}</parallelTestsTimeoutInSeconds>
+    <perCoreThreadCount default-value="true">${perCoreThreadCount}</perCoreThreadCount>
+    <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
+    <pluginDescriptor default-value="${plugin}"/>
+    <printSummary default-value="true">${surefire.printSummary}</printSummary>
+    <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
+    <redirectTestOutputToFile default-value="false">${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+    <remoteRepositories default-value="${project.pluginArtifactRepositories}"/>
+    <reportFormat default-value="brief">${surefire.reportFormat}</reportFormat>
+    <reportNameSuffix default-value="">${surefire.reportNameSuffix}</reportNameSuffix>
+    <reportsDirectory default-value="${project.build.directory}/surefire-reports"/>
+    <rerunFailingTestsCount default-value="0">${surefire.rerunFailingTestsCount}</rerunFailingTestsCount>
+    <reuseForks default-value="true">${reuseForks}</reuseForks>
+    <runOrder default-value="filesystem">${surefire.runOrder}</runOrder>
+    <skip default-value="false">${maven.test.skip}</skip>
+    <skipExec>${maven.test.skip.exec}</skipExec>
+    <skipTests default-value="false">${skipTests}</skipTests>
+    <suiteXmlFiles>${surefire.suiteXmlFiles}</suiteXmlFiles>
+    <test>${test}</test>
+    <testClassesDirectory default-value="${project.build.testOutputDirectory}"/>
+    <testFailureIgnore default-value="false">${maven.test.failure.ignore}</testFailureIgnore>
+    <testNGArtifactName default-value="org.testng:testng">${testNGArtifactName}</testNGArtifactName>
+    <testSourceDirectory default-value="${project.build.testSourceDirectory}"/>
+    <threadCount>${threadCount}</threadCount>
+    <threadCountClasses default-value="0">${threadCountClasses}</threadCountClasses>
+    <threadCountMethods default-value="0">${threadCountMethods}</threadCountMethods>
+    <threadCountSuites default-value="0">${threadCountSuites}</threadCountSuites>
+    <trimStackTrace default-value="true">${trimStackTrace}</trimStackTrace>
+    <useFile default-value="true">${surefire.useFile}</useFile>
+    <useManifestOnlyJar default-value="true">${surefire.useManifestOnlyJar}</useManifestOnlyJar>
+    <useSystemClassLoader default-value="true">${surefire.useSystemClassLoader}</useSystemClassLoader>
+    <useUnlimitedThreads default-value="false">${useUnlimitedThreads}</useUnlimitedThreads>
+    <workingDirectory>${basedir}</workingDirectory>
+    <project default-value="${project}"/>
+    <session default-value="${session}"/>
+</configuration>

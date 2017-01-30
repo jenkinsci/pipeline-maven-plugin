@@ -1,0 +1,320 @@
+JenkinsMavenEventSpy v3 1485438815486ms -  init
+JenkinsMavenEventSpy v3 1485438815486ms - context: org.apache.maven.cli.event.DefaultEventSpyContext@36b4091c
+JenkinsMavenEventSpy v3 1485438815487ms - context.data: {systemProperties={java.vendor=Oracle Corporation, sun.java.launcher=SUN_STANDARD, env.XPC_SERVICE_NAME=0, sun.management.compiler=HotSpot 64-Bit Tiered Compilers, env.SECURITYSESSIONID=186a7, env.COLORFGBG=15;0, os.name=Mac OS X, env.PYTHONPATH=/opt/graphite/lib/:, sun.boot.class.path=/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/resources.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/rt.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/sunrsasign.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/jsse.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/jce.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/charsets.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/jfr.jar:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/classes, env.TMPDIR=/var/folders/j7/tm8vqlwj3lx6vbcld3wwcf940000gn/T/, env.GRAPHITE_ROOT=/opt/graphite/, env.SPRINGBOOT_HOME=/Users/cleclerc/.sdkman/candidates/springboot/current, env.PWD=/Users/cleclerc/git/spring-source/spring-petclinic, user.country.format=FR, env.SDKMAN_LEGACY_API=https://api.sdkman.io/1, env.LANG=en_US.UTF-8, java.vm.specification.vendor=Oracle Corporation, java.runtime.version=1.8.0_111-b14, env.Apple_PubSub_Socket_Render=/private/tmp/com.apple.launchd.qhuOxnJSf4/Render, env.DISPLAY=/private/tmp/com.apple.launchd.bpeSVB3CuO/org.macosforge.xquartz:0, user.name=cleclerc, maven.build.version=Apache Maven 3.3.9 (bb52d8502b132ec0a5a3f4c09453c07478323dc5; 2015-11-10T17:41:47+01:00), env.USER=cleclerc, env.SHELL=/bin/bash, env.__CF_USER_TEXT_ENCODING=0x1F5:0x0:0x0, env.PATH=/Users/cleclerc/.sdkman/candidates/springboot/current/bin:/usr/local/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/bin:/Users/cleclerc/.rbenv/shims:/Users/cleclerc/.rbenv/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/bin:/Users/cleclerc/bin:/usr/local/sbin:/usr/local/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin:/usr/local/go/bin:/usr/local/MacGPG2/bin:/Library/Frameworks/Mono.framework/Versions/Current/Commands, user.language=en, sun.boot.library.path=/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib, classworlds.conf=/usr/local/Cellar/maven/3.3.9/libexec/bin/m2.conf, env.XPC_FLAGS=0x0, env.LC_CTYPE=UTF-8, java.version=1.8.0_111, user.timezone=, sun.arch.data.model=64, http.nonProxyHosts=local|*.local|169.254/16|*.169.254/16, java.endorsed.dirs=/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/endorsed, sun.cpu.isalist=, sun.jnu.encoding=UTF-8, env.ITERM_SESSION_ID=w0t0p1:FA899FB5-0CE3-4A23-BC49-042F8C3B432C, file.encoding.pkg=sun.io, env.SHLVL=1, file.separator=/, java.specification.name=Java Platform API Specification, java.class.version=52.0, user.country=US, java.home=/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre, java.vm.info=mixed mode, os.version=10.12.2, env.LOGNAME=cleclerc, env.TERM_PROGRAM_VERSION=3.0.13, path.separator=:, java.vm.version=25.111-b14, maven.ext.class.path=/Users/cleclerc/.m2/repository/org/jenkins-ci/plugins/pipeline-maven-spy/0.6-SNAPSHOT/pipeline-maven-spy-0.6-SNAPSHOT.jar, env.JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home, java.awt.printerjob=sun.lwawt.macosx.CPrinterJob, env.TERM=xterm, sun.io.unicode.encoding=UnicodeBig, awt.toolkit=sun.lwawt.macosx.LWCToolkit, socksNonProxyHosts=local|*.local|169.254/16|*.169.254/16, ftp.nonProxyHosts=local|*.local|169.254/16|*.169.254/16, env.SDKMAN_PLATFORM=Darwin, env.ITERM_PREV_PS1=\[]133;D;$?]1337;RemoteHost=cleclerc@localhost]1337;CurrentDir=/Users/cleclerc/git/spring-source/spring-petclinic]133;A\]\h \W\[\033[32m\]$(parse_git_branch)\[\033[00m\] $ \[]133;B\], env.SDKMAN_DIR=/Users/cleclerc/.sdkman, user.home=/Users/cleclerc, env.ITERM_ORIG_PS1=\h \W\[\033[32m\]$(parse_git_branch)\[\033[00m\] $ , env.OLDPWD=/Users/cleclerc/git/spring-source/spring-petclinic, java.specification.vendor=Oracle Corporation, env.TERM_PROGRAM=iTerm.app, java.library.path=/Users/cleclerc/Library/Java/Extensions:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java:., java.vendor.url=http://java.oracle.com/, env.SDKMAN_CURRENT_API=https://api.sdkman.io/2, env.MAVEN_CMD_LINE_ARGS= -Dmaven.ext.class.path=/Users/cleclerc/.m2/repository/org/jenkins-ci/plugins/pipeline-maven-spy/0.6-SNAPSHOT/pipeline-maven-spy-0.6-SNAPSHOT.jar clean package, java.vm.vendor=Oracle Corporation, gopherProxySet=false, maven.home=/usr/local/Cellar/maven/3.3.9/libexec, java.runtime.name=Java(TM) SE Runtime Environment, sun.java.command=org.codehaus.plexus.classworlds.launcher.Launcher -Dmaven.ext.class.path=/Users/cleclerc/.m2/repository/org/jenkins-ci/plugins/pipeline-maven-spy/0.6-SNAPSHOT/pipeline-maven-spy-0.6-SNAPSHOT.jar clean package, java.class.path=/usr/local/Cellar/maven/3.3.9/libexec/boot/plexus-classworlds-2.5.2.jar, env.TERM_SESSION_ID=w0t0p1:FA899FB5-0CE3-4A23-BC49-042F8C3B432C, maven.version=3.3.9, java.vm.specification.name=Java Virtual Machine Specification, env.RBENV_SHELL=bash, java.vm.specification.version=1.8, sun.cpu.endian=little, sun.os.patch.level=unknown, env.HOME=/Users/cleclerc, java.io.tmpdir=/var/folders/j7/tm8vqlwj3lx6vbcld3wwcf940000gn/T/, java.vendor.url.bug=http://bugreport.sun.com/bugreport/, env.SDKMAN_CANDIDATES_DIR=/Users/cleclerc/.sdkman/candidates, maven.multiModuleProjectDirectory=/Users/cleclerc/git/spring-source/spring-petclinic, env.JAVA_MAIN_CLASS_56973=org.codehaus.plexus.classworlds.launcher.Launcher, env.SSH_AUTH_SOCK=/private/tmp/com.apple.launchd.YGU6Ddhse4/Listeners, env.COMMAND_MODE=unix2003, os.arch=x86_64, java.awt.graphicsenv=sun.awt.CGraphicsEnvironment, java.ext.dirs=/Users/cleclerc/Library/Java/Extensions:/Library/Java/JavaVirtualMachines/jdk1.8.0_111.jdk/Contents/Home/jre/lib/ext:/Library/Java/Extensions:/Network/Library/Java/Extensions:/System/Library/Java/Extensions:/usr/lib/java, user.dir=/Users/cleclerc/git/spring-source/spring-petclinic, env.SDKMAN_VERSION=5.3.0+159, env.LC_ALL=en_US.UTF-8, line.separator=
+, java.vm.name=Java HotSpot(TM) 64-Bit Server VM, env.ITERM_PROFILE=Default, file.encoding=UTF-8, java.specification.version=1.8, env.MAVEN_PROJECTBASEDIR=/Users/cleclerc/git/spring-source/spring-petclinic}, versionProperties={version=3.3.9, buildNumber=bb52d8502b132ec0a5a3f4c09453c07478323dc5, distributionId=apache-maven, timestamp=1447173707273, distributionName=Apache Maven, distributionShortName=Maven}, workingDirectory=/Users/cleclerc/git/spring-source/spring-petclinic, userProperties={maven.ext.class.path=/Users/cleclerc/.m2/repository/org/jenkins-ci/plugins/pipeline-maven-spy/0.6-SNAPSHOT/pipeline-maven-spy-0.6-SNAPSHOT.jar}, plexus=org.codehaus.plexus.DefaultPlexusContainer@7674b62c}
+JenkinsMavenEventSpy v3 1485438815487ms - new File(.): /Users/cleclerc/git/spring-source/spring-petclinic/.
+JenkinsMavenEventSpy v3 1485438815626ms - UNKNOWN type:class org.apache.maven.settings.building.DefaultSettingsBuildingRequest, toString(): org.apache.maven.settings.building.DefaultSettingsBuildingRequest@7cf6a5f9
+JenkinsMavenEventSpy v3 1485438815659ms - UNKNOWN type:class org.apache.maven.settings.building.DefaultSettingsBuildingResult, toString(): org.apache.maven.settings.building.DefaultSettingsBuildingResult@69653e16
+JenkinsMavenEventSpy v3 1485438815662ms - UNKNOWN type:class org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest, toString(): org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest@57abad67
+JenkinsMavenEventSpy v3 1485438815670ms - MavenExecutionRequest(class org.apache.maven.execution.DefaultMavenExecutionRequest, org.apache.maven.execution.DefaultMavenExecutionRequest@2cc44ad)
+JenkinsMavenEventSpy v3 1485438815967ms - executionEvent: ProjectDiscoveryStarted - org.apache.maven.lifecycle.internal.DefaultExecutionEvent@546ccad7
+JenkinsMavenEventSpy v3 1485438815997ms - UNKNOWN type:class org.eclipse.aether.RepositoryEvent, toString(): ARTIFACT_RESOLVING org.springframework.boot:spring-boot-starter-parent:pom:1.4.2.RELEASE
+JenkinsMavenEventSpy v3 1485438816286ms - executionEvent: ProjectStarted - petclinic
+JenkinsMavenEventSpy v3 1485438816514ms - UNKNOWN type:class org.apache.maven.project.DefaultDependencyResolutionRequest, toString(): org.apache.maven.project.DefaultDependencyResolutionRequest@2fab4aff
+JenkinsMavenEventSpy v3 1485438817035ms - UNKNOWN type:class org.apache.maven.project.DefaultDependencyResolutionResult, toString(): org.apache.maven.project.DefaultDependencyResolutionResult@2f40a43
+JenkinsMavenEventSpy v3 1485438817039ms - executionEvent: MojoStarted - org.apache.maven.plugins:maven-clean-plugin:clean@default-clean
+JenkinsMavenEventSpy v3 1485438817191ms - executionEvent: MojoSucceeded - org.apache.maven.plugins:maven-clean-plugin:clean@default-clean <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <directory default-value="${project.build.directory}"/>
+  <excludeDefaultDirectories default-value="false">${clean.excludeDefaultDirectories}</excludeDefaultDirectories>
+  <failOnError default-value="true">${maven.clean.failOnError}</failOnError>
+  <followSymLinks default-value="false">${clean.followSymLinks}</followSymLinks>
+  <outputDirectory default-value="${project.build.outputDirectory}"/>
+  <reportDirectory default-value="${project.build.outputDirectory}"/>
+  <retryOnError default-value="true">${maven.clean.retryOnError}</retryOnError>
+  <skip default-value="false">${clean.skip}</skip>
+  <testOutputDirectory default-value="${project.build.testOutputDirectory}"/>
+  <verbose>${clean.verbose}</verbose>
+</configuration>
+JenkinsMavenEventSpy v3 1485438817192ms - executionEvent: MojoStarted - org.codehaus.mojo:cobertura-maven-plugin:clean@default
+JenkinsMavenEventSpy v3 1485438817665ms - executionEvent: MojoSucceeded - org.codehaus.mojo:cobertura-maven-plugin:clean@default <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <dataFile default-value="${project.build.directory}/cobertura/cobertura.ser">${cobertura.datafile}</dataFile>
+  <forceMojoExecution default-value="false">${cobertura.force}</forceMojoExecution>
+  <maxmem default-value="64m">${cobertura.maxmem}</maxmem>
+  <mojoExecution default-value="${mojoExecution}"/>
+  <pluginClasspathList default-value="${plugin.artifacts}"/>
+  <project default-value="${project}"/>
+  <quiet default-value="false">${quiet}</quiet>
+  <skip default-value="false">${cobertura.skip}</skip>
+</configuration>
+JenkinsMavenEventSpy v3 1485438817667ms - executionEvent: MojoStarted - pl.project13.maven:git-commit-id-plugin:revision@default
+JenkinsMavenEventSpy v3 1485438818363ms - executionEvent: MojoSucceeded - pl.project13.maven:git-commit-id-plugin:revision@default <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <abbrevLength default-value="7"/>
+  <dateFormat default-value="dd.MM.yyyy &apos;@&apos; HH:mm:ss z">yyyy-MM-dd&apos;T&apos;HH:mm:ssZ</dateFormat>
+  <dotGitDirectory default-value="${project.basedir}/.git"/>
+  <failOnNoGitDirectory default-value="true"/>
+  <failOnUnableToExtractRepoInfo default-value="true"/>
+  <format default-value="properties"/>
+  <generateGitPropertiesFile default-value="false">true</generateGitPropertiesFile>
+  <generateGitPropertiesFilename default-value="${project.build.outputDirectory}/git.properties">/Users/cleclerc/git/spring-source/spring-petclinic/target/classes/git.properties</generateGitPropertiesFilename>
+  <injectAllReactorProjects default-value="true"/>
+  <prefix default-value="git"/>
+  <project>${project}</project>
+  <reactorProjects>${reactorProjects}</reactorProjects>
+  <skip default-value="false"/>
+  <skipPoms default-value="true"/>
+  <useNativeGit default-value="false"/>
+  <verbose default-value="false">true</verbose>
+</configuration>
+JenkinsMavenEventSpy v3 1485438818363ms - executionEvent: MojoStarted - org.springframework.boot:spring-boot-maven-plugin:build-info@default
+JenkinsMavenEventSpy v3 1485438818887ms - executionEvent: MojoSucceeded - org.springframework.boot:spring-boot-maven-plugin:build-info@default <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <additionalProperties>
+    <encoding.source>UTF-8</encoding.source>
+    <encoding.reporting>UTF-8</encoding.reporting>
+    <java.source>1.8</java.source>
+    <java.target>1.8</java.target>
+  </additionalProperties>
+  <outputFile default-value="${project.build.outputDirectory}/META-INF/build-info.properties"/>
+  <project default-value="${project}"/>
+</configuration>
+JenkinsMavenEventSpy v3 1485438818888ms - executionEvent: MojoStarted - ro.isdc.wro4j:wro4j-maven-plugin:run@default
+JenkinsMavenEventSpy v3 1485438824948ms - executionEvent: MojoSucceeded - ro.isdc.wro4j:wro4j-maven-plugin:run@default <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <buildDirectory default-value="${project.build.directory}"/>
+  <buildFinalName default-value="${project.build.directory}/${project.build.finalName}"/>
+  <contextFolder default-value="${basedir}/src/main/webapp/">/Users/cleclerc/git/spring-source/spring-petclinic/src/main/less</contextFolder>
+  <contextPath>${contextPath}</contextPath>
+  <cssDestinationFolder>/Users/cleclerc/git/spring-source/spring-petclinic/target/classes/static/resources/css</cssDestinationFolder>
+  <destinationFolder default-value="${project.build.directory}">${destinationFolder}</destinationFolder>
+  <extraConfigFile default-value="${basedir}/src/main/webapp/WEB-INF/wro.properties">/Users/cleclerc/git/spring-source/spring-petclinic/src/main/wro/wro.properties</extraConfigFile>
+  <groupNameMappingFile>${groupNameMappingFile}</groupNameMappingFile>
+  <ignoreMissingResources>${ignoreMissingResources}</ignoreMissingResources>
+  <incrementalBuildEnabled default-value="false">${incrementalBuildEnabled}</incrementalBuildEnabled>
+  <jsDestinationFolder>${jsDestinationFolder}</jsDestinationFolder>
+  <mavenProject default-value="${project}"/>
+  <minimize default-value="true">${minimize}</minimize>
+  <parallelProcessing default-value="false">${parallelProcessing}</parallelProcessing>
+  <skip default-value="false"/>
+  <targetGroups>${targetGroups}</targetGroups>
+  <wroFile default-value="${basedir}/src/main/webapp/WEB-INF/wro.xml">/Users/cleclerc/git/spring-source/spring-petclinic/src/main/wro/wro.xml</wroFile>
+  <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
+</configuration>
+JenkinsMavenEventSpy v3 1485438824948ms - executionEvent: MojoStarted - org.apache.maven.plugins:maven-resources-plugin:resources@default-resources
+JenkinsMavenEventSpy v3 1485438825183ms - executionEvent: MojoSucceeded - org.apache.maven.plugins:maven-resources-plugin:resources@default-resources <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <buildFilters default-value="${project.build.filters}"/>
+  <delimiters>
+    <delimiter>@</delimiter>
+  </delimiters>
+  <encoding default-value="${project.build.sourceEncoding}">${encoding}</encoding>
+  <escapeString>${maven.resources.escapeString}</escapeString>
+  <escapeWindowsPaths default-value="true">${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+  <includeEmptyDirs default-value="false">${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+  <outputDirectory default-value="${project.build.outputDirectory}"/>
+  <overwrite default-value="false">${maven.resources.overwrite}</overwrite>
+  <project default-value="${project}"/>
+  <resources default-value="${project.resources}"/>
+  <session default-value="${session}"/>
+  <supportMultiLineFiltering default-value="false">${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+  <useBuildFilters default-value="true"/>
+  <useDefaultDelimiters default-value="true">false</useDefaultDelimiters>
+</configuration>
+JenkinsMavenEventSpy v3 1485438825183ms - executionEvent: MojoStarted - org.apache.maven.plugins:maven-compiler-plugin:compile@default-compile
+JenkinsMavenEventSpy v3 1485438826453ms - executionEvent: MojoSucceeded - org.apache.maven.plugins:maven-compiler-plugin:compile@default-compile <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <basedir default-value="${basedir}"/>
+  <buildDirectory default-value="${project.build.directory}"/>
+  <classpathElements default-value="${project.compileClasspathElements}"/>
+  <compileSourceRoots default-value="${project.compileSourceRoots}"/>
+  <compilerId default-value="javac">${maven.compiler.compilerId}</compilerId>
+  <compilerReuseStrategy default-value="${reuseCreated}">${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+  <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+  <debug default-value="true">${maven.compiler.debug}</debug>
+  <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+  <encoding default-value="${project.build.sourceEncoding}">${encoding}</encoding>
+  <executable>${maven.compiler.executable}</executable>
+  <failOnError default-value="true">${maven.compiler.failOnError}</failOnError>
+  <forceJavacCompilerUse default-value="false">${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+  <fork default-value="false">${maven.compiler.fork}</fork>
+  <generatedSourcesDirectory default-value="${project.build.directory}/generated-sources/annotations"/>
+  <maxmem>${maven.compiler.maxmem}</maxmem>
+  <meminitial>${maven.compiler.meminitial}</meminitial>
+  <mojoExecution>${mojoExecution}</mojoExecution>
+  <optimize default-value="false">${maven.compiler.optimize}</optimize>
+  <outputDirectory default-value="${project.build.outputDirectory}"/>
+  <projectArtifact default-value="${project.artifact}"/>
+  <showDeprecation default-value="false">${maven.compiler.showDeprecation}</showDeprecation>
+  <showWarnings default-value="false">${maven.compiler.showWarnings}</showWarnings>
+  <skipMain>${maven.main.skip}</skipMain>
+  <skipMultiThreadWarning default-value="false">${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+  <source default-value="1.5">${maven.compiler.source}</source>
+  <staleMillis default-value="0">${lastModGranularityMs}</staleMillis>
+  <target default-value="1.5">${maven.compiler.target}</target>
+  <useIncrementalCompilation default-value="true">${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+  <verbose default-value="false">${maven.compiler.verbose}</verbose>
+  <mavenSession default-value="${session}"/>
+  <session default-value="${session}"/>
+</configuration>
+JenkinsMavenEventSpy v3 1485438826453ms - executionEvent: MojoStarted - org.apache.maven.plugins:maven-resources-plugin:testResources@default-testResources
+JenkinsMavenEventSpy v3 1485438826456ms - executionEvent: MojoSucceeded - org.apache.maven.plugins:maven-resources-plugin:testResources@default-testResources <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <buildFilters default-value="${project.build.filters}"/>
+  <delimiters>
+    <delimiter>@</delimiter>
+  </delimiters>
+  <encoding default-value="${project.build.sourceEncoding}">${encoding}</encoding>
+  <escapeString>${maven.resources.escapeString}</escapeString>
+  <escapeWindowsPaths default-value="true">${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+  <includeEmptyDirs default-value="false">${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+  <outputDirectory default-value="${project.build.testOutputDirectory}"/>
+  <overwrite default-value="false">${maven.resources.overwrite}</overwrite>
+  <project default-value="${project}"/>
+  <resources default-value="${project.testResources}"/>
+  <session default-value="${session}"/>
+  <skip>${maven.test.skip}</skip>
+  <supportMultiLineFiltering default-value="false">${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+  <useBuildFilters default-value="true"/>
+  <useDefaultDelimiters default-value="true">false</useDefaultDelimiters>
+</configuration>
+JenkinsMavenEventSpy v3 1485438826456ms - executionEvent: MojoStarted - org.apache.maven.plugins:maven-compiler-plugin:testCompile@default-testCompile
+JenkinsMavenEventSpy v3 1485438827179ms - executionEvent: MojoSucceeded - org.apache.maven.plugins:maven-compiler-plugin:testCompile@default-testCompile <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <basedir default-value="${basedir}"/>
+  <buildDirectory default-value="${project.build.directory}"/>
+  <classpathElements default-value="${project.testClasspathElements}"/>
+  <compileSourceRoots default-value="${project.testCompileSourceRoots}"/>
+  <compilerId default-value="javac">${maven.compiler.compilerId}</compilerId>
+  <compilerReuseStrategy default-value="${reuseCreated}">${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+  <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+  <debug default-value="true">${maven.compiler.debug}</debug>
+  <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+  <encoding default-value="${project.build.sourceEncoding}">${encoding}</encoding>
+  <executable>${maven.compiler.executable}</executable>
+  <failOnError default-value="true">${maven.compiler.failOnError}</failOnError>
+  <forceJavacCompilerUse default-value="false">${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+  <fork default-value="false">${maven.compiler.fork}</fork>
+  <generatedTestSourcesDirectory default-value="${project.build.directory}/generated-test-sources/test-annotations"/>
+  <maxmem>${maven.compiler.maxmem}</maxmem>
+  <meminitial>${maven.compiler.meminitial}</meminitial>
+  <mojoExecution>${mojoExecution}</mojoExecution>
+  <optimize default-value="false">${maven.compiler.optimize}</optimize>
+  <outputDirectory default-value="${project.build.testOutputDirectory}"/>
+  <showDeprecation default-value="false">${maven.compiler.showDeprecation}</showDeprecation>
+  <showWarnings default-value="false">${maven.compiler.showWarnings}</showWarnings>
+  <skip>${maven.test.skip}</skip>
+  <skipMultiThreadWarning default-value="false">${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+  <source default-value="1.5">${maven.compiler.source}</source>
+  <staleMillis default-value="0">${lastModGranularityMs}</staleMillis>
+  <target default-value="1.5">${maven.compiler.target}</target>
+  <testSource>${maven.compiler.testSource}</testSource>
+  <testTarget>${maven.compiler.testTarget}</testTarget>
+  <useIncrementalCompilation default-value="true">${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+  <verbose default-value="false">${maven.compiler.verbose}</verbose>
+  <mavenSession default-value="${session}"/>
+  <session default-value="${session}"/>
+</configuration>
+JenkinsMavenEventSpy v3 1485438827179ms - executionEvent: MojoStarted - org.apache.maven.plugins:maven-surefire-plugin:test@default-test
+JenkinsMavenEventSpy v3 1485438849425ms - executionEvent: MojoSucceeded - org.apache.maven.plugins:maven-surefire-plugin:test@default-test <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
+  <argLine>${argLine}</argLine>
+  <basedir default-value="${basedir}"/>
+  <childDelegation default-value="false">${childDelegation}</childDelegation>
+  <classesDirectory default-value="${project.build.outputDirectory}"/>
+  <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
+  <debugForkedProcess>${maven.surefire.debug}</debugForkedProcess>
+  <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
+  <disableXmlReport default-value="false">${disableXmlReport}</disableXmlReport>
+  <enableAssertions default-value="true">${enableAssertions}</enableAssertions>
+  <excludedGroups>${excludedGroups}</excludedGroups>
+  <excludes>
+    <exclude>**/Abstract*.java</exclude>
+  </excludes>
+  <failIfNoSpecifiedTests>${surefire.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
+  <failIfNoTests>${failIfNoTests}</failIfNoTests>
+  <forkCount default-value="1">${forkCount}</forkCount>
+  <forkMode default-value="once">${forkMode}</forkMode>
+  <forkedProcessTimeoutInSeconds>${surefire.timeout}</forkedProcessTimeoutInSeconds>
+  <groups>${groups}</groups>
+  <includes>
+    <include>**/*Tests.java</include>
+    <include>**/*Test.java</include>
+  </includes>
+  <junitArtifactName default-value="junit:junit">${junitArtifactName}</junitArtifactName>
+  <jvm>${jvm}</jvm>
+  <localRepository default-value="${localRepository}"/>
+  <objectFactory>${objectFactory}</objectFactory>
+  <parallel>${parallel}</parallel>
+  <parallelMavenExecution default-value="${session.parallel}"/>
+  <parallelOptimized default-value="true">${parallelOptimized}</parallelOptimized>
+  <parallelTestsTimeoutForcedInSeconds>${surefire.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
+  <parallelTestsTimeoutInSeconds>${surefire.parallel.timeout}</parallelTestsTimeoutInSeconds>
+  <perCoreThreadCount default-value="true">${perCoreThreadCount}</perCoreThreadCount>
+  <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
+  <pluginDescriptor default-value="${plugin}"/>
+  <printSummary default-value="true">${surefire.printSummary}</printSummary>
+  <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
+  <redirectTestOutputToFile default-value="false">${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+  <remoteRepositories default-value="${project.pluginArtifactRepositories}"/>
+  <reportFormat default-value="brief">${surefire.reportFormat}</reportFormat>
+  <reportNameSuffix default-value="">${surefire.reportNameSuffix}</reportNameSuffix>
+  <reportsDirectory default-value="${project.build.directory}/surefire-reports"/>
+  <rerunFailingTestsCount default-value="0">${surefire.rerunFailingTestsCount}</rerunFailingTestsCount>
+  <reuseForks default-value="true">${reuseForks}</reuseForks>
+  <runOrder default-value="filesystem">${surefire.runOrder}</runOrder>
+  <skip default-value="false">${maven.test.skip}</skip>
+  <skipExec>${maven.test.skip.exec}</skipExec>
+  <skipTests default-value="false">${skipTests}</skipTests>
+  <suiteXmlFiles>${surefire.suiteXmlFiles}</suiteXmlFiles>
+  <test>${test}</test>
+  <testClassesDirectory default-value="${project.build.testOutputDirectory}"/>
+  <testFailureIgnore default-value="false">${maven.test.failure.ignore}</testFailureIgnore>
+  <testNGArtifactName default-value="org.testng:testng">${testNGArtifactName}</testNGArtifactName>
+  <testSourceDirectory default-value="${project.build.testSourceDirectory}"/>
+  <threadCount>${threadCount}</threadCount>
+  <threadCountClasses default-value="0">${threadCountClasses}</threadCountClasses>
+  <threadCountMethods default-value="0">${threadCountMethods}</threadCountMethods>
+  <threadCountSuites default-value="0">${threadCountSuites}</threadCountSuites>
+  <trimStackTrace default-value="true">${trimStackTrace}</trimStackTrace>
+  <useFile default-value="true">${surefire.useFile}</useFile>
+  <useManifestOnlyJar default-value="true">${surefire.useManifestOnlyJar}</useManifestOnlyJar>
+  <useSystemClassLoader default-value="true">${surefire.useSystemClassLoader}</useSystemClassLoader>
+  <useUnlimitedThreads default-value="false">${useUnlimitedThreads}</useUnlimitedThreads>
+  <workingDirectory>${basedir}</workingDirectory>
+  <project default-value="${project}"/>
+  <session default-value="${session}"/>
+</configuration>
+JenkinsMavenEventSpy v3 1485438849426ms - org.apache.maven.plugins:maven-surefire-plugin:2.18.1:test {execution: default-test} - reportsDirectory: ${project.build.directory}/surefire-reports
+JenkinsMavenEventSpy v3 1485438849427ms - executionEvent: MojoStarted - org.apache.maven.plugins:maven-jar-plugin:jar@default-jar
+JenkinsMavenEventSpy v3 1485438850032ms - executionEvent: MojoSucceeded - org.apache.maven.plugins:maven-jar-plugin:jar@default-jar <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <archive>
+    <manifest>
+      <mainClass>${start-class}</mainClass>
+      <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+    </manifest>
+  </archive>
+  <classesDirectory default-value="${project.build.outputDirectory}"/>
+  <classifier default-value="">${maven.jar.classifier}</classifier>
+  <defaultManifestFile default-value="${project.build.outputDirectory}/META-INF/MANIFEST.MF"/>
+  <finalName default-value="${project.build.finalName}">${jar.finalName}</finalName>
+  <forceCreation default-value="false">${jar.forceCreation}</forceCreation>
+  <outputDirectory default-value="${project.build.directory}"/>
+  <project default-value="${project}"/>
+  <session default-value="${session}"/>
+  <skipIfEmpty default-value="false">${jar.skipIfEmpty}</skipIfEmpty>
+  <useDefaultManifestFile default-value="false">${jar.useDefaultManifestFile}</useDefaultManifestFile>
+</configuration>
+JenkinsMavenEventSpy v3 1485438850032ms - org.apache.maven.plugins:maven-jar-plugin:2.6:jar {execution: default-jar} - outputDirectory: ${project.build.directory}, finalName: ${jar.finalName}
+JenkinsMavenEventSpy v3 1485438850032ms - executionEvent: MojoStarted - org.springframework.boot:spring-boot-maven-plugin:repackage@default
+JenkinsMavenEventSpy v3 1485438850621ms - executionEvent: MojoSucceeded - org.springframework.boot:spring-boot-maven-plugin:repackage@default <?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <attach default-value="true"/>
+  <excludeArtifactIds default-value="">${excludeArtifactIds}</excludeArtifactIds>
+  <excludeDevtools default-value="false"/>
+  <excludeGroupIds default-value="">${excludeGroupIds}</excludeGroupIds>
+  <executable default-value="false"/>
+  <finalName default-value="${project.build.finalName}"/>
+  <includeSystemScope default-value="false"/>
+  <mainClass>${start-class}</mainClass>
+  <outputDirectory default-value="${project.build.directory}"/>
+  <project default-value="${project}"/>
+  <skip default-value="false">${skip}</skip>
+</configuration>
+JenkinsMavenEventSpy v3 1485438850622ms - executionEvent: ProjectSucceeded - petclinic
+JenkinsMavenEventSpy v3 1485438850622ms - Project succeeded: name: petclinic, artifact: org.springframework.samples:springboot-petclinic:jar:1.4.2, artifact.file=/Users/cleclerc/git/spring-source/spring-petclinic/target/springboot-petclinic-1.4.2.jar
+JenkinsMavenEventSpy v3 1485438850957ms - UNKNOWN type:class org.apache.maven.execution.DefaultMavenExecutionResult, toString(): org.apache.maven.execution.DefaultMavenExecutionResult@17d606c9
+JenkinsMavenEventSpy v3 1485438850957ms - close: ignored:[class org.eclipse.aether.RepositoryEvent, class org.apache.maven.settings.building.DefaultSettingsBuildingResult, class org.apache.maven.toolchain.building.DefaultToolchainsBuildingRequest, class org.apache.maven.execution.DefaultMavenExecutionResult, class org.apache.maven.project.DefaultDependencyResolutionResult, class org.apache.maven.settings.building.DefaultSettingsBuildingRequest, class org.apache.maven.project.DefaultDependencyResolutionRequest], blackListed: []
