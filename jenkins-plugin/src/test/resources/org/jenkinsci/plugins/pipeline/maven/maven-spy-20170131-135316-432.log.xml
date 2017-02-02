@@ -28,26 +28,26 @@
     </ExecutionEvent>
     <ExecutionEvent type="SessionStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:17.059">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <no-execution-found/>
     </ExecutionEvent>
     <ExecutionEvent type="ProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:17.369">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <no-execution-found/>
     </ExecutionEvent>
     <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest"
                                  _time="2017-01-31 13:53:17.384">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
     </DependencyResolutionRequest>
     <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult"
                                 _time="2017-01-31 13:53:17.799"/>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:17.802">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-clean" goal="clean" groupId="org.apache.maven.plugins"
                 artifactId="maven-clean-plugin" version="2.6.1">
@@ -65,7 +65,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:17.899">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-clean" goal="clean" groupId="org.apache.maven.plugins"
                 artifactId="maven-clean-plugin" version="2.6.1">
@@ -83,7 +83,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:17.899">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="clean" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin"
                 version="2.7">
@@ -99,7 +99,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:18.232">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="clean" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin"
                 version="2.7">
@@ -115,7 +115,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="ForkStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:18.233">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin"
                 version="2.4">
@@ -137,7 +137,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="ForkedProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:18.234">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin"
                 version="2.4">
@@ -159,7 +159,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:18.236">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin"
                 version="2.1.11">
@@ -185,7 +185,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:18.761">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin"
                 version="2.1.11">
@@ -211,7 +211,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="ForkedProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:18.761">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin"
                 version="2.4">
@@ -233,7 +233,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="ForkSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:18.762">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin"
                 version="2.4">
@@ -255,7 +255,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:18.762">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin"
                 version="2.4">
@@ -277,7 +277,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:19.086">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin"
                 version="2.4">
@@ -299,7 +299,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:19.087">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin"
                 version="2.1.11">
@@ -325,7 +325,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:19.146">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin"
                 version="2.1.11">
@@ -351,7 +351,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:19.147">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="build-info" groupId="org.springframework.boot"
                 artifactId="spring-boot-maven-plugin" version="1.4.2.RELEASE">
@@ -362,7 +362,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:19.605">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="build-info" groupId="org.springframework.boot"
                 artifactId="spring-boot-maven-plugin" version="1.4.2.RELEASE">
@@ -373,7 +373,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:19.606">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="run" groupId="ro.isdc.wro4j" artifactId="wro4j-maven-plugin"
                 version="1.8.0">
@@ -403,7 +403,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:26.335">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="run" groupId="ro.isdc.wro4j" artifactId="wro4j-maven-plugin"
                 version="1.8.0">
@@ -433,7 +433,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:26.336">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-resources" goal="resources" groupId="org.apache.maven.plugins"
                 artifactId="maven-resources-plugin" version="2.6">
@@ -455,7 +455,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:26.5">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-resources" goal="resources" groupId="org.apache.maven.plugins"
                 artifactId="maven-resources-plugin" version="2.6">
@@ -477,7 +477,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:26.501">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-compile" goal="compile" groupId="org.apache.maven.plugins"
                 artifactId="maven-compiler-plugin" version="3.1">
@@ -518,7 +518,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:28.0">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-compile" goal="compile" groupId="org.apache.maven.plugins"
                 artifactId="maven-compiler-plugin" version="3.1">
@@ -559,7 +559,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:28.0">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-testResources" goal="testResources" groupId="org.apache.maven.plugins"
                 artifactId="maven-resources-plugin" version="2.6">
@@ -582,7 +582,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:28.004">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-testResources" goal="testResources" groupId="org.apache.maven.plugins"
                 artifactId="maven-resources-plugin" version="2.6">
@@ -605,7 +605,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:28.004">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-testCompile" goal="testCompile" groupId="org.apache.maven.plugins"
                 artifactId="maven-compiler-plugin" version="3.1">
@@ -647,7 +647,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:28.667">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-testCompile" goal="testCompile" groupId="org.apache.maven.plugins"
                 artifactId="maven-compiler-plugin" version="3.1">
@@ -689,7 +689,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:28.667">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins"
                 artifactId="maven-surefire-plugin" version="2.18.1">
@@ -760,7 +760,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:46.567">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins"
                 artifactId="maven-surefire-plugin" version="2.18.1">
@@ -769,7 +769,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:46.567">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-jar" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin"
                 version="2.6">
@@ -788,7 +788,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:46.897">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-jar" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin"
                 version="2.6">
@@ -798,7 +798,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:46.897">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="repackage" groupId="org.springframework.boot"
                 artifactId="spring-boot-maven-plugin" version="1.4.2.RELEASE">
@@ -817,7 +817,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:47.366">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="repackage" groupId="org.springframework.boot"
                 artifactId="spring-boot-maven-plugin" version="1.4.2.RELEASE">
@@ -836,7 +836,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="ForkStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:47.366">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin"
                 version="2.7">
@@ -853,7 +853,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="ForkedProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:47.367">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin"
                 version="2.7">
@@ -870,14 +870,14 @@
     </ExecutionEvent>
     <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest"
                                  _time="2017-01-31 13:53:47.367">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
     </DependencyResolutionRequest>
     <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult"
                                 _time="2017-01-31 13:53:47.42"/>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:47.424">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin"
                 version="2.1.11">
@@ -903,7 +903,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:47.524">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin"
                 version="2.1.11">
@@ -929,7 +929,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:47.524">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="build-info" groupId="org.springframework.boot"
                 artifactId="spring-boot-maven-plugin" version="1.4.2.RELEASE">
@@ -940,7 +940,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:47.525">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="build-info" groupId="org.springframework.boot"
                 artifactId="spring-boot-maven-plugin" version="1.4.2.RELEASE">
@@ -951,7 +951,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:47.526">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="run" groupId="ro.isdc.wro4j" artifactId="wro4j-maven-plugin"
                 version="1.8.0">
@@ -981,7 +981,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:49.628">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="run" groupId="ro.isdc.wro4j" artifactId="wro4j-maven-plugin"
                 version="1.8.0">
@@ -1011,7 +1011,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:49.629">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-resources" goal="resources" groupId="org.apache.maven.plugins"
                 artifactId="maven-resources-plugin" version="2.6">
@@ -1033,7 +1033,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:49.643">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-resources" goal="resources" groupId="org.apache.maven.plugins"
                 artifactId="maven-resources-plugin" version="2.6">
@@ -1055,7 +1055,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:49.643">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-compile" goal="compile" groupId="org.apache.maven.plugins"
                 artifactId="maven-compiler-plugin" version="3.1">
@@ -1096,7 +1096,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:50.084">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-compile" goal="compile" groupId="org.apache.maven.plugins"
                 artifactId="maven-compiler-plugin" version="3.1">
@@ -1137,7 +1137,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:50.084">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="instrument" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin"
                 version="2.7">
@@ -1156,7 +1156,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:52.493">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="instrument" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin"
                 version="2.7">
@@ -1175,14 +1175,14 @@
     </ExecutionEvent>
     <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest"
                                  _time="2017-01-31 13:53:52.493">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
     </DependencyResolutionRequest>
     <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult"
                                 _time="2017-01-31 13:53:52.55"/>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:52.552">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-testResources" goal="testResources" groupId="org.apache.maven.plugins"
                 artifactId="maven-resources-plugin" version="2.6">
@@ -1205,7 +1205,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:52.554">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-testResources" goal="testResources" groupId="org.apache.maven.plugins"
                 artifactId="maven-resources-plugin" version="2.6">
@@ -1228,7 +1228,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:52.554">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-testCompile" goal="testCompile" groupId="org.apache.maven.plugins"
                 artifactId="maven-compiler-plugin" version="3.1">
@@ -1270,7 +1270,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:52.574">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-testCompile" goal="testCompile" groupId="org.apache.maven.plugins"
                 artifactId="maven-compiler-plugin" version="3.1">
@@ -1312,7 +1312,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:53:52.574">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins"
                 artifactId="maven-surefire-plugin" version="2.18.1">
@@ -1383,7 +1383,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:54:10.335">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins"
                 artifactId="maven-surefire-plugin" version="2.18.1">
@@ -1392,7 +1392,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="ForkedProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:54:10.335">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin"
                 version="2.7">
@@ -1409,7 +1409,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="ForkSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:54:10.336">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin"
                 version="2.7">
@@ -1426,7 +1426,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:54:10.336">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin"
                 version="2.7">
@@ -1443,7 +1443,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:54:10.875">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin"
                 version="2.7">
@@ -1460,7 +1460,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:54:10.875">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-install" goal="install" groupId="org.apache.maven.plugins"
                 artifactId="maven-install-plugin" version="2.5.2">
@@ -1479,7 +1479,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:54:11.207">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <plugin executionId="default-install" goal="install" groupId="org.apache.maven.plugins"
                 artifactId="maven-install-plugin" version="2.5.2">
@@ -1498,7 +1498,7 @@
     </ExecutionEvent>
     <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent"
                     _time="2017-01-31 13:54:11.207">
-        <project artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <project artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                  version="1.4.2"/>
         <no-execution-found/>
         <artifact groupId="org.springframework.samples" artifactId="spring-petclinic"
@@ -1516,7 +1516,7 @@
     </ExecutionEvent>
     <MavenExecutionResult class="org.apache.maven.execution.DefaultMavenExecutionResult"
                           _time="2017-01-31 13:54:11.633">
-        <buildSummary artifactIdId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
+        <buildSummary artifactId="spring-petclinic" groupId="org.springframework.samples" name="petclinic"
                       time="53838" version="1.4.2" class="org.apache.maven.execution.BuildSuccess"/>
     </MavenExecutionResult>
     <!-- 2017-01-31 13:54:11.633 - close:                                       -->

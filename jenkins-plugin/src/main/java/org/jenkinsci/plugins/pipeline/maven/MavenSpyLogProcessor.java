@@ -155,7 +155,7 @@ public class MavenSpyLogProcessor implements Serializable {
 
     /*
     <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-01-31 00:15:42.255">
-    <project artifactIdId="pipeline-maven" groupId="org.jenkins-ci.plugins" name="Pipeline Maven Integration Plugin" version="0.6-SNAPSHOT"/>
+    <project artifactId="pipeline-maven" groupId="org.jenkins-ci.plugins" name="Pipeline Maven Integration Plugin" version="0.6-SNAPSHOT"/>
     <no-execution-found/>
     <artifact groupId="org.jenkins-ci.plugins" artifactId="pipeline-maven" id="org.jenkins-ci.plugins:pipeline-maven:hpi:0.6-SNAPSHOT" type="hpi" version="0.6-SNAPSHOT">
       <file>/Users/cleclerc/git/jenkins/pipeline-maven-plugin/target/pipeline-maven.hpi</file>
@@ -203,7 +203,7 @@ public class MavenSpyLogProcessor implements Serializable {
      */
     /*
     <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-01-31 00:15:42.255">
-    <project artifactIdId="pipeline-maven" groupId="org.jenkins-ci.plugins" name="Pipeline Maven Integration Plugin" version="0.6-SNAPSHOT"/>
+    <project artifactId="pipeline-maven" groupId="org.jenkins-ci.plugins" name="Pipeline Maven Integration Plugin" version="0.6-SNAPSHOT"/>
     <no-execution-found/>
     <artifact groupId="org.jenkins-ci.plugins" artifactId="pipeline-maven" id="org.jenkins-ci.plugins:pipeline-maven:hpi:0.6-SNAPSHOT" type="hpi" version="0.6-SNAPSHOT">
       <file>/Users/cleclerc/git/jenkins/pipeline-maven-plugin/target/pipeline-maven.hpi</file>
@@ -241,7 +241,6 @@ public class MavenSpyLogProcessor implements Serializable {
         }
         return result;
     }
-
 
     public MavenArtifact newMavenArtifact(Element artifactElt) {
         MavenArtifact mavenArtifact = new MavenArtifact();
