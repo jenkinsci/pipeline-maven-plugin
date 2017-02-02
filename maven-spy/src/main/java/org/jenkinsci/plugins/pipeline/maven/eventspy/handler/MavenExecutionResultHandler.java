@@ -45,10 +45,19 @@ public class MavenExecutionResultHandler extends AbstractMavenEventHandler<Maven
 
         for (MavenProject project : result.getTopologicallySortedProjects()) {
             BuildSummary summary = result.getBuildSummary(project);
-            Xpp3Dom buildSummary = newElement("buildSummary", project);
-            root.addChild(buildSummary);
-            buildSummary.setAttribute("class", summary.getClass().getName());
-            buildSummary.setAttribute("time", Long.toString(summary.getTime()));
+            if (summary == null) {
+                Xpp3Dom comment = new Xpp3Dom("comment");
+                comment.setValue("No build summary found for maven project: " + project);
+                root.addChild(comment);
+            } else {
+                Xpp3Dom buildSummary = newElement("buildSummary", project);
+                root.addChild(buildSummary);
+                buildSummary.setAttribute("class", summary.getClass().getName());
+                buildSummary.setAttribute("time", Long.toString(summary.getTime()));
+            }
+        }
+        for(Throwable throwable: result.getExceptions()) {
+            root.addChild(newElement("exception", throwable));
         }
         reporter.print(root);
         return true;

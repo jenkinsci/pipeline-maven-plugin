@@ -30,6 +30,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
 import java.io.File;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -88,6 +90,25 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         projectElt.setAttribute("artifactIdId", project.getArtifactId());
         projectElt.setAttribute("version", project.getVersion());
         return projectElt;
+    }
+
+    public Xpp3Dom newElement(@Nonnull String name, @Nullable Throwable t) {
+        Xpp3Dom rootElt = new Xpp3Dom(name);
+        if (t == null) {
+            return rootElt;
+        }
+        rootElt.setAttribute("class", t.getClass().getName());
+
+        Xpp3Dom messageElt = new Xpp3Dom("message");
+        rootElt.addChild(messageElt);
+        messageElt.setValue(t.getMessage());
+
+        Xpp3Dom stackTraceElt = new Xpp3Dom("stackTrace");
+        rootElt.addChild(stackTraceElt);
+        StringWriter stackTrace = new StringWriter();
+        t.printStackTrace(new PrintWriter(stackTrace, true));
+        messageElt.setValue(stackTrace.toString());
+        return rootElt;
     }
 
     public Xpp3Dom newElement(@Nonnull String name, @Nullable File file) {
