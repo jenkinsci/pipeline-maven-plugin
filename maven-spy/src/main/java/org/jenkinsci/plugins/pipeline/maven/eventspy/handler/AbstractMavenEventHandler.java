@@ -25,6 +25,7 @@
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
@@ -89,6 +90,25 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         projectElt.setAttribute("groupId", project.getGroupId());
         projectElt.setAttribute("artifactId", project.getArtifactId());
         projectElt.setAttribute("version", project.getVersion());
+
+        if (project.getBasedir() != null) {
+            projectElt.setAttribute("baseDir", project.getBasedir().getAbsolutePath());
+        }
+
+        if (project.getFile() != null) {
+            projectElt.setAttribute("file", project.getFile().getAbsolutePath());
+        }
+
+        Build build = project.getBuild();
+
+        if (build != null) {
+            Xpp3Dom buildElt = new Xpp3Dom("build");
+            projectElt.addChild(buildElt);
+            if (build.getOutputDirectory() != null) {
+                buildElt.setAttribute("directory", build.getDirectory());
+            }
+        }
+
         return projectElt;
     }
 

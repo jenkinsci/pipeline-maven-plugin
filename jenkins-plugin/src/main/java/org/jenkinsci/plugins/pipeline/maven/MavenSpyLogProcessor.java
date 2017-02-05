@@ -28,19 +28,20 @@ import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.plugins.findbugs.FindBugsReporter;
 import hudson.tasks.Fingerprinter;
 import jenkins.model.ArtifactManager;
 import jenkins.util.BuildListenerAdapter;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.pipeline.maven.reporters.FindbugsAnalysisReporter;
+import org.jenkinsci.plugins.pipeline.maven.reporters.JunitTestsReporter;
+import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,15 +50,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -115,11 +110,8 @@ public class MavenSpyLogProcessor implements Serializable {
                                     mavenArtifact.artifactId + "/" +
                                     mavenArtifact.version + "/" +
                                     mavenArtifact.getFileName();
-                    String workspaceRemote = workspace.getRemote();
-                    if(!workspaceRemote.endsWith("/")) {
-                        workspaceRemote = workspaceRemote + "/";
-                    }
-                    String artifactPathInWorkspace = StringUtils.substringAfter(mavenArtifact.file, workspaceRemote);
+
+                    String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace);
 
                     if (StringUtils.isEmpty(artifactPathInWorkspace)) {
                         listener.error("Invalid path in the workspace (" + workspace.getRemote() + ") for artifact " + mavenArtifact);
@@ -140,16 +132,17 @@ public class MavenSpyLogProcessor implements Serializable {
                 // FINGERPRINT GENERATED MAVEN ARTIFACT
                 Fingerprinter.FingerprintAction fingerprintAction = run.getAction(Fingerprinter.FingerprintAction.class);
                 if (fingerprintAction == null) {
-                  run.addAction(new Fingerprinter.FingerprintAction(run, artifactsToFingerPrint));
+                    run.addAction(new Fingerprinter.FingerprintAction(run, artifactsToFingerPrint));
                 } else {
                     fingerprintAction.add(artifactsToFingerPrint);
                 }
 
+                new JunitTestsReporter().process(context, mavenSpyLogsElt);
+                new FindbugsAnalysisReporter().process(context, mavenSpyLogsElt);
             } catch (SAXException e) {
                 listener.error("Exception parsing maven spy logs " + mavenSpyLogs + ", ignore file");
                 e.printStackTrace(listener.getLogger());
             }
-
         }
     }
 
@@ -172,22 +165,32 @@ public class MavenSpyLogProcessor implements Serializable {
      * @param mavenSpyLogs Root XML element
      * @return list of {@link MavenArtifact}
      */
+    /*
+
+    <artifact artifactId="demo-pom" groupId="com.example" id="com.example:demo-pom:pom:0.0.1-SNAPSHOT" type="pom" version="0.0.1-SNAPSHOT">
+      <file/>
+    </artifact>
+     */
     @Nonnull
     public List<MavenArtifact> listArtifacts(Element mavenSpyLogs) {
 
         List<MavenArtifact> result = new ArrayList<>();
 
-        for (Element projectSucceededElt : getExecutionEvent(mavenSpyLogs, "ProjectSucceeded")) {
+        for (Element projectSucceededElt : XmlUtils.getExecutionEvents(mavenSpyLogs, "ProjectSucceeded")) {
 
-            Element projectElt = getUniqueChildElement(projectSucceededElt, "project");
-            MavenArtifact projectArtifact = newMavenArtifact(projectElt);
+            Element projectElt = XmlUtils.getUniqueChildElement(projectSucceededElt, "project");
+            MavenArtifact projectArtifact = XmlUtils.newMavenArtifact(projectElt);
 
-            Element artifactElt = getUniqueChildElement(projectSucceededElt, "artifact");
-            MavenArtifact mavenArtifact = newMavenArtifact(artifactElt);
+            Element artifactElt = XmlUtils.getUniqueChildElement(projectSucceededElt, "artifact");
+            MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(artifactElt);
+            if ("pom".equals(mavenArtifact.type)) {
+                // NO file is generated by Maven for pom projects, skip
+                continue;
+            }
 
-            Element fileElt = getUniqueChildElementOrNull(artifactElt, "file");
+            Element fileElt = XmlUtils.getUniqueChildElementOrNull(artifactElt, "file");
             if (fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
-                LOGGER.log(Level.WARNING, "Project " + projectArtifact + ":  no associated file found for " + mavenArtifact + " in " + toString(artifactElt));
+                LOGGER.log(Level.WARNING, "listArtifacts: Project " + projectArtifact + ":  no associated file found for " + mavenArtifact + " in " + XmlUtils.toString(artifactElt));
             }
             mavenArtifact.file = StringUtils.trim(fileElt.getTextContent());
             result.add(mavenArtifact);
@@ -219,19 +222,19 @@ public class MavenSpyLogProcessor implements Serializable {
     public List<MavenArtifact> listAttachedArtifacts(Element mavenSpyLogs) {
         List<MavenArtifact> result = new ArrayList<>();
 
-        for (Element projectSucceededElt : getExecutionEvent(mavenSpyLogs, "ProjectSucceeded")) {
+        for (Element projectSucceededElt : XmlUtils.getExecutionEvents(mavenSpyLogs, "ProjectSucceeded")) {
 
-            Element projectElt = getUniqueChildElement(projectSucceededElt, "project");
-            MavenArtifact projectArtifact = newMavenArtifact(projectElt);
+            Element projectElt = XmlUtils.getUniqueChildElement(projectSucceededElt, "project");
+            MavenArtifact projectArtifact = XmlUtils.newMavenArtifact(projectElt);
 
-            Element attachedArtifactsParentElt = getUniqueChildElement(projectSucceededElt, "attachedArtifacts");
-            List<Element> attachedArtifactsElts = getChildrenElements(attachedArtifactsParentElt, "artifact");
+            Element attachedArtifactsParentElt = XmlUtils.getUniqueChildElement(projectSucceededElt, "attachedArtifacts");
+            List<Element> attachedArtifactsElts = XmlUtils.getChildrenElements(attachedArtifactsParentElt, "artifact");
             for (Element attachedArtifactElt : attachedArtifactsElts) {
-                MavenArtifact attachedMavenArtifact = newMavenArtifact(attachedArtifactElt);
+                MavenArtifact attachedMavenArtifact = XmlUtils.newMavenArtifact(attachedArtifactElt);
 
-                Element fileElt = getUniqueChildElementOrNull(attachedArtifactElt, "file");
+                Element fileElt = XmlUtils.getUniqueChildElementOrNull(attachedArtifactElt, "file");
                 if (fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
-                    LOGGER.log(Level.WARNING, "Project " + projectArtifact + ", no associated file found for attached artifact " + attachedMavenArtifact + " in " + toString(attachedArtifactElt));
+                    LOGGER.log(Level.WARNING, "Project " + projectArtifact + ", no associated file found for attached artifact " + attachedMavenArtifact + " in " + XmlUtils.toString(attachedArtifactElt));
                 }
                 attachedMavenArtifact.file = StringUtils.trim(fileElt.getTextContent());
                 result.add(attachedMavenArtifact);
@@ -242,83 +245,12 @@ public class MavenSpyLogProcessor implements Serializable {
         return result;
     }
 
-    public MavenArtifact newMavenArtifact(Element artifactElt) {
-        MavenArtifact mavenArtifact = new MavenArtifact();
-        mavenArtifact.groupId = artifactElt.getAttribute("groupId");
-        mavenArtifact.artifactId = artifactElt.getAttribute("artifactId");
-        mavenArtifact.version = artifactElt.getAttribute("version");
-        mavenArtifact.type = artifactElt.getAttribute("type");
-        mavenArtifact.classifier = artifactElt.hasAttribute("classifier") ? artifactElt.getAttribute("classifier") : null;
-        return mavenArtifact;
-    }
+    public static class MavenArtifact {
+        public String groupId, artifactId, version, type, classifier;
+        public String file;
 
-    @Nonnull
-    public Element getUniqueChildElement(@Nonnull Element element, @Nonnull String childElementName) {
-        Element child = getUniqueChildElementOrNull(element, childElementName);
-        if (child == null) {
-            throw new IllegalStateException("No <" + childElementName + "> element found");
-        }
-        return child;
-    }
-
-    @Nullable
-    public Element getUniqueChildElementOrNull(@Nonnull Element element, @Nonnull String childElementName) {
-        List<Element> childElts = getChildrenElements(element, childElementName);
-        if (childElts.size() == 0) {
-            return null;
-        } else if (childElts.size() > 1) {
-            throw new IllegalStateException("More than 1 (" + childElts.size() + ") elements <" + childElementName + "> found in " + toString(element));
-        }
-
-        return childElts.get(0);
-    }
-
-    @Nonnull
-    public List<Element> getChildrenElements(@Nonnull Element element, @Nonnull String childElementName) {
-        NodeList childElts = element.getChildNodes();
-        List<Element> result = new ArrayList<>();
-
-        for (int i = 0; i < childElts.getLength(); i++) {
-            Node node = childElts.item(i);
-            if (node instanceof Element && node.getNodeName().equals(childElementName)) {
-                result.add((Element) node);
-            }
-        }
-
-        return result;
-    }
-
-    @Nonnull
-    public String toString(@Nullable Node node) {
-        try {
-            StringWriter out = new StringWriter();
-            Transformer identityTransformer = TransformerFactory.newInstance().newTransformer();
-            identityTransformer.transform(new DOMSource(node), new StreamResult(out));
-            return out.toString();
-        } catch (TransformerException e) {
-            LOGGER.log(Level.WARNING, "Exception dumping node " + node, e);
-            return e.toString();
-        }
-    }
-
-    @Nonnull
-    public List<Element> getExecutionEvent(@Nonnull Element mavenSpyLogs, String expectedType) {
-
-        List<Element> result = new ArrayList<>();
-        for (Element element : getChildrenElements(mavenSpyLogs, "ExecutionEvent")) {
-            if (element.getAttribute("type").equals(expectedType)) {
-                result.add(element);
-            }
-        }
-        return result;
-    }
-
-    static class MavenArtifact {
-        String groupId, artifactId, version, type, classifier;
-        String file;
-
-        String getFileName(){
-            return artifactId + "-" + version + ((classifier == null || classifier.isEmpty())? "" : "-" + classifier) + "." + type;
+        String getFileName() {
+            return artifactId + "-" + version + ((classifier == null || classifier.isEmpty()) ? "" : "-" + classifier) + "." + type;
         }
 
         @Override
@@ -330,6 +262,24 @@ public class MavenSpyLogProcessor implements Serializable {
                     (classifier == null ? "" : ":" + classifier) + ":" +
                     version +
                     (file == null ? "" : " " + file) +
+                    '}';
+        }
+    }
+
+    /*
+      <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
+     */
+    public static class PluginInvocation {
+        public String groupId, artifactId, version, goal, executionId;
+
+        @Override
+        public String toString() {
+            return "PluginInvocation{" +
+                    groupId + ":" +
+                    artifactId + ":" +
+                    version + "@" +
+                    goal + " " +
+                    " " + executionId +
                     '}';
         }
     }
