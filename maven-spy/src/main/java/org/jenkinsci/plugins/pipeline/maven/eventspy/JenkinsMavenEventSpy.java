@@ -39,6 +39,7 @@ import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.ProjectStartedExecu
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.ProjectSucceededExecutionHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.SessionEndedHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.SurefireTestExecutionHandler;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.DevNullMavenEventReporter;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.FileMavenEventReporter;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
@@ -55,23 +56,33 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 /**
+ * Maven {@link EventSpy} to capture build details consumed by the Jenkins Pipeline Maven Plugin
+ * and the {@code withMaven(){...}} pipeline step.
+ *
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 @Named
 @Singleton
 public class JenkinsMavenEventSpy extends AbstractEventSpy {
 
-    private MavenEventReporter reporter;
+    public final static String DISABLE_MAVEN_EVENT_SPY_PROPERTY_NAME =  JenkinsMavenEventSpy.class.getName() + ".disabled";
 
-    boolean disabled = false;
+    public final static String DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME =  "JENKINS_MAVEN_AGENT_DISABLED";
 
-    Set<Class> blackList = new HashSet();
-    Set<String> ignoredList = new HashSet(Arrays.asList(
+    private final MavenEventReporter reporter;
+
+    /*
+     * visible for testing
+     */
+    protected final boolean disabled;
+
+    private Set<Class> blackList = new HashSet();
+    private Set<String> ignoredList = new HashSet(Arrays.asList(
             "org.eclipse.aether.RepositoryEvent",
             "org.apache.maven.settings.building.DefaultSettingsBuildingResult"/*,
             "org.apache.maven.execution.DefaultMavenExecutionResult"*/));
 
-    List<MavenEventHandler> handlers = new ArrayList();
+    private List<MavenEventHandler> handlers = new ArrayList();
 
     public JenkinsMavenEventSpy() throws IOException {
         this(new FileMavenEventReporter());
@@ -90,12 +101,21 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
         handlers.add(new SessionEndedHandler(reporter));
 
         handlers.add(new CatchAllExecutionHandler(reporter));
-        this.reporter = reporter;
-    }
 
+        if (isEventSpyDisabled()) {
+            this.disabled = true;
+            this.reporter = new DevNullMavenEventReporter();
+        } else {
+            this.disabled = false;
+            this.reporter = reporter;
+        }
+    }
 
     @Override
     public void init(EventSpy.Context context) throws Exception {
+        if (disabled)
+            return;
+
         Xpp3Dom element = new Xpp3Dom("context");
         for (Map.Entry<String, Object> entry : context.getData().entrySet()) {
             Xpp3Dom entryElt = new Xpp3Dom(entry.getKey());
@@ -137,16 +157,21 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
 
     @Override
     public void close() {
+        if (disabled) {
+            return;
+        }
         reporter.print("close: ignored:" + ignoredList + ", blackListed: " + blackList);
         reporter.close();
     }
 
-    public MavenEventReporter getReporter() {
-        return reporter;
+
+    protected boolean isEventSpyDisabled(){
+        return "true".equalsIgnoreCase(System.getProperty(DISABLE_MAVEN_EVENT_SPY_PROPERTY_NAME)) ||
+                "true".equalsIgnoreCase(System.getenv(DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME));
     }
 
-    public void setReporter(MavenEventReporter reporter) {
-        this.reporter = reporter;
+    public MavenEventReporter getReporter() {
+        return reporter;
     }
 
     public List<MavenEventHandler> getHandlers() {

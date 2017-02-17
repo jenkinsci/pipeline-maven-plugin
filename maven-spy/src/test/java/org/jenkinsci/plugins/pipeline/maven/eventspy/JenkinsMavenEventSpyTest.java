@@ -57,11 +57,15 @@ public class JenkinsMavenEventSpyTest {
     StringWriter writer = new StringWriter();
     MavenProject project;
 
-
     @Before
     public void before() throws Exception {
         reporter = new OutputStreamEventReporter(writer);
-        spy = new JenkinsMavenEventSpy(reporter);
+        spy = new JenkinsMavenEventSpy(reporter) {
+            @Override
+            protected boolean isEventSpyDisabled() {
+                return false;
+            }
+        };
         spy.init(new EventSpy.Context() {
             @Override
             public Map<String, Object> getData() {
