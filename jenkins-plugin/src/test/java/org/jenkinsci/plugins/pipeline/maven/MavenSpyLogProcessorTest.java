@@ -21,7 +21,7 @@ public class MavenSpyLogProcessorTest {
 
     @Before
     public void before() throws Exception {
-        String mavenSpyLogs = "org/jenkinsci/plugins/pipeline/maven/maven-spy-20170131-135316-432.log.xml";
+        String mavenSpyLogs = "org/jenkinsci/plugins/pipeline/maven/maven-spy.xml";
         InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(mavenSpyLogs);
         doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
     }
@@ -29,9 +29,14 @@ public class MavenSpyLogProcessorTest {
     @Test
     public void testListArtifacts() throws Exception {
         List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = mavenSpyLogProcessor.listArtifacts(doc.getDocumentElement());
-        Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(1));
-        MavenSpyLogProcessor.MavenArtifact mavenArtifact = mavenArtifacts.get(0);
         System.out.println(mavenArtifacts);
+        Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
+
+        MavenSpyLogProcessor.MavenArtifact pomArtifact = mavenArtifacts.get(0);
+        Assert.assertThat(pomArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
+        Assert.assertThat(pomArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/pom.xml"));
+
+        MavenSpyLogProcessor.MavenArtifact mavenArtifact = mavenArtifacts.get(1);
         Assert.assertThat(mavenArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
         Assert.assertThat(mavenArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-1.4.2.jar"));
     }

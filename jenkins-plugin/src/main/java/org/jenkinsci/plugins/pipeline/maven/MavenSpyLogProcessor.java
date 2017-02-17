@@ -181,6 +181,15 @@ public class MavenSpyLogProcessor implements Serializable {
             Element projectElt = XmlUtils.getUniqueChildElement(projectSucceededElt, "project");
             MavenArtifact projectArtifact = XmlUtils.newMavenArtifact(projectElt);
 
+            MavenArtifact pomArtifact = new MavenArtifact();
+            pomArtifact.groupId = projectArtifact.groupId;
+            pomArtifact.artifactId = projectArtifact.artifactId;
+            pomArtifact.version = projectArtifact.version;
+            pomArtifact.type = "pom";
+            pomArtifact.file = projectElt.getAttribute("file");
+
+            result.add(pomArtifact);
+
             Element artifactElt = XmlUtils.getUniqueChildElement(projectSucceededElt, "artifact");
             MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(artifactElt);
             if ("pom".equals(mavenArtifact.type)) {
