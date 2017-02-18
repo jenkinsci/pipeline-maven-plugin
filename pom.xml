@@ -24,101 +24,68 @@
  -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.jenkins-ci.plugins</groupId>
-    <artifactId>plugin</artifactId>
-    <version>2.19</version>
-    <relativePath />
-  </parent>
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>2.19</version>
+        <relativePath />
+    </parent>
 
-  <artifactId>pipeline-maven</artifactId>
-  <version>0.6-SNAPSHOT</version>
-  <packaging>hpi</packaging>
+    <artifactId>pipeline-maven-pom</artifactId>
+    <version>2.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
-  <name>Pipeline Maven Integration Plugin</name>
-  <description>
-    This plugin provides integration with Pipeline, configures maven environment to use within a pipeline job by calling sh mvn or bat mvn.
-    The selected maven installation will be configured and prepended to the path.
-  </description>
-  <url>https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Maven+Plugin</url>
-  <licenses>
-    <license>
-      <name>The MIT license</name>
-      <url>http://www.opensource.org/licenses/mit-license.php</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+    <name>Pipeline Maven Integration Plugin POM</name>
+    <description>
+        This plugin provides integration with Pipeline, configures maven environment to use within a pipeline job by calling sh mvn or bat mvn.
+        The selected maven installation will be configured and prepended to the path.
+    </description>
+    <url>https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Maven+Plugin</url>
+    <licenses>
+        <license>
+            <name>The MIT license</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
-  <developers>
-    <developer>
-      <id>alvarolobato</id>
-      <name>Alvaro Lobato</name>
-      <email>alobato@cloudbees.com</email>
-    </developer>
-  </developers>
+    <developers>
+        <developer>
+            <id>alvarolobato</id>
+            <name>Alvaro Lobato</name>
+            <email>alobato@cloudbees.com</email>
+        </developer>
+        <developer>
+            <id>cleclerc</id>
+            <name>Cyrille Le Clerc</name>
+            <email>cleclerc@cloudbees.com</email>
+        </developer>
+    </developers>
 
-  <scm>
-    <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
-    <tag>HEAD</tag>
-  </scm>
+    <scm>
+        <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
+        <tag>HEAD</tag>
+    </scm>
 
-  <properties>
-    <jenkins.version>1.642.4</jenkins.version>
-  </properties>
+    <modules>
+        <module>maven-spy</module>
+        <module>jenkins-plugin</module>
+    </modules>
+    <repositories>
+        <repository>
+            <id>repo.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+        </repository>
+    </repositories>
 
-  <repositories>
-    <repository>
-      <id>repo.jenkins-ci.org</id>
-      <url>https://repo.jenkins-ci.org/public/</url>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>repo.jenkins-ci.org</id>
-      <url>https://repo.jenkins-ci.org/public/</url>
-    </pluginRepository>
-  </pluginRepositories>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-step-api</artifactId>
-      <version>2.5</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>config-file-provider</artifactId>
-      <version>2.15.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-cps</artifactId>
-      <version>2.23</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-job</artifactId>
-      <version>2.9</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-durable-task-step</artifactId>
-      <version>2.5</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-support</artifactId>
-      <version>2.11</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>repo.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
