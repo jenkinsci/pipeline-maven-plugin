@@ -45,9 +45,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.configprovider.model.Config;
@@ -98,6 +95,10 @@ class WithMavenStepExecution extends StepExecution {
     private final transient FilePath ws;
     private final transient Launcher launcher;
     private final transient EnvVars env;
+    /*
+     * TODO document the role of envOverride in regard to env. cleclerc suspects that the environment variables defined
+     * in "envOverride" will override the environment variables defined in "env"
+     */
     private transient EnvVars envOverride;
     private final transient Run<?, ?> build;
 
@@ -225,7 +226,17 @@ class WithMavenStepExecution extends StepExecution {
 
         FilePath mvnExec = new FilePath(ws.getChannel(), mvnExecPath);
         FilePath mavenSpyJarPath = setupMavenSpy();
-        String content = mavenWrapperContent(mvnExec, setupSettingFile(), setupGlobalSettingFile(), setupMavenLocalRepo(), mavenSpyJarPath);
+
+        // JAVA_TOOL_OPTIONS: https://docs.oracle.com/javase/8/docs/technotes/guides/troubleshoot/envvars002.html
+        String javaToolsOptions = env.get("JAVA_TOOL_OPTIONS", "");
+        if (StringUtils.isNotEmpty(javaToolsOptions)) {
+            javaToolsOptions += " ";
+        }
+        javaToolsOptions += "-Dmaven.ext.class.path=\"" + mavenSpyJarPath.getRemote() + "\" " +
+                "-Dorg.jenkinsci.plugins.pipeline.maven.reportsFolder=\"" + this.tempBinDir.getRemote() + "\" ";
+        envOverride.put("JAVA_TOOL_OPTIONS", javaToolsOptions);
+
+        String content = mavenWrapperContent(mvnExec, setupSettingFile(), setupGlobalSettingFile(), setupMavenLocalRepo());
 
         createWrapperScript(tempBinDir, mvnExec.getName(), content);
 
@@ -401,11 +412,10 @@ class WithMavenStepExecution extends StepExecution {
      * @param settingsFile       settings file
      * @param globalSettingsFile global settings file
      * @param mavenLocalRepo     maven local repo location
-     * @param mavenSpyJarPath    path to the maven-spy jar
      * @return wrapper script content
      * @throws AbortException when problems creating content
      */
-    private String mavenWrapperContent(FilePath mvnExec, String settingsFile, String globalSettingsFile, String mavenLocalRepo, @Nullable FilePath mavenSpyJarPath) throws AbortException {
+    private String mavenWrapperContent(FilePath mvnExec, String settingsFile, String globalSettingsFile, String mavenLocalRepo) throws AbortException {
 
         ArgumentListBuilder argList = new ArgumentListBuilder(mvnExec.getRemote());
 
@@ -427,11 +437,6 @@ class WithMavenStepExecution extends StepExecution {
 
         argList.add("--batch-mode");
         argList.add("--show-version");
-
-        if (mavenSpyJarPath != null) {
-            argList.add("-Dmaven.ext.class.path=\"" + mavenSpyJarPath.getRemote() + "\"");
-            argList.add("-Dorg.jenkinsci.plugins.pipeline.maven.reportsFolder=\"" + this.tempBinDir.getRemote() + "\"");
-        }
 
         StringBuilder c = new StringBuilder();
 
