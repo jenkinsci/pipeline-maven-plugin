@@ -86,6 +86,15 @@
       <version>4.69</version>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+      <!--
+      Match the version used in jenkins-core
+      -->
+      <version>2.6</version>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
