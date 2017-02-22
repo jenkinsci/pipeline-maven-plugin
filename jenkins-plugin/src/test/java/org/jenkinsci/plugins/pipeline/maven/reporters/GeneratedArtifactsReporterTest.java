@@ -1,6 +1,8 @@
-package org.jenkinsci.plugins.pipeline.maven;
+package org.jenkinsci.plugins.pipeline.maven.reporters;
 
 import org.hamcrest.CoreMatchers;
+import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
+import org.jenkinsci.plugins.pipeline.maven.reporters.GeneratedArtifactsReporter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,10 +16,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class MavenSpyLogProcessorTest {
+public class GeneratedArtifactsReporterTest {
 
     Document doc;
-    MavenSpyLogProcessor mavenSpyLogProcessor = new MavenSpyLogProcessor();
+    GeneratedArtifactsReporter generatedArtifactsReporter = new GeneratedArtifactsReporter();
 
     @Before
     public void before() throws Exception {
@@ -28,7 +30,7 @@ public class MavenSpyLogProcessorTest {
 
     @Test
     public void testListArtifacts() throws Exception {
-        List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = mavenSpyLogProcessor.listArtifacts(doc.getDocumentElement());
+        List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = generatedArtifactsReporter.listArtifacts(doc.getDocumentElement());
         System.out.println(mavenArtifacts);
         Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
 
@@ -43,7 +45,7 @@ public class MavenSpyLogProcessorTest {
 
     @Test
     public void testListAttachedArtifacts() throws Exception {
-        List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = mavenSpyLogProcessor.listAttachedArtifacts(doc.getDocumentElement());
+        List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = generatedArtifactsReporter.listAttachedArtifacts(doc.getDocumentElement());
         Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(1));
         MavenSpyLogProcessor.MavenArtifact mavenArtifact = mavenArtifacts.get(0);
         System.out.println(mavenArtifacts);

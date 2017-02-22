@@ -27,6 +27,7 @@ package org.jenkinsci.plugins.pipeline.maven.reporters;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
+import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.tasks.junit.JUnitResultArchiver;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
@@ -36,6 +37,7 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -135,7 +137,8 @@ public class JunitTestsReporter implements ResultsReporter {
 
         TaskListener listener = context.get(TaskListener.class);
         if (listener == null) {
-            LOGGER.warning("listener is NULL"); // TODO
+            LOGGER.warning("TaskListener is NULL, default to stderr");
+            listener = new StreamBuildListener((OutputStream) System.err);
         }
         FilePath workspace = context.get(FilePath.class); // TODO check that it's the good workspace
         Run run = context.get(Run.class);
