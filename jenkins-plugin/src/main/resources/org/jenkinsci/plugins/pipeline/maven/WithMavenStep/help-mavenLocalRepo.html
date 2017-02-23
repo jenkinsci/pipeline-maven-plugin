@@ -15,7 +15,11 @@
   <p>
   By using this option, Jenkins will tell Maven to use a custom path for the build as the local Maven repository by using <tt>-Dmaven.repo.local</tt>
   <br>
-  ie. <tt>$WORKSPACE/.repository</tt> if <tt>.repository</tt> value is specified.
+
+  If specified as a relative path then this value well be resolved against the workspace root and not the current working directory.
+  <br>
+  ie. if <tt>.repository</tt> is specified then <tt>$WORKSPACE/.repository</tt> will be used.
+
   <p>
   This means each job could get its own isolated Maven repository just for itself. It fixes the above problems,
   at the expense of additional disk space consumption.
