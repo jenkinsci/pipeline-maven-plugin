@@ -94,7 +94,7 @@ public class MavenSpyLogProcessor implements Serializable {
 
                 FilePath skipArchiveArtifactsFile = workspace.child(".skip-archive-generated-artifacts");
                 if (skipArchiveArtifactsFile.exists()) {
-                    listener.getLogger().println("Skip archiving of generated artifacts, file '" + skipArchiveArtifactsFile + "' found in workspace");
+                    listener.getLogger().println("[withMaven] Skip archiving of generated artifacts, file '" + skipArchiveArtifactsFile + "' found in workspace");
                 } else {
                     LOGGER.log(Level.FINE, "Look for generated artifacts to archive, file {0} NOT found in workspace", skipArchiveArtifactsFile);
                     new GeneratedArtifactsReporter().process(context, mavenSpyLogsElt);
@@ -102,20 +102,20 @@ public class MavenSpyLogProcessor implements Serializable {
 
                 FilePath skipJunitFile = workspace.child(".skip-publish-junit-results");
                 if (skipJunitFile.exists()) {
-                    listener.getLogger().println("Skip publishing of JUnit results, file '" + skipJunitFile + "' found in workspace");
+                    listener.getLogger().println("[withMaven] Skip publishing of JUnit results, file '" + skipJunitFile + "' found in workspace");
                 } else {
                     LOGGER.log(Level.FINE, "Look for JUnit results to publish, file {0} NOT found in workspace", skipJunitFile);
                     new JunitTestsReporter().process(context, mavenSpyLogsElt);
                 }
                 FilePath skipFindbugsFile = workspace.child(".skip-publish-findbugs-results");
                 if (skipFindbugsFile.exists()) {
-                    listener.getLogger().println("Skip publishing of FindBugs results, file '" + skipFindbugsFile + "' found in workspace");
+                    listener.getLogger().println("[withMaven] Skip publishing of FindBugs results, file '" + skipFindbugsFile + "' found in workspace");
                 } else {
                     LOGGER.log(Level.FINE, "Look for Findbugs results to publish, file {0} NOT found in workspace", skipFindbugsFile);
                     new FindbugsAnalysisReporter().process(context, mavenSpyLogsElt);
                 }
             } catch (SAXException e) {
-                listener.error("Exception parsing maven spy logs " + mavenSpyLogs + ", ignore file");
+                listener.error("[withMaven] Exception parsing maven spy logs " + mavenSpyLogs + ", ignore file");
                 e.printStackTrace(listener.getLogger());
             }
         }
