@@ -55,27 +55,38 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
         Map<String, String> artifactsToArchive = new HashMap<>(); // artifactPathInArchiveZone -> artifactPathInWorkspace
         Map<String, String> artifactsToFingerPrint = new HashMap<>(); // artifactPathInArchiveZone -> artifactMd5
         for (MavenSpyLogProcessor.MavenArtifact mavenArtifact : join) {
-            if (StringUtils.isEmpty(mavenArtifact.file)) {
-                listener.error("[withMaven] Can't archive maven artifact with no file attached: " + mavenArtifact);
-                continue;
-            }
+            try {
+                if (StringUtils.isEmpty(mavenArtifact.file)) {
+                    listener.error("[withMaven] Can't archive maven artifact with no file attached: " + mavenArtifact);
+                    continue;
+                }
 
-            String artifactPathInArchiveZone =
-                    mavenArtifact.groupId.replace('.', '/') + "/" +
-                            mavenArtifact.artifactId + "/" +
-                            mavenArtifact.version + "/" +
-                            mavenArtifact.getFileName();
+                String artifactPathInArchiveZone =
+                        mavenArtifact.groupId.replace('.', '/') + "/" +
+                                mavenArtifact.artifactId + "/" +
+                                mavenArtifact.version + "/" +
+                                mavenArtifact.getFileName();
 
-            String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace);
+                String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace);
 
-            if (StringUtils.isEmpty(artifactPathInWorkspace)) {
-                listener.error("[withMaven] Invalid path in the workspace (" + workspace.getRemote() + ") for artifact " + mavenArtifact);
-            } else {
-                listener.getLogger().println("[withMaven] Archive " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone);
-                artifactsToArchive.put(artifactPathInArchiveZone, artifactPathInWorkspace);
-                FilePath artifactFilePath = new FilePath(workspace, artifactPathInWorkspace);
-                String artifactDigest = artifactFilePath.digest();
-                artifactsToFingerPrint.put(artifactPathInArchiveZone, artifactDigest);
+                if (StringUtils.isEmpty(artifactPathInWorkspace)) {
+                    listener.error("[withMaven] Invalid path in the workspace (" + workspace.getRemote() + ") for artifact " + mavenArtifact);
+                } else {
+                    FilePath artifactFilePath = new FilePath(workspace, artifactPathInWorkspace);
+                    if (artifactFilePath.exists()) {
+                        // the subsequent call to digest could test the existence but we don't want to prematurely optimize performances
+                        listener.getLogger().println("[withMaven] Archive " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone);
+                        artifactsToArchive.put(artifactPathInArchiveZone, artifactPathInWorkspace);
+                        String artifactDigest = artifactFilePath.digest();
+                        artifactsToFingerPrint.put(artifactPathInArchiveZone, artifactDigest);
+                    } else {
+                        listener.getLogger().println("[withMaven] FAILURE to archive " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone + ", file not found");
+                    }
+                }
+            } catch (IOException | RuntimeException e) {
+                listener.error("[withMaven] WARNING: Exception archiving and fingerprinting " + mavenArtifact + ", skip archiving of the artifacts");
+                e.printStackTrace(listener.getLogger());
+                listener.getLogger().flush();
             }
         }
 
