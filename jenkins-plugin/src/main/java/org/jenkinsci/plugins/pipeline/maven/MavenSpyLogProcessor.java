@@ -126,11 +126,11 @@ public class MavenSpyLogProcessor implements Serializable {
 
 
     public static class MavenArtifact {
-        public String groupId, artifactId, version, type, classifier;
+        public String groupId, artifactId, version, type, classifier, extension;
         public String file;
 
         public String getFileName() {
-            return artifactId + "-" + version + ((classifier == null || classifier.isEmpty()) ? "" : "-" + classifier) + "." + type;
+            return artifactId + "-" + version + ((classifier == null || classifier.isEmpty()) ? "" : "-" + classifier) + "." + extension;
         }
 
         @Override

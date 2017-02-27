@@ -58,6 +58,7 @@ public class XmlUtils {
         mavenArtifact.version = artifactElt.getAttribute("version");
         mavenArtifact.type = artifactElt.getAttribute("type");
         mavenArtifact.classifier = artifactElt.hasAttribute("classifier") ? artifactElt.getAttribute("classifier") : null;
+        mavenArtifact.extension = artifactElt.getAttribute("extension");
 
         return mavenArtifact;
     }

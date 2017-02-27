@@ -18,6 +18,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
  */
 public class GeneratedArtifactsReporterTest {
 
+    static final String PETCLINIC_VERSION = "1.5.1";
+
     Document doc;
     GeneratedArtifactsReporter generatedArtifactsReporter = new GeneratedArtifactsReporter();
 
@@ -37,10 +39,13 @@ public class GeneratedArtifactsReporterTest {
         MavenSpyLogProcessor.MavenArtifact pomArtifact = mavenArtifacts.get(0);
         Assert.assertThat(pomArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
         Assert.assertThat(pomArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/pom.xml"));
+        Assert.assertThat(pomArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".pom"));
 
         MavenSpyLogProcessor.MavenArtifact mavenArtifact = mavenArtifacts.get(1);
         Assert.assertThat(mavenArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
-        Assert.assertThat(mavenArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-1.4.2.jar"));
+        Assert.assertThat(mavenArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
+        Assert.assertThat(mavenArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
+
     }
 
     @Test
@@ -51,6 +56,6 @@ public class GeneratedArtifactsReporterTest {
         System.out.println(mavenArtifacts);
         Assert.assertThat(mavenArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
         Assert.assertThat(mavenArtifact.classifier, CoreMatchers.is("sources"));
-        Assert.assertThat(mavenArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-1.4.2-sources.jar"));
+        Assert.assertThat(mavenArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-" + PETCLINIC_VERSION + "-sources.jar"));
     }
 }

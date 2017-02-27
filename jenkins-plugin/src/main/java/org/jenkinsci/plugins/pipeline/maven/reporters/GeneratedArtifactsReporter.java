@@ -145,6 +145,7 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
             pomArtifact.artifactId = projectArtifact.artifactId;
             pomArtifact.version = projectArtifact.version;
             pomArtifact.type = "pom";
+            pomArtifact.extension = "pom";
             pomArtifact.file = projectElt.getAttribute("file");
 
             result.add(pomArtifact);
