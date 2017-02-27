@@ -25,6 +25,7 @@
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -163,6 +164,15 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         }
         element.setAttribute("type", artifact.getType());
         element.setAttribute("id", artifact.getId());
+
+        ArtifactHandler artifactHandler = artifact.getArtifactHandler();
+        String extension;
+        if (artifactHandler == null) {
+            extension = artifact.getType();
+        } else {
+            extension = artifactHandler.getExtension();
+        }
+        element.setAttribute("extension", extension);
 
         return element;
     }
