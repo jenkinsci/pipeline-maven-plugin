@@ -57,7 +57,9 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
         for (MavenSpyLogProcessor.MavenArtifact mavenArtifact : join) {
             try {
                 if (StringUtils.isEmpty(mavenArtifact.file)) {
-                    listener.error("[withMaven] Can't archive maven artifact with no file attached: " + mavenArtifact);
+                    if (LOGGER.isLoggable(Level.FINE)) {
+                        listener.getLogger().println("[withMaven] Can't archive maven artifact with no file attached: " + mavenArtifact);
+                    }
                     continue;
                 }
 
