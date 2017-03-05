@@ -2,7 +2,7 @@
 injected byt the Jenkins `withMaven(){...}` pipeline step to capture the execution details of the maven builds.
 
 
-## How to test this MAven Event Spy
+## How to test this Maven Event Spy
 
 Maven Spy can be tested 
 
