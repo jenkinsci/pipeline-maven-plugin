@@ -24,13 +24,19 @@
 
 package org.jenkinsci.plugins.pipeline.maven.util;
 
+import hudson.AbortException;
 import hudson.FilePath;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +45,8 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -193,5 +201,36 @@ public class XmlUtils {
             return null;
         }
         return build.getAttribute("directory");
+    }
+
+    /**
+     * Check that the given file is a valid Maven settings.xml file
+     * @param file the file to check
+     * @throws AbortException if the given file is not a valid settings.xml file
+     */
+    public static void checkFileIsaMavenSettingsFile(File file) throws AbortException {
+        if (!file.exists()) {
+            FileNotFoundException fnfe = new FileNotFoundException("Maven settings file '" + file + "' not found");
+            AbortException abortException = new AbortException(fnfe.getMessage());
+            abortException.initCause(fnfe);
+            throw abortException;
+        }
+        Document mavenSettingsDocument;
+        try {
+            mavenSettingsDocument = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(file);
+        } catch (ParserConfigurationException|IOException|SAXException e) {
+            AbortException abortException = new AbortException("Invalid Maven settings file '" + file.getPath() + "': " + e.toString());
+            abortException.initCause(new IllegalStateException(e));
+            throw abortException;
+        }
+        Element documentElement = mavenSettingsDocument.getDocumentElement();
+        if (!"settings".equals(documentElement.getNodeName())) {
+            throw new AbortException(
+                    "Invalid Maven settings file '" + file.getPath() + "', " +
+                            "actual document element: '" + documentElement.getNodeName() + "', " +
+                            "expected document element: 'settings'");
+        }
+        // we don't check the namespace as the XML parsers are often "non validating"
+
     }
 }
