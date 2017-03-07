@@ -560,7 +560,7 @@ class WithMavenStepExecution extends StepExecution {
                 LOGGER.log(Level.FINE, "Copying maven settings file from build agent {0} to {1}", new Object[]{settings, settingsDest});
                 settings.copyTo(settingsDest);
             } else {
-                throw new AbortException("Could not find file '" + settingsPath + "' on the build agent");
+                throw new AbortException("Could not find file '" + settings + "' on the build agent");
             }
             envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
@@ -600,7 +600,7 @@ class WithMavenStepExecution extends StepExecution {
                 LOGGER.log(Level.FINE, "Copying maven global settings file from build agent {0} to {1}", new Object[]{settings, settingsDest});
                 settings.copyTo(settingsDest);
             } else {
-                throw new AbortException("Could not find file '" + settingsPath + "' on the build agent");
+                throw new AbortException("Could not find file '" + settings + "' on the build agent");
             }
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
