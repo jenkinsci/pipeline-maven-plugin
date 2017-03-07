@@ -551,7 +551,7 @@ class WithMavenStepExecution extends StepExecution {
 
         // Settings from the file path
         if (StringUtils.isNotEmpty(step.getMavenSettingsFilePath())) {
-            String settingsPath = envOverride.expand(env.expand(step.getMavenSettingsFilePath()));
+            String settingsPath = step.getMavenSettingsFilePath();
             FilePath settings;
 
             if ((settings = ws.child(settingsPath)).exists()) {
@@ -592,7 +592,7 @@ class WithMavenStepExecution extends StepExecution {
 
         // Global settings from the file path
         if (StringUtils.isNotEmpty(step.getGlobalMavenSettingsFilePath())) {
-            String settingsPath = envOverride.expand(env.expand(step.getGlobalMavenSettingsFilePath()));
+            String settingsPath = step.getGlobalMavenSettingsFilePath();
             FilePath settings;
             if ((settings = ws.child(settingsPath)).exists()) {
                 // Global settings file residing on the agent
