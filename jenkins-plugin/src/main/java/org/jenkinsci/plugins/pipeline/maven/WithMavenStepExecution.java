@@ -559,10 +559,8 @@ class WithMavenStepExecution extends StepExecution {
                 console.format("[withMaven] use Maven settings provided on the build agent '%s' %n", settingsPath);
                 LOGGER.log(Level.FINE, "Copying maven settings file from build agent {0} to {1}", new Object[]{settings, settingsDest});
                 settings.copyTo(settingsDest);
-            } else if ((settings = new FilePath(new File(settingsPath))).exists()) {
-                throw new IllegalStateException("Using a Maven settings file located on the master is no longer supported: " + settings);
             } else {
-                throw new AbortException("Could not find file '" + settingsPath + "' on the build agent nor the master");
+                throw new AbortException("Could not find file '" + settingsPath + "' on the build agent");
             }
             envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
@@ -601,10 +599,8 @@ class WithMavenStepExecution extends StepExecution {
                 console.format("[withMaven] use Maven global settings provided on the build agent '%s' %n", settingsPath);
                 LOGGER.log(Level.FINE, "Copying maven global settings file from build agent {0} to {1}", new Object[]{settings, settingsDest});
                 settings.copyTo(settingsDest);
-            } else if ((settings = new FilePath(new File(settingsPath))).exists()) { // File from the master
-                throw new IllegalStateException("Using a Maven global settings file located on the master is no longer supported: " + settings);
             } else {
-                throw new AbortException("Could not find file '" + settingsPath + "' on the build agent nor the master");
+                throw new AbortException("Could not find file '" + settingsPath + "' on the build agent");
             }
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
