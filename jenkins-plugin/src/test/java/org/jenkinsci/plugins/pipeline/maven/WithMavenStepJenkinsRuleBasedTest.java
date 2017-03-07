@@ -50,18 +50,34 @@ public class WithMavenStepJenkinsRuleBasedTest {
 
     @Test
     public void test_cannot_use_maven_settings_on_master() throws Exception {
-        DumbSlave s = r.createOnlineSlave();
-        System.out.println("Slave root:" + s.getRootPath());
-        System.out.println("Master root:" + r.jenkins.getRootDir());
-        File onMaster = new File(r.jenkins.getRootDir(), "onmaster");
+        WorkflowJob p = r.createProject(WorkflowJob.class, "p");
 
+        DumbSlave s = r.createOnlineSlave();
+        String fileRelativePath = "onMaster";
+        File onMaster = new File(r.jenkins.getWorkspaceFor(p).getRemote(), fileRelativePath);
         String secret = "content on master";
         FileUtils.writeStringToFile(onMaster, secret);
-        WorkflowJob p = r.createProject(WorkflowJob.class, "p");
-        String pipelineScript = "node('" + s.getNodeName() + "') {withMaven(mavenSettingsFilePath: '" + onMaster + "') {isUnix() ? sh('cat $MVN_SETTINGS') : bat('type %MAVEN_SETTINGS%')}}";
+
+        String pipelineScript = "node('" + s.getNodeName() + "') {withMaven(mavenSettingsFilePath: '" + fileRelativePath + "') {isUnix() ? sh('cat $MVN_SETTINGS') : bat('type %MAVEN_SETTINGS%')}}";
         p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun b = r.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
         r.assertLogNotContains(secret, b);
 
+    }
+
+    @Test
+    public void test_can_use_maven_settings_on_agent() throws Exception {
+        WorkflowJob p = r.createProject(WorkflowJob.class, "p");
+
+        DumbSlave s = r.createOnlineSlave();
+        String fileRelativePath = "onAgent";
+        File onAgent = new File(s.getWorkspaceFor(p).getRemote(), fileRelativePath);
+        String secret = "content on agent";
+        FileUtils.writeStringToFile(onAgent, secret);
+
+        String pipelineScript = "node('" + s.getNodeName() + "') {withMaven(mavenSettingsFilePath: '" + fileRelativePath + "') {isUnix() ? sh('cat $MVN_SETTINGS') : bat('type %MAVEN_SETTINGS%')}}";
+        p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun b = r.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0));
+        r.assertLogContains(secret, b);
     }
 }

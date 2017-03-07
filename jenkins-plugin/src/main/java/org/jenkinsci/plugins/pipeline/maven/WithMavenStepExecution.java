@@ -554,7 +554,7 @@ class WithMavenStepExecution extends StepExecution {
             String settingsPath = envOverride.expand(env.expand(step.getMavenSettingsFilePath()));
             FilePath settings;
 
-            if ((settings = new FilePath(ws.getChannel(), settingsPath)).exists()) {
+            if ((settings = ws.child(settingsPath)).exists()) {
                 // settings file residing on the agent
                 console.format("[withMaven] use Maven settings provided on the build agent '%s' %n", settingsPath);
                 LOGGER.log(Level.FINE, "Copying maven settings file from build agent {0} to {1}", new Object[]{settings, settingsDest});
@@ -594,7 +594,7 @@ class WithMavenStepExecution extends StepExecution {
         if (StringUtils.isNotEmpty(step.getGlobalMavenSettingsFilePath())) {
             String settingsPath = envOverride.expand(env.expand(step.getGlobalMavenSettingsFilePath()));
             FilePath settings;
-            if ((settings = new FilePath(ws.getChannel(), settingsPath)).exists()) {
+            if ((settings = ws.child(settingsPath)).exists()) {
                 // Global settings file residing on the agent
                 console.format("[withMaven] use Maven global settings provided on the build agent '%s' %n", settingsPath);
                 LOGGER.log(Level.FINE, "Copying maven global settings file from build agent {0} to {1}", new Object[]{settings, settingsDest});
