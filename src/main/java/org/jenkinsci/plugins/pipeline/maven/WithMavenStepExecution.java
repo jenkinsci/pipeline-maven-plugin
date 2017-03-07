@@ -455,7 +455,7 @@ class WithMavenStepExecution extends StepExecution {
             envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         } else if (!StringUtils.isEmpty(step.getMavenSettingsFilePath())) {
-            String settingsPath = envOverride.expand(env.expand(step.getMavenSettingsFilePath()));
+            String settingsPath = step.getMavenSettingsFilePath();
             FilePath settings;
             console.println("Setting up settings file " + settingsPath);
             // file from agent
@@ -488,7 +488,7 @@ class WithMavenStepExecution extends StepExecution {
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         } else if (!StringUtils.isEmpty(step.getGlobalMavenSettingsFilePath())) {
-            String settingsPath = envOverride.expand(env.expand(step.getGlobalMavenSettingsFilePath()));
+            String settingsPath = step.getGlobalMavenSettingsFilePath();
             FilePath settings;
             console.println("Setting up global settings file " + settingsPath);
             // file from agent
