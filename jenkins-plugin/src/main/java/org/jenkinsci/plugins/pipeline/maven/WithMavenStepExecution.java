@@ -45,6 +45,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -57,6 +58,7 @@ import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
 import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
+import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
 import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
 import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
@@ -83,6 +85,7 @@ import hudson.util.ArgumentListBuilder;
 import jenkins.model.*;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.springframework.util.ClassUtils;
+import org.w3c.dom.Document;
 
 @SuppressFBWarnings(value = "SE_TRANSIENT_FIELD_NOT_RESTORED", justification = "Contextual fields used only in start(); no onResume needed")
 class WithMavenStepExecution extends StepExecution {
@@ -561,6 +564,12 @@ class WithMavenStepExecution extends StepExecution {
                 settings.copyTo(settingsDest);
             } else if ((settings = new FilePath(new File(settingsPath))).exists()) {
                 // settings file residing on the master
+                try {
+                    XmlUtils.checkFileIsaMavenSettingsFile(new File(settingsPath));
+                } catch (AbortException e) {
+                    LOGGER.log(Level.WARNING,"Invalid Maven Setting File executing " + this.build.getFullDisplayName(), e);
+                    throw e;
+                }
                 console.format("[withMaven] use Maven settings provided on the master '%s' %n", settingsPath);
                 LOGGER.log(Level.FINE, "Copying maven settings file from master to build agent {0} to {1}", new Object[]{settings, settingsDest});
                 settings.copyTo(settingsDest);
@@ -606,6 +615,12 @@ class WithMavenStepExecution extends StepExecution {
                 settings.copyTo(settingsDest);
             } else if ((settings = new FilePath(new File(settingsPath))).exists()) { // File from the master
                 // Global settings file residing on the master
+                try {
+                    XmlUtils.checkFileIsaMavenSettingsFile(new File(settingsPath));
+                } catch (AbortException e) {
+                    LOGGER.log(Level.WARNING,"Invalid Maven Global Setting File executing " + this.build.getFullDisplayName(), e);
+                    throw e;
+                }
                 console.format("[withMaven] use Maven global settings provided on the master '%s' %n", settingsPath);
                 LOGGER.log(Level.FINE, "Copying maven global settings file from master to build agent {0} to {1}", new Object[]{settings, settingsDest});
                 settings.copyTo(settingsDest);
