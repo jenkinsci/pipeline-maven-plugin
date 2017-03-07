@@ -560,10 +560,7 @@ class WithMavenStepExecution extends StepExecution {
                 LOGGER.log(Level.FINE, "Copying maven settings file from build agent {0} to {1}", new Object[]{settings, settingsDest});
                 settings.copyTo(settingsDest);
             } else if ((settings = new FilePath(new File(settingsPath))).exists()) {
-                // settings file residing on the master
-                console.format("[withMaven] use Maven settings provided on the master '%s' %n", settingsPath);
-                LOGGER.log(Level.FINE, "Copying maven settings file from master to build agent {0} to {1}", new Object[]{settings, settingsDest});
-                settings.copyTo(settingsDest);
+                throw new IllegalStateException("Using a Maven settings file located on the master is no longer supported: " + settings);
             } else {
                 throw new AbortException("Could not find file '" + settingsPath + "' on the build agent nor the master");
             }
@@ -605,10 +602,7 @@ class WithMavenStepExecution extends StepExecution {
                 LOGGER.log(Level.FINE, "Copying maven global settings file from build agent {0} to {1}", new Object[]{settings, settingsDest});
                 settings.copyTo(settingsDest);
             } else if ((settings = new FilePath(new File(settingsPath))).exists()) { // File from the master
-                // Global settings file residing on the master
-                console.format("[withMaven] use Maven global settings provided on the master '%s' %n", settingsPath);
-                LOGGER.log(Level.FINE, "Copying maven global settings file from master to build agent {0} to {1}", new Object[]{settings, settingsDest});
-                settings.copyTo(settingsDest);
+                throw new IllegalStateException("Using a Maven global settings file located on the master is no longer supported: " + settings);
             } else {
                 throw new AbortException("Could not find file '" + settingsPath + "' on the build agent nor the master");
             }
