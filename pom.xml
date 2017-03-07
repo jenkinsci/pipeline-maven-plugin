@@ -71,6 +71,10 @@
         <tag>HEAD</tag>
     </scm>
 
+    <properties> <!-- TODO unwise to use the plugin parent POM for a non-plugin! -->
+        <jenkins.version>1.642.4</jenkins.version>
+    </properties>
+
     <modules>
         <module>maven-spy</module>
         <module>jenkins-plugin</module>
