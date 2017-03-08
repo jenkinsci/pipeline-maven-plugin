@@ -24,13 +24,8 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.ExecutionEvent;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.hamcrest.CoreMatchers;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.DevNullMavenEventReporter;
@@ -40,6 +35,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -88,7 +84,7 @@ public class JenkinsMavenEventSpyDisablementTest {
         spy.init(new EventSpy.Context() {
             @Override
             public Map<String, Object> getData() {
-                return new HashedMap();
+                return new HashMap<String, Object>();
             }
         });
 

@@ -28,13 +28,15 @@
 
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
-    <artifactId>pipeline-maven-parent</artifactId>
-    <version>2.0-beta-7-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath>
+    <artifactId>plugin</artifactId>
+    <version>2.19</version>
+    <relativePath />
   </parent>
 
+  <groupId>org.jenkins-ci.plugins</groupId>
   <artifactId>pipeline-maven</artifactId>
   <packaging>hpi</packaging>
+  <version>2.0-beta-7-SNAPSHOT</version>
 
   <name>Pipeline Maven Integration Plugin</name>
   <description>
@@ -58,6 +60,9 @@
     </developer>
   </developers>
 
+  <properties>
+    <jenkins.version>1.642.4</jenkins.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
@@ -92,16 +97,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <!--
-      Match the version used in jenkins-core
-      -->
-      <version>2.6</version>
-      <scope>provided</scope>
-    </dependency>
-
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-cps</artifactId>
@@ -186,4 +181,17 @@
         </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
 </project>
