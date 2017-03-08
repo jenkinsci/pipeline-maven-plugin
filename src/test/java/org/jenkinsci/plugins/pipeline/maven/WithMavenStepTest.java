@@ -23,10 +23,21 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
+import hudson.model.Node;
+import hudson.model.Result;
+import hudson.plugins.sshslaves.SSHLauncher;
+import hudson.slaves.DumbSlave;
+import hudson.slaves.NodeProperty;
+import hudson.slaves.RetentionStrategy;
+import java.io.File;
+import java.util.Collections;
+import org.apache.commons.io.FileUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.test.steps.SemaphoreStep;
+import org.jenkinsci.test.acceptance.docker.DockerRule;
+import org.jenkinsci.test.acceptance.docker.fixtures.JavaContainer;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.Rule;
@@ -42,6 +53,9 @@ public class WithMavenStepTest {
 
     @Rule
     public RestartableJenkinsRule rr = new RestartableJenkinsRule();
+
+    @Rule
+    public DockerRule<JavaContainer> slaveRule = new DockerRule<>(JavaContainer.class);
 
     @Issue("JENKINS-39134")
     @Test
@@ -64,6 +78,28 @@ public class WithMavenStepTest {
                 rr.j.assertBuildStatusSuccess(rr.j.waitForCompletion(b));
                 SemaphoreStep.success("wait/2", null);
                 rr.j.buildAndAssertSuccess(p);
+            }
+        });
+    }
+
+    @Issue("SECURITY-441")
+    @Test
+    public void fileOnMaster() {
+        rr.addStep(new Statement() {
+            @Override
+            public void evaluate() throws Throwable {
+                JavaContainer slaveContainer = slaveRule.get();
+                rr.j.jenkins.addNode(new DumbSlave("remote", "", "/home/test/slave", "1", Node.Mode.NORMAL, "",
+                                                   new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), "test", "test", "", ""),
+                                                   RetentionStrategy.INSTANCE, Collections.<NodeProperty<?>>emptyList()));
+                File onMaster = new File(rr.j.jenkins.getRootDir(), "onmaster");
+                String secret = "secret content on master";
+                FileUtils.writeStringToFile(onMaster, secret);
+                WorkflowJob p = rr.j.createProject(WorkflowJob.class, "p");
+                String pipelineScript = "node('remote') {withMaven(mavenSettingsFilePath: '" + onMaster + "') {echo readFile(MVN_SETTINGS)}}";
+                p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+                WorkflowRun b = rr.j.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
+                rr.j.assertLogNotContains(secret, b);
             }
         });
     }
