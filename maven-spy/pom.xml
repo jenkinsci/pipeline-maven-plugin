@@ -41,6 +41,20 @@
         Jenkins Pipeline withMaven(){} step.
     </description>
 
+    <licenses>
+        <license>
+            <name>The MIT license</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
+        <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>javax.inject</groupId>
