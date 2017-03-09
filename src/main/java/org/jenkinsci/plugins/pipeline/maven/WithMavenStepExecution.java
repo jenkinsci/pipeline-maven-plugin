@@ -455,20 +455,16 @@ class WithMavenStepExecution extends StepExecution {
             envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         } else if (!StringUtils.isEmpty(step.getMavenSettingsFilePath())) {
-            String settingsPath = envOverride.expand(env.expand(step.getMavenSettingsFilePath()));
+            String settingsPath = step.getMavenSettingsFilePath();
             FilePath settings;
             console.println("Setting up settings file " + settingsPath);
             // file from agent
-            if ((settings = new FilePath(ws.getChannel(), settingsPath)).exists()) {
+            if ((settings = ws.child(settingsPath)).exists()) {
                 console.format("Using settings from: %s on build agent%n", settingsPath);
                 LOGGER.log(Level.FINE, "Copying file from build agent {0} to {1}", new Object[] { settings, settingsDest });
                 settings.copyTo(settingsDest);
-            } else if ((settings = new FilePath(new File(settingsPath))).exists()) { // File from the master
-                console.format("Using settings from: %s on master%n", settingsPath);
-                LOGGER.log(Level.FINE, "Copying file from master to build agent {0} to {1}", new Object[] { settings, settingsDest });
-                settings.copyTo(settingsDest);
             } else {
-                throw new AbortException("Could not find file '" + settingsPath + "' on the build agent nor the master");
+                throw new AbortException("Could not find file '" + settings + "' on the build agent");
             }
             envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
@@ -492,20 +488,16 @@ class WithMavenStepExecution extends StepExecution {
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         } else if (!StringUtils.isEmpty(step.getGlobalMavenSettingsFilePath())) {
-            String settingsPath = envOverride.expand(env.expand(step.getGlobalMavenSettingsFilePath()));
+            String settingsPath = step.getGlobalMavenSettingsFilePath();
             FilePath settings;
             console.println("Setting up global settings file " + settingsPath);
             // file from agent
-            if ((settings = new FilePath(ws.getChannel(), settingsPath)).exists()) {
+            if ((settings = ws.child(settingsPath)).exists()) {
                 console.format("Using global settings from: %s on build agent%n", settingsPath);
                 LOGGER.log(Level.FINE, "Copying file from build agent {0} to {1}", new Object[] { settings, settingsDest });
                 settings.copyTo(settingsDest);
-            } else if ((settings = new FilePath(new File(settingsPath))).exists()) { // File from the master
-                console.format("Using global settings from: %s on master%n", settingsPath);
-                LOGGER.log(Level.FINE, "Copying file from master to build agent {0} to {1}", new Object[] { settings, settingsDest });
-                settings.copyTo(settingsDest);
             } else {
-                throw new AbortException("Could not find file '" + settingsPath + "' on the build agent nor the master");
+                throw new AbortException("Could not find file '" + settings + "' on the build agent");
             }
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
