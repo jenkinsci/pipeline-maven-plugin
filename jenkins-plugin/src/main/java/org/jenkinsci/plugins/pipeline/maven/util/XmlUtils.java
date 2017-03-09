@@ -24,6 +24,7 @@
 
 package org.jenkinsci.plugins.pipeline.maven.util;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.FilePath;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
@@ -33,7 +34,11 @@ import org.w3c.dom.NodeList;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,15 +91,19 @@ public class XmlUtils {
     }
 
     @Nullable
-    public static Element getUniqueChildElementOrNull(@Nonnull Element element, @Nonnull String childElementName) {
-        List<Element> childElts = getChildrenElements(element, childElementName);
-        if (childElts.size() == 0) {
-            return null;
-        } else if (childElts.size() > 1) {
-            throw new IllegalStateException("More than 1 (" + childElts.size() + ") elements <" + childElementName + "> found in " + toString(element));
-        }
+    public static Element getUniqueChildElementOrNull(@Nonnull Element element, String... childElementName) {
+        Element result = element;
+        for (String childEltName : childElementName) {
+            List<Element> childElts = getChildrenElements(result, childEltName);
+            if (childElts.size() == 0) {
+                return null;
+            } else if (childElts.size() > 1) {
+                throw new IllegalStateException("More than 1 (" + childElts.size() + ") elements <" + childEltName + "> found in " + toString(element));
+            }
 
-        return childElts.get(0);
+            result = childElts.get(0);
+        }
+        return result;
     }
 
     @Nonnull
@@ -126,11 +135,12 @@ public class XmlUtils {
     }
 
     @Nonnull
-    public static List<Element> getExecutionEvents(@Nonnull Element mavenSpyLogs, String expectedType) {
+    public static List<Element> getExecutionEvents(@Nonnull Element mavenSpyLogs, String... expectedType) {
 
+        Set<String> expectedTypes = new HashSet<>(Arrays.asList(expectedType));
         List<Element> result = new ArrayList<>();
         for (Element element : getChildrenElements(mavenSpyLogs, "ExecutionEvent")) {
-            if (element.getAttribute("type").equals(expectedType)) {
+            if (expectedTypes.contains(element.getAttribute("type"))){
                 result.add(element);
             }
         }
@@ -193,5 +203,22 @@ public class XmlUtils {
             return null;
         }
         return build.getAttribute("directory");
+    }
+
+    /**
+     * Concatenate the given {@code elements} using the given {@code delimiter} to concatenate.
+     */
+    @NonNull
+    public static String join(@NonNull Iterable<String> elements, @NonNull String delimiter) {
+        StringBuilder result = new StringBuilder();
+        Iterator<String> it = elements.iterator();
+        while (it.hasNext()) {
+            String element = it.next();
+            result.append(element);
+            if (it.hasNext()) {
+                result.append(delimiter);
+            }
+        }
+        return result.toString();
     }
 }

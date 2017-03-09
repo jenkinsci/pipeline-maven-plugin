@@ -35,6 +35,7 @@ import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.JarJarExecutionHand
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.MavenEventHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.MavenExecutionRequestHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.MavenExecutionResultHandler;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.ProjectFailedExecutionHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.ProjectStartedExecutionHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.ProjectSucceededExecutionHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.SessionEndedHandler;
@@ -90,6 +91,7 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
 
     public JenkinsMavenEventSpy(MavenEventReporter reporter) throws IOException {
         handlers.add(new ProjectSucceededExecutionHandler(reporter));
+        handlers.add(new ProjectFailedExecutionHandler(reporter));
         handlers.add(new ProjectStartedExecutionHandler(reporter));
         handlers.add(new SurefireTestExecutionHandler(reporter));
         handlers.add(new JarJarExecutionHandler(reporter));
