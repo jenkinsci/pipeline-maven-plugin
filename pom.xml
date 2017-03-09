@@ -25,19 +25,12 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <parent>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>plugin</artifactId>
-        <version>2.19</version>
-        <relativePath />
-    </parent>
-
+    <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>pipeline-maven-parent</artifactId>
     <version>2.0-beta-7-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Pipeline Maven Integration Plugin POM</name>
+    <name>Pipeline Maven Integration Plugin Parent</name>
     <description>
         This plugin provides integration with Pipeline, configures maven environment to use within a pipeline job by calling sh mvn or bat mvn.
         The selected maven installation will be configured and prepended to the path.
@@ -70,15 +63,19 @@
         <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
         <tag>HEAD</tag>
     </scm>
-
-    <properties> <!-- TODO unwise to use the plugin parent POM for a non-plugin! -->
-        <jenkins.version>1.642.4</jenkins.version>
-    </properties>
-
     <modules>
         <module>maven-spy</module>
         <module>jenkins-plugin</module>
     </modules>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.5.3</version>
+            </plugin>
+        </plugins>
+    </build>
     <repositories>
         <repository>
             <id>repo.jenkins-ci.org</id>
@@ -92,4 +89,15 @@
             <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
+    <distributionManagement>
+        <repository>
+            <uniqueVersion>false</uniqueVersion>
+            <id>maven.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>maven.jenkins-ci.org</id>
+            <url>https://repo.jenkins-ci.org/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>
