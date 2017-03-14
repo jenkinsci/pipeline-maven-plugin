@@ -120,6 +120,9 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
             if (build.getOutputDirectory() != null) {
                 buildElt.setAttribute("directory", build.getDirectory());
             }
+            if (build.getSourceDirectory() != null) {
+                buildElt.setAttribute("sourceDirectory", build.getSourceDirectory());
+            }
         }
 
         return projectElt;

@@ -25,39 +25,26 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
-import hudson.plugins.findbugs.FindBugsReporter;
-import hudson.tasks.Fingerprinter;
-import jenkins.model.ArtifactManager;
 import jenkins.model.InterruptedBuildAction;
-import jenkins.util.BuildListenerAdapter;
-import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.reporters.FindbugsAnalysisReporter;
 import org.jenkinsci.plugins.pipeline.maven.reporters.GeneratedArtifactsReporter;
 import org.jenkinsci.plugins.pipeline.maven.reporters.JunitTestsReporter;
-import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
+import org.jenkinsci.plugins.pipeline.maven.reporters.TasksScannerReporter;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -121,6 +108,16 @@ public class MavenSpyLogProcessor implements Serializable {
                     LOGGER.log(Level.FINE, "Look for Findbugs results to publish, file {0} NOT found in workspace", skipFindbugsFile);
                     new FindbugsAnalysisReporter().process(context, mavenSpyLogsElt);
                 }
+
+                FilePath skipTasksScannerFile = workspace.child(".skip-task-scanner");
+                if (skipTasksScannerFile.exists()) {
+                    listener.getLogger().println("[withMaven] Skip publishing of tasks in source code, file '" + skipTasksScannerFile + "' found in workspace");
+                } else {
+                    LOGGER.log(Level.FINE, "Look for tasks in source code to publish, file {0} NOT found in workspace", skipTasksScannerFile);
+                    new TasksScannerReporter().process(context, mavenSpyLogsElt);
+                }
+
+
             } catch (SAXException e) {
                 Run run = context.get(Run.class);
                 if (run.getActions(InterruptedBuildAction.class).isEmpty()) {
