@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>pipeline-maven-parent</artifactId>
-        <version>2.0-beta-7-SNAPSHOT</version>
+        <version>2.0-beta-7</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -53,7 +53,8 @@
         <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
-    </scm>
+      <tag>pipeline-maven-parent-2.0-beta-7</tag>
+  </scm>
 
     <dependencies>
         <dependency>
