@@ -50,6 +50,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import jenkins.mvn.GlobalMavenConfig;
+import jenkins.mvn.GlobalSettingsProvider;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.configprovider.model.Config;
 import org.jenkinsci.plugins.configfiles.ConfigFiles;
@@ -566,6 +568,15 @@ class WithMavenStepExecution extends StepExecution {
             return settingsDest.getRemote();
         }
 
+        // Settings provided by the global maven configuration
+        FilePath settings = GlobalMavenConfig.get().getSettingsProvider().supplySettings(this.build, this.ws, this.listener);
+        if (settings != null) {
+            console.format("[withMaven] use Maven settings provided Jenkins Global configuration '%s' %n", settings);
+            settings.copyTo(settingsDest);
+            envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
+            return settingsDest.getRemote();
+        }
+
         return null;
     }
 
@@ -574,7 +585,7 @@ class WithMavenStepExecution extends StepExecution {
      * file existence is checked on the build agent, if not found, it will be checked and copied from the master. The
      * file will be generated/copied to the workspace temp folder to make sure docker container can access it.
      *
-     * @return the mavne global settings file path on the agent or {@code null} if none defined
+     * @return the maven global settings file path on the agent or {@code null} if none defined
      * @throws InterruptedException when processing remote calls
      * @throws IOException          when reading files
      */
@@ -605,6 +616,17 @@ class WithMavenStepExecution extends StepExecution {
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         }
+
+        // Global settings provided by the global maven configuration
+        GlobalSettingsProvider globalSettingsProvider = GlobalMavenConfig.get().getGlobalSettingsProvider();
+        FilePath settings = globalSettingsProvider.supplySettings(this.build, this.ws, this.listener);
+        if (settings != null) {
+            console.format("[withMaven] use Maven global settings provided Jenkins Global configuration '%s' %n", settings);
+            settings.copyTo(settingsDest);
+            envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
+            return settingsDest.getRemote();
+        }
+
         return null;
     }
 
