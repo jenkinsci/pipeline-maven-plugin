@@ -99,12 +99,12 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         if (project.getFile() != null) {
             File projectFile = project.getFile();
             String absolutePath = projectFile.getAbsolutePath();
-            if (absolutePath.endsWith("/pom.xml")) {
+            if (absolutePath.endsWith(File.separator + "pom.xml")) {
                 // no tweak
-            } else if (absolutePath.endsWith("/dependency-reduced-pom.xml")) {
+            } else if (absolutePath.endsWith(File.separator + "dependency-reduced-pom.xml")) {
                 // JENKINS-42302: maven-shade-plugin creates a temporary project file dependency-reduced-pom.xml
                 // TODO see if there is a better way to implement this "workaround"
-                absolutePath = absolutePath.replace("/dependency-reduced-pom.xml", "/pom.xml");
+                absolutePath = absolutePath.replace(File.separator + "dependency-reduced-pom.xml", File.separator + "pom.xml");
             } else {
                 System.out.println("[jenkins-maven-event-spy] WARNING: unexpected Maven project file name '"
                         + projectFile.getName() + "', problems may occur");
