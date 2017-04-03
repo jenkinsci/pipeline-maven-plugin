@@ -29,22 +29,29 @@ import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.slaves.DumbSlave;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.RetentionStrategy;
-import java.io.File;
-import java.util.Collections;
+import hudson.tasks.Maven;
+import jenkins.mvn.DefaultGlobalSettingsProvider;
+import jenkins.mvn.DefaultSettingsProvider;
+import jenkins.mvn.GlobalMavenConfig;
+import jenkins.scm.impl.mock.GitRepoRule;
 import org.apache.commons.io.FileUtils;
+import org.jenkinsci.plugins.pipeline.maven.docker.JavaGitContainer;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.jenkinsci.plugins.workflow.test.steps.SemaphoreStep;
 import org.jenkinsci.test.acceptance.docker.DockerRule;
-import org.jenkinsci.test.acceptance.docker.fixtures.JavaContainer;
+import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Test;
 import org.junit.Rule;
-import org.junit.runners.model.Statement;
+import org.junit.Test;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.RestartableJenkinsRule;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.ToolInstallations;
+
+import java.io.File;
+import java.net.URL;
+import java.util.Collections;
 
 public class WithMavenStepTest {
 
@@ -52,56 +59,134 @@ public class WithMavenStepTest {
     public static BuildWatcher buildWatcher = new BuildWatcher();
 
     @Rule
-    public RestartableJenkinsRule rr = new RestartableJenkinsRule();
+    public JenkinsRule jenkinsRule = new JenkinsRule();
 
     @Rule
-    public DockerRule<JavaContainer> slaveRule = new DockerRule<>(JavaContainer.class);
+    public GitRepoRule gitRepoRule = new GitRepoRule();
 
-    @Issue("JENKINS-39134")
-    @Test
-    public void resume() throws Exception {
-        rr.addStep(new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                WorkflowJob p = rr.j.createProject(WorkflowJob.class, "p");
-                p.setDefinition(new CpsFlowDefinition("node {withMaven {semaphore 'wait'}}", true));
-                WorkflowRun b = p.scheduleBuild2(0).waitForStart();
-                SemaphoreStep.waitForStart("wait/1", b);
-            }
-        });
-        rr.addStep(new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                WorkflowJob p = rr.j.jenkins.getItemByFullName("p", WorkflowJob.class);
-                WorkflowRun b = p.getBuildByNumber(1);
-                SemaphoreStep.success("wait/1", null);
-                rr.j.assertBuildStatusSuccess(rr.j.waitForCompletion(b));
-                SemaphoreStep.success("wait/2", null);
-                rr.j.buildAndAssertSuccess(p);
-            }
-        });
+    @Rule
+    public DockerRule<JavaGitContainer> slaveRule = new DockerRule<>(JavaGitContainer.class);
+
+    private String mavenInstallationName;
+
+    @Before
+    public void setup() throws Exception {
+        Maven.MavenInstallation maven3 = ToolInstallations.configureMaven33();
+        mavenInstallationName = maven3.getName();
+
+        GlobalMavenConfig globalMavenConfig = jenkinsRule.get(GlobalMavenConfig.class);
+        globalMavenConfig.setGlobalSettingsProvider(new DefaultGlobalSettingsProvider());
+        globalMavenConfig.setSettingsProvider(new DefaultSettingsProvider());
+
+        JavaGitContainer slaveContainer = slaveRule.get();
+
+        DumbSlave agent = new DumbSlave("remote", "", "/home/test/slave", "1", Node.Mode.NORMAL, "",
+                new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), "test", "test", "", ""),
+                RetentionStrategy.INSTANCE, Collections.<NodeProperty<?>>emptyList());
+        jenkinsRule.jenkins.addNode(agent);
+
+        System.out.println("WithMavenStepTest new File('.'): " + new File(".").getAbsolutePath());
+
     }
 
     @Issue("SECURITY-441")
     @Test
-    public void fileOnMaster() {
-        rr.addStep(new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                JavaContainer slaveContainer = slaveRule.get();
-                rr.j.jenkins.addNode(new DumbSlave("remote", "", "/home/test/slave", "1", Node.Mode.NORMAL, "",
-                                                   new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), "test", "test", "", ""),
-                                                   RetentionStrategy.INSTANCE, Collections.<NodeProperty<?>>emptyList()));
-                File onMaster = new File(rr.j.jenkins.getRootDir(), "onmaster");
-                String secret = "secret content on master";
-                FileUtils.writeStringToFile(onMaster, secret);
-                WorkflowJob p = rr.j.createProject(WorkflowJob.class, "p");
-                String pipelineScript = "node('remote') {withMaven(mavenSettingsFilePath: '" + onMaster + "') {echo readFile(MVN_SETTINGS)}}";
-                p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-                WorkflowRun b = rr.j.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
-                rr.j.assertLogNotContains(secret, b);
-            }
-        });
+    public void maven_build_on_remote_agent_with_settings_file_on_master_fails() throws Exception {
+        File onMaster = new File(jenkinsRule.jenkins.getRootDir(), "onmaster");
+        String secret = "secret content on master";
+        FileUtils.writeStringToFile(onMaster, secret);
+        String pipelineScript = "node('remote') {withMaven(mavenSettingsFilePath: '" + onMaster + "') {echo readFile(MVN_SETTINGS)}}";
+
+        WorkflowJob p = jenkinsRule.createProject(WorkflowJob.class, "p");
+        p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun b = jenkinsRule.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
+        jenkinsRule.assertLogNotContains(secret, b);
     }
 
+    @Test
+    public void maven_build_on_master_with_specified_maven_installation_succeeds() throws Exception {
+        loadMavenJarProjectInGitRepo(this.gitRepoRule);
+
+        String pipelineScript = "node('master') {\n" +
+                "    git($/" + gitRepoRule.getRepositoryAbsolutePath() + "/$)\n" +
+                "    withMaven(maven: 'apache-maven-3.3.9') {\n" +
+                "        sh 'mvn package'\n" +
+                "    }\n" +
+                "}";
+
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-with-tool-provided-maven");
+        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+
+        // verify provided Maven is used
+        jenkinsRule.assertLogContains("use Maven installation '" + this.mavenInstallationName+                "'", build);
+
+        // verify .pom is archived and fingerprinted
+        // "[withMaven] Archive ... under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.pom"
+        jenkinsRule.assertLogContains("under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.pom", build);
+
+        // verify .jar is archived and fingerprinted
+        jenkinsRule.assertLogContains("under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.jar", build);
+    }
+
+    @Test
+    public void maven_build_on_master_with_missing_specified_maven_installation_fails() throws Exception {
+        loadMavenJarProjectInGitRepo(this.gitRepoRule);
+
+        String pipelineScript = "node('master') {\n" +
+                "    git($/" + gitRepoRule.getRepositoryAbsolutePath() + "/$)\n" +
+                "    withMaven(maven: 'install-does-not-exist') {\n" +
+                "        sh 'mvn package'\n" +
+                "        sh 'pwd && tree .'\n" +
+                "    }\n" +
+                "}";
+
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-with-tool-provided-maven");
+        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.FAILURE, pipeline.scheduleBuild2(0));
+    }
+
+    @Test
+    public void maven_build_on_master_succeeds() throws Exception {
+        loadMavenJarProjectInGitRepo(this.gitRepoRule);
+
+        String pipelineScript = "node('master') {\n" +
+                "    git($/" + gitRepoRule.getRepositoryAbsolutePath() + "/$)\n" +
+                "    withMaven() {\n" +
+                "        sh 'mvn package'\n" +
+                "        sh 'pwd && tree .'\n" +
+                "    }\n" +
+                "}";
+
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
+        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+
+        // verify Maven installation provided by the build agent is used
+        jenkinsRule.assertLogContains("[withMaven] use Maven installation provided by the build agent with executable", build);
+
+        // verify .pom is archived and fingerprinted
+        // "[withMaven] Archive ... under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.pom"
+        jenkinsRule.assertLogContains("under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.pom", build);
+
+        // verify .jar is archived and fingerprinted
+        jenkinsRule.assertLogContains("under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.jar", build);
+
+        // verify Junit Archiver is called for jenkins.mvn.test:mono-module-maven-app
+        jenkinsRule.assertLogContains("[withMaven] Archive test results for Maven artifact MavenArtifact{jenkins.mvn.test:mono-module-maven-app::0.1-SNAPSHOT}", build);
+
+        // verify Task Scanner is called for jenkins.mvn.test:mono-module-maven-app
+        jenkinsRule.assertLogContains("[withMaven] Scan Tasks for Maven artifact MavenArtifact{jenkins.mvn.test:mono-module-maven-app::0.1-SNAPSHOT}", build);
+    }
+
+    private void loadMavenJarProjectInGitRepo(GitRepoRule gitRepo) throws Exception {
+        gitRepo.init();
+
+        File mavenProjectRoot = new File("src/test/test-maven-projects/maven-jar-project");
+        if (! mavenProjectRoot.exists()) {
+            throw new IllegalStateException("Folder '" + mavenProjectRoot.getAbsolutePath() + "' not found");
+        }
+
+        gitRepo.addFilesAndCommit(mavenProjectRoot.toPath());
+    }
 }
