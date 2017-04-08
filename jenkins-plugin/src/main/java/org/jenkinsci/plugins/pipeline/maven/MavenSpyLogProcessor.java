@@ -58,16 +58,6 @@ public class MavenSpyLogProcessor implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(MavenSpyLogProcessor.class.getName());
 
-    protected final transient DocumentBuilder documentBuilder;
-
-    public MavenSpyLogProcessor() {
-        try {
-            documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new IllegalStateException(e);
-        }
-    }
-
     public void processMavenSpyLogs(StepContext context, FilePath mavenSpyLogFolder) throws IOException, InterruptedException {
         FilePath[] mavenSpyLogsList = mavenSpyLogFolder.list("maven-spy-*.log");
         LOGGER.log(Level.FINE, "Found {0} maven execution reports in {1}", new Object[]{mavenSpyLogsList.length, mavenSpyLogFolder});
@@ -79,10 +69,20 @@ public class MavenSpyLogProcessor implements Serializable {
         }
         FilePath workspace = context.get(FilePath.class); // TODO check that it's the good workspace
 
+        DocumentBuilder documentBuilder;
+        try {
+            documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new IllegalStateException("Failure to create a DocumentBuilder", e);
+        }
+
         for (FilePath mavenSpyLogs : mavenSpyLogsList) {
             try {
                 LOGGER.log(Level.INFO, "Evaluate Maven Spy logs: " + mavenSpyLogs.getRemote());
                 InputStream mavenSpyLogsInputStream = mavenSpyLogs.read();
+                if (mavenSpyLogsInputStream == null) {
+                    throw new IllegalStateException("InputStream for " + mavenSpyLogs.getRemote() + " is null");
+                }
 
                 Element mavenSpyLogsElt = documentBuilder.parse(mavenSpyLogsInputStream).getDocumentElement();
 
