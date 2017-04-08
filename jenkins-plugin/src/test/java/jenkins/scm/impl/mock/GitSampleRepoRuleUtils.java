@@ -1,7 +1,7 @@
 package jenkins.scm.impl.mock;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import hudson.FilePath;
+import jenkins.plugins.git.GitSampleRepoRule;
 
 import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
@@ -13,12 +13,12 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
 
-import static java.nio.file.FileVisitResult.CONTINUE;
+import static java.nio.file.FileVisitResult.*;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class SampleDVCSRepoRuleUtils {
+public class GitSampleRepoRuleUtils {
 
     /**
      * Copy the files of the given {@code rootFolder} into the given {@link AbstractSampleDVCSRepoRule}.
@@ -27,7 +27,7 @@ public class SampleDVCSRepoRuleUtils {
      * @param sampleDVCSRepoRule target sample repo
      * @throws IOException exception during the copy
      */
-    public static void addFiles(@NonNull Path rootFolder, @NonNull AbstractSampleDVCSRepoRule sampleDVCSRepoRule) throws IOException {
+    public static void addFilesAndCommit(@NonNull Path rootFolder, @NonNull GitSampleRepoRule sampleDVCSRepoRule) throws IOException {
 
         if (!Files.exists(rootFolder))
             return;
@@ -55,15 +55,17 @@ public class SampleDVCSRepoRuleUtils {
 
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                        if (file.toFile().getName().startsWith(".")) {
-                            // skip files starting with "."
-                        } else {
-                            Files.copy(file, target.resolve(source.relativize(file)));
-                        }
+                        Files.copy(file, target.resolve(source.relativize(file)));
                         return CONTINUE;
                     }
                 });
 
+        try {
+            sampleDVCSRepoRule.git("add", "--all");
+            sampleDVCSRepoRule.git("commit", "--message=addfiles");
+        } catch (Exception e) {
+            throw new IOException("Exception executing 'git commit' adding " + source, e);
+        }
 
     }
 }
