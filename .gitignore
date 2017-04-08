@@ -16,3 +16,6 @@ work/
 .project
 .metadata
 .loadpath
+
+# log files
+*.log
