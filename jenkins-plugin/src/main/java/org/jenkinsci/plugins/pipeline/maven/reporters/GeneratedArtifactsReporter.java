@@ -2,11 +2,13 @@ package org.jenkinsci.plugins.pipeline.maven.reporters;
 
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.FingerprintMap;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.tasks.Fingerprinter;
 import jenkins.model.ArtifactManager;
+import jenkins.model.Jenkins;
 import jenkins.util.BuildListenerAdapter;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
@@ -97,6 +99,14 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
         artifactManager.archive(workspace, launcher, new BuildListenerAdapter(listener), artifactsToArchive);
 
         // FINGERPRINT GENERATED MAVEN ARTIFACT
+        FingerprintMap fingerprintMap = Jenkins.getActiveInstance().getFingerprintMap();
+        for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
+            String artifactPathInArchiveZone = artifactToFingerprint.getKey();
+            String artifactMd5 = artifactToFingerprint.getValue();
+            fingerprintMap.getOrCreate(run, artifactPathInArchiveZone, artifactMd5);
+        }
+
+        // add action
         Fingerprinter.FingerprintAction fingerprintAction = run.getAction(Fingerprinter.FingerprintAction.class);
         if (fingerprintAction == null) {
             run.addAction(new Fingerprinter.FingerprintAction(run, artifactsToFingerPrint));
