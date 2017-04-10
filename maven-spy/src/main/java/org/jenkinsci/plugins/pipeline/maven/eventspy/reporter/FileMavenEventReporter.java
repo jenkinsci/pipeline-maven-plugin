@@ -41,6 +41,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -49,7 +50,9 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class FileMavenEventReporter implements MavenEventReporter {
     File outFile;
+    @GuardedBy("this")
     PrintWriter out;
+    @GuardedBy("this")
     XMLWriter xmlWriter;
 
     public FileMavenEventReporter() throws IOException {

@@ -37,6 +37,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 
+import javax.annotation.concurrent.GuardedBy;
 import javax.annotation.concurrent.ThreadSafe;
 
 /**
@@ -45,7 +46,9 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public class OutputStreamEventReporter implements MavenEventReporter {
 
+    @GuardedBy("this")
     final PrintWriter out;
+    @GuardedBy("this")
     final XMLWriter xmlWriter;
 
     public OutputStreamEventReporter(OutputStream out) {
