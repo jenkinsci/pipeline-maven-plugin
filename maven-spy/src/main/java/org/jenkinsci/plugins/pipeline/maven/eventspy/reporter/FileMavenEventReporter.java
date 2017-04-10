@@ -41,13 +41,18 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
+
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
+@ThreadSafe
 public class FileMavenEventReporter implements MavenEventReporter {
     File outFile;
+    @GuardedBy("this")
     PrintWriter out;
-
+    @GuardedBy("this")
     XMLWriter xmlWriter;
 
     public FileMavenEventReporter() throws IOException {
@@ -77,20 +82,20 @@ public class FileMavenEventReporter implements MavenEventReporter {
     }
 
     @Override
-    public void print(Object message) {
+    public synchronized void print(Object message) {
         XmlWriterUtil.writeComment(xmlWriter, new Timestamp(System.currentTimeMillis()) + " - " + message);
         XmlWriterUtil.writeLineBreak(xmlWriter);
     }
 
     @Override
-    public void print(Xpp3Dom element) {
+    public synchronized void print(Xpp3Dom element) {
         element.setAttribute("_time", new Timestamp(System.currentTimeMillis()).toString());
         Xpp3DomWriter.write(xmlWriter, element);
         XmlWriterUtil.writeLineBreak(xmlWriter);
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         xmlWriter.endElement();
 
         out.close();

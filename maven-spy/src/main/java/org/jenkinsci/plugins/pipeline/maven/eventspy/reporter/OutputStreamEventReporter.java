@@ -37,12 +37,18 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.sql.Timestamp;
 
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
+
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
+@ThreadSafe
 public class OutputStreamEventReporter implements MavenEventReporter {
 
+    @GuardedBy("this")
     final PrintWriter out;
+    @GuardedBy("this")
     final XMLWriter xmlWriter;
 
     public OutputStreamEventReporter(OutputStream out) {
@@ -61,7 +67,7 @@ public class OutputStreamEventReporter implements MavenEventReporter {
     }
 
     @Override
-    public void print(Object message) {
+    public synchronized void print(Object message) {
         String comment = new Timestamp(System.currentTimeMillis()) + " - " + message;
         XmlWriterUtil.writeComment(xmlWriter, comment);
         XmlWriterUtil.writeLineBreak(xmlWriter);
@@ -70,7 +76,7 @@ public class OutputStreamEventReporter implements MavenEventReporter {
     }
 
     @Override
-    public void print(Xpp3Dom element) {
+    public synchronized void print(Xpp3Dom element) {
         Xpp3DomWriter.write(xmlWriter, element);
         XmlWriterUtil.writeLineBreak(xmlWriter);
 
@@ -78,7 +84,7 @@ public class OutputStreamEventReporter implements MavenEventReporter {
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
         xmlWriter.endElement();
         out.flush();
     }
