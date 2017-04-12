@@ -70,7 +70,7 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
 
     public final static String DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME =  "JENKINS_MAVEN_AGENT_DISABLED";
 
-    private final MavenEventReporter reporter;
+    private MavenEventReporter reporter;
 
     /*
      * visible for testing
@@ -86,10 +86,28 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
     private List<MavenEventHandler> handlers = new ArrayList();
 
     public JenkinsMavenEventSpy() throws IOException {
-        this(new FileMavenEventReporter());
+        this.disabled = isEventSpyDisabled();
+        if (disabled) {
+            System.out.println("[jenkins-maven-event-spy] INFO Jenkins Maven Event Spy is disabled");
+        }
     }
 
     public JenkinsMavenEventSpy(MavenEventReporter reporter) throws IOException {
+        this();
+        this.reporter = reporter;
+    }
+
+    @Override
+    public void init(EventSpy.Context context) throws Exception {
+        if (disabled) {
+            this.reporter = new DevNullMavenEventReporter();
+            return;
+        }
+
+        if (reporter == null) {
+            this.reporter = new FileMavenEventReporter();
+        }
+        // Initialize handlers
         handlers.add(new ProjectSucceededExecutionHandler(reporter));
         handlers.add(new ProjectFailedExecutionHandler(reporter));
         handlers.add(new ProjectStartedExecutionHandler(reporter));
@@ -104,20 +122,7 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
 
         handlers.add(new CatchAllExecutionHandler(reporter));
 
-        if (isEventSpyDisabled()) {
-            this.disabled = true;
-            this.reporter = new DevNullMavenEventReporter();
-        } else {
-            this.disabled = false;
-            this.reporter = reporter;
-        }
-    }
-
-    @Override
-    public void init(EventSpy.Context context) throws Exception {
-        if (disabled)
-            return;
-
+        // Print context
         Xpp3Dom element = new Xpp3Dom("context");
         for (Map.Entry<String, Object> entry : context.getData().entrySet()) {
             Xpp3Dom entryElt = new Xpp3Dom(entry.getKey());
@@ -150,7 +155,7 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
 
         } catch (Throwable t) {
             blackList.add(event.getClass());
-            System.err.println("Exception processing " + event);
+            System.err.println("[jenkins-maven-event-spy] WARNING Exception processing " + event);
             reporter.print(getClass().getName() + ": Exception processing " + event);
             t.printStackTrace();
         }
@@ -166,7 +171,9 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
         reporter.close();
     }
 
-
+    /**
+     * Visible for testing
+     */
     protected boolean isEventSpyDisabled(){
         return "true".equalsIgnoreCase(System.getProperty(DISABLE_MAVEN_EVENT_SPY_PROPERTY_NAME)) ||
                 "true".equalsIgnoreCase(System.getenv(DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME));
