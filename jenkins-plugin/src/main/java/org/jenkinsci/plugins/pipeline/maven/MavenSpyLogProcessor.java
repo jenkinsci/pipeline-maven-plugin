@@ -32,6 +32,7 @@ import jenkins.model.InterruptedBuildAction;
 import org.jenkinsci.plugins.pipeline.maven.reporters.FindbugsAnalysisReporter;
 import org.jenkinsci.plugins.pipeline.maven.reporters.GeneratedArtifactsReporter;
 import org.jenkinsci.plugins.pipeline.maven.reporters.JunitTestsReporter;
+import org.jenkinsci.plugins.pipeline.maven.reporters.JenkinsMavenEventSpyLogsReporter;
 import org.jenkinsci.plugins.pipeline.maven.reporters.TasksScannerReporter;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.w3c.dom.Element;
@@ -82,6 +83,12 @@ public class MavenSpyLogProcessor implements Serializable {
                 InputStream mavenSpyLogsInputStream = mavenSpyLogs.read();
                 if (mavenSpyLogsInputStream == null) {
                     throw new IllegalStateException("InputStream for " + mavenSpyLogs.getRemote() + " is null");
+                }
+
+                FilePath archiveJenkinsMavenEventSpyLogs = workspace.child(".archive-jenkins-maven-event-spy-logs");
+                if (archiveJenkinsMavenEventSpyLogs.exists()) {
+                    LOGGER.log(Level.FINE, "Archive Jenkins Maven Event Spy logs {0}", mavenSpyLogs.getRemote());
+                    new JenkinsMavenEventSpyLogsReporter().process(context, mavenSpyLogs);
                 }
 
                 Element mavenSpyLogsElt = documentBuilder.parse(mavenSpyLogsInputStream).getDocumentElement();

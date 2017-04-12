@@ -67,8 +67,9 @@ public class FileMavenEventReporter implements MavenEventReporter {
             } else {
                 boolean created = reportsFolder.mkdirs();
                 if (!created) {
-                    System.err.println("Failure to create " + reportsFolder.getAbsolutePath());
                     reportsFolder = new File(".");
+                    System.err.println("[jenkins-maven-event-spy] WARNING Failure to create folder '" + reportsFolder.getAbsolutePath() +
+                            "', generate report in '" + reportsFolder.getAbsolutePath() + "'");
                 }
             }
         }
@@ -79,6 +80,8 @@ public class FileMavenEventReporter implements MavenEventReporter {
         xmlWriter = new PrettyPrintXMLWriter(out);
         xmlWriter.startElement("mavenExecution");
         xmlWriter.addAttribute("_time", new Timestamp(System.currentTimeMillis()).toString());
+
+        System.out.println("[jenkins-maven-event-spy] generate " + outFile.getAbsolutePath() + " ...");
     }
 
     @Override
@@ -99,6 +102,6 @@ public class FileMavenEventReporter implements MavenEventReporter {
         xmlWriter.endElement();
 
         out.close();
-        System.out.println("JenkinsMavenEventSpy generated " + outFile.getAbsolutePath());
+        System.out.println("[jenkins-maven-event-spy] generated " + outFile.getAbsolutePath());
     }
 }
