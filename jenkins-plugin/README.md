@@ -38,7 +38,30 @@ Default locale: en_US, platform encoding: UTF-8
 OS name: "linux", version: "3.13.0-109-generic", arch: "amd64", family: "unix"
 ```
 
+## settings.xml provided by Maven global configuration with the file path settings provider
 
+```
+[Pipeline] withMaven
+[withMaven] use JDK installation provided by the build agent
+$ /bin/sh -c "which mvn"
+[withMaven] use Maven installation provided by the build agent with executable /usr/local/bin/mvn
+[withMaven] use Maven settings provided Jenkins Global configuration '/path/to/maven-settings-defined-in-jenkins-global-configuration.xml' 
+...
+```
+
+## settings.xml provided by Maven global configuration with the config file provider
+
+This log message should be improved
+
+```
+[Pipeline] withMaven
+[withMaven] use JDK installation provided by the build agent
+$ /bin/sh -c "which mvn"
+[withMaven] use Maven installation provided by the build agent with executable /usr/local/bin/mvn
+Inject in Maven settings.xml credentials for maven servers (replaceAll: true): github->com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl@b5c11be3, nexus->com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl@63dd3ff
+[withMaven] use Maven settings provided Jenkins Global configuration '/Users/cyrilleleclerc/git/jenkins/pipeline-maven-plugin/jenkins-plugin/work/jobs/pipeline-maven-plugin/workspace@tmp/maven-5485254522648220427-settings.xml' 
+...
+```
 
 
 # Maven Build Phases Reporters
