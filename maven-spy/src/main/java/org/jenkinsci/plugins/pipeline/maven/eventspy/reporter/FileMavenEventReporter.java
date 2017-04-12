@@ -81,7 +81,7 @@ public class FileMavenEventReporter implements MavenEventReporter {
         xmlWriter.startElement("mavenExecution");
         xmlWriter.addAttribute("_time", new Timestamp(System.currentTimeMillis()).toString());
 
-        System.out.println("[jenkins-maven-event-spy] generate " + outFile.getAbsolutePath() + " ...");
+        System.out.println("[jenkins-maven-event-spy] INFO generate " + outFile.getAbsolutePath() + " ...");
     }
 
     @Override
@@ -102,6 +102,6 @@ public class FileMavenEventReporter implements MavenEventReporter {
         xmlWriter.endElement();
 
         out.close();
-        System.out.println("[jenkins-maven-event-spy] generated " + outFile.getAbsolutePath());
+        System.out.println("[jenkins-maven-event-spy] INFO generated " + outFile.getAbsolutePath());
     }
 }

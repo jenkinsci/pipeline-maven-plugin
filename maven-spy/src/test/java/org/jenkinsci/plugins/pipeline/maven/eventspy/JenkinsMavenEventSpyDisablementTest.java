@@ -53,6 +53,14 @@ public class JenkinsMavenEventSpyDisablementTest {
                 return true;
             }
         };
+        Assert.assertThat(spy.getReporter(), CoreMatchers.nullValue());
+        spy.init(new EventSpy.Context() {
+            @Override
+            public Map<String, Object> getData() {
+                return new HashMap<String, Object>();
+            }
+        });
+
         Assert.assertThat(spy.getReporter(), CoreMatchers.instanceOf(DevNullMavenEventReporter.class));
         Assert.assertThat(spy.disabled, CoreMatchers.is(true));
     }
