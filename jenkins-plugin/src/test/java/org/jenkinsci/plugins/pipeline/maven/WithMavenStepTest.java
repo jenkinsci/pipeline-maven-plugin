@@ -29,22 +29,28 @@ import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.slaves.DumbSlave;
 import hudson.slaves.NodeProperty;
 import hudson.slaves.RetentionStrategy;
-import java.io.File;
-import java.util.Collections;
+import hudson.tasks.Maven;
+import jenkins.mvn.DefaultGlobalSettingsProvider;
+import jenkins.mvn.DefaultSettingsProvider;
+import jenkins.mvn.GlobalMavenConfig;
+import jenkins.plugins.git.GitSampleRepoRule;
 import org.apache.commons.io.FileUtils;
+import org.jenkinsci.plugins.pipeline.maven.docker.JavaGitContainer;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.jenkinsci.plugins.workflow.test.steps.SemaphoreStep;
 import org.jenkinsci.test.acceptance.docker.DockerRule;
-import org.jenkinsci.test.acceptance.docker.fixtures.JavaContainer;
+import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Test;
 import org.junit.Rule;
-import org.junit.runners.model.Statement;
+import org.junit.Test;
 import org.jvnet.hudson.test.BuildWatcher;
+import org.jvnet.hudson.test.ExtendedToolInstallations;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.RestartableJenkinsRule;
+import org.jvnet.hudson.test.JenkinsRule;
+
+import java.io.File;
+import java.util.Collections;
 
 public class WithMavenStepTest {
 
@@ -52,56 +58,47 @@ public class WithMavenStepTest {
     public static BuildWatcher buildWatcher = new BuildWatcher();
 
     @Rule
-    public RestartableJenkinsRule rr = new RestartableJenkinsRule();
+    public JenkinsRule jenkinsRule = new JenkinsRule();
 
     @Rule
-    public DockerRule<JavaContainer> slaveRule = new DockerRule<>(JavaContainer.class);
+    public GitSampleRepoRule gitRepoRule = new GitSampleRepoRule();
 
-    @Issue("JENKINS-39134")
-    @Test
-    public void resume() throws Exception {
-        rr.addStep(new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                WorkflowJob p = rr.j.createProject(WorkflowJob.class, "p");
-                p.setDefinition(new CpsFlowDefinition("node {withMaven {semaphore 'wait'}}", true));
-                WorkflowRun b = p.scheduleBuild2(0).waitForStart();
-                SemaphoreStep.waitForStart("wait/1", b);
-            }
-        });
-        rr.addStep(new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                WorkflowJob p = rr.j.jenkins.getItemByFullName("p", WorkflowJob.class);
-                WorkflowRun b = p.getBuildByNumber(1);
-                SemaphoreStep.success("wait/1", null);
-                rr.j.assertBuildStatusSuccess(rr.j.waitForCompletion(b));
-                SemaphoreStep.success("wait/2", null);
-                rr.j.buildAndAssertSuccess(p);
-            }
-        });
+    @Rule
+    public DockerRule<JavaGitContainer> slaveRule = new DockerRule<>(JavaGitContainer.class);
+
+    private String mavenInstallationName;
+
+    @Before
+    public void setup() throws Exception {
+        // Maven.MavenInstallation maven3 = ToolInstallations.configureMaven35();
+        Maven.MavenInstallation maven3 = ExtendedToolInstallations.configureMaven35();
+
+        mavenInstallationName = maven3.getName();
+
+        GlobalMavenConfig globalMavenConfig = jenkinsRule.get(GlobalMavenConfig.class);
+        globalMavenConfig.setGlobalSettingsProvider(new DefaultGlobalSettingsProvider());
+        globalMavenConfig.setSettingsProvider(new DefaultSettingsProvider());
+
+
+        JavaGitContainer slaveContainer = slaveRule.get();
+
+        DumbSlave agent = new DumbSlave("remote", "", "/home/test/slave", "1", Node.Mode.NORMAL, "",
+                new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), "test", "test", "", ""),
+                RetentionStrategy.INSTANCE, Collections.<NodeProperty<?>>emptyList());
+        jenkinsRule.jenkins.addNode(agent);
     }
 
     @Issue("SECURITY-441")
     @Test
-    public void fileOnMaster() {
-        rr.addStep(new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                JavaContainer slaveContainer = slaveRule.get();
-                rr.j.jenkins.addNode(new DumbSlave("remote", "", "/home/test/slave", "1", Node.Mode.NORMAL, "",
-                                                   new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), "test", "test", "", ""),
-                                                   RetentionStrategy.INSTANCE, Collections.<NodeProperty<?>>emptyList()));
-                File onMaster = new File(rr.j.jenkins.getRootDir(), "onmaster");
-                String secret = "secret content on master";
-                FileUtils.writeStringToFile(onMaster, secret);
-                WorkflowJob p = rr.j.createProject(WorkflowJob.class, "p");
-                String pipelineScript = "node('remote') {withMaven(mavenSettingsFilePath: '" + onMaster + "') {echo readFile(MVN_SETTINGS)}}";
-                p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-                WorkflowRun b = rr.j.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
-                rr.j.assertLogNotContains(secret, b);
-            }
-        });
-    }
+    public void maven_build_on_remote_agent_with_settings_file_on_master_fails() throws Exception {
+        File onMaster = new File(jenkinsRule.jenkins.getRootDir(), "onmaster");
+        String secret = "secret content on master";
+        FileUtils.writeStringToFile(onMaster, secret);
+        String pipelineScript = "node('remote') {withMaven(mavenSettingsFilePath: '" + onMaster + "') {echo readFile(MVN_SETTINGS)}}";
 
+        WorkflowJob p = jenkinsRule.createProject(WorkflowJob.class, "p");
+        p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun b = jenkinsRule.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
+        jenkinsRule.assertLogNotContains(secret, b);
+    }
 }
