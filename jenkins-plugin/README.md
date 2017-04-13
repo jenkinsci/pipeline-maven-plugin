@@ -90,3 +90,8 @@ to workaround a bug in the `withMaven` waiting for a fix. These marker file must
 The API for Maven reporters is still experimental. Please open a Request for Enhancement Jira issue to discuss how to add Maven reporters.
 
 We want to quickly add reporters for CheckStyle, Jacoco...
+
+
+```
+mvn test -Dtest=org.jenkinsci.plugins.pipeline.maven.WithMavenStepTest#maven_build_on_master_succeeds&>mvn.log
+```
