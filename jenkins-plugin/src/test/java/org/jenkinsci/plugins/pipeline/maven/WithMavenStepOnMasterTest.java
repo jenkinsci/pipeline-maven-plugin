@@ -23,31 +23,39 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
+import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.*;
+
+import hudson.model.Fingerprint;
 import hudson.model.Result;
+import hudson.model.Run;
+import hudson.plugins.tasks.TasksResultAction;
+import hudson.tasks.Fingerprinter;
 import hudson.tasks.Maven;
+import hudson.tasks.junit.TestResultAction;
 import jenkins.mvn.DefaultGlobalSettingsProvider;
 import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
-import org.apache.commons.io.FileUtils;
+import org.hamcrest.CoreMatchers;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.ExtendedToolInstallations;
-import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Map;
 
 /**
  * TODO migrate to {@link WithMavenStepTest} once we have implemented a GitRepoRule that can be used on remote agents
@@ -135,6 +143,8 @@ public class WithMavenStepOnMasterTest {
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
+        Thread.sleep(5000);
+
         // verify Maven installation provided by the build agent is used
         jenkinsRule.assertLogContains("[withMaven] use Maven installation provided by the build agent with executable", build);
 
@@ -144,12 +154,38 @@ public class WithMavenStepOnMasterTest {
 
         // verify .jar is archived and fingerprinted
         jenkinsRule.assertLogContains("under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.jar", build);
+        System.out.println(getClass() + " artifacts: " + build.getArtifacts());
+
+        // TODO build.getArtifacts() is always empty (size=0), skip verification
+
+        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.jar");
+        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.pom");
 
         //  verify Junit Archiver is called for jenkins.mvn.test:mono-module-maven-app
         jenkinsRule.assertLogContains("[withMaven] Archive test results for Maven artifact MavenArtifact{jenkins.mvn.test:mono-module-maven-app::0.1-SNAPSHOT}", build);
+        // TODO check why we have "[build-on-master #1] None of the test reports contained any result" when there should be 1 result
+        TestResultAction testResultAction = build.getAction(TestResultAction.class);
+        System.out.println(getClass() + " testResultAction: " + testResultAction);
 
         // verify Task Scanner is called for jenkins.mvn.test:mono-module-maven-app
         jenkinsRule.assertLogContains("[withMaven] Scan Tasks for Maven artifact MavenArtifact{jenkins.mvn.test:mono-module-maven-app::0.1-SNAPSHOT}", build);
+        // TODO check why we have "Found 0 files to scan for tasks" when there should be 2 java files to scan
+        TasksResultAction tasksResultAction = build.getAction(TasksResultAction.class);
+        assertThat(tasksResultAction.getProjectActions().size(), is(1));
+    }
+
+    private void verifyFileIsFingerPrinted(WorkflowJob pipeline, WorkflowRun build, String fileName) throws java.io.IOException {
+        System.out.println(getClass() + " verifyFileIsFingerPrinted(" + build + ", " + fileName + ")");
+        Fingerprinter.FingerprintAction fingerprintAction = build.getAction(Fingerprinter.FingerprintAction.class);
+        Map<String, String> records = fingerprintAction.getRecords();
+        System.out.println(getClass() + " records: " + records);
+        String jarFileMd5sum = records.get(fileName);
+        assertThat(jarFileMd5sum, not(nullValue()));
+
+        Fingerprint jarFileFingerPrint = jenkinsRule.getInstance().getFingerprintMap().get(jarFileMd5sum);
+        assertThat(jarFileFingerPrint.getFileName(), is(fileName));
+        assertThat(jarFileFingerPrint.getOriginal().getJob().getName(), is(pipeline.getName()));
+        assertThat(jarFileFingerPrint.getOriginal().getNumber(), is(build.getNumber()));
     }
 
     /**
@@ -158,7 +194,7 @@ public class WithMavenStepOnMasterTest {
     @Test
     public void mavenSettingsFilePath_should_work_with_relative_path() throws Exception {
 
-        String pipelineScript ="node () {\n" +
+        String pipelineScript = "node () {\n" +
                 "    writeFile file: 'maven-settings.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
                 "<settings \n" +
                 "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
