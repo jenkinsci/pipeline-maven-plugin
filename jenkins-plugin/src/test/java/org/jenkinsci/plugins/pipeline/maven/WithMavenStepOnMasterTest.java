@@ -146,7 +146,8 @@ public class WithMavenStepOnMasterTest {
         Thread.sleep(5000);
 
         // verify Maven installation provided by the build agent is used
-        jenkinsRule.assertLogContains("[withMaven] use Maven installation provided by the build agent with executable", build);
+        // can be either "by the build agent with executable..." or "by the build agent with the environment variable MAVEN_HOME=..."
+        jenkinsRule.assertLogContains("[withMaven] use Maven installation provided by the build agent with", build);
 
         // verify .pom is archived and fingerprinted
         // "[withMaven] Archive ... under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.pom"
