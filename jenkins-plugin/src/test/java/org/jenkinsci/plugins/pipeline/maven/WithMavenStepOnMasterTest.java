@@ -143,8 +143,6 @@ public class WithMavenStepOnMasterTest {
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
-        Thread.sleep(5000);
-
         // verify Maven installation provided by the build agent is used
         // can be either "by the build agent with executable..." or "by the build agent with the environment variable MAVEN_HOME=..."
         jenkinsRule.assertLogContains("[withMaven] use Maven installation provided by the build agent with", build);
