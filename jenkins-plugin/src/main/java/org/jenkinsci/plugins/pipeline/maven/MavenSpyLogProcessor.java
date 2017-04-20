@@ -79,7 +79,9 @@ public class MavenSpyLogProcessor implements Serializable {
 
         for (FilePath mavenSpyLogs : mavenSpyLogsList) {
             try {
-                LOGGER.log(Level.INFO, "Evaluate Maven Spy logs: " + mavenSpyLogs.getRemote());
+                if (LOGGER.isLoggable(Level.FINE)) {
+                    listener.getLogger().println("[withMaven]  Evaluate Maven Spy logs: " + mavenSpyLogs.getRemote());
+                }
                 InputStream mavenSpyLogsInputStream = mavenSpyLogs.read();
                 if (mavenSpyLogsInputStream == null) {
                     throw new IllegalStateException("InputStream for " + mavenSpyLogs.getRemote() + " is null");
