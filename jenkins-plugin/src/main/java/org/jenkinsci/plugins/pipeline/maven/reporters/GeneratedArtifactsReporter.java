@@ -63,6 +63,14 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
                         listener.getLogger().println("[withMaven] Can't archive maven artifact with no file attached: " + mavenArtifact);
                     }
                     continue;
+                } else if (!(mavenArtifact.file.endsWith("." + mavenArtifact.extension))) {
+                    FilePath mavenGeneratedArtifact = workspace.child(XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace));
+                    if (mavenGeneratedArtifact.isDirectory()) {
+                        if (LOGGER.isLoggable(Level.FINE)) {
+                            listener.getLogger().println("[withMaven] Skip archiving for generated maven artifact of type directory (it's likely to be target/classes, see JENKINS-43714) " + mavenArtifact);
+                        }
+                        continue;
+                    }
                 }
 
                 String artifactPathInArchiveZone =
