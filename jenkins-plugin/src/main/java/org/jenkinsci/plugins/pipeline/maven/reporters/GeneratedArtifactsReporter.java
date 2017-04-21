@@ -101,13 +101,20 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
                 listener.getLogger().flush();
             }
         }
+        LOGGER.log(Level.FINE, "Archive and fingerprint {0}", artifactsToArchive);
 
         // ARCHIVE GENERATED MAVEN ARTIFACT
         // see org.jenkinsci.plugins.workflow.steps.ArtifactArchiverStepExecution#run
-        artifactManager.archive(workspace, launcher, new BuildListenerAdapter(listener), artifactsToArchive);
+        try {
+            artifactManager.archive(workspace, launcher, new BuildListenerAdapter(listener), artifactsToArchive);
+        } catch (IOException e) {
+            throw new IOException("Exception archiving " + artifactsToArchive, e);
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Exception archiving " + artifactsToArchive, e);
+        }
 
         // FINGERPRINT GENERATED MAVEN ARTIFACT
-        FingerprintMap fingerprintMap = Jenkins.getActiveInstance().getFingerprintMap();
+        FingerprintMap fingerprintMap = Jenkins.getInstance().getFingerprintMap();
         for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
             String artifactPathInArchiveZone = artifactToFingerprint.getKey();
             String artifactMd5 = artifactToFingerprint.getValue();
