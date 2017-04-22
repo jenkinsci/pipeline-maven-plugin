@@ -50,11 +50,18 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import jenkins.mvn.DefaultGlobalSettingsProvider;
+import jenkins.mvn.FilePathGlobalSettingsProvider;
+import jenkins.mvn.GlobalMavenConfig;
+import jenkins.mvn.GlobalSettingsProvider;
+import jenkins.mvn.SettingsProvider;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.lib.configprovider.model.Config;
 import org.jenkinsci.plugins.configfiles.ConfigFiles;
 import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
+import org.jenkinsci.plugins.configfiles.maven.job.MvnGlobalSettingsProvider;
+import org.jenkinsci.plugins.configfiles.maven.job.MvnSettingsProvider;
 import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
 import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
@@ -605,6 +612,37 @@ class WithMavenStepExecution extends StepExecution {
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         }
+
+        // Settings provided by the global maven configuration
+        GlobalSettingsProvider globalSettingsProvider = GlobalMavenConfig.get().getGlobalSettingsProvider();
+        if (globalSettingsProvider instanceof MvnGlobalSettingsProvider) {
+            MvnGlobalSettingsProvider mvnGlobalSettingsProvider = (MvnGlobalSettingsProvider) globalSettingsProvider;
+            console.format("[withMaven] use Maven global settings provided by the Jenkins global configuration '%s' %n", mvnGlobalSettingsProvider.getSettingsConfigId());
+            globalSettingsFromConfig(mvnGlobalSettingsProvider.getSettingsConfigId(), settingsDest);
+            envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
+            return settingsDest.getRemote();
+        } else if (globalSettingsProvider instanceof FilePathGlobalSettingsProvider) {
+            FilePathGlobalSettingsProvider filePathGlobalSettingsProvider = (FilePathGlobalSettingsProvider) globalSettingsProvider;
+            String settingsPath = filePathGlobalSettingsProvider.getPath();
+            FilePath settings;
+            if ((settings = ws.child(settingsPath)).exists()) {
+                // Global settings file residing on the agent
+                console.format("[withMaven] use Maven global settings provided by the Jenkins global configuration on the build agent '%s' %n", settingsPath);
+                settings.copyTo(settingsDest);
+            } else {
+                throw new AbortException("Could not find file provided by the Jenkins global configuration '" + settings + "' on the build agent");
+            }
+            envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
+            return settingsDest.getRemote();
+        } else if (globalSettingsProvider instanceof DefaultGlobalSettingsProvider) {
+            // do nothing
+        } else if (globalSettingsProvider == null) {
+            // should not happen according to the source code of jenkins.mvn.GlobalMavenConfig.getGlobalSettingsProvider() in jenkins-core 2.7
+            // do nothing
+        } else {
+            console.println("[withMaven] Ignore unsupported Maven GlobalSettingsProvider " + globalSettingsProvider);
+        }
+
         return null;
     }
 
