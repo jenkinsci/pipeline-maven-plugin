@@ -24,8 +24,8 @@
 
 package org.jenkinsci.plugins.pipeline.maven;
 
+
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -36,6 +36,7 @@ import java.nio.charset.Charset;
 import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,26 +47,13 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
+import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.lib.configprovider.model.Config;
-import org.jenkinsci.plugins.configfiles.ConfigFiles;
-import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
-import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
-import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
-import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
-import org.jenkinsci.plugins.workflow.steps.BodyExecution;
-import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
-import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
-import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
-import org.jenkinsci.plugins.workflow.steps.StepContext;
-
-import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
 import hudson.AbortException;
 import hudson.EnvVars;
 import hudson.FilePath;
@@ -74,13 +62,40 @@ import hudson.Launcher.ProcStarter;
 import hudson.Proc;
 import hudson.Util;
 import hudson.console.ConsoleLogFilter;
-import hudson.model.*;
+import hudson.model.AbstractBuild;
+import hudson.model.BuildListener;
+import hudson.model.Computer;
+import hudson.model.JDK;
+import hudson.model.Node;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.slaves.WorkspaceList;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
 import hudson.tasks._maven.MavenConsoleAnnotator;
 import hudson.util.ArgumentListBuilder;
-import jenkins.model.*;
+import jenkins.model.Jenkins;
+import jenkins.mvn.DefaultGlobalSettingsProvider;
+import jenkins.mvn.DefaultSettingsProvider;
+import jenkins.mvn.FilePathGlobalSettingsProvider;
+import jenkins.mvn.FilePathSettingsProvider;
+import jenkins.mvn.GlobalMavenConfig;
+import jenkins.mvn.GlobalSettingsProvider;
+import jenkins.mvn.SettingsProvider;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.lib.configprovider.model.Config;
+import org.jenkinsci.plugins.configfiles.ConfigFiles;
+import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
+import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
+import org.jenkinsci.plugins.configfiles.maven.job.MvnGlobalSettingsProvider;
+import org.jenkinsci.plugins.configfiles.maven.job.MvnSettingsProvider;
+import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
+import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
+import org.jenkinsci.plugins.workflow.steps.BodyExecution;
+import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
+import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
+import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.springframework.util.ClassUtils;
 
@@ -566,6 +581,36 @@ class WithMavenStepExecution extends StepExecution {
             return settingsDest.getRemote();
         }
 
+        // Settings provided by the global maven configuration
+        SettingsProvider settingsProvider = GlobalMavenConfig.get().getSettingsProvider();
+        if (settingsProvider instanceof MvnSettingsProvider) {
+            MvnSettingsProvider mvnSettingsProvider = (MvnSettingsProvider) settingsProvider;
+            console.format("[withMaven] use Maven settings provided by the Jenkins global configuration '%s' %n", mvnSettingsProvider.getSettingsConfigId());
+            settingsFromConfig(mvnSettingsProvider.getSettingsConfigId(), settingsDest);
+            envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
+            return settingsDest.getRemote();
+        } else if (settingsProvider instanceof FilePathSettingsProvider) {
+            FilePathSettingsProvider filePathSettingsProvider = (FilePathSettingsProvider) settingsProvider;
+            String settingsPath = filePathSettingsProvider.getPath();
+            FilePath settings;
+            if ((settings = ws.child(settingsPath)).exists()) {
+                // Settings file residing on the agent
+                console.format("[withMaven] use Maven settings provided by the Jenkins global configuration on the build agent '%s' %n", settingsPath);
+                settings.copyTo(settingsDest);
+            } else {
+                throw new AbortException("Could not find file provided by the Jenkins global configuration '" + settings + "' on the build agent");
+            }
+            envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
+            return settingsDest.getRemote();
+        } else if (settingsProvider instanceof DefaultSettingsProvider) {
+            // do nothing
+        } else if (settingsProvider == null) {
+            // should not happen according to the source code of jenkins.mvn.MavenConfig.getSettingsProvider() in jenkins-core 2.7
+            // do nothing
+        } else {
+            console.println("[withMaven] Ignore unsupported Maven SettingsProvider " + settingsProvider);
+        }
+
         return null;
     }
 
@@ -605,6 +650,37 @@ class WithMavenStepExecution extends StepExecution {
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         }
+
+        // Settings provided by the global maven configuration
+        GlobalSettingsProvider globalSettingsProvider = GlobalMavenConfig.get().getGlobalSettingsProvider();
+        if (globalSettingsProvider instanceof MvnGlobalSettingsProvider) {
+            MvnGlobalSettingsProvider mvnGlobalSettingsProvider = (MvnGlobalSettingsProvider) globalSettingsProvider;
+            console.format("[withMaven] use Maven global settings provided by the Jenkins global configuration '%s' %n", mvnGlobalSettingsProvider.getSettingsConfigId());
+            globalSettingsFromConfig(mvnGlobalSettingsProvider.getSettingsConfigId(), settingsDest);
+            envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
+            return settingsDest.getRemote();
+        } else if (globalSettingsProvider instanceof FilePathGlobalSettingsProvider) {
+            FilePathGlobalSettingsProvider filePathGlobalSettingsProvider = (FilePathGlobalSettingsProvider) globalSettingsProvider;
+            String settingsPath = filePathGlobalSettingsProvider.getPath();
+            FilePath settings;
+            if ((settings = ws.child(settingsPath)).exists()) {
+                // Global settings file residing on the agent
+                console.format("[withMaven] use Maven global settings provided by the Jenkins global configuration on the build agent '%s' %n", settingsPath);
+                settings.copyTo(settingsDest);
+            } else {
+                throw new AbortException("Could not find file provided by the Jenkins global configuration '" + settings + "' on the build agent");
+            }
+            envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
+            return settingsDest.getRemote();
+        } else if (globalSettingsProvider instanceof DefaultGlobalSettingsProvider) {
+            // do nothing
+        } else if (globalSettingsProvider == null) {
+            // should not happen according to the source code of jenkins.mvn.GlobalMavenConfig.getGlobalSettingsProvider() in jenkins-core 2.7
+            // do nothing
+        } else {
+            console.println("[withMaven] Ignore unsupported Maven GlobalSettingsProvider " + globalSettingsProvider);
+        }
+
         return null;
     }
 
@@ -636,7 +712,9 @@ class WithMavenStepExecution extends StepExecution {
 
         try {
 
-            final List<ServerCredentialMapping> serverCredentialMappings = mavenSettingsConfig.getServerCredentialMappings();
+            // JENKINS-43787 handle null
+            final List<ServerCredentialMapping> serverCredentialMappings = Objects.firstNonNull(mavenSettingsConfig.getServerCredentialMappings(), Collections.<ServerCredentialMapping>emptyList());
+
             final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
 
             String mavenSettingsFileContent;
@@ -685,7 +763,9 @@ class WithMavenStepExecution extends StepExecution {
         }
 
         try {
-            final List<ServerCredentialMapping> serverCredentialMappings = mavenGlobalSettingsConfig.getServerCredentialMappings();
+            // JENKINS-43787 handle null
+            final List<ServerCredentialMapping> serverCredentialMappings = Objects.firstNonNull(mavenGlobalSettingsConfig.getServerCredentialMappings(), Collections.<ServerCredentialMapping>emptyList());
+
             final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
 
             String mavenGlobalSettingsFileContent;
