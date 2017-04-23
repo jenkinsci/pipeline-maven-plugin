@@ -36,12 +36,18 @@ import hudson.tasks.junit.TestResultAction;
 import jenkins.mvn.DefaultGlobalSettingsProvider;
 import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.FilePathGlobalSettingsProvider;
+import jenkins.mvn.FilePathSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.mvn.GlobalSettingsProvider;
 import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.CoreMatchers;
+import org.jenkinsci.plugins.configfiles.GlobalConfigFiles;
+import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
+import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
+import org.jenkinsci.plugins.configfiles.maven.job.MvnGlobalSettingsProvider;
+import org.jenkinsci.plugins.configfiles.maven.job.MvnSettingsProvider;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -333,43 +339,6 @@ public class WithMavenStepOnMasterTest {
         assertThat(jarFileFingerPrint.getOriginal().getNumber(), is(build.getNumber()));
     }
 
-    /**
-     * https://issues.jenkins-ci.org/browse/JENKINS-42565
-     */
-    @Test
-    public void mavenSettingsFilePath_should_work_with_relative_path() throws Exception {
-
-        String pipelineScript = "node () {\n" +
-                "    writeFile file: 'maven-settings.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
-                "<settings \n" +
-                "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
-                "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
-                "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
-                "</settings>'''\n" +
-                "\n" +
-                "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
-                "<project\n" +
-                "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
-                "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
-                "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
-                "    <modelVersion>4.0.0</modelVersion>\n" +
-                "    <groupId>com.example</groupId>\n" +
-                "    <artifactId>my-artifact</artifactId>\n" +
-                "    <version>1.0.0-SNAPSHOT</version>\n" +
-                "    <packaging>pom</packaging>\n" +
-                "</project>'''\n" +
-                "\n" +
-                "    withMaven(maven: 'apache-maven-3.5.0', mavenSettingsFilePath: 'maven-settings.xml') {\n" +
-                "        sh 'mvn clean'\n" +
-                "    }\n" +
-                "}\n";
-
-        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-with-relative-maven-settings-path");
-        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
-        jenkinsRule.assertLogContains("[withMaven] use Maven settings provided on the build agent 'maven-settings.xml'", build);
-    }
-
     @Test
     public void maven_global_settings_path_defined_through_jenkins_global_config() throws Exception {
 
@@ -419,6 +388,56 @@ public class WithMavenStepOnMasterTest {
     }
 
     @Test
+    public void maven_global_settings_path_defined_through_jenkins_global_config_and_config_file_provider() throws Exception {
+
+        String mavenGlobalSettings =                 "<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<settings \n" +
+                "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+                "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+                "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+                "    <servers>\n" +
+                "    	<server>\n" +
+                "	        <id>id-global-settings-test-from-config-file-provider</id>\n" +
+                "	    </server>\n" +
+                "    </servers>\n" +
+                "</settings>\n";
+
+        GlobalMavenSettingsConfig mavenGlobalSettingsConfig = new GlobalMavenSettingsConfig("maven-global-config-test", "maven-global-config-test", "", mavenGlobalSettings);
+
+        String pipelineScript = "node () {\n" +
+                "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<project\n" +
+                "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+                "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+                "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+                "    <modelVersion>4.0.0</modelVersion>\n" +
+                "    <groupId>com.example</groupId>\n" +
+                "    <artifactId>my-artifact</artifactId>\n" +
+                "    <version>1.0.0-SNAPSHOT</version>\n" +
+                "    <packaging>pom</packaging>\n" +
+                "</project>'''\n" +
+                "\n" +
+                "    withMaven(maven: 'apache-maven-3.5.0') {\n" +
+                "        sh 'mvn help:effective-settings'\n" +
+                "    }\n" +
+                "}\n";
+
+        GlobalConfigFiles.get().save(mavenGlobalSettingsConfig);
+        GlobalMavenConfig.get().setGlobalSettingsProvider(new MvnGlobalSettingsProvider(mavenGlobalSettingsConfig.id));
+
+        try {
+            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-with-maven-global-settings-defined-in-jenkins-global-config-with-config-file-provider");
+            pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+            WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+            jenkinsRule.assertLogContains("[withMaven] use Maven global settings provided by the Jenkins global configuration", build);
+            jenkinsRule.assertLogContains("<id>id-global-settings-test-from-config-file-provider</id>", build);
+        } finally {
+            GlobalMavenConfig.get().setGlobalSettingsProvider(null);
+            GlobalConfigFiles.get().remove(mavenGlobalSettingsConfig.id);
+        }
+    }
+
+    @Test
     public void maven_global_settings_path_defined_through_pipeline_attribute() throws Exception {
 
         String pipelineScript = "node () {\n" +
@@ -459,6 +478,9 @@ public class WithMavenStepOnMasterTest {
 
     }
 
+    /**
+     * https://issues.jenkins-ci.org/browse/JENKINS-42565
+     */
     @Test
     public void maven_settings_path_defined_through_pipeline_attribute() throws Exception {
 
@@ -498,6 +520,150 @@ public class WithMavenStepOnMasterTest {
         jenkinsRule.assertLogContains("[withMaven] use Maven settings provided on the build agent", build);
         jenkinsRule.assertLogContains("<id>id-settings-test</id>", build);
 
+    }
+
+    @Test
+    public void maven_settings_defined_through_jenkins_global_config() throws Exception {
+
+        File mavenSettingsFile = new File(jenkinsRule.jenkins.getRootDir(), "maven-settings.xml");
+        String mavenSettings =                 "<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<settings \n" +
+                "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+                "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+                "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+                "    <servers>\n" +
+                "    	<server>\n" +
+                "	        <id>id-settings-test</id>\n" +
+                "	    </server>\n" +
+                "    </servers>\n" +
+                "</settings>\n";
+        FileUtils.writeStringToFile(mavenSettingsFile, mavenSettings);
+
+
+        String pipelineScript = "node () {\n" +
+                "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<project\n" +
+                "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+                "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+                "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+                "    <modelVersion>4.0.0</modelVersion>\n" +
+                "    <groupId>com.example</groupId>\n" +
+                "    <artifactId>my-artifact</artifactId>\n" +
+                "    <version>1.0.0-SNAPSHOT</version>\n" +
+                "    <packaging>pom</packaging>\n" +
+                "</project>'''\n" +
+                "\n" +
+                "    withMaven(maven: 'apache-maven-3.5.0') {\n" +
+                "        sh 'mvn help:effective-settings'\n" +
+                "    }\n" +
+                "}\n";
+        GlobalMavenConfig.get().setSettingsProvider(new FilePathSettingsProvider(mavenSettingsFile.getAbsolutePath()));
+
+        try {
+            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-with-maven-settings-defined-in-jenkins-global-config");
+            pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+            WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+            jenkinsRule.assertLogContains("[withMaven] use Maven settings provided by the Jenkins global configuration", build);
+            jenkinsRule.assertLogContains("<id>id-settings-test</id>", build);
+        } finally {
+            GlobalMavenConfig.get().setSettingsProvider(null);
+        }
+    }
+
+    @Test
+    public void maven_settings_defined_through_jenkins_global_config_and_config_file_provider() throws Exception {
+
+        String mavenSettings =                 "<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<settings \n" +
+                "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+                "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+                "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+                "    <servers>\n" +
+                "    	<server>\n" +
+                "	        <id>id-settings-test-through-config-file-provider</id>\n" +
+                "	    </server>\n" +
+                "    </servers>\n" +
+                "</settings>\n";
+        MavenSettingsConfig mavenSettingsConfig = new MavenSettingsConfig("maven-config-test", "maven-config-test", "", mavenSettings, false, null);
+
+
+        String pipelineScript = "node () {\n" +
+                "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<project\n" +
+                "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+                "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+                "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+                "    <modelVersion>4.0.0</modelVersion>\n" +
+                "    <groupId>com.example</groupId>\n" +
+                "    <artifactId>my-artifact</artifactId>\n" +
+                "    <version>1.0.0-SNAPSHOT</version>\n" +
+                "    <packaging>pom</packaging>\n" +
+                "</project>'''\n" +
+                "\n" +
+                "    withMaven(maven: 'apache-maven-3.5.0') {\n" +
+                "        sh 'mvn help:effective-settings'\n" +
+                "    }\n" +
+                "}\n";
+        GlobalConfigFiles.get().save(mavenSettingsConfig);
+        GlobalMavenConfig.get().setSettingsProvider(new MvnSettingsProvider(mavenSettingsConfig.id));
+
+        try {
+            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-with-maven-settings-defined-in-jenkins-global-config-with-config-file-provider");
+            pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+            WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+            jenkinsRule.assertLogContains("[withMaven] use Maven settings provided by the Jenkins global configuration", build);
+            jenkinsRule.assertLogContains("<id>id-settings-test-through-config-file-provider</id>", build);
+        } finally {
+            GlobalMavenConfig.get().setSettingsProvider(null);
+        }
+    }
+
+    @Test
+    public void maven_settings_defined_through_pipeline_attribute_and_config_file_provider() throws Exception {
+
+        String mavenSettings =                 "<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<settings \n" +
+                "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+                "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+                "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+                "    <servers>\n" +
+                "    	<server>\n" +
+                "	        <id>id-settings-test-from-pipeline-attribute-and-config-file-provider</id>\n" +
+                "	    </server>\n" +
+                "    </servers>\n" +
+                "</settings>\n";
+
+        MavenSettingsConfig mavenSettingsConfig = new MavenSettingsConfig("maven-config-test-from-pipeline-attribute", "maven-config-test-from-pipeline-attribute", "", mavenSettings, false, null);
+
+        String pipelineScript = "node () {\n" +
+                "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<project\n" +
+                "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+                "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+                "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+                "    <modelVersion>4.0.0</modelVersion>\n" +
+                "    <groupId>com.example</groupId>\n" +
+                "    <artifactId>my-artifact</artifactId>\n" +
+                "    <version>1.0.0-SNAPSHOT</version>\n" +
+                "    <packaging>pom</packaging>\n" +
+                "</project>'''\n" +
+                "\n" +
+                "    withMaven(maven: 'apache-maven-3.5.0', mavenSettingsConfig: 'maven-config-test-from-pipeline-attribute') {\n" +
+                "        sh 'mvn help:effective-settings'\n" +
+                "    }\n" +
+                "}\n";
+
+        GlobalConfigFiles.get().save(mavenSettingsConfig);
+
+        try {
+            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-with-maven-global-settings-defined-in-jenkins-global-config-with-config-file-provider");
+            pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+            WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+            jenkinsRule.assertLogContains("[withMaven] use Maven settings provided by the Jenkins Managed Configuration File 'maven-config-test-from-pipeline-attribute'", build);
+            jenkinsRule.assertLogContains("<id>id-settings-test-from-pipeline-attribute-and-config-file-provider</id>", build);
+        } finally {
+            GlobalConfigFiles.get().remove(mavenSettingsConfig.id);
+        }
     }
 
     private void loadMavenJarProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
