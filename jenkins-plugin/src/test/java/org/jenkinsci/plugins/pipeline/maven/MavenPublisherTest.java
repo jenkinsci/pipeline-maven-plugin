@@ -29,11 +29,11 @@ public class MavenPublisherTest {
     public JenkinsRule jenkinsRule = new JenkinsRule();
 
     @Test
-    public void listMavenReporters() throws Exception {
+    public void listMavenPublishers() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         List<MavenPublisher> mavenPublishers = MavenPublisher.buildPublishersList(Collections.<MavenPublisher>emptyList(), new StreamTaskListener(baos));
-        Assert.assertThat(mavenPublishers.size(), CoreMatchers.is(4));
+        Assert.assertThat(mavenPublishers.size(), CoreMatchers.is(5));
 
         Map<String, MavenPublisher> reportersByDescriptorId = new HashMap<>();
         for(MavenPublisher mavenPublisher : mavenPublishers) {

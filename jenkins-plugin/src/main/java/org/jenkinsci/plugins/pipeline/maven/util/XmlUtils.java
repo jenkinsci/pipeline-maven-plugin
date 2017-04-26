@@ -32,7 +32,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -60,15 +59,29 @@ public class XmlUtils {
 
     public static MavenSpyLogProcessor.MavenArtifact newMavenArtifact(Element artifactElt) {
         MavenSpyLogProcessor.MavenArtifact mavenArtifact = new MavenSpyLogProcessor.MavenArtifact();
+        loadMavenArtifact(artifactElt, mavenArtifact);
+
+        return mavenArtifact;
+    }
+
+    public static MavenSpyLogProcessor.MavenDependency newMavenDependency(Element dependencyElt) {
+        MavenSpyLogProcessor.MavenDependency dependency = new MavenSpyLogProcessor.MavenDependency();
+        loadMavenArtifact(dependencyElt, dependency);
+        dependency.scope = dependencyElt.getAttribute("scope");
+        dependency.optional = Boolean.valueOf(dependencyElt.getAttribute("optional"));
+
+        return dependency;
+    }
+
+    private static void loadMavenArtifact(Element artifactElt, MavenSpyLogProcessor.MavenArtifact mavenArtifact) {
         mavenArtifact.groupId = artifactElt.getAttribute("groupId");
         mavenArtifact.artifactId = artifactElt.getAttribute("artifactId");
         mavenArtifact.version = artifactElt.getAttribute("version");
         mavenArtifact.type = artifactElt.getAttribute("type");
         mavenArtifact.classifier = artifactElt.hasAttribute("classifier") ? artifactElt.getAttribute("classifier") : null;
         mavenArtifact.extension = artifactElt.getAttribute("extension");
-
-        return mavenArtifact;
     }
+
 
     /*
   <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
