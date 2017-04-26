@@ -29,11 +29,7 @@ import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import jenkins.model.InterruptedBuildAction;
-import org.jenkinsci.plugins.pipeline.maven.reporters.FindbugsAnalysisReporter;
-import org.jenkinsci.plugins.pipeline.maven.reporters.GeneratedArtifactsReporter;
-import org.jenkinsci.plugins.pipeline.maven.reporters.JunitTestsReporter;
-import org.jenkinsci.plugins.pipeline.maven.reporters.JenkinsMavenEventSpyLogsReporter;
-import org.jenkinsci.plugins.pipeline.maven.reporters.TasksScannerReporter;
+import org.jenkinsci.plugins.pipeline.maven.reporters.*;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -101,6 +97,14 @@ public class MavenSpyLogProcessor implements Serializable {
                 } else {
                     LOGGER.log(Level.FINE, "Look for generated artifacts to archive, file {0} NOT found in workspace", skipArchiveArtifactsFile);
                     new GeneratedArtifactsReporter().process(context, mavenSpyLogsElt);
+                }
+
+                FilePath skipFingerprintDependenciesFile = workspace.child(".skip-archive-generated-artifacts");
+                if (skipFingerprintDependenciesFile.exists()) {
+                    listener.getLogger().println("[withMaven] Skip archiving of generated artifacts, file '" + skipFingerprintDependenciesFile + "' found in workspace");
+                } else {
+                    LOGGER.log(Level.FINE, "Look for dependencies to fingerprint, file {0} NOT found in workspace", skipFingerprintDependenciesFile);
+                    new DependenciesReporter().process(context, mavenSpyLogsElt);
                 }
 
                 FilePath skipJunitFile = workspace.child(".skip-publish-junit-results");
