@@ -49,6 +49,11 @@ import javax.annotation.Nonnull;
  */
 public class JunitTestsReporter implements ResultsReporter {
     private static final Logger LOGGER = Logger.getLogger(JunitTestsReporter.class.getName());
+    private static final String GROUP_ID = "org.apache.maven.plugins";
+    private static final String SUREFIRE_ID = "maven-surefire-plugin";
+    private static final String FAILSAFE_ID = "maven-failsafe-plugin";
+    private static final String SUREFIRE_GOAL = "test";
+    private static final String FAILSAFE_GOAL = "integration-test";
 
     /*
 <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-03 10:15:12.554">
@@ -140,46 +145,54 @@ public class JunitTestsReporter implements ResultsReporter {
             LOGGER.warning("TaskListener is NULL, default to stderr");
             listener = new StreamBuildListener((OutputStream) System.err);
         }
-        FilePath workspace = context.get(FilePath.class); // TODO check that it's the good workspace
-        Run run = context.get(Run.class);
-        Launcher launcher = context.get(Launcher.class);
 
-        List<Element> sureFireTestEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, "org.apache.maven.plugins", "maven-surefire-plugin", "test");
-
-        if (sureFireTestEvents.isEmpty()) {
-            LOGGER.log(Level.FINE, "No org.apache.maven.plugins:maven-surefire-plugin:test execution found");
-            return;
-        }
         try {
             Class.forName("hudson.tasks.junit.JUnitResultArchiver");
         } catch (ClassNotFoundException e) {
             listener.getLogger().print("[withMaven] Jenkins ");
             listener.hyperlink("http://wiki.jenkins-ci.org/display/JENKINS/JUnit+Plugin", "JUnit Plugin");
-            listener.getLogger().println(" not found, don't display org.apache.maven.plugins:maven-surefire-plugin:test results in pipeline screen.");
+            listener.getLogger().print(" not found, don't display " + GROUP_ID + ":" + SUREFIRE_ID + ":" + SUREFIRE_GOAL);
+            listener.getLogger().print(" nor " + GROUP_ID + ":" + FAILSAFE_ID + ":" + FAILSAFE_GOAL + " results in pipeline screen.");
             return;
         }
 
+        List<Element> sureFireTestEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL);
+        List<Element> failSafeTestEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL);
 
-        for (Element sureFireTestEvent : sureFireTestEvents) {
-            String surefireEventType = sureFireTestEvent.getAttribute("type");
+        executeReporter(context, listener, sureFireTestEvents, SUREFIRE_ID + ":" + SUREFIRE_GOAL);
+        executeReporter(context, listener, failSafeTestEvents, FAILSAFE_ID + ":" + FAILSAFE_GOAL);
+    }
+
+    private void executeReporter(StepContext context, TaskListener listener, List<Element> testEvents, String goal) throws IOException, InterruptedException {
+        FilePath workspace = context.get(FilePath.class); // TODO check that it's the good workspace
+        Run run = context.get(Run.class);
+        Launcher launcher = context.get(Launcher.class);
+
+        if (testEvents.isEmpty()) {
+            LOGGER.log(Level.FINE, "No " + GROUP_ID + ":" + goal + " execution found");
+            return;
+        }
+
+        for (Element testEvent : testEvents) {
+            String surefireEventType = testEvent.getAttribute("type");
             if (!surefireEventType.equals("MojoSucceeded") && !surefireEventType.equals("MojoFailed")) {
                 continue;
             }
-            Element pluginElt = XmlUtils.getUniqueChildElement(sureFireTestEvent, "plugin");
+            Element pluginElt = XmlUtils.getUniqueChildElement(testEvent, "plugin");
             Element reportsDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "reportsDirectory");
-            Element projectElt = XmlUtils.getUniqueChildElement(sureFireTestEvent, "project");
+            Element projectElt = XmlUtils.getUniqueChildElement(testEvent, "project");
             MavenSpyLogProcessor.MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
             MavenSpyLogProcessor.PluginInvocation pluginInvocation = XmlUtils.newPluginInvocation(pluginElt);
 
             if (reportsDirectoryElt == null) {
-                listener.getLogger().println("[withMaven] No <reportsDirectory> element found for <plugin> in " + XmlUtils.toString(sureFireTestEvent));
+                listener.getLogger().println("[withMaven] No <reportsDirectory> element found for <plugin> in " + XmlUtils.toString(testEvent));
                 continue;
             }
             String reportsDirectory = reportsDirectoryElt.getTextContent().trim();
             if (reportsDirectory.contains("${project.build.directory}")) {
                 String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
                 if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
-                    listener.getLogger().println("[withMaven] '${project.build.directory}' found for <project> in " + XmlUtils.toString(sureFireTestEvent));
+                    listener.getLogger().println("[withMaven] '${project.build.directory}' found for <project> in " + XmlUtils.toString(testEvent));
                     continue;
                 }
 
@@ -188,7 +201,7 @@ public class JunitTestsReporter implements ResultsReporter {
             } else if (reportsDirectory.contains("${basedir}")) {
                 String baseDir = projectElt.getAttribute("baseDir");
                 if (baseDir.isEmpty()) {
-                    listener.getLogger().println("[withMaven] '${basedir}' found for <project> in " + XmlUtils.toString(sureFireTestEvent));
+                    listener.getLogger().println("[withMaven] '${basedir}' found for <project> in " + XmlUtils.toString(testEvent));
                     continue;
                 }
 
@@ -199,7 +212,7 @@ public class JunitTestsReporter implements ResultsReporter {
 
             String testResults = reportsDirectory + "/*.xml";
             listener.getLogger().println("[withMaven] Archive test results for Maven artifact " + mavenArtifact.toString() + " generated by " +
-                    pluginInvocation + ": " + testResults);
+                pluginInvocation + ": " + testResults);
             JUnitResultArchiver archiver = new JUnitResultArchiver(testResults);
 
             // even if "org.apache.maven.plugins:maven-surefire-plugin@test" succeeds, it maybe with "-DskipTests" and thus not have any test results.
@@ -208,12 +221,10 @@ public class JunitTestsReporter implements ResultsReporter {
             try {
                 archiver.perform(run, workspace, launcher, listener);
             } catch (Exception e) {
-                listener.error("[withMaven] Silently ignore exception archiving JUnit results for Maven artifact " + mavenArtifact.toString() + " generated by " +
-                        pluginInvocation + ": " + e);
-                LOGGER.log(Level.WARNING, "Exception processing " + XmlUtils.toString(sureFireTestEvent), e);
+                listener.error("[withMaven] Silently ignore exception archiving JUnit results for Maven artifact " + mavenArtifact.toString() + " generated by " + pluginInvocation + ": " + e);
+                LOGGER.log(Level.WARNING, "Exception processing " + XmlUtils.toString(testEvent), e);
             }
 
         }
-
     }
 }
