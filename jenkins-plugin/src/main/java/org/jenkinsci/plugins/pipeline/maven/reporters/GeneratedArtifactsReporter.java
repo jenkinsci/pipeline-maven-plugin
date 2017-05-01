@@ -85,7 +85,7 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
                     listener.error("[withMaven] Invalid path in the workspace (" + workspace.getRemote() + ") for artifact " + mavenArtifact);
                 } else {
                     FilePath artifactFilePath = new FilePath(workspace, artifactPathInWorkspace);
-                    if (artifactFilePath.exists()) {
+                    if (artifactFilePath.exists() && !artifactFilePath.isDirectory()) {
                         // the subsequent call to digest could test the existence but we don't want to prematurely optimize performances
                         listener.getLogger().println("[withMaven] Archive artifact " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone);
                         artifactsToArchive.put(artifactPathInArchiveZone, artifactPathInWorkspace);
