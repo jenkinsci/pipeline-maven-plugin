@@ -145,7 +145,7 @@ public class WithMavenStepOnMasterTest {
         String pipelineScript = "node('master') {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
-                "        sh 'mvn package'\n" +
+                "        sh 'mvn package verify'\n" +
                 "    }\n" +
                 "}";
 
