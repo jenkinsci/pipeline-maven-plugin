@@ -1,0 +1,1946 @@
+<mavenExecution _time="2017-05-06 13:30:30.757">
+    <context _time="2017-05-06 13:30:30.772">
+        <systemProperties/>
+        <versionProperties/>
+        <workingDirectory/>
+        <userProperties/>
+        <plexus/>
+    </context>
+    <!-- 2017-05-06 13:30:30.772 - new File(.):                                 -->
+    <!-- C:\path\to\spring-petclinic\.                              -->
+    <!-- mvn clean source:jar package install -->
+
+    <DefaultSettingsBuildingRequest class="org.apache.maven.settings.building.DefaultSettingsBuildingRequest" _time="2017-05-06 13:30:31.194">
+        <userSettingsFile>C:\Users\IEUser\.m2\settings.xml</userSettingsFile>
+        <globalSettings>C:\apps\apache-maven-3.5.0\bin\..\conf\settings.xml</globalSettings>
+    </DefaultSettingsBuildingRequest>
+    <MavenExecutionRequest class="org.apache.maven.execution.DefaultMavenExecutionRequest" _time="2017-05-06 13:30:31.397">
+        <pom>C:\path\to\spring-petclinic\pom.xml</pom>
+        <globalSettingsFile>C:\apps\apache-maven-3.5.0\bin\..\conf\settings.xml</globalSettingsFile>
+        <userSettingsFile>C:\Users\IEUser\.m2\settings.xml</userSettingsFile>
+        <baseDirectory>C:\path\to\spring-petclinic</baseDirectory>
+    </MavenExecutionRequest>
+    <ExecutionEvent type="ProjectDiscoveryStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:30:31.444">
+        <project/>
+        <no-execution-found/>
+    </ExecutionEvent>
+    <ExecutionEvent type="SessionStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:30:33.491">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <no-execution-found/>
+    </ExecutionEvent>
+    <ExecutionEvent type="ProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:31:10.773">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <no-execution-found/>
+    </ExecutionEvent>
+    <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest" _time="2017-05-06 13:31:11.268">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+    </DependencyResolutionRequest>
+    <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult" _time="2017-05-06 13:31:16.542"/>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:31:16.598">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-clean" goal="clean" groupId="org.apache.maven.plugins" artifactId="maven-clean-plugin" version="2.6.1">
+            <directory>${project.build.directory}</directory>
+            <excludeDefaultDirectories>${clean.excludeDefaultDirectories}</excludeDefaultDirectories>
+            <failOnError>${maven.clean.failOnError}</failOnError>
+            <followSymLinks>${clean.followSymLinks}</followSymLinks>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <reportDirectory>${project.build.outputDirectory}</reportDirectory>
+            <retryOnError>${maven.clean.retryOnError}</retryOnError>
+            <skip>${clean.skip}</skip>
+            <testOutputDirectory>${project.build.testOutputDirectory}</testOutputDirectory>
+            <verbose>${clean.verbose}</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:31:18.193">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-clean" goal="clean" groupId="org.apache.maven.plugins" artifactId="maven-clean-plugin" version="2.6.1">
+            <directory>${project.build.directory}</directory>
+            <excludeDefaultDirectories>${clean.excludeDefaultDirectories}</excludeDefaultDirectories>
+            <failOnError>${maven.clean.failOnError}</failOnError>
+            <followSymLinks>${clean.followSymLinks}</followSymLinks>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <reportDirectory>${project.build.outputDirectory}</reportDirectory>
+            <retryOnError>${maven.clean.retryOnError}</retryOnError>
+            <skip>${clean.skip}</skip>
+            <testOutputDirectory>${project.build.testOutputDirectory}</testOutputDirectory>
+            <verbose>${clean.verbose}</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:31:18.356">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="clean" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin" version="2.7">
+            <dataFile>${cobertura.datafile}</dataFile>
+            <forceMojoExecution>${cobertura.force}</forceMojoExecution>
+            <maxmem>${cobertura.maxmem}</maxmem>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <pluginClasspathList>${plugin.artifacts}</pluginClasspathList>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <skip>${cobertura.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:36.743">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="clean" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin" version="2.7">
+            <dataFile>${cobertura.datafile}</dataFile>
+            <forceMojoExecution>${cobertura.force}</forceMojoExecution>
+            <maxmem>${cobertura.maxmem}</maxmem>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <pluginClasspathList>${plugin.artifacts}</pluginClasspathList>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <skip>${cobertura.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:36.743">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin" version="2.4">
+            <attach>${attach}</attach>
+            <classifier>${maven.source.classifier}</classifier>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <excludeResources>${source.excludeResources}</excludeResources>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${source.forceCreation}</forceCreation>
+            <includePom>${source.includePom}</includePom>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <session>${session}</session>
+            <skipSource>${source.skip}</skipSource>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <useDefaultManifestFile>false</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkedProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:36.743">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin" version="2.4">
+            <attach>${attach}</attach>
+            <classifier>${maven.source.classifier}</classifier>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <excludeResources>${source.excludeResources}</excludeResources>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${source.forceCreation}</forceCreation>
+            <includePom>${source.includePom}</includePom>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <session>${session}</session>
+            <skipSource>${source.skip}</skipSource>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <useDefaultManifestFile>false</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:36.757">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin" version="2.2.2">
+            <abbrevLength>7</abbrevLength>
+            <commitIdGenerationMode>flat</commitIdGenerationMode>
+            <dateFormat>yyyy-MM-dd&apos;T&apos;HH:mm:ssZ</dateFormat>
+            <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+            <failOnNoGitDirectory>false</failOnNoGitDirectory>
+            <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+            <format>properties</format>
+            <generateGitPropertiesFile>true</generateGitPropertiesFile>
+            <generateGitPropertiesFilename>C:\path\to\spring-petclinic\target\classes/git.properties</generateGitPropertiesFilename>
+            <injectAllReactorProjects>false</injectAllReactorProjects>
+            <prefix>git</prefix>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <runOnlyOnce>false</runOnlyOnce>
+            <session>${session}</session>
+            <skip>false</skip>
+            <skipPoms>true</skipPoms>
+            <useNativeGit>false</useNativeGit>
+            <verbose>true</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:41.95">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin" version="2.2.2">
+            <abbrevLength>7</abbrevLength>
+            <commitIdGenerationMode>flat</commitIdGenerationMode>
+            <dateFormat>yyyy-MM-dd&apos;T&apos;HH:mm:ssZ</dateFormat>
+            <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+            <failOnNoGitDirectory>false</failOnNoGitDirectory>
+            <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+            <format>properties</format>
+            <generateGitPropertiesFile>true</generateGitPropertiesFile>
+            <generateGitPropertiesFilename>C:\path\to\spring-petclinic\target\classes/git.properties</generateGitPropertiesFilename>
+            <injectAllReactorProjects>false</injectAllReactorProjects>
+            <prefix>git</prefix>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <runOnlyOnce>false</runOnlyOnce>
+            <session>${session}</session>
+            <skip>false</skip>
+            <skipPoms>true</skipPoms>
+            <useNativeGit>false</useNativeGit>
+            <verbose>true</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkedProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:41.95">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin" version="2.4">
+            <attach>${attach}</attach>
+            <classifier>${maven.source.classifier}</classifier>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <excludeResources>${source.excludeResources}</excludeResources>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${source.forceCreation}</forceCreation>
+            <includePom>${source.includePom}</includePom>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <session>${session}</session>
+            <skipSource>${source.skip}</skipSource>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <useDefaultManifestFile>false</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:42.081">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin" version="2.4">
+            <attach>${attach}</attach>
+            <classifier>${maven.source.classifier}</classifier>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <excludeResources>${source.excludeResources}</excludeResources>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${source.forceCreation}</forceCreation>
+            <includePom>${source.includePom}</includePom>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <session>${session}</session>
+            <skipSource>${source.skip}</skipSource>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <useDefaultManifestFile>false</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:42.083">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin" version="2.4">
+            <attach>${attach}</attach>
+            <classifier>${maven.source.classifier}</classifier>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <excludeResources>${source.excludeResources}</excludeResources>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${source.forceCreation}</forceCreation>
+            <includePom>${source.includePom}</includePom>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <session>${session}</session>
+            <skipSource>${source.skip}</skipSource>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <useDefaultManifestFile>false</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:50.805">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin" version="2.4">
+            <attach>${attach}</attach>
+            <classifier>${maven.source.classifier}</classifier>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <excludeResources>${source.excludeResources}</excludeResources>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${source.forceCreation}</forceCreation>
+            <includePom>${source.includePom}</includePom>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <session>${session}</session>
+            <skipSource>${source.skip}</skipSource>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <useDefaultManifestFile>false</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:50.805">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin" version="2.2.2">
+            <abbrevLength>7</abbrevLength>
+            <commitIdGenerationMode>flat</commitIdGenerationMode>
+            <dateFormat>yyyy-MM-dd&apos;T&apos;HH:mm:ssZ</dateFormat>
+            <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+            <failOnNoGitDirectory>false</failOnNoGitDirectory>
+            <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+            <format>properties</format>
+            <generateGitPropertiesFile>true</generateGitPropertiesFile>
+            <generateGitPropertiesFilename>C:\path\to\spring-petclinic\target\classes/git.properties</generateGitPropertiesFilename>
+            <injectAllReactorProjects>false</injectAllReactorProjects>
+            <prefix>git</prefix>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <runOnlyOnce>false</runOnlyOnce>
+            <session>${session}</session>
+            <skip>false</skip>
+            <skipPoms>true</skipPoms>
+            <useNativeGit>false</useNativeGit>
+            <verbose>true</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:51.626">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin" version="2.2.2">
+            <abbrevLength>7</abbrevLength>
+            <commitIdGenerationMode>flat</commitIdGenerationMode>
+            <dateFormat>yyyy-MM-dd&apos;T&apos;HH:mm:ssZ</dateFormat>
+            <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+            <failOnNoGitDirectory>false</failOnNoGitDirectory>
+            <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+            <format>properties</format>
+            <generateGitPropertiesFile>true</generateGitPropertiesFile>
+            <generateGitPropertiesFilename>C:\path\to\spring-petclinic\target\classes/git.properties</generateGitPropertiesFilename>
+            <injectAllReactorProjects>false</injectAllReactorProjects>
+            <prefix>git</prefix>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <runOnlyOnce>false</runOnlyOnce>
+            <session>${session}</session>
+            <skip>false</skip>
+            <skipPoms>true</skipPoms>
+            <useNativeGit>false</useNativeGit>
+            <verbose>true</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:51.626">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="build-info" groupId="org.springframework.boot" artifactId="spring-boot-maven-plugin" version="1.5.1.RELEASE">
+            <additionalProperties/>
+            <outputFile>${project.build.outputDirectory}/META-INF/build-info.properties</outputFile>
+            <project>${project}</project>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:57.768">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="build-info" groupId="org.springframework.boot" artifactId="spring-boot-maven-plugin" version="1.5.1.RELEASE">
+            <additionalProperties/>
+            <outputFile>${project.build.outputDirectory}/META-INF/build-info.properties</outputFile>
+            <project>${project}</project>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:32:57.768">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="run" groupId="ro.isdc.wro4j" artifactId="wro4j-maven-plugin" version="1.8.0">
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <buildFinalName>${project.build.directory}/${project.build.finalName}</buildFinalName>
+            <contextFolder>C:\path\to\spring-petclinic/src/main/less</contextFolder>
+            <contextPath>${contextPath}</contextPath>
+            <cssDestinationFolder>C:\path\to\spring-petclinic\target/classes/static/resources/css</cssDestinationFolder>
+            <destinationFolder>${destinationFolder}</destinationFolder>
+            <extraConfigFile>C:\path\to\spring-petclinic/src/main/wro/wro.properties</extraConfigFile>
+            <groupNameMappingFile>${groupNameMappingFile}</groupNameMappingFile>
+            <ignoreMissingResources>${ignoreMissingResources}</ignoreMissingResources>
+            <incrementalBuildEnabled>${incrementalBuildEnabled}</incrementalBuildEnabled>
+            <jsDestinationFolder>${jsDestinationFolder}</jsDestinationFolder>
+            <mavenProject>${project}</mavenProject>
+            <minimize>${minimize}</minimize>
+            <parallelProcessing>${parallelProcessing}</parallelProcessing>
+            <skip>false</skip>
+            <targetGroups>${targetGroups}</targetGroups>
+            <wroFile>C:\path\to\spring-petclinic/src/main/wro/wro.xml</wroFile>
+            <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:33:53.588">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="run" groupId="ro.isdc.wro4j" artifactId="wro4j-maven-plugin" version="1.8.0">
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <buildFinalName>${project.build.directory}/${project.build.finalName}</buildFinalName>
+            <contextFolder>C:\path\to\spring-petclinic/src/main/less</contextFolder>
+            <contextPath>${contextPath}</contextPath>
+            <cssDestinationFolder>C:\path\to\spring-petclinic\target/classes/static/resources/css</cssDestinationFolder>
+            <destinationFolder>${destinationFolder}</destinationFolder>
+            <extraConfigFile>C:\path\to\spring-petclinic/src/main/wro/wro.properties</extraConfigFile>
+            <groupNameMappingFile>${groupNameMappingFile}</groupNameMappingFile>
+            <ignoreMissingResources>${ignoreMissingResources}</ignoreMissingResources>
+            <incrementalBuildEnabled>${incrementalBuildEnabled}</incrementalBuildEnabled>
+            <jsDestinationFolder>${jsDestinationFolder}</jsDestinationFolder>
+            <mavenProject>${project}</mavenProject>
+            <minimize>${minimize}</minimize>
+            <parallelProcessing>${parallelProcessing}</parallelProcessing>
+            <skip>false</skip>
+            <targetGroups>${targetGroups}</targetGroups>
+            <wroFile>C:\path\to\spring-petclinic/src/main/wro/wro.xml</wroFile>
+            <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:33:53.588">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-resources" goal="resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <delimiters/>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.resources}</resources>
+            <session>${session}</session>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:33:55.391">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-resources" goal="resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <delimiters/>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.resources}</resources>
+            <session>${session}</session>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:33:55.391">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-compile" goal="compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <classpathElements>${project.compileClasspathElements}</classpathElements>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <projectArtifact>${project.artifact}</projectArtifact>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skipMain>${maven.main.skip}</skipMain>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>${maven.compiler.source}</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>${maven.compiler.target}</target>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+            <mavenSession>${session}</mavenSession>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:34:01.112">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-compile" goal="compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <classpathElements>${project.compileClasspathElements}</classpathElements>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <projectArtifact>${project.artifact}</projectArtifact>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skipMain>${maven.main.skip}</skipMain>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>${maven.compiler.source}</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>${maven.compiler.target}</target>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+            <mavenSession>${session}</mavenSession>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:34:01.112">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-testResources" goal="testResources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <delimiters/>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.testResources}</resources>
+            <session>${session}</session>
+            <skip>${maven.test.skip}</skip>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:34:01.112">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-testResources" goal="testResources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <delimiters/>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.testResources}</resources>
+            <session>${session}</session>
+            <skip>${maven.test.skip}</skip>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:34:01.112">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-testCompile" goal="testCompile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <classpathElements>${project.testClasspathElements}</classpathElements>
+            <compileSourceRoots>${project.testCompileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/test-annotations</generatedTestSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skip>${maven.test.skip}</skip>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>${maven.compiler.source}</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>${maven.compiler.target}</target>
+            <testSource>${maven.compiler.testSource}</testSource>
+            <testTarget>${maven.compiler.testTarget}</testTarget>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+            <mavenSession>${session}</mavenSession>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:34:05.485">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-testCompile" goal="testCompile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <classpathElements>${project.testClasspathElements}</classpathElements>
+            <compileSourceRoots>${project.testCompileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/test-annotations</generatedTestSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skip>${maven.test.skip}</skip>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>${maven.compiler.source}</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>${maven.compiler.target}</target>
+            <testSource>${maven.compiler.testSource}</testSource>
+            <testTarget>${maven.compiler.testTarget}</testTarget>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+            <mavenSession>${session}</mavenSession>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:34:05.485">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.18.1">
+            <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
+            <argLine>${argLine}</argLine>
+            <basedir>${basedir}</basedir>
+            <childDelegation>${childDelegation}</childDelegation>
+            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+            <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
+            <debugForkedProcess>${maven.surefire.debug}</debugForkedProcess>
+            <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
+            <disableXmlReport>${disableXmlReport}</disableXmlReport>
+            <enableAssertions>${enableAssertions}</enableAssertions>
+            <excludedGroups>${excludedGroups}</excludedGroups>
+            <excludes/>
+            <failIfNoSpecifiedTests>${surefire.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
+            <failIfNoTests>${failIfNoTests}</failIfNoTests>
+            <forkCount>${forkCount}</forkCount>
+            <forkMode>${forkMode}</forkMode>
+            <forkedProcessTimeoutInSeconds>${surefire.timeout}</forkedProcessTimeoutInSeconds>
+            <groups>${groups}</groups>
+            <includes/>
+            <junitArtifactName>${junitArtifactName}</junitArtifactName>
+            <jvm>${jvm}</jvm>
+            <localRepository>${localRepository}</localRepository>
+            <objectFactory>${objectFactory}</objectFactory>
+            <parallel>${parallel}</parallel>
+            <parallelMavenExecution>${session.parallel}</parallelMavenExecution>
+            <parallelOptimized>${parallelOptimized}</parallelOptimized>
+            <parallelTestsTimeoutForcedInSeconds>${surefire.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
+            <parallelTestsTimeoutInSeconds>${surefire.parallel.timeout}</parallelTestsTimeoutInSeconds>
+            <perCoreThreadCount>${perCoreThreadCount}</perCoreThreadCount>
+            <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
+            <pluginDescriptor>${plugin}</pluginDescriptor>
+            <printSummary>${surefire.printSummary}</printSummary>
+            <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <remoteRepositories>${project.pluginArtifactRepositories}</remoteRepositories>
+            <reportFormat>${surefire.reportFormat}</reportFormat>
+            <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
+            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+            <rerunFailingTestsCount>${surefire.rerunFailingTestsCount}</rerunFailingTestsCount>
+            <reuseForks>${reuseForks}</reuseForks>
+            <runOrder>${surefire.runOrder}</runOrder>
+            <skip>${maven.test.skip}</skip>
+            <skipExec>${maven.test.skip.exec}</skipExec>
+            <skipTests>${skipTests}</skipTests>
+            <suiteXmlFiles>${surefire.suiteXmlFiles}</suiteXmlFiles>
+            <test>${test}</test>
+            <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
+            <testFailureIgnore>${maven.test.failure.ignore}</testFailureIgnore>
+            <testNGArtifactName>${testNGArtifactName}</testNGArtifactName>
+            <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+            <threadCount>${threadCount}</threadCount>
+            <threadCountClasses>${threadCountClasses}</threadCountClasses>
+            <threadCountMethods>${threadCountMethods}</threadCountMethods>
+            <threadCountSuites>${threadCountSuites}</threadCountSuites>
+            <trimStackTrace>${trimStackTrace}</trimStackTrace>
+            <useFile>${surefire.useFile}</useFile>
+            <useManifestOnlyJar>${surefire.useManifestOnlyJar}</useManifestOnlyJar>
+            <useSystemClassLoader>${surefire.useSystemClassLoader}</useSystemClassLoader>
+            <useUnlimitedThreads>${useUnlimitedThreads}</useUnlimitedThreads>
+            <workingDirectory>${basedir}</workingDirectory>
+            <project>${project}</project>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:36.099">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.18.1">
+            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:36.099">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-jar" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="2.6">
+            <archive/>
+            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+            <classifier>${maven.jar.classifier}</classifier>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <finalName>${jar.finalName}</finalName>
+            <forceCreation>${jar.forceCreation}</forceCreation>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <session>${session}</session>
+            <skipIfEmpty>${jar.skipIfEmpty}</skipIfEmpty>
+            <useDefaultManifestFile>${jar.useDefaultManifestFile}</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:37.469">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-jar" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="2.6">
+            <finalName>${jar.finalName}</finalName>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:37.469">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="repackage" groupId="org.springframework.boot" artifactId="spring-boot-maven-plugin" version="1.5.1.RELEASE">
+            <attach>true</attach>
+            <excludeArtifactIds>${excludeArtifactIds}</excludeArtifactIds>
+            <excludeDevtools>true</excludeDevtools>
+            <excludeGroupIds>${excludeGroupIds}</excludeGroupIds>
+            <executable>false</executable>
+            <finalName>${project.build.finalName}</finalName>
+            <includeSystemScope>false</includeSystemScope>
+            <mainClass>${start-class}</mainClass>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <skip>${skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:38.259">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="repackage" groupId="org.springframework.boot" artifactId="spring-boot-maven-plugin" version="1.5.1.RELEASE">
+            <attach>true</attach>
+            <excludeArtifactIds>${excludeArtifactIds}</excludeArtifactIds>
+            <excludeDevtools>true</excludeDevtools>
+            <excludeGroupIds>${excludeGroupIds}</excludeGroupIds>
+            <executable>false</executable>
+            <finalName>${project.build.finalName}</finalName>
+            <includeSystemScope>false</includeSystemScope>
+            <mainClass>${start-class}</mainClass>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <skip>${skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:38.259">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin" version="2.2.2">
+            <abbrevLength>7</abbrevLength>
+            <commitIdGenerationMode>flat</commitIdGenerationMode>
+            <dateFormat>yyyy-MM-dd&apos;T&apos;HH:mm:ssZ</dateFormat>
+            <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+            <failOnNoGitDirectory>false</failOnNoGitDirectory>
+            <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+            <format>properties</format>
+            <generateGitPropertiesFile>true</generateGitPropertiesFile>
+            <generateGitPropertiesFilename>C:\path\to\spring-petclinic\target\classes/git.properties</generateGitPropertiesFilename>
+            <injectAllReactorProjects>false</injectAllReactorProjects>
+            <prefix>git</prefix>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <runOnlyOnce>false</runOnlyOnce>
+            <session>${session}</session>
+            <skip>false</skip>
+            <skipPoms>true</skipPoms>
+            <useNativeGit>false</useNativeGit>
+            <verbose>true</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:40.139">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin" version="2.2.2">
+            <abbrevLength>7</abbrevLength>
+            <commitIdGenerationMode>flat</commitIdGenerationMode>
+            <dateFormat>yyyy-MM-dd&apos;T&apos;HH:mm:ssZ</dateFormat>
+            <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+            <failOnNoGitDirectory>false</failOnNoGitDirectory>
+            <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+            <format>properties</format>
+            <generateGitPropertiesFile>true</generateGitPropertiesFile>
+            <generateGitPropertiesFilename>C:\path\to\spring-petclinic\target\classes/git.properties</generateGitPropertiesFilename>
+            <injectAllReactorProjects>false</injectAllReactorProjects>
+            <prefix>git</prefix>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <runOnlyOnce>false</runOnlyOnce>
+            <session>${session}</session>
+            <skip>false</skip>
+            <skipPoms>true</skipPoms>
+            <useNativeGit>false</useNativeGit>
+            <verbose>true</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:40.139">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="build-info" groupId="org.springframework.boot" artifactId="spring-boot-maven-plugin" version="1.5.1.RELEASE">
+            <additionalProperties/>
+            <outputFile>${project.build.outputDirectory}/META-INF/build-info.properties</outputFile>
+            <project>${project}</project>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:40.271">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="build-info" groupId="org.springframework.boot" artifactId="spring-boot-maven-plugin" version="1.5.1.RELEASE">
+            <additionalProperties/>
+            <outputFile>${project.build.outputDirectory}/META-INF/build-info.properties</outputFile>
+            <project>${project}</project>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:40.271">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="run" groupId="ro.isdc.wro4j" artifactId="wro4j-maven-plugin" version="1.8.0">
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <buildFinalName>${project.build.directory}/${project.build.finalName}</buildFinalName>
+            <contextFolder>C:\path\to\spring-petclinic/src/main/less</contextFolder>
+            <contextPath>${contextPath}</contextPath>
+            <cssDestinationFolder>C:\path\to\spring-petclinic\target/classes/static/resources/css</cssDestinationFolder>
+            <destinationFolder>${destinationFolder}</destinationFolder>
+            <extraConfigFile>C:\path\to\spring-petclinic/src/main/wro/wro.properties</extraConfigFile>
+            <groupNameMappingFile>${groupNameMappingFile}</groupNameMappingFile>
+            <ignoreMissingResources>${ignoreMissingResources}</ignoreMissingResources>
+            <incrementalBuildEnabled>${incrementalBuildEnabled}</incrementalBuildEnabled>
+            <jsDestinationFolder>${jsDestinationFolder}</jsDestinationFolder>
+            <mavenProject>${project}</mavenProject>
+            <minimize>${minimize}</minimize>
+            <parallelProcessing>${parallelProcessing}</parallelProcessing>
+            <skip>false</skip>
+            <targetGroups>${targetGroups}</targetGroups>
+            <wroFile>C:\path\to\spring-petclinic/src/main/wro/wro.xml</wroFile>
+            <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:55.91">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="run" groupId="ro.isdc.wro4j" artifactId="wro4j-maven-plugin" version="1.8.0">
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <buildFinalName>${project.build.directory}/${project.build.finalName}</buildFinalName>
+            <contextFolder>C:\path\to\spring-petclinic/src/main/less</contextFolder>
+            <contextPath>${contextPath}</contextPath>
+            <cssDestinationFolder>C:\path\to\spring-petclinic\target/classes/static/resources/css</cssDestinationFolder>
+            <destinationFolder>${destinationFolder}</destinationFolder>
+            <extraConfigFile>C:\path\to\spring-petclinic/src/main/wro/wro.properties</extraConfigFile>
+            <groupNameMappingFile>${groupNameMappingFile}</groupNameMappingFile>
+            <ignoreMissingResources>${ignoreMissingResources}</ignoreMissingResources>
+            <incrementalBuildEnabled>${incrementalBuildEnabled}</incrementalBuildEnabled>
+            <jsDestinationFolder>${jsDestinationFolder}</jsDestinationFolder>
+            <mavenProject>${project}</mavenProject>
+            <minimize>${minimize}</minimize>
+            <parallelProcessing>${parallelProcessing}</parallelProcessing>
+            <skip>false</skip>
+            <targetGroups>${targetGroups}</targetGroups>
+            <wroFile>C:\path\to\spring-petclinic/src/main/wro/wro.xml</wroFile>
+            <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:55.91">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-resources" goal="resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <delimiters/>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.resources}</resources>
+            <session>${session}</session>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:56.636">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-resources" goal="resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <delimiters/>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.resources}</resources>
+            <session>${session}</session>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:56.636">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-compile" goal="compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <classpathElements>${project.compileClasspathElements}</classpathElements>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <projectArtifact>${project.artifact}</projectArtifact>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skipMain>${maven.main.skip}</skipMain>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>${maven.compiler.source}</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>${maven.compiler.target}</target>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+            <mavenSession>${session}</mavenSession>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:59.115">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-compile" goal="compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <classpathElements>${project.compileClasspathElements}</classpathElements>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <projectArtifact>${project.artifact}</projectArtifact>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skipMain>${maven.main.skip}</skipMain>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>${maven.compiler.source}</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>${maven.compiler.target}</target>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+            <mavenSession>${session}</mavenSession>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:59.115">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-testResources" goal="testResources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <delimiters/>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.testResources}</resources>
+            <session>${session}</session>
+            <skip>${maven.test.skip}</skip>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:59.168">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-testResources" goal="testResources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <delimiters/>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.testResources}</resources>
+            <session>${session}</session>
+            <skip>${maven.test.skip}</skip>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:59.168">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-testCompile" goal="testCompile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <classpathElements>${project.testClasspathElements}</classpathElements>
+            <compileSourceRoots>${project.testCompileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/test-annotations</generatedTestSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skip>${maven.test.skip}</skip>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>${maven.compiler.source}</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>${maven.compiler.target}</target>
+            <testSource>${maven.compiler.testSource}</testSource>
+            <testTarget>${maven.compiler.testTarget}</testTarget>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+            <mavenSession>${session}</mavenSession>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:59.682">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-testCompile" goal="testCompile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <classpathElements>${project.testClasspathElements}</classpathElements>
+            <compileSourceRoots>${project.testCompileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/test-annotations</generatedTestSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skip>${maven.test.skip}</skip>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>${maven.compiler.source}</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>${maven.compiler.target}</target>
+            <testSource>${maven.compiler.testSource}</testSource>
+            <testTarget>${maven.compiler.testTarget}</testTarget>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+            <mavenSession>${session}</mavenSession>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:36:59.682">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.18.1">
+            <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
+            <argLine>${argLine}</argLine>
+            <basedir>${basedir}</basedir>
+            <childDelegation>${childDelegation}</childDelegation>
+            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+            <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
+            <debugForkedProcess>${maven.surefire.debug}</debugForkedProcess>
+            <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
+            <disableXmlReport>${disableXmlReport}</disableXmlReport>
+            <enableAssertions>${enableAssertions}</enableAssertions>
+            <excludedGroups>${excludedGroups}</excludedGroups>
+            <excludes/>
+            <failIfNoSpecifiedTests>${surefire.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
+            <failIfNoTests>${failIfNoTests}</failIfNoTests>
+            <forkCount>${forkCount}</forkCount>
+            <forkMode>${forkMode}</forkMode>
+            <forkedProcessTimeoutInSeconds>${surefire.timeout}</forkedProcessTimeoutInSeconds>
+            <groups>${groups}</groups>
+            <includes/>
+            <junitArtifactName>${junitArtifactName}</junitArtifactName>
+            <jvm>${jvm}</jvm>
+            <localRepository>${localRepository}</localRepository>
+            <objectFactory>${objectFactory}</objectFactory>
+            <parallel>${parallel}</parallel>
+            <parallelMavenExecution>${session.parallel}</parallelMavenExecution>
+            <parallelOptimized>${parallelOptimized}</parallelOptimized>
+            <parallelTestsTimeoutForcedInSeconds>${surefire.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
+            <parallelTestsTimeoutInSeconds>${surefire.parallel.timeout}</parallelTestsTimeoutInSeconds>
+            <perCoreThreadCount>${perCoreThreadCount}</perCoreThreadCount>
+            <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
+            <pluginDescriptor>${plugin}</pluginDescriptor>
+            <printSummary>${surefire.printSummary}</printSummary>
+            <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <remoteRepositories>${project.pluginArtifactRepositories}</remoteRepositories>
+            <reportFormat>${surefire.reportFormat}</reportFormat>
+            <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
+            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+            <rerunFailingTestsCount>${surefire.rerunFailingTestsCount}</rerunFailingTestsCount>
+            <reuseForks>${reuseForks}</reuseForks>
+            <runOrder>${surefire.runOrder}</runOrder>
+            <skip>${maven.test.skip}</skip>
+            <skipExec>${maven.test.skip.exec}</skipExec>
+            <skipTests>${skipTests}</skipTests>
+            <suiteXmlFiles>${surefire.suiteXmlFiles}</suiteXmlFiles>
+            <test>${test}</test>
+            <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
+            <testFailureIgnore>${maven.test.failure.ignore}</testFailureIgnore>
+            <testNGArtifactName>${testNGArtifactName}</testNGArtifactName>
+            <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+            <threadCount>${threadCount}</threadCount>
+            <threadCountClasses>${threadCountClasses}</threadCountClasses>
+            <threadCountMethods>${threadCountMethods}</threadCountMethods>
+            <threadCountSuites>${threadCountSuites}</threadCountSuites>
+            <trimStackTrace>${trimStackTrace}</trimStackTrace>
+            <useFile>${surefire.useFile}</useFile>
+            <useManifestOnlyJar>${surefire.useManifestOnlyJar}</useManifestOnlyJar>
+            <useSystemClassLoader>${surefire.useSystemClassLoader}</useSystemClassLoader>
+            <useUnlimitedThreads>${useUnlimitedThreads}</useUnlimitedThreads>
+            <workingDirectory>${basedir}</workingDirectory>
+            <project>${project}</project>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:00.231">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.18.1">
+            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:00.231">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-jar" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="2.6">
+            <archive/>
+            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+            <classifier>${maven.jar.classifier}</classifier>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <finalName>${jar.finalName}</finalName>
+            <forceCreation>${jar.forceCreation}</forceCreation>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <session>${session}</session>
+            <skipIfEmpty>${jar.skipIfEmpty}</skipIfEmpty>
+            <useDefaultManifestFile>${jar.useDefaultManifestFile}</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:01.116">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-jar" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="2.6">
+            <finalName>${jar.finalName}</finalName>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:01.116">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="repackage" groupId="org.springframework.boot" artifactId="spring-boot-maven-plugin" version="1.5.1.RELEASE">
+            <attach>true</attach>
+            <excludeArtifactIds>${excludeArtifactIds}</excludeArtifactIds>
+            <excludeDevtools>true</excludeDevtools>
+            <excludeGroupIds>${excludeGroupIds}</excludeGroupIds>
+            <executable>false</executable>
+            <finalName>${project.build.finalName}</finalName>
+            <includeSystemScope>false</includeSystemScope>
+            <mainClass>${start-class}</mainClass>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <skip>${skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:01.807">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="repackage" groupId="org.springframework.boot" artifactId="spring-boot-maven-plugin" version="1.5.1.RELEASE">
+            <attach>true</attach>
+            <excludeArtifactIds>${excludeArtifactIds}</excludeArtifactIds>
+            <excludeDevtools>true</excludeDevtools>
+            <excludeGroupIds>${excludeGroupIds}</excludeGroupIds>
+            <executable>false</executable>
+            <finalName>${project.build.finalName}</finalName>
+            <includeSystemScope>false</includeSystemScope>
+            <mainClass>${start-class}</mainClass>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <skip>${skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:01.807">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin" version="2.7">
+            <check/>
+            <dataFile>${cobertura.datafile}</dataFile>
+            <forceMojoExecution>${cobertura.force}</forceMojoExecution>
+            <maxmem>${cobertura.maxmem}</maxmem>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <pluginClasspathList>${plugin.artifacts}</pluginClasspathList>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <skip>${cobertura.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkedProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:01.825">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin" version="2.7">
+            <check/>
+            <dataFile>${cobertura.datafile}</dataFile>
+            <forceMojoExecution>${cobertura.force}</forceMojoExecution>
+            <maxmem>${cobertura.maxmem}</maxmem>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <pluginClasspathList>${plugin.artifacts}</pluginClasspathList>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <skip>${cobertura.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest" _time="2017-05-06 13:37:01.825">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+    </DependencyResolutionRequest>
+    <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult" _time="2017-05-06 13:37:03.276"/>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:03.276">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin" version="2.2.2">
+            <abbrevLength>7</abbrevLength>
+            <commitIdGenerationMode>flat</commitIdGenerationMode>
+            <dateFormat>yyyy-MM-dd&apos;T&apos;HH:mm:ssZ</dateFormat>
+            <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+            <failOnNoGitDirectory>false</failOnNoGitDirectory>
+            <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+            <format>properties</format>
+            <generateGitPropertiesFile>true</generateGitPropertiesFile>
+            <generateGitPropertiesFilename>C:\path\to\spring-petclinic\target\classes/git.properties</generateGitPropertiesFilename>
+            <injectAllReactorProjects>false</injectAllReactorProjects>
+            <prefix>git</prefix>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <runOnlyOnce>false</runOnlyOnce>
+            <session>${session}</session>
+            <skip>false</skip>
+            <skipPoms>true</skipPoms>
+            <useNativeGit>false</useNativeGit>
+            <verbose>true</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:06.88">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="revision" groupId="pl.project13.maven" artifactId="git-commit-id-plugin" version="2.2.2">
+            <abbrevLength>7</abbrevLength>
+            <commitIdGenerationMode>flat</commitIdGenerationMode>
+            <dateFormat>yyyy-MM-dd&apos;T&apos;HH:mm:ssZ</dateFormat>
+            <dotGitDirectory>${project.basedir}/.git</dotGitDirectory>
+            <failOnNoGitDirectory>false</failOnNoGitDirectory>
+            <failOnUnableToExtractRepoInfo>true</failOnUnableToExtractRepoInfo>
+            <format>properties</format>
+            <generateGitPropertiesFile>true</generateGitPropertiesFile>
+            <generateGitPropertiesFilename>C:\path\to\spring-petclinic\target\classes/git.properties</generateGitPropertiesFilename>
+            <injectAllReactorProjects>false</injectAllReactorProjects>
+            <prefix>git</prefix>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <runOnlyOnce>false</runOnlyOnce>
+            <session>${session}</session>
+            <skip>false</skip>
+            <skipPoms>true</skipPoms>
+            <useNativeGit>false</useNativeGit>
+            <verbose>true</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:06.88">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="build-info" groupId="org.springframework.boot" artifactId="spring-boot-maven-plugin" version="1.5.1.RELEASE">
+            <additionalProperties/>
+            <outputFile>${project.build.outputDirectory}/META-INF/build-info.properties</outputFile>
+            <project>${project}</project>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:06.899">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="build-info" groupId="org.springframework.boot" artifactId="spring-boot-maven-plugin" version="1.5.1.RELEASE">
+            <additionalProperties/>
+            <outputFile>${project.build.outputDirectory}/META-INF/build-info.properties</outputFile>
+            <project>${project}</project>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:06.899">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="run" groupId="ro.isdc.wro4j" artifactId="wro4j-maven-plugin" version="1.8.0">
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <buildFinalName>${project.build.directory}/${project.build.finalName}</buildFinalName>
+            <contextFolder>C:\path\to\spring-petclinic/src/main/less</contextFolder>
+            <contextPath>${contextPath}</contextPath>
+            <cssDestinationFolder>C:\path\to\spring-petclinic\target/classes/static/resources/css</cssDestinationFolder>
+            <destinationFolder>${destinationFolder}</destinationFolder>
+            <extraConfigFile>C:\path\to\spring-petclinic/src/main/wro/wro.properties</extraConfigFile>
+            <groupNameMappingFile>${groupNameMappingFile}</groupNameMappingFile>
+            <ignoreMissingResources>${ignoreMissingResources}</ignoreMissingResources>
+            <incrementalBuildEnabled>${incrementalBuildEnabled}</incrementalBuildEnabled>
+            <jsDestinationFolder>${jsDestinationFolder}</jsDestinationFolder>
+            <mavenProject>${project}</mavenProject>
+            <minimize>${minimize}</minimize>
+            <parallelProcessing>${parallelProcessing}</parallelProcessing>
+            <skip>false</skip>
+            <targetGroups>${targetGroups}</targetGroups>
+            <wroFile>C:\path\to\spring-petclinic/src/main/wro/wro.xml</wroFile>
+            <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:16.3">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="run" groupId="ro.isdc.wro4j" artifactId="wro4j-maven-plugin" version="1.8.0">
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <buildFinalName>${project.build.directory}/${project.build.finalName}</buildFinalName>
+            <contextFolder>C:\path\to\spring-petclinic/src/main/less</contextFolder>
+            <contextPath>${contextPath}</contextPath>
+            <cssDestinationFolder>C:\path\to\spring-petclinic\target/classes/static/resources/css</cssDestinationFolder>
+            <destinationFolder>${destinationFolder}</destinationFolder>
+            <extraConfigFile>C:\path\to\spring-petclinic/src/main/wro/wro.properties</extraConfigFile>
+            <groupNameMappingFile>${groupNameMappingFile}</groupNameMappingFile>
+            <ignoreMissingResources>${ignoreMissingResources}</ignoreMissingResources>
+            <incrementalBuildEnabled>${incrementalBuildEnabled}</incrementalBuildEnabled>
+            <jsDestinationFolder>${jsDestinationFolder}</jsDestinationFolder>
+            <mavenProject>${project}</mavenProject>
+            <minimize>${minimize}</minimize>
+            <parallelProcessing>${parallelProcessing}</parallelProcessing>
+            <skip>false</skip>
+            <targetGroups>${targetGroups}</targetGroups>
+            <wroFile>C:\path\to\spring-petclinic/src/main/wro/wro.xml</wroFile>
+            <wroManagerFactory>ro.isdc.wro.maven.plugin.manager.factory.ConfigurableWroManagerFactory</wroManagerFactory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:16.3">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-resources" goal="resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <delimiters/>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.resources}</resources>
+            <session>${session}</session>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:16.939">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-resources" goal="resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <delimiters/>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.resources}</resources>
+            <session>${session}</session>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:16.939">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-compile" goal="compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <classpathElements>${project.compileClasspathElements}</classpathElements>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <projectArtifact>${project.artifact}</projectArtifact>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skipMain>${maven.main.skip}</skipMain>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>${maven.compiler.source}</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>${maven.compiler.target}</target>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+            <mavenSession>${session}</mavenSession>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:18.804">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-compile" goal="compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <classpathElements>${project.compileClasspathElements}</classpathElements>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <projectArtifact>${project.artifact}</projectArtifact>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skipMain>${maven.main.skip}</skipMain>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>${maven.compiler.source}</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>${maven.compiler.target}</target>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+            <mavenSession>${session}</mavenSession>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:18.804">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="instrument" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin" version="2.7">
+            <attach>${cobertura.attach}</attach>
+            <classifier>${cobertura.classifier}</classifier>
+            <dataFile>${cobertura.datafile}</dataFile>
+            <forceMojoExecution>${cobertura.force}</forceMojoExecution>
+            <instrumentation>${instrumentation}</instrumentation>
+            <maxmem>${cobertura.maxmem}</maxmem>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <pluginClasspathList>${plugin.artifacts}</pluginClasspathList>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <skip>${cobertura.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:24.31">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="instrument" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin" version="2.7">
+            <attach>${cobertura.attach}</attach>
+            <classifier>${cobertura.classifier}</classifier>
+            <dataFile>${cobertura.datafile}</dataFile>
+            <forceMojoExecution>${cobertura.force}</forceMojoExecution>
+            <instrumentation>${instrumentation}</instrumentation>
+            <maxmem>${cobertura.maxmem}</maxmem>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <pluginClasspathList>${plugin.artifacts}</pluginClasspathList>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <skip>${cobertura.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest" _time="2017-05-06 13:37:24.31">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+    </DependencyResolutionRequest>
+    <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult" _time="2017-05-06 13:37:26.624"/>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:26.624">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-testResources" goal="testResources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <delimiters/>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.testResources}</resources>
+            <session>${session}</session>
+            <skip>${maven.test.skip}</skip>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:26.646">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-testResources" goal="testResources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <delimiters/>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.testResources}</resources>
+            <session>${session}</session>
+            <skip>${maven.test.skip}</skip>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>false</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:26.646">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-testCompile" goal="testCompile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <classpathElements>${project.testClasspathElements}</classpathElements>
+            <compileSourceRoots>${project.testCompileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/test-annotations</generatedTestSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skip>${maven.test.skip}</skip>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>${maven.compiler.source}</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>${maven.compiler.target}</target>
+            <testSource>${maven.compiler.testSource}</testSource>
+            <testTarget>${maven.compiler.testTarget}</testTarget>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+            <mavenSession>${session}</mavenSession>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:26.666">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-testCompile" goal="testCompile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <classpathElements>${project.testClasspathElements}</classpathElements>
+            <compileSourceRoots>${project.testCompileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/test-annotations</generatedTestSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skip>${maven.test.skip}</skip>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>${maven.compiler.source}</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>${maven.compiler.target}</target>
+            <testSource>${maven.compiler.testSource}</testSource>
+            <testTarget>${maven.compiler.testTarget}</testTarget>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+            <mavenSession>${session}</mavenSession>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:37:26.689">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.18.1">
+            <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
+            <argLine>${argLine}</argLine>
+            <basedir>${basedir}</basedir>
+            <childDelegation>${childDelegation}</childDelegation>
+            <classesDirectory>${project.build.directory}/generated-classes/cobertura</classesDirectory>
+            <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
+            <debugForkedProcess>${maven.surefire.debug}</debugForkedProcess>
+            <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
+            <disableXmlReport>${disableXmlReport}</disableXmlReport>
+            <enableAssertions>${enableAssertions}</enableAssertions>
+            <excludedGroups>${excludedGroups}</excludedGroups>
+            <excludes/>
+            <failIfNoSpecifiedTests>${surefire.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
+            <failIfNoTests>${failIfNoTests}</failIfNoTests>
+            <forkCount>${forkCount}</forkCount>
+            <forkMode>${forkMode}</forkMode>
+            <forkedProcessTimeoutInSeconds>${surefire.timeout}</forkedProcessTimeoutInSeconds>
+            <groups>${groups}</groups>
+            <includes/>
+            <junitArtifactName>${junitArtifactName}</junitArtifactName>
+            <jvm>${jvm}</jvm>
+            <localRepository>${localRepository}</localRepository>
+            <objectFactory>${objectFactory}</objectFactory>
+            <parallel>${parallel}</parallel>
+            <parallelMavenExecution>${session.parallel}</parallelMavenExecution>
+            <parallelOptimized>${parallelOptimized}</parallelOptimized>
+            <parallelTestsTimeoutForcedInSeconds>${surefire.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
+            <parallelTestsTimeoutInSeconds>${surefire.parallel.timeout}</parallelTestsTimeoutInSeconds>
+            <perCoreThreadCount>${perCoreThreadCount}</perCoreThreadCount>
+            <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
+            <pluginDescriptor>${plugin}</pluginDescriptor>
+            <printSummary>${surefire.printSummary}</printSummary>
+            <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <remoteRepositories>${project.pluginArtifactRepositories}</remoteRepositories>
+            <reportFormat>${surefire.reportFormat}</reportFormat>
+            <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
+            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+            <rerunFailingTestsCount>${surefire.rerunFailingTestsCount}</rerunFailingTestsCount>
+            <reuseForks>${reuseForks}</reuseForks>
+            <runOrder>${surefire.runOrder}</runOrder>
+            <skip>${maven.test.skip}</skip>
+            <skipExec>${maven.test.skip.exec}</skipExec>
+            <skipTests>${skipTests}</skipTests>
+            <suiteXmlFiles>${surefire.suiteXmlFiles}</suiteXmlFiles>
+            <test>${test}</test>
+            <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
+            <testFailureIgnore>true</testFailureIgnore>
+            <testNGArtifactName>${testNGArtifactName}</testNGArtifactName>
+            <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+            <threadCount>${threadCount}</threadCount>
+            <threadCountClasses>${threadCountClasses}</threadCountClasses>
+            <threadCountMethods>${threadCountMethods}</threadCountMethods>
+            <threadCountSuites>${threadCountSuites}</threadCountSuites>
+            <trimStackTrace>${trimStackTrace}</trimStackTrace>
+            <useFile>${surefire.useFile}</useFile>
+            <useManifestOnlyJar>${surefire.useManifestOnlyJar}</useManifestOnlyJar>
+            <useSystemClassLoader>${surefire.useSystemClassLoader}</useSystemClassLoader>
+            <useUnlimitedThreads>${useUnlimitedThreads}</useUnlimitedThreads>
+            <workingDirectory>${basedir}</workingDirectory>
+            <project>${project}</project>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:39:18.228">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.18.1">
+            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkedProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:39:18.228">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin" version="2.7">
+            <check/>
+            <dataFile>${cobertura.datafile}</dataFile>
+            <forceMojoExecution>${cobertura.force}</forceMojoExecution>
+            <maxmem>${cobertura.maxmem}</maxmem>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <pluginClasspathList>${plugin.artifacts}</pluginClasspathList>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <skip>${cobertura.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:39:18.228">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin" version="2.7">
+            <check/>
+            <dataFile>${cobertura.datafile}</dataFile>
+            <forceMojoExecution>${cobertura.force}</forceMojoExecution>
+            <maxmem>${cobertura.maxmem}</maxmem>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <pluginClasspathList>${plugin.artifacts}</pluginClasspathList>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <skip>${cobertura.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:39:18.228">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin" version="2.7">
+            <check/>
+            <dataFile>${cobertura.datafile}</dataFile>
+            <forceMojoExecution>${cobertura.force}</forceMojoExecution>
+            <maxmem>${cobertura.maxmem}</maxmem>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <pluginClasspathList>${plugin.artifacts}</pluginClasspathList>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <skip>${cobertura.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:39:19.805">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="cobertura-maven-plugin" version="2.7">
+            <check/>
+            <dataFile>${cobertura.datafile}</dataFile>
+            <forceMojoExecution>${cobertura.force}</forceMojoExecution>
+            <maxmem>${cobertura.maxmem}</maxmem>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <pluginClasspathList>${plugin.artifacts}</pluginClasspathList>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <skip>${cobertura.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:39:19.805">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-install" goal="install" groupId="org.apache.maven.plugins" artifactId="maven-install-plugin" version="2.5.2">
+            <artifact>${project.artifact}</artifact>
+            <attachedArtifacts>${project.attachedArtifacts}</attachedArtifacts>
+            <createChecksum>${createChecksum}</createChecksum>
+            <installAtEnd>${installAtEnd}</installAtEnd>
+            <localRepository>${localRepository}</localRepository>
+            <packaging>${project.packaging}</packaging>
+            <pomFile>${project.file}</pomFile>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <skip>${maven.install.skip}</skip>
+            <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:39:20.025">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <plugin executionId="default-install" goal="install" groupId="org.apache.maven.plugins" artifactId="maven-install-plugin" version="2.5.2">
+            <artifact>${project.artifact}</artifact>
+            <attachedArtifacts>${project.attachedArtifacts}</attachedArtifacts>
+            <createChecksum>${createChecksum}</createChecksum>
+            <installAtEnd>${installAtEnd}</installAtEnd>
+            <localRepository>${localRepository}</localRepository>
+            <packaging>${project.packaging}</packaging>
+            <pomFile>${project.file}</pomFile>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <skip>${maven.install.skip}</skip>
+            <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-05-06 13:39:20.025">
+        <project baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </project>
+        <no-execution-found/>
+        <artifact extension="jar" groupId="org.springframework.samples" artifactId="spring-petclinic" id="org.springframework.samples:spring-petclinic:jar:1.5.1" type="jar" version="1.5.1">
+            <file>C:\path\to\spring-petclinic\target\spring-petclinic-1.5.1.jar</file>
+        </artifact>
+        <attachedArtifacts>
+            <artifact extension="jar" groupId="org.springframework.samples" classifier="sources" artifactId="spring-petclinic" id="org.springframework.samples:spring-petclinic:java-source:sources:1.5.1" type="java-source" version="1.5.1">
+                <file>C:\path\to\spring-petclinic\target\spring-petclinic-1.5.1-sources.jar</file>
+            </artifact>
+        </attachedArtifacts>
+    </ExecutionEvent>
+    <MavenExecutionResult class="org.apache.maven.execution.DefaultMavenExecutionResult" _time="2017-05-06 13:39:20.245">
+        <buildSummary baseDir="C:\path\to\spring-petclinic" file="C:\path\to\spring-petclinic\pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" time="489252" version="1.5.1" class="org.apache.maven.execution.BuildSuccess">
+            <build sourceDirectory="C:\path\to\spring-petclinic\src\main\java" directory="C:\path\to\spring-petclinic\target"/>
+        </buildSummary>
+    </MavenExecutionResult>
+    <!-- 2017-05-06 13:39:20.263 - close:                                       -->
+    <!-- ignored:[org.eclipse.aether.RepositoryEvent,                           -->
+    <!-- org.apache.maven.settings.building.DefaultSettingsBuildingResult],     -->
+    <!-- blackListed: []                                                        -->
+
+</mavenExecution>
