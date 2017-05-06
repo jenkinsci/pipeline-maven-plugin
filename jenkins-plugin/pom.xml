@@ -82,6 +82,11 @@
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>maven-plugin</artifactId>
       <version>2.14</version>
+      <!--
+      Discussed on https://github.com/jenkinsci/pipeline-maven-plugin/pull/48
+      Keep the dependency optional
+      -->
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
