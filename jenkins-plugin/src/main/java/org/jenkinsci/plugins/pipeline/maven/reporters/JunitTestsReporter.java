@@ -171,7 +171,9 @@ public class JunitTestsReporter implements ResultsReporter {
         Launcher launcher = context.get(Launcher.class);
 
         if (testEvents.isEmpty()) {
-            LOGGER.log(Level.FINE, "No " + GROUP_ID + ":" + goal + " execution found");
+            if (LOGGER.isLoggable(Level.FINE)) {
+                listener.getLogger().println("[withMaven] No " + GROUP_ID + ":" + goal + " execution found");
+            }
             return;
         }
 

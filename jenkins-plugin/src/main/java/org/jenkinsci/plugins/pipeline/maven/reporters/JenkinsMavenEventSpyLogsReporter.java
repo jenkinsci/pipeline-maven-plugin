@@ -33,7 +33,7 @@ public class JenkinsMavenEventSpyLogsReporter {
         FilePath tmpFile = new FilePath(workspace, "." + mavenSpyLogs.getName());
         try {
             mavenSpyLogs.copyTo(tmpFile);
-            listener.getLogger().println("[withMaven] archive " + mavenSpyLogs.getRemote() + " as " + mavenSpyLogs.getName());
+            listener.getLogger().println("[withMaven] Archive " + mavenSpyLogs.getRemote() + " as " + mavenSpyLogs.getName());
             // filePathInArchiveZone -> filePathInWorkspace
             Map<String, String> mavenBuildLogs = Collections.singletonMap(mavenSpyLogs.getName(), tmpFile.getName());
             artifactManager.archive(workspace, launcher, new BuildListenerAdapter(listener), mavenBuildLogs);
