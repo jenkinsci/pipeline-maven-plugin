@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.util;
 
+import hudson.FilePath;
 import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -8,6 +9,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
@@ -128,5 +130,23 @@ public class XmlUtilsTest {
         List<String> elements = Arrays.asList("a", "b", "c");
         String actual = XmlUtils.join(elements, ",");
         Assert.assertThat(actual, CoreMatchers.is("a,b,c"));
+    }
+
+    @Test
+    public void test_getPathInWorkspace_linux(){
+        String workspace = "/path/to/spring-petclinic";
+        String absolutePath = "/path/to/spring-petclinic/pom.xml";
+        String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
+        String expected = "pom.xml";
+        Assert.assertThat(actual, CoreMatchers.is(expected));
+    }
+
+    @Test
+    public void test_getPathInWorkspace_windows(){
+        String workspace = "C:\\path\\to\\spring-petclinic";
+        String absolutePath = "C:\\path\\to\\spring-petclinic\\pom.xml";
+        String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
+        String expected = "pom.xml";
+        Assert.assertThat(actual, CoreMatchers.is(expected));
     }
 }
