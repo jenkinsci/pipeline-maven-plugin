@@ -159,7 +159,7 @@ public class FindbugsAnalysisReporter implements ResultsReporter {
             LOGGER.warning("TaskListener is NULL, default to stderr");
             listener = new StreamBuildListener((OutputStream) System.err);
         }
-        FilePath workspace = context.get(FilePath.class); // TODO check that it's the good workspace
+        FilePath workspace = context.get(FilePath.class);
         Run run = context.get(Run.class);
         Launcher launcher = context.get(Launcher.class);
 
