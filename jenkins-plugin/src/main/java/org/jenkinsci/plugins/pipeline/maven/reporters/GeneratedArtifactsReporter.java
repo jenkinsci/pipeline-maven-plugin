@@ -103,7 +103,7 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
             }
         }
         if (LOGGER.isLoggable(Level.FINE)) {
-            listener.getLogger().println("Archive and fingerprint " + artifactsToArchive);
+            listener.getLogger().println("[withMaven] Archive and fingerprint " + artifactsToArchive);
         }
 
         // ARCHIVE GENERATED MAVEN ARTIFACT
