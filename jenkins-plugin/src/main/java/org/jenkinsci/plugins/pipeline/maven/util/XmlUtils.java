@@ -177,13 +177,22 @@ public class XmlUtils {
     }
 
     /**
-     * @return empty string if not matching
+     * @return same path if not matching workspace
      */
     @Nonnull
     public static String getPathInWorkspace(@Nonnull String absoluteFilePath, @Nonnull FilePath workspace) {
         String workspaceRemote = workspace.getRemote();
-        if (!workspaceRemote.endsWith("/")) {
-            workspaceRemote = workspaceRemote + "/";
+
+        String fileSeparator;
+        if (absoluteFilePath.contains("\\")) {
+            // '\' character found in the absoluteFilePath, this is windows
+            fileSeparator = "\\";
+        } else {
+            fileSeparator = "/";
+        }
+
+        if (!workspaceRemote.endsWith(fileSeparator)) {
+            workspaceRemote = workspaceRemote + fileSeparator;
         }
         if (absoluteFilePath.startsWith(workspaceRemote)) {
             return StringUtils.substringAfter(absoluteFilePath, workspaceRemote);
