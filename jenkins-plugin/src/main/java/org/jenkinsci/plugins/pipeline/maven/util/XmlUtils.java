@@ -140,7 +140,7 @@ public class XmlUtils {
         Set<String> expectedTypes = new HashSet<>(Arrays.asList(expectedType));
         List<Element> result = new ArrayList<>();
         for (Element element : getChildrenElements(mavenSpyLogs, "ExecutionEvent")) {
-            if (expectedTypes.contains(element.getAttribute("type"))){
+            if (expectedTypes.contains(element.getAttribute("type"))) {
                 result.add(element);
             }
         }
@@ -177,19 +177,43 @@ public class XmlUtils {
     }
 
     /**
-     * @return empty string if not matching
+     * @return same path if not matching workspace
      */
     @Nonnull
     public static String getPathInWorkspace(@Nonnull String absoluteFilePath, @Nonnull FilePath workspace) {
+        String fileSeparator = getFileSeparatorOnRemote(workspace);
+
         String workspaceRemote = workspace.getRemote();
-        if (!workspaceRemote.endsWith("/")) {
-            workspaceRemote = workspaceRemote + "/";
+        if (!workspaceRemote.endsWith(fileSeparator)) {
+            workspaceRemote = workspaceRemote + fileSeparator;
         }
         if (absoluteFilePath.startsWith(workspaceRemote)) {
             return StringUtils.substringAfter(absoluteFilePath, workspaceRemote);
         } else {
             return absoluteFilePath;
         }
+    }
+
+    /**
+     * Return the File separator "/" or "\" that is effective on the remote agent.
+     *
+     * @param filePath
+     * @return "/" or "\"
+     */
+    @Nonnull
+    public static String getFileSeparatorOnRemote(@Nonnull FilePath filePath) {
+        int indexOfSlash = filePath.getRemote().indexOf('/');
+        int indexOfBackSlash = filePath.getRemote().indexOf('\\');
+        if (indexOfSlash == -1) {
+            return "\\";
+        } else if (indexOfBackSlash == -1) {
+            return "/";
+        } else if (indexOfSlash < indexOfBackSlash) {
+            return "/";
+        } else {
+            return "\\";
+        }
+
     }
 
     /**

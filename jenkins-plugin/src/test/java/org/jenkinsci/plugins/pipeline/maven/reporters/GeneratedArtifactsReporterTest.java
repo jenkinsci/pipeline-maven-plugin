@@ -1,13 +1,16 @@
 package org.jenkinsci.plugins.pipeline.maven.reporters;
 
+import hudson.FilePath;
 import org.hamcrest.CoreMatchers;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
-import org.jenkinsci.plugins.pipeline.maven.reporters.GeneratedArtifactsReporter;
+import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
@@ -20,19 +23,34 @@ public class GeneratedArtifactsReporterTest {
 
     static final String PETCLINIC_VERSION = "1.5.1";
 
-    Document doc;
+    /**
+     * generated on MacOSX
+     */
+    Document mavenSpyLogsOnMacOSX;
+    /**
+     * generated on Windows
+     */
+    Document mavenSpyLogsOnWindows;
     GeneratedArtifactsReporter generatedArtifactsReporter = new GeneratedArtifactsReporter();
 
     @Before
     public void before() throws Exception {
-        String mavenSpyLogs = "org/jenkinsci/plugins/pipeline/maven/maven-spy.xml";
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(mavenSpyLogs);
-        doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
+        {
+            String mavenSpyLogsOnMacOSXPath = "org/jenkinsci/plugins/pipeline/maven/maven-spy.xml";
+            InputStream inMacOSX = Thread.currentThread().getContextClassLoader().getResourceAsStream(mavenSpyLogsOnMacOSXPath);
+            mavenSpyLogsOnMacOSX = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inMacOSX);
+        }
+        {
+            String mavenSpyLogsOnWindowsPath = "org/jenkinsci/plugins/pipeline/maven/maven-spy-windows.xml";
+            InputStream inWindows = Thread.currentThread().getContextClassLoader().getResourceAsStream(mavenSpyLogsOnWindowsPath);
+            mavenSpyLogsOnWindows = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(inWindows);
+
+        }
     }
 
     @Test
-    public void testListArtifacts() throws Exception {
-        List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = generatedArtifactsReporter.listArtifacts(doc.getDocumentElement());
+    public void testListArtifactsMacOSX() throws Exception {
+        List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = generatedArtifactsReporter.listArtifacts(this.mavenSpyLogsOnMacOSX.getDocumentElement());
         System.out.println(mavenArtifacts);
         Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
 
@@ -41,16 +59,47 @@ public class GeneratedArtifactsReporterTest {
         Assert.assertThat(pomArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/pom.xml"));
         Assert.assertThat(pomArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".pom"));
 
+        Element projectStartedElt = XmlUtils.getExecutionEvents(this.mavenSpyLogsOnMacOSX.getDocumentElement(), "ProjectStarted").get(0);
+        String workspace = XmlUtils.getUniqueChildElement(projectStartedElt, "project").getAttribute("baseDir");
+
+        String pomPathInWorkspace = XmlUtils.getPathInWorkspace(pomArtifact.file, new FilePath(new File(workspace)));
+        System.out.println("workspace: " + workspace);
+        System.out.println("pomPathInWorkspace: " + pomPathInWorkspace);
+
+
         MavenSpyLogProcessor.MavenArtifact mavenArtifact = mavenArtifacts.get(1);
         Assert.assertThat(mavenArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
         Assert.assertThat(mavenArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
-        Assert.assertThat(mavenArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
+        Assert.assertThat(mavenArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".jar"));    }
 
+    @Test
+    public void testListArtifactsWindows() throws Exception {
+        List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = generatedArtifactsReporter.listArtifacts(this.mavenSpyLogsOnWindows.getDocumentElement());
+        System.out.println(mavenArtifacts);
+        Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
+
+        MavenSpyLogProcessor.MavenArtifact pomArtifact = mavenArtifacts.get(0);
+        Assert.assertThat(pomArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
+        Assert.assertThat(pomArtifact.file, CoreMatchers.is("C:\\path\\to\\spring-petclinic\\pom.xml"));
+        Assert.assertThat(pomArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".pom"));
+
+        Element projectStartedElt = XmlUtils.getExecutionEvents(this.mavenSpyLogsOnWindows.getDocumentElement(), "ProjectStarted").get(0);
+        String workspace = XmlUtils.getUniqueChildElement(projectStartedElt, "project").getAttribute("baseDir");
+
+        String pomPathInWorkspace = XmlUtils.getPathInWorkspace(pomArtifact.file, new FilePath(new File(workspace)));
+        System.out.println("workspace: " + workspace);
+        System.out.println("pomPathInWorkspace: " + pomPathInWorkspace);
+
+
+        MavenSpyLogProcessor.MavenArtifact mavenArtifact = mavenArtifacts.get(1);
+        Assert.assertThat(mavenArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
+        Assert.assertThat(mavenArtifact.file, CoreMatchers.is("C:\\path\\to\\spring-petclinic\\target\\spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
+        Assert.assertThat(mavenArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
     }
 
     @Test
-    public void testListAttachedArtifacts() throws Exception {
-        List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = generatedArtifactsReporter.listAttachedArtifacts(doc.getDocumentElement());
+    public void testListAttachedArtifactsMacOSX() throws Exception {
+        List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = generatedArtifactsReporter.listAttachedArtifacts(this.mavenSpyLogsOnMacOSX.getDocumentElement());
         Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(1));
         MavenSpyLogProcessor.MavenArtifact mavenArtifact = mavenArtifacts.get(0);
         System.out.println(mavenArtifacts);
@@ -58,4 +107,16 @@ public class GeneratedArtifactsReporterTest {
         Assert.assertThat(mavenArtifact.classifier, CoreMatchers.is("sources"));
         Assert.assertThat(mavenArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-" + PETCLINIC_VERSION + "-sources.jar"));
     }
+
+    @Test
+    public void testListAttachedArtifactsWindows() throws Exception {
+        List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = generatedArtifactsReporter.listAttachedArtifacts(this.mavenSpyLogsOnWindows.getDocumentElement());
+        Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(1));
+        MavenSpyLogProcessor.MavenArtifact mavenArtifact = mavenArtifacts.get(0);
+        System.out.println(mavenArtifacts);
+        Assert.assertThat(mavenArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
+        Assert.assertThat(mavenArtifact.classifier, CoreMatchers.is("sources"));
+        Assert.assertThat(mavenArtifact.file, CoreMatchers.is("C:\\path\\to\\spring-petclinic\\target\\spring-petclinic-" + PETCLINIC_VERSION + "-sources.jar"));
+    }
+
 }

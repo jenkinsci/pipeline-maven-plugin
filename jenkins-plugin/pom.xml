@@ -36,7 +36,7 @@
   <groupId>org.jenkins-ci.plugins</groupId>
   <artifactId>pipeline-maven</artifactId>
   <packaging>hpi</packaging>
-  <version>2.1.1-SNAPSHOT</version>
+  <version>2.2.1-SNAPSHOT</version>
 
   <name>Pipeline Maven Integration Plugin</name>
   <description>
@@ -78,6 +78,16 @@
     <git-plugin.version>3.1.0</git-plugin.version>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.jenkins-ci.main</groupId>
+      <artifactId>maven-plugin</artifactId>
+      <version>2.14</version>
+      <!--
+      Discussed on https://github.com/jenkinsci/pipeline-maven-plugin/pull/48
+      Keep the dependency optional
+      -->
+      <optional>true</optional>
+    </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-step-api</artifactId>

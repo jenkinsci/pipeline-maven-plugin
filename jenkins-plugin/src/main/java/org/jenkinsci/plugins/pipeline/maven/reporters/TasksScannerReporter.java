@@ -44,7 +44,9 @@ public class TasksScannerReporter implements ResultsReporter {
             LOGGER.warning("TaskListener is NULL, default to stderr");
             listener = new StreamBuildListener((OutputStream) System.err);
         }
-        FilePath workspace = context.get(FilePath.class); // TODO check that it's the good workspace
+        FilePath workspace = context.get(FilePath.class);
+        final String fileSeparatorOnAgent = XmlUtils.getFileSeparatorOnRemote(workspace);
+
         Run run = context.get(Run.class);
         Launcher launcher = context.get(Launcher.class);
 
@@ -83,7 +85,7 @@ public class TasksScannerReporter implements ResultsReporter {
             String sourceDirectoryRelativePath = XmlUtils.getPathInWorkspace(sourceDirectory, workspace);
 
             if (workspace.child(sourceDirectoryRelativePath).exists()) {
-                sourceDirectoriesPatterns.add(sourceDirectoryRelativePath + "/**/*");
+                sourceDirectoriesPatterns.add(sourceDirectoryRelativePath + fileSeparatorOnAgent + "**" + fileSeparatorOnAgent + "*");
                 listener.getLogger().println("[withMaven] Scan Tasks for Maven artifact " + mavenArtifact.toString() + " in source directory " + sourceDirectoryRelativePath);
             } else {
                 LOGGER.log(Level.FINE, "Skip task scanning for {0}, folder {1} does not exist", new Object[]{mavenArtifact, sourceDirectoryRelativePath});

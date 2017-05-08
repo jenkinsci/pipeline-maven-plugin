@@ -45,7 +45,8 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
             LOGGER.warning("TaskListener is NULL, default to stderr");
             listener = new StreamBuildListener((OutputStream) System.err);
         }
-        FilePath workspace = context.get(FilePath.class); // TODO check that it's the good workspace
+        FilePath workspace = context.get(FilePath.class);
+        final String fileSeparatorOnAgent = XmlUtils.getFileSeparatorOnRemote(workspace);
 
         List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = listArtifacts(mavenSpyLogsElt);
         List<MavenSpyLogProcessor.MavenArtifact> attachedMavenArtifacts = listAttachedArtifacts(mavenSpyLogsElt);
@@ -74,9 +75,9 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
                 }
 
                 String artifactPathInArchiveZone =
-                        mavenArtifact.groupId.replace('.', '/') + "/" +
-                                mavenArtifact.artifactId + "/" +
-                                mavenArtifact.version + "/" +
+                        mavenArtifact.groupId.replace(".", fileSeparatorOnAgent) + fileSeparatorOnAgent +
+                                mavenArtifact.artifactId + fileSeparatorOnAgent +
+                                mavenArtifact.version + fileSeparatorOnAgent +
                                 mavenArtifact.getFileName();
 
                 String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace);
@@ -101,7 +102,9 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
                 listener.getLogger().flush();
             }
         }
-        LOGGER.log(Level.FINE, "Archive and fingerprint {0}", artifactsToArchive);
+        if (LOGGER.isLoggable(Level.FINE)) {
+            listener.getLogger().println("[withMaven] Archive and fingerprint " + artifactsToArchive);
+        }
 
         // ARCHIVE GENERATED MAVEN ARTIFACT
         // see org.jenkinsci.plugins.workflow.steps.ArtifactArchiverStepExecution#run
