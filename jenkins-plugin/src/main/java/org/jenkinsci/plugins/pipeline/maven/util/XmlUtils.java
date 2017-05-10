@@ -177,6 +177,8 @@ public class XmlUtils {
     }
 
     /**
+     * Relativize path
+     *
      * @return same path if not matching workspace
      */
     @Nonnull
@@ -213,7 +215,6 @@ public class XmlUtils {
         } else {
             return "\\";
         }
-
     }
 
     /**

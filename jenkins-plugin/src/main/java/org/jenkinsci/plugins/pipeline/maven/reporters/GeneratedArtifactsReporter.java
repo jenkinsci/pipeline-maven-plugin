@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,9 +82,10 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
                                 mavenArtifact.getFileName();
 
                 String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace);
-
                 if (StringUtils.isEmpty(artifactPathInWorkspace)) {
                     listener.error("[withMaven] Invalid path in the workspace (" + workspace.getRemote() + ") for artifact " + mavenArtifact);
+                } else if (Objects.equals(artifactPathInArchiveZone, mavenArtifact.file)) { // troubleshoot JENKINS-44088
+                    listener.error("[withMaven] Failed to relativize '" + mavenArtifact.file + "' in workspace '" + workspace.getRemote() + "' with file separator '" + fileSeparatorOnAgent + "'");
                 } else {
                     FilePath artifactFilePath = new FilePath(workspace, artifactPathInWorkspace);
                     if (artifactFilePath.exists()) {
@@ -93,7 +95,7 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
                         String artifactDigest = artifactFilePath.digest();
                         artifactsToFingerPrint.put(artifactPathInArchiveZone, artifactDigest);
                     } else {
-                        listener.getLogger().println("[withMaven] FAILURE to archive " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone + ", file not found");
+                        listener.getLogger().println("[withMaven] FAILURE to archive " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone + ", file not found in workspace " + workspace);
                     }
                 }
             } catch (IOException | RuntimeException e) {
@@ -103,7 +105,7 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
             }
         }
         if (LOGGER.isLoggable(Level.FINE)) {
-            listener.getLogger().println("[withMaven] Archive and fingerprint " + artifactsToArchive);
+            listener.getLogger().println("[withMaven] Archive and fingerprint artifacts " + artifactsToArchive + " located in workspace " + workspace.getRemote());
         }
 
         // ARCHIVE GENERATED MAVEN ARTIFACT
