@@ -192,12 +192,20 @@ public class XmlUtils {
 
         final String workspaceRemote = workspace.getRemote();
 
-        String sanitizedAbsoluteFilePath = absoluteFilePath;
-        String sanitizedWorkspaceRemote = workspaceRemote;
+        final String sanitizedAbsoluteFilePath;
+        final String sanitizedWorkspaceRemote;
         if (windows) {
             // sanitize see JENKINS-44088
             sanitizedWorkspaceRemote = workspaceRemote.replace('/', '\\');
             sanitizedAbsoluteFilePath = absoluteFilePath.replace('/', '\\');
+        } else if (workspaceRemote.startsWith("/var/") && absoluteFilePath.startsWith("/private/var/")) {
+            // eg String workspace = "/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven";
+            // eg String absolutePath = "/private/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven/pom.xml";
+            sanitizedWorkspaceRemote = workspaceRemote;
+            sanitizedAbsoluteFilePath = absoluteFilePath.substring("/private".length());
+        } else {
+            sanitizedAbsoluteFilePath = absoluteFilePath;
+            sanitizedWorkspaceRemote = workspaceRemote;
         }
 
         if (!sanitizedAbsoluteFilePath.startsWith(sanitizedWorkspaceRemote)) {

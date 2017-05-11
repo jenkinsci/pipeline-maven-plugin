@@ -202,4 +202,17 @@ public class XmlUtilsTest {
         String expected = "pom.xml";
         Assert.assertThat(actual, CoreMatchers.is(expected));
     }
+
+    @Test
+    public void test_getPathInWorkspace_macosx_edge_case(){
+        // java.lang.IllegalArgumentException:
+        // Cannot relativize '/private/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven/pom.xml'
+        // relatively to '/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven'
+
+        String workspace = "/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven";
+        String absolutePath = "/private/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven/pom.xml";
+        String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
+        String expected = "pom.xml";
+        Assert.assertThat(actual, CoreMatchers.is(expected));
+    }
 }
