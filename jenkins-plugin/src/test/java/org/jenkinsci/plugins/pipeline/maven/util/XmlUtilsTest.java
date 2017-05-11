@@ -133,7 +133,7 @@ public class XmlUtilsTest {
     }
 
     @Test
-    public void test_getPathInWorkspace_linux(){
+    public void test_getPathInWorkspace_linux_ok(){
         String workspace = "/path/to/spring-petclinic";
         String absolutePath = "/path/to/spring-petclinic/pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
@@ -141,10 +141,63 @@ public class XmlUtilsTest {
         Assert.assertThat(actual, CoreMatchers.is(expected));
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void test_getPathInWorkspace_linux_ko(){
+        String workspace = "/path/to/spring-petclinic";
+        String absolutePath = "/different/path/to/spring-petclinic/pom.xml";
+        String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
+        String expected = "pom.xml";
+        Assert.assertThat(actual, CoreMatchers.is(expected));
+    }
+
     @Test
-    public void test_getPathInWorkspace_windows(){
+    public void test_getPathInWorkspace_linux_with_trailing_file_separator_ok(){
+        String workspace = "/path/to/spring-petclinic/";
+        String absolutePath = "/path/to/spring-petclinic/pom.xml";
+        String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
+        String expected = "pom.xml";
+        Assert.assertThat(actual, CoreMatchers.is(expected));
+    }
+
+    @Test
+    public void test_getPathInWorkspace_windows_ok(){
         String workspace = "C:\\path\\to\\spring-petclinic";
         String absolutePath = "C:\\path\\to\\spring-petclinic\\pom.xml";
+        String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
+        String expected = "pom.xml";
+        Assert.assertThat(actual, CoreMatchers.is(expected));
+    }
+
+    @Test
+    public void test_getPathInWorkspace_windows_with_mixed_separators_ok(){
+        String workspace = "C:\\path\\to\\spring-petclinic";
+        String absolutePath = "C:\\path\\to\\spring-petclinic\\target/abc.xml";
+        String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
+        String expected = "target\\abc.xml";
+        Assert.assertThat(actual, CoreMatchers.is(expected));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void test_getPathInWorkspace_windows_ko(){
+        String workspace = "C:\\path\\to\\spring-petclinic";
+        String absolutePath = "C:\\different\\path\\to\\spring-petclinic\\pom.xml";
+        String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
+        Assert.fail("should have thrown an IllegalArgumentException, not return " + actual);
+    }
+
+    @Test
+    public void test_getPathInWorkspace_windows_with_trailing_file_separator_ok(){
+        String workspace = "C:\\path\\to\\spring-petclinic\\";
+        String absolutePath = "C:\\path\\to\\spring-petclinic\\pom.xml";
+        String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
+        String expected = "pom.xml";
+        Assert.assertThat(actual, CoreMatchers.is(expected));
+    }
+
+    @Test
+    public void test_getPathInWorkspace_windows_JENKINS_44088(){
+        String workspace = "C:/Jenkins/workspace/maven-pipeline-plugin-test";
+        String absolutePath = "C:\\Jenkins\\workspace\\maven-pipeline-plugin-test\\pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "pom.xml";
         Assert.assertThat(actual, CoreMatchers.is(expected));
