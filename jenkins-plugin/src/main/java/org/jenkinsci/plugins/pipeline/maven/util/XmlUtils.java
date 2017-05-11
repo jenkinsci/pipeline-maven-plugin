@@ -32,7 +32,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -179,20 +181,58 @@ public class XmlUtils {
     /**
      * Relativize path
      *
-     * @return same path if not matching workspace
+     * @return relativized path
+     * @throws IllegalArgumentException if {@code other} is not a {@code Path} that can be relativized
+     *                                  against this path
+     * @see java.nio.file.Path#relativize(Path)
      */
     @Nonnull
-    public static String getPathInWorkspace(@Nonnull String absoluteFilePath, @Nonnull FilePath workspace) {
-        String fileSeparator = getFileSeparatorOnRemote(workspace);
+    public static String getPathInWorkspace(@Nonnull final String absoluteFilePath, @Nonnull FilePath workspace) {
+        boolean windows = isWindows(workspace);
 
-        String workspaceRemote = workspace.getRemote();
-        if (!workspaceRemote.endsWith(fileSeparator)) {
-            workspaceRemote = workspaceRemote + fileSeparator;
+        final String workspaceRemote = workspace.getRemote();
+
+        String sanitizedAbsoluteFilePath = absoluteFilePath;
+        String sanitizedWorkspaceRemote = workspaceRemote;
+        if (windows) {
+            // sanitize see JENKINS-44088
+            sanitizedWorkspaceRemote = workspaceRemote.replace('/', '\\');
+            sanitizedAbsoluteFilePath = absoluteFilePath.replace('/', '\\');
         }
-        if (absoluteFilePath.startsWith(workspaceRemote)) {
-            return StringUtils.substringAfter(absoluteFilePath, workspaceRemote);
+
+        if (!sanitizedAbsoluteFilePath.startsWith(sanitizedWorkspaceRemote)) {
+            throw new IllegalArgumentException("Cannot relativize '" + absoluteFilePath + "' relatively to '" + workspace.getRemote() + "'");
+        }
+
+        String relativePath = StringUtils.substringAfter(sanitizedAbsoluteFilePath, sanitizedWorkspaceRemote);
+        String fileSeparator = windows ? "\\" : "/";
+
+        if (relativePath.startsWith(fileSeparator)) {
+            relativePath = relativePath.substring(fileSeparator.length());
+        }
+        LOGGER.log(Level.FINEST, "getPathInWorkspace({0}, {1}: {2}", new Object[]{absoluteFilePath, workspaceRemote, relativePath});
+        return relativePath;
+    }
+
+    public static boolean isWindows(@Nonnull FilePath path) {
+        String remote = path.getRemote();
+        if (remote.length() > 3 && remote.charAt(1) == ':' && remote.charAt(2) == '\\') {
+            // windows path such as "C:\path\to\..."
+            return true;
+        } else if (remote.length() > 3 && remote.charAt(1) == ':' && remote.charAt(2) == '/') {
+            // nasty windows path such as "C:/path/to/...". See JENKINS-44088
+            return true;
+        }
+        int indexOfSlash = path.getRemote().indexOf('/');
+        int indexOfBackSlash = path.getRemote().indexOf('\\');
+        if (indexOfSlash == -1) {
+            return true;
+        } else if (indexOfBackSlash == -1) {
+            return false;
+        } else if (indexOfSlash < indexOfBackSlash) {
+            return false;
         } else {
-            return absoluteFilePath;
+            return true;
         }
     }
 
