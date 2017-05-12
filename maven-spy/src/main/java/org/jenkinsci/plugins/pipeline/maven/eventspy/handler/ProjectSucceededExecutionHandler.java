@@ -28,9 +28,11 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.RuntimeIOException;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,7 +61,11 @@ public class ProjectSucceededExecutionHandler extends AbstractExecutionHandler {
         } else {
             Xpp3Dom artifactElt = newElement("artifact", artifact);
             File file = artifact.getFile();
-            artifactElt.addChild(newElement("file", file == null ? null : file.getAbsolutePath()));
+            try {
+                artifactElt.addChild(newElement("file", file == null ? null : file.getCanonicalPath()));
+            } catch (IOException e) {
+                throw new RuntimeIOException(e);
+            }
             element.addChild(artifactElt);
         }
 
@@ -68,7 +74,11 @@ public class ProjectSucceededExecutionHandler extends AbstractExecutionHandler {
         for (Artifact attachedArtifact : project.getAttachedArtifacts()) {
             Xpp3Dom artifactElt = newElement("artifact", attachedArtifact);
             File file = attachedArtifact.getFile();
-            artifactElt.addChild(newElement("file", file == null ? null : file.getAbsolutePath()));
+            try {
+                artifactElt.addChild(newElement("file", file == null ? null : file.getCanonicalPath()));
+            } catch (IOException e) {
+                throw new RuntimeIOException(e);
+            }
             attachedArtifactsElt.addChild(artifactElt);
         }
 

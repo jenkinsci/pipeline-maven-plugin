@@ -133,7 +133,7 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
         }
 
         reporter.print(element);
-        reporter.print("new File(.): " + new File(".").getAbsolutePath());
+        reporter.print("new File(.): " + new File(".").getCanonicalPath());
     }
 
     @Override
