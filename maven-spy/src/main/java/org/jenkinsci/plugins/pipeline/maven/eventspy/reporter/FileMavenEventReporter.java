@@ -29,6 +29,7 @@ import org.codehaus.plexus.util.xml.XMLWriter;
 import org.codehaus.plexus.util.xml.XmlWriterUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomWriter;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.RuntimeIOException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -81,7 +82,11 @@ public class FileMavenEventReporter implements MavenEventReporter {
         xmlWriter.startElement("mavenExecution");
         xmlWriter.addAttribute("_time", new Timestamp(System.currentTimeMillis()).toString());
 
-        System.out.println("[jenkins-maven-event-spy] INFO generate " + outFile.getAbsolutePath() + " ...");
+        try {
+            System.out.println("[jenkins-maven-event-spy] INFO generate " + outFile.getCanonicalPath() + " ...");
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
     }
 
     @Override
@@ -102,6 +107,10 @@ public class FileMavenEventReporter implements MavenEventReporter {
         xmlWriter.endElement();
 
         out.close();
-        System.out.println("[jenkins-maven-event-spy] INFO generated " + outFile.getAbsolutePath());
+        try {
+            System.out.println("[jenkins-maven-event-spy] INFO generated " + outFile.getCanonicalPath());
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
     }
 }
