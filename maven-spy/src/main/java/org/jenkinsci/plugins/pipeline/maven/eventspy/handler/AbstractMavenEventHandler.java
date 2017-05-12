@@ -29,9 +29,11 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Build;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.RuntimeIOException;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.ParameterizedType;
@@ -93,12 +95,21 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         projectElt.setAttribute("version", project.getVersion());
 
         if (project.getBasedir() != null) {
-            projectElt.setAttribute("baseDir", project.getBasedir().getAbsolutePath());
+            try {
+                projectElt.setAttribute("baseDir", project.getBasedir().getCanonicalPath());
+            } catch (IOException e) {
+                throw new RuntimeIOException(e);
+            }
         }
 
         if (project.getFile() != null) {
             File projectFile = project.getFile();
-            String absolutePath = projectFile.getAbsolutePath();
+            String absolutePath;
+            try {
+                absolutePath = projectFile.getCanonicalPath();
+            } catch (IOException e) {
+                throw new RuntimeIOException(e);
+            }
             if (absolutePath.endsWith(File.separator + "pom.xml")) {
                 // no tweak
             } else if (absolutePath.endsWith(File.separator + "dependency-reduced-pom.xml")) {
@@ -153,7 +164,11 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
 
     public Xpp3Dom newElement(@Nonnull String name, @Nullable File file) {
         Xpp3Dom element = new Xpp3Dom(name);
-        element.setValue(file == null ? null : file.getAbsolutePath());
+        try {
+            element.setValue(file == null ? null : file.getCanonicalPath());
+        } catch (IOException e) {
+            throw new RuntimeIOException(e);
+        }
         return element;
     }
 
