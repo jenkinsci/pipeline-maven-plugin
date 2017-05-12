@@ -88,7 +88,7 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
                     listener.error("[withMaven] Failed to relativize '" + mavenArtifact.file + "' in workspace '" + workspace.getRemote() + "' with file separator '" + fileSeparatorOnAgent + "'");
                 } else {
                     FilePath artifactFilePath = new FilePath(workspace, artifactPathInWorkspace);
-                    if (artifactFilePath.exists()) {
+                    if (artifactFilePath.exists() && !artifactFilePath.isDirectory()) {
                         // the subsequent call to digest could test the existence but we don't want to prematurely optimize performances
                         listener.getLogger().println("[withMaven] Archive artifact " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone);
                         artifactsToArchive.put(artifactPathInArchiveZone, artifactPathInWorkspace);
