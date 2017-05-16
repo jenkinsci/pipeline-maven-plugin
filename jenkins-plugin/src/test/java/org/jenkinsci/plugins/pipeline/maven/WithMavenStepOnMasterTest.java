@@ -46,11 +46,16 @@ import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.CoreMatchers;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.configfiles.GlobalConfigFiles;
 import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnGlobalSettingsProvider;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnSettingsProvider;
+import org.jenkinsci.plugins.pipeline.maven.reporters.FindbugsAnalysisReporter;
+import org.jenkinsci.plugins.pipeline.maven.reporters.GeneratedArtifactsReporter;
+import org.jenkinsci.plugins.pipeline.maven.reporters.JunitTestsReporter;
+import org.jenkinsci.plugins.pipeline.maven.reporters.TasksScannerReporter;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -128,6 +133,7 @@ public class WithMavenStepOnMasterTest {
         jenkinsRule.assertLogContains("under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.jar", build);
     }
 
+
     @Test
     public void maven_build_on_master_with_missing_specified_maven_installation_fails() throws Exception {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
@@ -192,6 +198,49 @@ public class WithMavenStepOnMasterTest {
         jenkinsRule.assertLogContains("[withMaven] Scan Tasks for Maven artifact MavenArtifact{jenkins.mvn.test:mono-module-maven-app::0.1-SNAPSHOT}", build);
         TasksResultAction tasksResultAction = build.getAction(TasksResultAction.class);
         assertThat(tasksResultAction.getProjectActions().size(), is(1));
+    }
+
+    @Test
+    public void maven_build_jar_project_on_master_disable_findbugs_reporter_succeeds() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_reporter_succeeds(new FindbugsAnalysisReporter.DescriptorImpl(), "withMavenFindbugs");
+    }
+
+    @Test
+    public void maven_build_jar_project_on_master_disable_tasks_reporter_succeeds() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_reporter_succeeds(new TasksScannerReporter.DescriptorImpl(), "withMavenTasks");
+    }
+
+    @Test
+    public void maven_build_jar_project_on_master_disable_junit_reporter_succeeds() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_reporter_succeeds(new JunitTestsReporter.DescriptorImpl(), "withMavenJunit");
+    }
+
+    @Test
+    public void maven_build_jar_project_on_master_disable_generated_artifacts_reporter_succeeds() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_reporter_succeeds(new GeneratedArtifactsReporter.DescriptorImpl(), "withMavenGeneratedArtifacts");
+    }
+
+    private void maven_build_jar_project_on_master_with_disabled_reporter_succeeds(MavenReporter.DescriptorImpl descriptor, String symbol) throws Exception {
+        String displayName = descriptor.getDisplayName();
+
+        Symbol symbolAnnotation = descriptor.getClass().getAnnotation(Symbol.class);
+        String[] symbols = symbolAnnotation.value();
+        assertThat(new String[]{symbol},  is(symbols));
+
+        loadMavenJarProjectInGitRepo(this.gitRepoRule);
+
+        String pipelineScript = "node('master') {\n" +
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven(options:[" + symbol + "(disabled:true)]) {\n" +
+                "        sh 'mvn package verify'\n" +
+                "    }\n" +
+                "}";
+
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-findbugs-reporter-disabled");
+        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+
+        jenkinsRule.assertLogContains("[withMaven] Skip '" + displayName + "' disabled by configuration", build);
     }
 
     @Test

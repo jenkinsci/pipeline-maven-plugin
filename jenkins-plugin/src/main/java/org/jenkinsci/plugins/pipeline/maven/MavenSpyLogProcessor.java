@@ -24,11 +24,15 @@
 
 package org.jenkinsci.plugins.pipeline.maven;
 
+import hudson.DescriptorExtensionList;
 import hudson.FilePath;
+import hudson.model.Descriptor;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import jenkins.model.InterruptedBuildAction;
+import jenkins.model.Jenkins;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.reporters.FindbugsAnalysisReporter;
 import org.jenkinsci.plugins.pipeline.maven.reporters.GeneratedArtifactsReporter;
 import org.jenkinsci.plugins.pipeline.maven.reporters.JunitTestsReporter;
@@ -43,6 +47,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,7 +66,7 @@ public class MavenSpyLogProcessor implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(MavenSpyLogProcessor.class.getName());
 
-    public void processMavenSpyLogs(StepContext context, FilePath mavenSpyLogFolder) throws IOException, InterruptedException {
+    public void processMavenSpyLogs(StepContext context, FilePath mavenSpyLogFolder, List<MavenReporter> options) throws IOException, InterruptedException {
         FilePath[] mavenSpyLogsList = mavenSpyLogFolder.list("maven-spy-*.log");
         LOGGER.log(Level.FINE, "Found {0} maven execution reports in {1}", new Object[]{mavenSpyLogsList.length, mavenSpyLogFolder});
 
@@ -95,38 +102,28 @@ public class MavenSpyLogProcessor implements Serializable {
 
                 Element mavenSpyLogsElt = documentBuilder.parse(mavenSpyLogsInputStream).getDocumentElement();
 
-                FilePath skipArchiveArtifactsFile = workspace.child(".skip-archive-generated-artifacts");
-                if (skipArchiveArtifactsFile.exists()) {
-                    listener.getLogger().println("[withMaven] Skip archiving of generated artifacts, file '" + skipArchiveArtifactsFile + "' found in workspace");
-                } else {
-                    LOGGER.log(Level.FINE, "Look for generated artifacts to archive, file {0} NOT found in workspace", skipArchiveArtifactsFile);
-                    new GeneratedArtifactsReporter().process(context, mavenSpyLogsElt);
-                }
+                List<MavenReporter> mavenReporters = MavenReporter.buildReportersList(options, listener);
+                for (MavenReporter mavenReporter: mavenReporters){
+                    String skipFileName =  mavenReporter.getDescriptor().getSkipFileName();
+                    if (mavenReporter.isDisabled()) {
+                        listener.getLogger().println("[withMaven] Skip '" + mavenReporter.getDescriptor().getDisplayName() + "' disabled by configuration");
+                    } else if (StringUtils.isNotEmpty(skipFileName) && workspace.child(skipFileName).exists()) {
+                        listener.getLogger().println("[withMaven] Skip '" + mavenReporter.getDescriptor().getDisplayName() + "' disabled by marker file '" + skipFileName + "'");
+                    } else {
+                        if (LOGGER.isLoggable(Level.FINE)) {
+                            listener.getLogger().println("[withMaven] Run '" + mavenReporter.getDescriptor().getDisplayName() + "'...");
+                        }
+                        try {
+                            mavenReporter.process(context, mavenSpyLogsElt);
+                        } catch (IOException|RuntimeException e) {
+                            PrintWriter error = listener.error("[withMaven] WARNING Exception executing Maven reporter '" + mavenReporter.getDescriptor().getDisplayName() +
+                                    "' / " + mavenReporter.getDescriptor().getId() + "." +
+                                    " Please report a bug associated for the component 'pipeline-maven-plugin' at https://issues.jenkins-ci.org ");
+                            e.printStackTrace(error);
 
-                FilePath skipJunitFile = workspace.child(".skip-publish-junit-results");
-                if (skipJunitFile.exists()) {
-                    listener.getLogger().println("[withMaven] Skip publishing of JUnit results, file '" + skipJunitFile + "' found in workspace");
-                } else {
-                    LOGGER.log(Level.FINE, "Look for JUnit results to publish, file {0} NOT found in workspace", skipJunitFile);
-                    new JunitTestsReporter().process(context, mavenSpyLogsElt);
+                        }
+                    }
                 }
-                FilePath skipFindbugsFile = workspace.child(".skip-publish-findbugs-results");
-                if (skipFindbugsFile.exists()) {
-                    listener.getLogger().println("[withMaven] Skip publishing of FindBugs results, file '" + skipFindbugsFile + "' found in workspace");
-                } else {
-                    LOGGER.log(Level.FINE, "Look for Findbugs results to publish, file {0} NOT found in workspace", skipFindbugsFile);
-                    new FindbugsAnalysisReporter().process(context, mavenSpyLogsElt);
-                }
-
-                FilePath skipTasksScannerFile = workspace.child(".skip-task-scanner");
-                if (skipTasksScannerFile.exists()) {
-                    listener.getLogger().println("[withMaven] Skip publishing of tasks in source code, file '" + skipTasksScannerFile + "' found in workspace");
-                } else {
-                    LOGGER.log(Level.FINE, "Look for tasks in source code to publish, file {0} NOT found in workspace", skipTasksScannerFile);
-                    new TasksScannerReporter().process(context, mavenSpyLogsElt);
-                }
-
-
             } catch (SAXException e) {
                 Run run = context.get(Run.class);
                 if (run.getActions(InterruptedBuildAction.class).isEmpty()) {
@@ -144,8 +141,6 @@ public class MavenSpyLogProcessor implements Serializable {
             }
         }
     }
-
-
 
     public static class MavenArtifact {
         public String groupId, artifactId, version, type, classifier, extension;

@@ -25,37 +25,38 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import com.google.common.collect.ImmutableSet;
+import hudson.DescriptorExtensionList;
 import hudson.EnvVars;
-import hudson.model.ItemGroup;
-import org.jenkinsci.lib.configprovider.ConfigProvider;
-import org.jenkinsci.lib.configprovider.model.Config;
-import org.jenkinsci.plugins.configfiles.ConfigFiles;
-import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig.GlobalMavenSettingsConfigProvider;
-import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig.MavenSettingsConfigProvider;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
-
 import hudson.Extension;
-import hudson.ExtensionList;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.ItemGroup;
 import hudson.model.JDK;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
 import hudson.util.ListBoxModel;
-import java.util.Set;
 import jenkins.model.Jenkins;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.mvn.SettingsProvider;
+import org.jenkinsci.lib.configprovider.model.Config;
+import org.jenkinsci.plugins.configfiles.ConfigFiles;
+import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig.GlobalMavenSettingsConfigProvider;
+import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig.MavenSettingsConfigProvider;
 import org.jenkinsci.plugins.workflow.steps.Step;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepDescriptor;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
+import org.kohsuke.stapler.AncestorInPath;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Configures maven environment to use within a pipeline job by calling <tt>sh mvn</tt> or <tt>bat mvn</tt>.
@@ -73,6 +74,7 @@ public class WithMavenStep extends Step {
     private String mavenOpts = "";
     private String jdk;
     private String mavenLocalRepo = "";
+    private List<MavenReporter> options = new ArrayList<>();
 
     @DataBoundConstructor
     public WithMavenStep() {
@@ -151,6 +153,15 @@ public class WithMavenStep extends Step {
         this.mavenLocalRepo = mavenLocalRepo;
     }
 
+    public List<MavenReporter> getOptions() {
+        return options;
+    }
+
+    @DataBoundSetter
+    public void setOptions(List<MavenReporter> options) {
+        this.options = options;
+    }
+
     @Override
     public StepExecution start(StepContext context) throws Exception {
         return new WithMavenStepExecution(context, this);
@@ -185,7 +196,7 @@ public class WithMavenStep extends Step {
         }
         
         private Maven.DescriptorImpl getMavenDescriptor() {
-            return Jenkins.getActiveInstance().getDescriptorByType(Maven.DescriptorImpl.class);
+            return Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class);
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
@@ -199,7 +210,7 @@ public class WithMavenStep extends Step {
         }
 
         private JDK.DescriptorImpl getJDKDescriptor() {
-            return Jenkins.getActiveInstance().getDescriptorByType(JDK.DescriptorImpl.class);
+            return Jenkins.getInstance().getDescriptorByType(JDK.DescriptorImpl.class);
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
@@ -231,5 +242,13 @@ public class WithMavenStep extends Step {
             }
             return r;
         }
+
+        /**
+         * Return all the registered Maven reporters
+         */
+        public static DescriptorExtensionList<MavenReporter, MavenReporter.DescriptorImpl> getOptionsDescriptors() {
+            return Jenkins.getInstance().getDescriptorList(MavenReporter.class);
+        }
+
     }
 }

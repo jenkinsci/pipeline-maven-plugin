@@ -56,6 +56,7 @@ import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.AbortException;
 import hudson.EnvVars;
+import hudson.ExtensionList;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Launcher.ProcStarter;
@@ -156,7 +157,12 @@ class WithMavenStepExecution extends StepExecution {
             LOGGER.log(Level.FINE, "Settings FilePath: {0}", step.getMavenSettingsFilePath());
             LOGGER.log(Level.FINE, "Global settings Config: {0}", step.getGlobalMavenSettingsConfig());
             LOGGER.log(Level.FINE, "Global settings FilePath: {0}", step.getGlobalMavenSettingsFilePath());
+            LOGGER.log(Level.FINE, "Options: {0}", step.getOptions());
         }
+
+        listener.getLogger().println("[withMaven] Options: " + step.getOptions());
+        ExtensionList<MavenReporter> availableMavenReporters = Jenkins.getInstance().getExtensionList(MavenReporter.class);
+        listener.getLogger().println("[withMaven] Available options: " + Joiner.on(",").join(availableMavenReporters));
 
         getComputer();
 
@@ -168,7 +174,7 @@ class WithMavenStepExecution extends StepExecution {
         ConsoleLogFilter consFilter = BodyInvoker.mergeConsoleLogFilters(getContext().get(ConsoleLogFilter.class), new MavenConsoleFilter(getComputer().getDefaultCharset().name()));
         EnvironmentExpander envEx = EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), new ExpanderImpl(envOverride));
 
-        body = getContext().newBodyInvoker().withContexts(envEx, consFilter).withCallback(new Callback(tempBinDir)).start();
+        body = getContext().newBodyInvoker().withContexts(envEx, consFilter).withCallback(new Callback(tempBinDir, step.getOptions())).start();
 
         return false;
     }
@@ -839,15 +845,18 @@ class WithMavenStepExecution extends StepExecution {
     private static class Callback extends BodyExecutionCallback.TailCall {
         private final FilePath tempBinDir;
 
+        private final List<MavenReporter> options;
+
         private final MavenSpyLogProcessor mavenSpyLogProcessor = new MavenSpyLogProcessor();
 
-        public Callback(FilePath tempBinDir) {
+        public Callback(@Nonnull FilePath tempBinDir, @Nonnull List<MavenReporter> options) {
             this.tempBinDir = tempBinDir;
+            this.options = options;
         }
 
         @Override
         protected void finished(StepContext context) throws Exception {
-            mavenSpyLogProcessor.processMavenSpyLogs(context, tempBinDir);
+            mavenSpyLogProcessor.processMavenSpyLogs(context, tempBinDir, options);
 
             try {
                 tempBinDir.deleteRecursive();

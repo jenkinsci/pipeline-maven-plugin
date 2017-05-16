@@ -24,17 +24,19 @@
 
 package org.jenkinsci.plugins.pipeline.maven.reporters;
 
+import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.plugins.findbugs.FindBugsPublisher;
-import hudson.tasks.junit.JUnitResultArchiver;
+import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.MavenReporter;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
-import org.jenkinsci.plugins.pipeline.maven.ResultsReporter;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -48,109 +50,116 @@ import javax.annotation.Nonnull;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class FindbugsAnalysisReporter implements ResultsReporter {
+public class FindbugsAnalysisReporter extends MavenReporter {
     private static final Logger LOGGER = Logger.getLogger(FindbugsAnalysisReporter.class.getName());
 
+    private static final long serialVersionUID = 1L;
+
+    @DataBoundConstructor
+    public FindbugsAnalysisReporter() {
+
+    }
+
     /*
-<ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-05 19:46:26.956">
-    <project baseDir="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project" file="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project/pom.xml" groupId="com.example" name="demo-pom" artifactId="demo-pom" version="0.0.1-SNAPSHOT">
-      <build directory="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project/target"/>
-    </project>
-    <plugin executionId="findbugs" goal="findbugs" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
-      <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
-      <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
-      <debug>${findbugs.debug}</debug>
-      <effort>${findbugs.effort}</effort>
-      <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
-      <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
-      <failOnError>${findbugs.failOnError}</failOnError>
-      <findbugsXmlOutput>true</findbugsXmlOutput>
-      <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
-      <fork>${findbugs.fork}</fork>
-      <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
-      <includeTests>${findbugs.includeTests}</includeTests>
-      <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
-      <localRepository>${localRepository}</localRepository>
-      <maxHeap>${findbugs.maxHeap}</maxHeap>
-      <maxRank>${findbugs.maxRank}</maxRank>
-      <nested>${findbugs.nested}</nested>
-      <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
-      <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
-      <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
-      <outputEncoding>${outputEncoding}</outputEncoding>
-      <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
-      <pluginList>${findbugs.pluginList}</pluginList>
-      <project>${project}</project>
-      <relaxed>${findbugs.relaxed}</relaxed>
-      <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
-      <remoteRepositories>${project.remoteArtifactRepositories}</remoteRepositories>
-      <skip>${findbugs.skip}</skip>
-      <skipEmptyReport>${findbugs.skipEmptyReport}</skipEmptyReport>
-      <sourceEncoding>${encoding}</sourceEncoding>
-      <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
-      <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
-      <threshold>${findbugs.threshold}</threshold>
-      <timeout>${findbugs.timeout}</timeout>
-      <trace>${findbugs.trace}</trace>
-      <userPrefs>${findbugs.userPrefs}</userPrefs>
-      <visitors>${findbugs.visitors}</visitors>
-      <xmlEncoding>UTF-8</xmlEncoding>
-      <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
-      <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
-      <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
-      <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
-    </plugin>
-  </ExecutionEvent>
-<ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-05 19:46:28.108">
-    <project baseDir="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project" file="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project/pom.xml" groupId="com.example" name="demo-pom" artifactId="demo-pom" version="0.0.1-SNAPSHOT">
-      <build directory="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project/target"/>
-    </project>
-    <plugin executionId="findbugs" goal="findbugs" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
-      <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
-      <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
-      <debug>${findbugs.debug}</debug>
-      <effort>${findbugs.effort}</effort>
-      <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
-      <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
-      <failOnError>${findbugs.failOnError}</failOnError>
-      <findbugsXmlOutput>true</findbugsXmlOutput>
-      <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
-      <fork>${findbugs.fork}</fork>
-      <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
-      <includeTests>${findbugs.includeTests}</includeTests>
-      <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
-      <localRepository>${localRepository}</localRepository>
-      <maxHeap>${findbugs.maxHeap}</maxHeap>
-      <maxRank>${findbugs.maxRank}</maxRank>
-      <nested>${findbugs.nested}</nested>
-      <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
-      <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
-      <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
-      <outputEncoding>${outputEncoding}</outputEncoding>
-      <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
-      <pluginList>${findbugs.pluginList}</pluginList>
-      <project>${project}</project>
-      <relaxed>${findbugs.relaxed}</relaxed>
-      <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
-      <remoteRepositories>${project.remoteArtifactRepositories}</remoteRepositories>
-      <skip>${findbugs.skip}</skip>
-      <skipEmptyReport>${findbugs.skipEmptyReport}</skipEmptyReport>
-      <sourceEncoding>${encoding}</sourceEncoding>
-      <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
-      <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
-      <threshold>${findbugs.threshold}</threshold>
-      <timeout>${findbugs.timeout}</timeout>
-      <trace>${findbugs.trace}</trace>
-      <userPrefs>${findbugs.userPrefs}</userPrefs>
-      <visitors>${findbugs.visitors}</visitors>
-      <xmlEncoding>UTF-8</xmlEncoding>
-      <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
-      <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
-      <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
-      <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
-    </plugin>
-  </ExecutionEvent>
-     */
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-05 19:46:26.956">
+        <project baseDir="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project" file="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project/pom.xml" groupId="com.example" name="demo-pom" artifactId="demo-pom" version="0.0.1-SNAPSHOT">
+          <build directory="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project/target"/>
+        </project>
+        <plugin executionId="findbugs" goal="findbugs" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
+          <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+          <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+          <debug>${findbugs.debug}</debug>
+          <effort>${findbugs.effort}</effort>
+          <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
+          <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
+          <failOnError>${findbugs.failOnError}</failOnError>
+          <findbugsXmlOutput>true</findbugsXmlOutput>
+          <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
+          <fork>${findbugs.fork}</fork>
+          <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
+          <includeTests>${findbugs.includeTests}</includeTests>
+          <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
+          <localRepository>${localRepository}</localRepository>
+          <maxHeap>${findbugs.maxHeap}</maxHeap>
+          <maxRank>${findbugs.maxRank}</maxRank>
+          <nested>${findbugs.nested}</nested>
+          <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
+          <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
+          <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+          <outputEncoding>${outputEncoding}</outputEncoding>
+          <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
+          <pluginList>${findbugs.pluginList}</pluginList>
+          <project>${project}</project>
+          <relaxed>${findbugs.relaxed}</relaxed>
+          <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
+          <remoteRepositories>${project.remoteArtifactRepositories}</remoteRepositories>
+          <skip>${findbugs.skip}</skip>
+          <skipEmptyReport>${findbugs.skipEmptyReport}</skipEmptyReport>
+          <sourceEncoding>${encoding}</sourceEncoding>
+          <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
+          <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
+          <threshold>${findbugs.threshold}</threshold>
+          <timeout>${findbugs.timeout}</timeout>
+          <trace>${findbugs.trace}</trace>
+          <userPrefs>${findbugs.userPrefs}</userPrefs>
+          <visitors>${findbugs.visitors}</visitors>
+          <xmlEncoding>UTF-8</xmlEncoding>
+          <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
+          <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+          <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
+          <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
+        </plugin>
+      </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-05 19:46:28.108">
+        <project baseDir="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project" file="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project/pom.xml" groupId="com.example" name="demo-pom" artifactId="demo-pom" version="0.0.1-SNAPSHOT">
+          <build directory="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project/target"/>
+        </project>
+        <plugin executionId="findbugs" goal="findbugs" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
+          <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+          <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+          <debug>${findbugs.debug}</debug>
+          <effort>${findbugs.effort}</effort>
+          <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
+          <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
+          <failOnError>${findbugs.failOnError}</failOnError>
+          <findbugsXmlOutput>true</findbugsXmlOutput>
+          <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
+          <fork>${findbugs.fork}</fork>
+          <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
+          <includeTests>${findbugs.includeTests}</includeTests>
+          <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
+          <localRepository>${localRepository}</localRepository>
+          <maxHeap>${findbugs.maxHeap}</maxHeap>
+          <maxRank>${findbugs.maxRank}</maxRank>
+          <nested>${findbugs.nested}</nested>
+          <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
+          <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
+          <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+          <outputEncoding>${outputEncoding}</outputEncoding>
+          <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
+          <pluginList>${findbugs.pluginList}</pluginList>
+          <project>${project}</project>
+          <relaxed>${findbugs.relaxed}</relaxed>
+          <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
+          <remoteRepositories>${project.remoteArtifactRepositories}</remoteRepositories>
+          <skip>${findbugs.skip}</skip>
+          <skipEmptyReport>${findbugs.skipEmptyReport}</skipEmptyReport>
+          <sourceEncoding>${encoding}</sourceEncoding>
+          <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
+          <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
+          <threshold>${findbugs.threshold}</threshold>
+          <timeout>${findbugs.timeout}</timeout>
+          <trace>${findbugs.trace}</trace>
+          <userPrefs>${findbugs.userPrefs}</userPrefs>
+          <visitors>${findbugs.visitors}</visitors>
+          <xmlEncoding>UTF-8</xmlEncoding>
+          <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
+          <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+          <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
+          <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
+        </plugin>
+      </ExecutionEvent>
+         */
     @Override
     public void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException {
 
@@ -235,5 +244,26 @@ public class FindbugsAnalysisReporter implements ResultsReporter {
 
         }
 
+    }
+
+    @Symbol("withMavenFindbugs")
+    @Extension
+    public static class DescriptorImpl extends MavenReporter.DescriptorImpl {
+        @Nonnull
+        @Override
+        public String getDisplayName() {
+            return "Findbugs Reporter";
+        }
+
+        @Override
+        public int ordinal() {
+            return 20;
+        }
+
+        @Nonnull
+        @Override
+        public String getSkipFileName() {
+            return ".skip-publish-findbugs-results";
+        }
     }
 }
