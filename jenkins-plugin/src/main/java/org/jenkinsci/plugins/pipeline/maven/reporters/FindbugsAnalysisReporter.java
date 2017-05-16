@@ -246,6 +246,9 @@ public class FindbugsAnalysisReporter extends MavenReporter {
 
     }
 
+    /**
+     * Don't use symbol "findbugs", it would collide with hudson.plugins.findbugs.FindBugsPublisher
+     */
     @Symbol("withMavenFindbugs")
     @Extension
     public static class DescriptorImpl extends MavenReporter.DescriptorImpl {

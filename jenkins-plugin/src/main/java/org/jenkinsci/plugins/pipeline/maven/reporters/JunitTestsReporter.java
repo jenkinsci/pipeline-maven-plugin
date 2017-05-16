@@ -242,6 +242,9 @@ public class JunitTestsReporter extends MavenReporter {
         }
     }
 
+    /**
+     * Don't use the symbol "junit", it would collide with hudson.tasks.junit.JUnitResultArchiver
+     */
     @Symbol("withMavenJunit")
     @Extension
     public static class DescriptorImpl extends MavenReporter.DescriptorImpl {
