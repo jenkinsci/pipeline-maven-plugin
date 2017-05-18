@@ -26,7 +26,12 @@ package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
 import org.apache.maven.project.DependencyResolutionResult;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.graph.Dependency;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -42,13 +47,34 @@ public class DependencyResolutionResultHandler extends AbstractMavenEventHandler
         Xpp3Dom root = new Xpp3Dom("DependencyResolutionResult");
         root.setAttribute("class", result.getClass().getName());
 
-        /*
         Xpp3Dom dependenciesElt = new Xpp3Dom("resolvedDependencies");
         root.addChild(dependenciesElt);
-        // don't cast to Dependency to not have a classloading issue at runtime
-        for (Object dependency: result.getResolvedDependencies()) {
-            dependenciesElt.addChild(newElement("dependency", dependency.toString()));
-        }*/
+
+        for (Dependency dependency: result.getResolvedDependencies()) {
+            Artifact artifact = dependency.getArtifact();
+
+            if(!artifact.isSnapshot()) {
+                continue;
+            }
+
+            Xpp3Dom dependencyElt = new Xpp3Dom("dependency");
+
+            dependencyElt.addChild(newElement("file", artifact.getFile().getAbsolutePath()));
+
+            dependencyElt.setAttribute("name", artifact.getFile().getName());
+
+            dependencyElt.setAttribute("groupId", artifact.getGroupId());
+            dependencyElt.setAttribute("artifactId", artifact.getArtifactId());
+            dependencyElt.setAttribute("version", artifact.getVersion());
+            if (artifact.getClassifier() != null) {
+                dependencyElt.setAttribute("classifier", artifact.getClassifier());
+            }
+            dependencyElt.setAttribute("type", artifact.getExtension());
+            dependencyElt.setAttribute("id", artifact.getVersion());
+            dependencyElt.setAttribute("extension", artifact.getExtension());
+
+            dependenciesElt.addChild(dependencyElt);
+        }
 
         reporter.print(root);
         return true;
