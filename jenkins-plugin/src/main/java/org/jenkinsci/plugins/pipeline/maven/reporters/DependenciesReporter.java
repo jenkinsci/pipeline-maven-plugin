@@ -1,15 +1,12 @@
 package org.jenkinsci.plugins.pipeline.maven.reporters;
 
 import hudson.FilePath;
-import hudson.Launcher;
 import hudson.model.FingerprintMap;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.tasks.Fingerprinter;
-import jenkins.model.ArtifactManager;
 import jenkins.model.Jenkins;
-import jenkins.util.BuildListenerAdapter;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.ResultsReporter;
@@ -36,19 +33,15 @@ public class DependenciesReporter implements ResultsReporter{
     @Override
     public void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException {
         Run run = context.get(Run.class);
-        ArtifactManager artifactManager = run.pickArtifactManager();
-        Launcher launcher = context.get(Launcher.class);
         TaskListener listener = context.get(TaskListener.class);
         if (listener == null) {
             LOGGER.warning("TaskListener is NULL, default to stderr");
             listener = new StreamBuildListener((OutputStream) System.err);
         }
         FilePath workspace = context.get(FilePath.class); // TODO check that it's the good workspace
-
         List<MavenSpyLogProcessor.MavenArtifact> mavenArtifacts = listArtifactDependencies(mavenSpyLogsElt);
 
-        Map<String, String> artifactsToArchive = new HashMap<>(); // artifactPathInArchiveZone -> artifactPathInWorkspace
-        Map<String, String> artifactsToFingerPrint = new HashMap<>(); // artifactPathInArchiveZone -> artifactMd5
+        Map<String, String> dependenciesToFingerPrint = new HashMap<>(); // artifactPathInArchiveZone -> artifactMd5
         for (MavenSpyLogProcessor.MavenArtifact mavenArtifact : mavenArtifacts) {
             try {
                 if (StringUtils.isEmpty(mavenArtifact.file)) {
@@ -66,26 +59,25 @@ public class DependenciesReporter implements ResultsReporter{
                     }
                 }
 
-                String artifactPathInArchiveZone =
+                String dependencyPathInArchiveZone =
                         mavenArtifact.groupId.replace('.', '/') + "/" +
                                 mavenArtifact.artifactId + "/" +
                                 mavenArtifact.version + "/" +
                                 mavenArtifact.getFileName();
 
-                String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace);
+                String dependencyPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace);
 
-                if (StringUtils.isEmpty(artifactPathInWorkspace)) {
+                if (StringUtils.isEmpty(dependencyPathInWorkspace)) {
                     listener.error("[withMaven] Invalid path in the workspace (" + workspace.getRemote() + ") for artifact " + mavenArtifact);
                 } else {
-                    FilePath artifactFilePath = new FilePath(workspace, artifactPathInWorkspace);
-                    if (artifactFilePath.exists()) {
+                    FilePath dependencyFilePath = new FilePath(workspace, dependencyPathInWorkspace);
+                    if (dependencyFilePath.exists()) {
                         // the subsequent call to digest could test the existence but we don't want to prematurely optimize performances
-                        listener.getLogger().println("[withMaven] Archive artifact " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone);
-                        artifactsToArchive.put(artifactPathInArchiveZone, artifactPathInWorkspace);
-                        String artifactDigest = artifactFilePath.digest();
-                        artifactsToFingerPrint.put(artifactPathInArchiveZone, artifactDigest);
+                        listener.getLogger().println("[withMaven] Archive artifact " + dependencyPathInWorkspace + " under " + dependencyPathInArchiveZone);
+                        String dependencyDigest = dependencyFilePath.digest();
+                        dependenciesToFingerPrint.put(dependencyPathInArchiveZone, dependencyDigest);
                     } else {
-                        listener.getLogger().println("[withMaven] FAILURE to archive " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone + ", file not found");
+                        listener.getLogger().println("[withMaven] FAILURE to archive " + dependencyPathInWorkspace + " under " + dependencyPathInArchiveZone + ", file not found");
                     }
                 }
             } catch (IOException | RuntimeException e) {
@@ -94,22 +86,21 @@ public class DependenciesReporter implements ResultsReporter{
                 listener.getLogger().flush();
             }
         }
-        LOGGER.log(Level.FINE, "Archive and fingerprint {0}", artifactsToArchive);
 
         // FINGERPRINT GENERATED MAVEN ARTIFACT
         FingerprintMap fingerprintMap = Jenkins.getInstance().getFingerprintMap();
-        for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
-            String artifactPathInArchiveZone = artifactToFingerprint.getKey();
-            String artifactMd5 = artifactToFingerprint.getValue();
+        for (Map.Entry<String, String> dependenciesToFingerprint : dependenciesToFingerPrint.entrySet()) {
+            String artifactPathInArchiveZone = dependenciesToFingerprint.getKey();
+            String artifactMd5 = dependenciesToFingerprint.getValue();
             fingerprintMap.getOrCreate(run, artifactPathInArchiveZone, artifactMd5);
         }
 
         // add action
         Fingerprinter.FingerprintAction fingerprintAction = run.getAction(Fingerprinter.FingerprintAction.class);
         if (fingerprintAction == null) {
-            run.addAction(new Fingerprinter.FingerprintAction(run, artifactsToFingerPrint));
+            run.addAction(new Fingerprinter.FingerprintAction(run, dependenciesToFingerPrint));
         } else {
-            fingerprintAction.add(artifactsToFingerPrint);
+            fingerprintAction.add(dependenciesToFingerPrint);
         }
     }
 

@@ -99,9 +99,9 @@ public class MavenSpyLogProcessor implements Serializable {
                     new GeneratedArtifactsReporter().process(context, mavenSpyLogsElt);
                 }
 
-                FilePath skipFingerprintDependenciesFile = workspace.child(".skip-archive-generated-artifacts");
+                FilePath skipFingerprintDependenciesFile = workspace.child(".skip-fingerprint-maven-dependencies");
                 if (skipFingerprintDependenciesFile.exists()) {
-                    listener.getLogger().println("[withMaven] Skip archiving of generated artifacts, file '" + skipFingerprintDependenciesFile + "' found in workspace");
+                    listener.getLogger().println("[withMaven] Skip fingerprinting of maven dependencies, file '" + skipFingerprintDependenciesFile + "' found in workspace");
                 } else {
                     LOGGER.log(Level.FINE, "Look for dependencies to fingerprint, file {0} NOT found in workspace", skipFingerprintDependenciesFile);
                     new DependenciesReporter().process(context, mavenSpyLogsElt);
