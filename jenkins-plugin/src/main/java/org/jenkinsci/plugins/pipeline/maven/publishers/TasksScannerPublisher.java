@@ -121,7 +121,7 @@ public class TasksScannerPublisher extends MavenPublisher {
         @Nonnull
         @Override
         public String getDisplayName() {
-            return "Task Scanner Publisher";
+            return "Open Task Scanner Publisher";
         }
 
         @Override
