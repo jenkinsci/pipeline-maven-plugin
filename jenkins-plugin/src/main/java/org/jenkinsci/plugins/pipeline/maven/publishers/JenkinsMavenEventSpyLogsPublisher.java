@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.pipeline.maven.reporters;
+package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.FilePath;
 import hudson.Launcher;
@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class JenkinsMavenEventSpyLogsReporter implements Serializable {
+public class JenkinsMavenEventSpyLogsPublisher implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.pipeline.maven.reporters;
+package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.Extension;
 import hudson.FilePath;
@@ -33,7 +33,7 @@ import hudson.model.TaskListener;
 import hudson.tasks.junit.JUnitResultArchiver;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
-import org.jenkinsci.plugins.pipeline.maven.MavenReporter;
+import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -50,8 +50,8 @@ import javax.annotation.Nonnull;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class JunitTestsReporter extends MavenReporter {
-    private static final Logger LOGGER = Logger.getLogger(JunitTestsReporter.class.getName());
+public class JunitTestsPublisher extends MavenPublisher {
+    private static final Logger LOGGER = Logger.getLogger(JunitTestsPublisher.class.getName());
     private static final String GROUP_ID = "org.apache.maven.plugins";
     private static final String SUREFIRE_ID = "maven-surefire-plugin";
     private static final String FAILSAFE_ID = "maven-failsafe-plugin";
@@ -61,7 +61,7 @@ public class JunitTestsReporter extends MavenReporter {
     private static final long serialVersionUID = 1L;
 
     @DataBoundConstructor
-    public JunitTestsReporter() {
+    public JunitTestsPublisher() {
 
     }
 
@@ -245,13 +245,13 @@ public class JunitTestsReporter extends MavenReporter {
     /**
      * Don't use the symbol "junit", it would collide with hudson.tasks.junit.JUnitResultArchiver
      */
-    @Symbol("withMavenJunit")
+    @Symbol("junitPublisher")
     @Extension
-    public static class DescriptorImpl extends MavenReporter.DescriptorImpl {
+    public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @Nonnull
         @Override
         public String getDisplayName() {
-            return "Junit Reporter";
+            return "Junit Publisher";
         }
 
         @Override

@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.pipeline.maven.reporters;
+package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.FilePath;
 import org.hamcrest.CoreMatchers;
@@ -31,7 +31,7 @@ public class GeneratedArtifactsReporterTest {
      * generated on Windows
      */
     Document mavenSpyLogsOnWindows;
-    GeneratedArtifactsReporter generatedArtifactsReporter = new GeneratedArtifactsReporter();
+    GeneratedArtifactsPublisher generatedArtifactsReporter = new GeneratedArtifactsPublisher();
 
     @Before
     public void before() throws Exception {

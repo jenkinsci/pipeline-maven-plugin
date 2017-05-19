@@ -161,8 +161,8 @@ class WithMavenStepExecution extends StepExecution {
         }
 
         listener.getLogger().println("[withMaven] Options: " + step.getOptions());
-        ExtensionList<MavenReporter> availableMavenReporters = Jenkins.getInstance().getExtensionList(MavenReporter.class);
-        listener.getLogger().println("[withMaven] Available options: " + Joiner.on(",").join(availableMavenReporters));
+        ExtensionList<MavenPublisher> availableMavenPublishers = Jenkins.getInstance().getExtensionList(MavenPublisher.class);
+        listener.getLogger().println("[withMaven] Available options: " + Joiner.on(",").join(availableMavenPublishers));
 
         getComputer();
 
@@ -845,11 +845,11 @@ class WithMavenStepExecution extends StepExecution {
     private static class Callback extends BodyExecutionCallback.TailCall {
         private final FilePath tempBinDir;
 
-        private final List<MavenReporter> options;
+        private final List<MavenPublisher> options;
 
         private final MavenSpyLogProcessor mavenSpyLogProcessor = new MavenSpyLogProcessor();
 
-        public Callback(@Nonnull FilePath tempBinDir, @Nonnull List<MavenReporter> options) {
+        public Callback(@Nonnull FilePath tempBinDir, @Nonnull List<MavenPublisher> options) {
             this.tempBinDir = tempBinDir;
             this.options = options;
         }

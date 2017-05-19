@@ -24,20 +24,13 @@
 
 package org.jenkinsci.plugins.pipeline.maven;
 
-import hudson.DescriptorExtensionList;
 import hudson.FilePath;
-import hudson.model.Descriptor;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import jenkins.model.InterruptedBuildAction;
-import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.pipeline.maven.reporters.FindbugsAnalysisReporter;
-import org.jenkinsci.plugins.pipeline.maven.reporters.GeneratedArtifactsReporter;
-import org.jenkinsci.plugins.pipeline.maven.reporters.JunitTestsReporter;
-import org.jenkinsci.plugins.pipeline.maven.reporters.JenkinsMavenEventSpyLogsReporter;
-import org.jenkinsci.plugins.pipeline.maven.reporters.TasksScannerReporter;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JenkinsMavenEventSpyLogsPublisher;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -47,9 +40,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,7 +57,7 @@ public class MavenSpyLogProcessor implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(MavenSpyLogProcessor.class.getName());
 
-    public void processMavenSpyLogs(StepContext context, FilePath mavenSpyLogFolder, List<MavenReporter> options) throws IOException, InterruptedException {
+    public void processMavenSpyLogs(StepContext context, FilePath mavenSpyLogFolder, List<MavenPublisher> options) throws IOException, InterruptedException {
         FilePath[] mavenSpyLogsList = mavenSpyLogFolder.list("maven-spy-*.log");
         LOGGER.log(Level.FINE, "Found {0} maven execution reports in {1}", new Object[]{mavenSpyLogsList.length, mavenSpyLogFolder});
 
@@ -97,27 +88,27 @@ public class MavenSpyLogProcessor implements Serializable {
                 FilePath archiveJenkinsMavenEventSpyLogs = workspace.child(".archive-jenkins-maven-event-spy-logs");
                 if (archiveJenkinsMavenEventSpyLogs.exists()) {
                     LOGGER.log(Level.FINE, "Archive Jenkins Maven Event Spy logs {0}", mavenSpyLogs.getRemote());
-                    new JenkinsMavenEventSpyLogsReporter().process(context, mavenSpyLogs);
+                    new JenkinsMavenEventSpyLogsPublisher().process(context, mavenSpyLogs);
                 }
 
                 Element mavenSpyLogsElt = documentBuilder.parse(mavenSpyLogsInputStream).getDocumentElement();
 
-                List<MavenReporter> mavenReporters = MavenReporter.buildReportersList(options, listener);
-                for (MavenReporter mavenReporter: mavenReporters){
-                    String skipFileName =  mavenReporter.getDescriptor().getSkipFileName();
-                    if (mavenReporter.isDisabled()) {
-                        listener.getLogger().println("[withMaven] Skip '" + mavenReporter.getDescriptor().getDisplayName() + "' disabled by configuration");
+                List<MavenPublisher> mavenPublishers = MavenPublisher.buildReportersList(options, listener);
+                for (MavenPublisher mavenPublisher : mavenPublishers){
+                    String skipFileName =  mavenPublisher.getDescriptor().getSkipFileName();
+                    if (Boolean.TRUE.equals(mavenPublisher.isDisabled())) {
+                        listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by configuration");
                     } else if (StringUtils.isNotEmpty(skipFileName) && workspace.child(skipFileName).exists()) {
-                        listener.getLogger().println("[withMaven] Skip '" + mavenReporter.getDescriptor().getDisplayName() + "' disabled by marker file '" + skipFileName + "'");
+                        listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by marker file '" + skipFileName + "'");
                     } else {
                         if (LOGGER.isLoggable(Level.FINE)) {
-                            listener.getLogger().println("[withMaven] Run '" + mavenReporter.getDescriptor().getDisplayName() + "'...");
+                            listener.getLogger().println("[withMaven] Run '" + mavenPublisher.getDescriptor().getDisplayName() + "'...");
                         }
                         try {
-                            mavenReporter.process(context, mavenSpyLogsElt);
+                            mavenPublisher.process(context, mavenSpyLogsElt);
                         } catch (IOException|RuntimeException e) {
-                            PrintWriter error = listener.error("[withMaven] WARNING Exception executing Maven reporter '" + mavenReporter.getDescriptor().getDisplayName() +
-                                    "' / " + mavenReporter.getDescriptor().getId() + "." +
+                            PrintWriter error = listener.error("[withMaven] WARNING Exception executing Maven reporter '" + mavenPublisher.getDescriptor().getDisplayName() +
+                                    "' / " + mavenPublisher.getDescriptor().getId() + "." +
                                     " Please report a bug associated for the component 'pipeline-maven-plugin' at https://issues.jenkins-ci.org ");
                             e.printStackTrace(error);
 

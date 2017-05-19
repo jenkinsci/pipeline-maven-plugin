@@ -26,36 +26,10 @@ THE SOFTWARE.
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
-    <f:entry title="${%Maven}" field="maven">
-        <f:select/>
-    </f:entry>
-    <f:entry title="${%JDK}" field="jdk">
-        <f:select/>
-    </f:entry>
-    <f:entry title="${%Maven Settings Config}" field="mavenSettingsConfig">
-        <f:select/>
-    </f:entry>
-    <f:entry title="${%Maven Settings File Path}" field="mavenSettingsFilePath">
-        <f:textbox/>
-    </f:entry>
-
-    <f:entry title="${%Global Maven Settings Config}" field="globalMavenSettingsConfig">
-        <f:select/>
-    </f:entry>
-    <f:entry title="${%Global Maven Settings File Path}" field="globalMavenSettingsFilePath">
-        <f:textbox/>
-    </f:entry>
-
-    <f:entry title="${%Maven JVM Opts}" field="mavenOpts">
-        <f:textbox/>
-    </f:entry>
-
-    <f:entry title="${%Maven Local Repository}" field="mavenLocalRepo">
-        <f:textbox/>
-    </f:entry>
-
-    <f:entry title="${%Options}">
-        <f:repeatableHeteroProperty field="options" targetType="org.jenkinsci.plugins.pipeline.maven.MavenPublisher"
-                                    addCaption="${%Add Option}" hasHeader="true" oneEach="true"/>
+    <f:entry title="${%Disabled}" field="disabled">
+        <select name="disabled">
+            <option value="true">True</option>
+            <option value="false">false</option>
+        </select>
     </f:entry>
 </j:jelly>

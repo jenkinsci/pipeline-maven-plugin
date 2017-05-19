@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.pipeline.maven.reporters;
+package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.Extension;
 import hudson.FilePath;
@@ -8,7 +8,7 @@ import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.plugins.tasks.TasksPublisher;
 import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.pipeline.maven.MavenReporter;
+import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -28,13 +28,13 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  * @see hudson.plugins.tasks.TasksPublisher
  */
-public class TasksScannerReporter extends MavenReporter {
-    private static final Logger LOGGER = Logger.getLogger(FindbugsAnalysisReporter.class.getName());
+public class TasksScannerPublisher extends MavenPublisher {
+    private static final Logger LOGGER = Logger.getLogger(FindbugsAnalysisPublisher.class.getName());
 
     private static final long serialVersionUID = 1L;
 
     @DataBoundConstructor
-    public TasksScannerReporter() {
+    public TasksScannerPublisher() {
 
     }
 
@@ -115,13 +115,13 @@ public class TasksScannerReporter extends MavenReporter {
         }
     }
 
-    @Symbol("withMavenTasks")
+    @Symbol("openTasksPublisher")
     @Extension
-    public static class DescriptorImpl extends MavenReporter.DescriptorImpl {
+    public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @Nonnull
         @Override
         public String getDisplayName() {
-            return "Task Scanner Reporter";
+            return "Task Scanner Publisher";
         }
 
         @Override

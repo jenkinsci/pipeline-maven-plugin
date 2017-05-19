@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.pipeline.maven.reporters;
+package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.Extension;
 import hudson.FilePath;
@@ -32,7 +32,7 @@ import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.plugins.findbugs.FindBugsPublisher;
 import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.pipeline.maven.MavenReporter;
+import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -50,13 +50,13 @@ import javax.annotation.Nonnull;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class FindbugsAnalysisReporter extends MavenReporter {
-    private static final Logger LOGGER = Logger.getLogger(FindbugsAnalysisReporter.class.getName());
+public class FindbugsAnalysisPublisher extends MavenPublisher {
+    private static final Logger LOGGER = Logger.getLogger(FindbugsAnalysisPublisher.class.getName());
 
     private static final long serialVersionUID = 1L;
 
     @DataBoundConstructor
-    public FindbugsAnalysisReporter() {
+    public FindbugsAnalysisPublisher() {
 
     }
 
@@ -249,13 +249,13 @@ public class FindbugsAnalysisReporter extends MavenReporter {
     /**
      * Don't use symbol "findbugs", it would collide with hudson.plugins.findbugs.FindBugsPublisher
      */
-    @Symbol("withMavenFindbugs")
+    @Symbol("findbugsPublisher")
     @Extension
-    public static class DescriptorImpl extends MavenReporter.DescriptorImpl {
+    public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @Nonnull
         @Override
         public String getDisplayName() {
-            return "Findbugs Reporter";
+            return "Findbugs Publisher";
         }
 
         @Override

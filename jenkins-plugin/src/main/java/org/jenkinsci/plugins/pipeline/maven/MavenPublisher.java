@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -29,18 +30,20 @@ import javax.annotation.Nullable;
  *
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public abstract class MavenReporter extends AbstractDescribableImpl<MavenReporter> implements ExtensionPoint, Comparable<MavenReporter>, Serializable {
+public abstract class MavenPublisher extends AbstractDescribableImpl<MavenPublisher> implements ExtensionPoint, Comparable<MavenPublisher>, Serializable {
 
-    private final static Logger LOGGER = Logger.getLogger(MavenReporter.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(MavenPublisher.class.getName());
 
-    private boolean disabled;
+    @CheckForNull
+    private Boolean disabled;
 
-    public boolean isDisabled() {
+    @CheckForNull
+    public Boolean isDisabled() {
         return disabled;
     }
 
     @DataBoundSetter
-    public void setDisabled(boolean disabled) {
+    public void setDisabled(@Nullable Boolean disabled) {
         this.disabled = disabled;
     }
 
@@ -58,7 +61,7 @@ public abstract class MavenReporter extends AbstractDescribableImpl<MavenReporte
     }
 
     @Override
-    public int compareTo(MavenReporter o) {
+    public int compareTo(MavenPublisher o) {
         return this.getDescriptor().compareTo(o.getDescriptor());
     }
 
@@ -69,11 +72,11 @@ public abstract class MavenReporter extends AbstractDescribableImpl<MavenReporte
                 ']';
     }
 
-    public static abstract class DescriptorImpl extends Descriptor<MavenReporter> implements Comparable<DescriptorImpl> {
+    public static abstract class DescriptorImpl extends Descriptor<MavenPublisher> implements Comparable<DescriptorImpl> {
         /**
          *
-         * @return the ordinal of this reporter to execute reporters in predictable order
-         * @see #compareTo(MavenReporter)
+         * @return the ordinal of this reporter to execute publishers in predictable order
+         * @see #compareTo(MavenPublisher)
          */
         public int ordinal() {
             return 100;
@@ -101,22 +104,22 @@ public abstract class MavenReporter extends AbstractDescribableImpl<MavenReporte
     }
 
     @Nonnull
-    public static List<MavenReporter> buildReportersList(@Nonnull List<MavenReporter> configuredReporters, @Nonnull TaskListener listener){
+    public static List<MavenPublisher> buildReportersList(@Nonnull List<MavenPublisher> configuredReporters, @Nonnull TaskListener listener){
 
         // mavenReporter.descriptor.id -> mavenReporter
-        Map<String, MavenReporter> configuredReportersById = new HashMap<>();
-        for (MavenReporter mavenReporter : configuredReporters) {
-            if (mavenReporter == null) {
+        Map<String, MavenPublisher> configuredReportersById = new HashMap<>();
+        for (MavenPublisher mavenPublisher : configuredReporters) {
+            if (mavenPublisher == null) {
                 // skipp null reporter injected by Jenkins pipeline for an unknown reason
             } else {
-                configuredReportersById.put(mavenReporter.getDescriptor().getId(), mavenReporter);
+                configuredReportersById.put(mavenPublisher.getDescriptor().getId(), mavenPublisher);
             }
         }
 
         // mavenReporter.descriptor.id -> mavenRepoer
-        Map<String, MavenReporter> defaultReportersById = new HashMap<>();
-        DescriptorExtensionList<MavenReporter, Descriptor<MavenReporter>> descriptorList = Jenkins.getInstance().getDescriptorList(MavenReporter.class);
-        for (Descriptor<MavenReporter> descriptor:descriptorList) {
+        Map<String, MavenPublisher> defaultReportersById = new HashMap<>();
+        DescriptorExtensionList<MavenPublisher, Descriptor<MavenPublisher>> descriptorList = Jenkins.getInstance().getDescriptorList(MavenPublisher.class);
+        for (Descriptor<MavenPublisher> descriptor:descriptorList) {
             if (configuredReportersById.containsKey(descriptor.getId())) {
                 // skip, already provided with a configuration
             } else {
@@ -136,7 +139,7 @@ public abstract class MavenReporter extends AbstractDescribableImpl<MavenReporte
             listener.getLogger().println("[withMaven] Maven Reporters with default configuration: " + defaultReportersById);
         }
 
-        List<MavenReporter> results = new ArrayList<>();
+        List<MavenPublisher> results = new ArrayList<>();
         results.addAll(configuredReportersById.values());
         results.addAll(defaultReportersById.values());
         Collections.sort(results);

@@ -74,7 +74,7 @@ public class WithMavenStep extends Step {
     private String mavenOpts = "";
     private String jdk;
     private String mavenLocalRepo = "";
-    private List<MavenReporter> options = new ArrayList<>();
+    private List<MavenPublisher> options = new ArrayList<>();
 
     @DataBoundConstructor
     public WithMavenStep() {
@@ -153,12 +153,24 @@ public class WithMavenStep extends Step {
         this.mavenLocalRepo = mavenLocalRepo;
     }
 
-    public List<MavenReporter> getOptions() {
+    public List<MavenPublisher> getOptions() {
         return options;
     }
 
+    @Override
+    public WithMavenStep.DescriptorImpl getDescriptor() {
+        return (WithMavenStep.DescriptorImpl) super.getDescriptor();
+    }
+
+    /**
+     * Return all the registered Maven publishers
+     */
+    public DescriptorExtensionList<MavenPublisher, MavenPublisher.DescriptorImpl> getOptionsDescriptors() {
+        return getDescriptor().getOptionsDescriptors();
+    }
+
     @DataBoundSetter
-    public void setOptions(List<MavenReporter> options) {
+    public void setOptions(List<MavenPublisher> options) {
         this.options = options;
     }
 
@@ -244,10 +256,10 @@ public class WithMavenStep extends Step {
         }
 
         /**
-         * Return all the registered Maven reporters
+         * Return all the registered Maven publishers
          */
-        public static DescriptorExtensionList<MavenReporter, MavenReporter.DescriptorImpl> getOptionsDescriptors() {
-            return Jenkins.getInstance().getDescriptorList(MavenReporter.class);
+        public DescriptorExtensionList<MavenPublisher, MavenPublisher.DescriptorImpl> getOptionsDescriptors() {
+            return Jenkins.getInstance().getDescriptorList(MavenPublisher.class);
         }
 
     }

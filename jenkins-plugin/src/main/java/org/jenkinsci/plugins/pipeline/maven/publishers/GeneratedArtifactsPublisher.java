@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.pipeline.maven.reporters;
+package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.Extension;
 import hudson.FilePath;
@@ -13,7 +13,7 @@ import jenkins.model.Jenkins;
 import jenkins.util.BuildListenerAdapter;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.pipeline.maven.MavenReporter;
+import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -35,14 +35,14 @@ import javax.annotation.Nonnull;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class GeneratedArtifactsReporter extends MavenReporter {
+public class GeneratedArtifactsPublisher extends MavenPublisher {
 
     private static final Logger LOGGER = Logger.getLogger(MavenSpyLogProcessor.class.getName());
 
     private static final long serialVersionUID = 1L;
 
     @DataBoundConstructor
-    public GeneratedArtifactsReporter() {
+    public GeneratedArtifactsPublisher() {
 
     }
 
@@ -257,12 +257,12 @@ public class GeneratedArtifactsReporter extends MavenReporter {
 
 
 
-    @Symbol("withMavenGeneratedArtifacts")
-    @Extension public static class DescriptorImpl extends MavenReporter.DescriptorImpl {
+    @Symbol("artifactsPublisher")
+    @Extension public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @Nonnull
         @Override
         public String getDisplayName() {
-            return "Generated Artifacts Reporter";
+            return "Generated Artifacts Publisher";
         }
 
         @Override
