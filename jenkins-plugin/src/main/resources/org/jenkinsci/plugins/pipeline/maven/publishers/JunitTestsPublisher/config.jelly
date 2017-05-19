@@ -32,4 +32,10 @@ THE SOFTWARE.
             <option value="true">True</option>
         </select>
     </f:entry>
+    <f:entry title="${%Ignore Attachments}" field="ignoreAttachments">
+        <select name="ignoreAttachments">
+            <option value="false">False</option>
+            <option value="true">True</option>
+        </select>
+    </f:entry>
 </j:jelly>

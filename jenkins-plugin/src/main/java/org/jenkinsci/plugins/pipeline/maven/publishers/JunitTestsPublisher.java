@@ -31,21 +31,27 @@ import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.tasks.junit.JUnitResultArchiver;
+import hudson.tasks.junit.TestDataPublisher;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -59,6 +65,9 @@ public class JunitTestsPublisher extends MavenPublisher {
     private static final String FAILSAFE_GOAL = "integration-test";
 
     private static final long serialVersionUID = 1L;
+
+    @CheckForNull
+    private Boolean ignoreAttachments;
 
     @DataBoundConstructor
     public JunitTestsPublisher() {
@@ -232,6 +241,29 @@ public class JunitTestsPublisher extends MavenPublisher {
             // even if "org.apache.maven.plugins:maven-surefire-plugin@test" succeeds, it maybe with "-DskipTests" and thus not have any test results.
             archiver.setAllowEmptyResults(true);
 
+
+            if (Boolean.TRUE.equals(this.ignoreAttachments)) {
+                if (LOGGER.isLoggable(Level.FINE)) {
+                    listener.getLogger().println("[withMaven] Ignore junit test attachments");
+                }
+            } else {
+                String className = "hudson.plugins.junitattachments.AttachmentPublisher";
+                try {
+                    TestDataPublisher attachmentPublisher =  (TestDataPublisher) Class.forName(className).newInstance();
+                    if (LOGGER.isLoggable(Level.FINE)) {
+                        listener.getLogger().println("[withMaven] Publish junit test attachments...");
+                    }
+                    archiver.setTestDataPublishers(Collections.singletonList(attachmentPublisher));
+                } catch(ClassNotFoundException e){
+                    listener.getLogger().print("[withMaven] Jenkins ");
+                    listener.hyperlink("https://wiki.jenkins-ci.org/display/JENKINS/JUnit+Attachments+Plugin", "JUnit Attachments Plugin");
+                    listener.getLogger().print(" not found, can't publish test attachments ");
+                } catch (IllegalAccessException|InstantiationException e) {
+                    PrintWriter err = listener.error("[withMaven] Failure to publish test attachments, exception instantiating '" + className + "'");
+                    e.printStackTrace(err);
+                }
+            }
+
             try {
                 archiver.perform(run, workspace, launcher, listener);
             } catch (Exception e) {
@@ -240,6 +272,16 @@ public class JunitTestsPublisher extends MavenPublisher {
             }
 
         }
+    }
+
+    @CheckForNull
+    public Boolean getIgnoreAttachments() {
+        return ignoreAttachments;
+    }
+
+    @DataBoundSetter
+    public void setIgnoreAttachments(@Nullable Boolean ignoreAttachments) {
+        this.ignoreAttachments = ignoreAttachments;
     }
 
     /**
