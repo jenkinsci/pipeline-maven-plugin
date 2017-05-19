@@ -22,18 +22,21 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.pipeline.maven.reporters;
+package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.tasks.junit.JUnitResultArchiver;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
-import org.jenkinsci.plugins.pipeline.maven.ResultsReporter;
+import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -47,13 +50,20 @@ import javax.annotation.Nonnull;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class JunitTestsReporter implements ResultsReporter {
-    private static final Logger LOGGER = Logger.getLogger(JunitTestsReporter.class.getName());
+public class JunitTestsPublisher extends MavenPublisher {
+    private static final Logger LOGGER = Logger.getLogger(JunitTestsPublisher.class.getName());
     private static final String GROUP_ID = "org.apache.maven.plugins";
     private static final String SUREFIRE_ID = "maven-surefire-plugin";
     private static final String FAILSAFE_ID = "maven-failsafe-plugin";
     private static final String SUREFIRE_GOAL = "test";
     private static final String FAILSAFE_GOAL = "integration-test";
+
+    private static final long serialVersionUID = 1L;
+
+    @DataBoundConstructor
+    public JunitTestsPublisher() {
+
+    }
 
     /*
 <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-03 10:15:12.554">
@@ -229,6 +239,31 @@ public class JunitTestsReporter implements ResultsReporter {
                 LOGGER.log(Level.WARNING, "Exception processing " + XmlUtils.toString(testEvent), e);
             }
 
+        }
+    }
+
+    /**
+     * Don't use the symbol "junit", it would collide with hudson.tasks.junit.JUnitResultArchiver
+     */
+    @Symbol("junitPublisher")
+    @Extension
+    public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
+        @Nonnull
+        @Override
+        public String getDisplayName() {
+            return "Junit Publisher";
+        }
+
+        @Override
+        public int ordinal() {
+            return 10;
+        }
+
+
+        @Nonnull
+        @Override
+        public String getSkipFileName() {
+            return ".skip-publish-junit-results";
         }
     }
 }

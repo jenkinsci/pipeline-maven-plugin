@@ -26,12 +26,8 @@ package org.jenkinsci.plugins.pipeline.maven;
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import hudson.model.Fingerprint;
 import hudson.model.Result;
-import hudson.model.Run;
 import hudson.plugins.tasks.TasksResultAction;
 import hudson.tasks.Fingerprinter;
 import hudson.tasks.Maven;
@@ -41,20 +37,22 @@ import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.FilePathGlobalSettingsProvider;
 import jenkins.mvn.FilePathSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
-import jenkins.mvn.GlobalSettingsProvider;
 import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
 import org.apache.commons.io.FileUtils;
-import org.hamcrest.CoreMatchers;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.configfiles.GlobalConfigFiles;
 import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnGlobalSettingsProvider;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnSettingsProvider;
+import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -68,10 +66,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-
-import javax.annotation.Nullable;
 
 /**
  * TODO migrate to {@link WithMavenStepTest} once we have implemented a GitRepoRule that can be used on remote agents
@@ -127,6 +122,7 @@ public class WithMavenStepOnMasterTest {
         // verify .jar is archived and fingerprinted
         jenkinsRule.assertLogContains("under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.jar", build);
     }
+
 
     @Test
     public void maven_build_on_master_with_missing_specified_maven_installation_fails() throws Exception {
@@ -192,6 +188,76 @@ public class WithMavenStepOnMasterTest {
         jenkinsRule.assertLogContains("[withMaven] Scan Tasks for Maven artifact MavenArtifact{jenkins.mvn.test:mono-module-maven-app::0.1-SNAPSHOT}", build);
         TasksResultAction tasksResultAction = build.getAction(TasksResultAction.class);
         assertThat(tasksResultAction.getProjectActions().size(), is(1));
+    }
+
+    @Test
+    public void maven_build_jar_project_on_master_disable_findbugs_publisher_succeeds() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new FindbugsAnalysisPublisher.DescriptorImpl(), "findbugsPublisher", true);
+    }
+
+    @Test
+    public void maven_build_jar_project_on_master_disable_tasks_publisher_succeeds() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new TasksScannerPublisher.DescriptorImpl(), "openTasksPublisher", true);
+    }
+
+    @Test
+    public void maven_build_jar_project_on_master_disable_junit_publisher_succeeds() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new JunitTestsPublisher.DescriptorImpl(), "junitPublisher", true);
+    }
+
+    @Test
+    public void maven_build_jar_project_on_master_disable_generated_artifacts_publisher_succeeds() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new GeneratedArtifactsPublisher.DescriptorImpl(), "artifactsPublisher", true);
+    }
+
+    @Test
+    public void maven_build_jar_project_on_master_force_enable_findbugs_publisher_succeeds() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new FindbugsAnalysisPublisher.DescriptorImpl(), "findbugsPublisher", false);
+    }
+
+    @Test
+    public void maven_build_jar_project_on_master_force_enable_tasks_publisher_succeeds() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new TasksScannerPublisher.DescriptorImpl(), "openTasksPublisher", false);
+    }
+
+    @Test
+    public void maven_build_jar_project_on_master_force_enable_junit_publisher_succeeds() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new JunitTestsPublisher.DescriptorImpl(), "junitPublisher", false);
+    }
+
+    @Test
+    public void maven_build_jar_project_on_master_force_enable_generated_artifacts_publisher_succeeds() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new GeneratedArtifactsPublisher.DescriptorImpl(), "artifactsPublisher", false);
+    }
+
+
+    private void maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(MavenPublisher.DescriptorImpl descriptor, String symbol, boolean disabled) throws Exception {
+
+        String displayName = descriptor.getDisplayName();
+
+        Symbol symbolAnnotation = descriptor.getClass().getAnnotation(Symbol.class);
+        String[] symbols = symbolAnnotation.value();
+        assertThat(new String[]{symbol},  is(symbols));
+
+        loadMavenJarProjectInGitRepo(this.gitRepoRule);
+
+        String pipelineScript = "node('master') {\n" +
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven(options:[" + symbol + "(disabled:" + disabled + ")]) {\n" +
+                "        sh 'mvn package verify'\n" +
+                "    }\n" +
+                "}";
+
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-" + symbol + "-publisher-disabled-" + disabled);
+        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+
+        String message = "[withMaven] Skip '" + displayName + "' disabled by configuration";
+        if (disabled) {
+            jenkinsRule.assertLogContains(message, build);
+        } else {
+            jenkinsRule.assertLogNotContains(message, build);
+        }
     }
 
     @Test

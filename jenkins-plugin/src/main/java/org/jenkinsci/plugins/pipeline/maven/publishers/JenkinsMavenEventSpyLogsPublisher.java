@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.pipeline.maven.reporters;
+package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.FilePath;
 import hudson.Launcher;
@@ -10,6 +10,7 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
@@ -20,7 +21,10 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class JenkinsMavenEventSpyLogsReporter {
+public class JenkinsMavenEventSpyLogsPublisher implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     public void process(@Nonnull StepContext context, @Nonnull FilePath mavenSpyLogs) throws IOException, InterruptedException {
 
         Run run = context.get(Run.class);

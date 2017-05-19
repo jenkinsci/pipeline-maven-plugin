@@ -1,16 +1,18 @@
-package org.jenkinsci.plugins.pipeline.maven.reporters;
+package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
-import hudson.plugins.findbugs.FindBugsPublisher;
 import hudson.plugins.tasks.TasksPublisher;
+import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
-import org.jenkinsci.plugins.pipeline.maven.ResultsReporter;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -26,8 +28,15 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  * @see hudson.plugins.tasks.TasksPublisher
  */
-public class TasksScannerReporter implements ResultsReporter {
-    private static final Logger LOGGER = Logger.getLogger(FindbugsAnalysisReporter.class.getName());
+public class TasksScannerPublisher extends MavenPublisher {
+    private static final Logger LOGGER = Logger.getLogger(FindbugsAnalysisPublisher.class.getName());
+
+    private static final long serialVersionUID = 1L;
+
+    @DataBoundConstructor
+    public TasksScannerPublisher() {
+
+    }
 
     /*
     <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-03-08 21:03:33.564">
@@ -103,6 +112,27 @@ public class TasksScannerReporter implements ResultsReporter {
         } catch (Exception e) {
             listener.error("[withMaven] Silently ignore exception scanning tasks in " + pattern + ": " + e);
             LOGGER.log(Level.WARNING, "Exception scanning tasks in  " + pattern, e);
+        }
+    }
+
+    @Symbol("openTasksPublisher")
+    @Extension
+    public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
+        @Nonnull
+        @Override
+        public String getDisplayName() {
+            return "Task Scanner Publisher";
+        }
+
+        @Override
+        public int ordinal() {
+            return 100;
+        }
+
+        @Nonnull
+        @Override
+        public String getSkipFileName() {
+            return ".skip-task-scanner";
         }
     }
 }

@@ -1,5 +1,6 @@
-package org.jenkinsci.plugins.pipeline.maven.reporters;
+package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.FingerprintMap;
@@ -11,10 +12,12 @@ import jenkins.model.ArtifactManager;
 import jenkins.model.Jenkins;
 import jenkins.util.BuildListenerAdapter;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
-import org.jenkinsci.plugins.pipeline.maven.ResultsReporter;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -32,8 +35,16 @@ import javax.annotation.Nonnull;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class GeneratedArtifactsReporter implements ResultsReporter{
+public class GeneratedArtifactsPublisher extends MavenPublisher {
+
     private static final Logger LOGGER = Logger.getLogger(MavenSpyLogProcessor.class.getName());
+
+    private static final long serialVersionUID = 1L;
+
+    @DataBoundConstructor
+    public GeneratedArtifactsPublisher() {
+
+    }
 
     @Override
     public void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException {
@@ -242,5 +253,28 @@ public class GeneratedArtifactsReporter implements ResultsReporter{
 
         }
         return result;
+    }
+
+
+
+    @Symbol("artifactsPublisher")
+    @Extension public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
+        @Nonnull
+        @Override
+        public String getDisplayName() {
+            return "Generated Artifacts Publisher";
+        }
+
+        @Override
+        public int ordinal() {
+            return 1;
+        }
+
+
+        @Nonnull
+        @Override
+        public String getSkipFileName() {
+            return ".skip-archive-generated-artifacts";
+        }
     }
 }
