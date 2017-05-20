@@ -7,12 +7,14 @@ import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.plugins.tasks.TasksPublisher;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -32,6 +34,38 @@ public class TasksScannerPublisher extends MavenPublisher {
     private static final Logger LOGGER = Logger.getLogger(FindbugsAnalysisPublisher.class.getName());
 
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Coma separated high priority task identifiers
+     *
+     * @see TasksPublisher#getHigh()
+     */
+    private String highPriorityTaskIdentifiers = "";
+    /**
+     * @see TasksPublisher#getNormal()
+     */
+    private String normalPriorityTaskIdentifiers = "";
+    /**
+     * @see TasksPublisher#getLow()
+     */
+    private String lowPriorityTaskIdentifiers = "";
+    /**
+     * @see TasksPublisher#getIgnoreCase()
+     */
+    private boolean ignoreCase = false;
+    /**
+     * @see TasksPublisher#getPattern()
+     */
+    private String pattern = "";
+    /**
+     * @see TasksPublisher#getExcludePattern()
+     */
+    private String excludePattern = "";
+
+    /**
+     * @see TasksPublisher#getAsRegexp()
+     */
+    private boolean asRegexp = false;
 
     @DataBoundConstructor
     public TasksScannerPublisher() {
@@ -102,10 +136,15 @@ public class TasksScannerPublisher extends MavenPublisher {
         }
 
         TasksPublisher tasksPublisher = new TasksPublisher();
-        String pattern = XmlUtils.join(sourceDirectoriesPatterns, ",");
+        String pattern = StringUtils.isEmpty(this.pattern)? XmlUtils.join(sourceDirectoriesPatterns, ",") : this.pattern;
         tasksPublisher.setPattern(pattern);
-        tasksPublisher.setHigh("FIXME");
-        tasksPublisher.setNormal("TODO");
+        tasksPublisher.setExcludePattern(StringUtils.trimToNull(this.excludePattern));
+
+        tasksPublisher.setHigh(StringUtils.defaultIfEmpty(this.highPriorityTaskIdentifiers, "FIXME"));
+        tasksPublisher.setNormal(StringUtils.defaultIfEmpty(this.normalPriorityTaskIdentifiers, "TODO"));
+        tasksPublisher.setLow(StringUtils.trimToNull(this.lowPriorityTaskIdentifiers));
+        tasksPublisher.setIgnoreCase(this.ignoreCase);
+        tasksPublisher.setAsRegexp(this.asRegexp);
 
         try {
             tasksPublisher.perform(run, workspace, launcher, listener);
@@ -113,6 +152,69 @@ public class TasksScannerPublisher extends MavenPublisher {
             listener.error("[withMaven] Silently ignore exception scanning tasks in " + pattern + ": " + e);
             LOGGER.log(Level.WARNING, "Exception scanning tasks in  " + pattern, e);
         }
+    }
+
+    public String getHighPriorityTaskIdentifiers() {
+        return highPriorityTaskIdentifiers;
+    }
+
+    @DataBoundSetter
+    public void setHighPriorityTaskIdentifiers(String highPriorityTaskIdentifiers) {
+        this.highPriorityTaskIdentifiers = highPriorityTaskIdentifiers;
+    }
+
+    public String getNormalPriorityTaskIdentifiers() {
+        return normalPriorityTaskIdentifiers;
+    }
+
+    @DataBoundSetter
+    public void setNormalPriorityTaskIdentifiers(String normalPriorityTaskIdentifiers) {
+        this.normalPriorityTaskIdentifiers = normalPriorityTaskIdentifiers;
+    }
+
+    public String getLowPriorityTaskIdentifiers() {
+        return lowPriorityTaskIdentifiers;
+    }
+
+    @DataBoundSetter
+    public void setLowPriorityTaskIdentifiers(String lowPriorityTaskIdentifiers) {
+        this.lowPriorityTaskIdentifiers = lowPriorityTaskIdentifiers;
+    }
+
+    public boolean isIgnoreCase() {
+        return ignoreCase;
+    }
+
+    @DataBoundSetter
+    public void setIgnoreCase(boolean ignoreCase) {
+        this.ignoreCase = ignoreCase;
+    }
+
+    public String getPattern() {
+        return pattern;
+    }
+
+    @DataBoundSetter
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
+    }
+
+    public String getExcludePattern() {
+        return excludePattern;
+    }
+
+    @DataBoundSetter
+    public void setExcludePattern(String excludePattern) {
+        this.excludePattern = excludePattern;
+    }
+
+    public boolean isAsRegexp() {
+        return asRegexp;
+    }
+
+    @DataBoundSetter
+    public void setAsRegexp(boolean asRegexp) {
+        this.asRegexp = asRegexp;
     }
 
     @Symbol("openTasksPublisher")

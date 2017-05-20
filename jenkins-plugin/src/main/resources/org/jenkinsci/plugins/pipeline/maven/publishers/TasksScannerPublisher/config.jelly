@@ -32,4 +32,38 @@ THE SOFTWARE.
             <option value="true">True</option>
         </select>
     </f:entry>
+
+    <f:section title="${%Source Code}">
+        <f:entry title="Pattern" field="pattern">
+            <f:textbox/>
+        </f:entry>
+        <f:entry title="Exclude Pattern" field="excludePattern">
+            <f:textbox/>
+        </f:entry>
+    </f:section>
+
+    <f:section title="${%Task Identifiers}">
+        <f:entry title="High Priority Tasks" field="highPriorityTaskIdentifiers">
+            <f:textbox/>
+        </f:entry>
+        <f:entry title="Normal Priority Tasks" field="normalPriorityTaskIdentifiers">
+            <f:textbox/>
+        </f:entry>
+        <f:entry title="Low Priority Tasks" field="lowPriorityTaskIdentifiers">
+            <f:textbox/>
+        </f:entry>
+        <f:entry title="${%Ignore Case}" field="ignoreCase">
+            <select name="ignoreCase">
+                <option value="false">False</option>
+                <option value="true">True</option>
+            </select>
+        </f:entry>
+        <f:entry title="${%As Regexp}" field="asRegexp">
+            <select name="asRegexp">
+                <option value="false">False</option>
+                <option value="true">True</option>
+            </select>
+        </f:entry>
+    </f:section>
+
 </j:jelly>

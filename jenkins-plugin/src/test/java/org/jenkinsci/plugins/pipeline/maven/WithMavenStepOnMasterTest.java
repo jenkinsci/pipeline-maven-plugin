@@ -261,6 +261,37 @@ public class WithMavenStepOnMasterTest {
     }
 
     @Test
+    public void maven_build_jar_project_on_master_with_open_task_scanner_config_succeeds() throws Exception {
+
+        MavenPublisher.DescriptorImpl descriptor = new TasksScannerPublisher.DescriptorImpl();
+        String displayName = descriptor.getDisplayName();
+
+        Symbol symbolAnnotation = descriptor.getClass().getAnnotation(Symbol.class);
+        String[] symbols = symbolAnnotation.value();
+        assertThat(new String[]{"openTasksPublisher"},  is(symbols));
+
+        loadMavenJarProjectInGitRepo(this.gitRepoRule);
+
+        String pipelineScript = "node('master') {\n" +
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven(options:[openTasksPublisher(" +
+                "       disabled:false, " +
+                "       pattern:'src/main/java', excludePattern:'a/path'," +
+                "       ignoreCase:true, asRegexp:false, " +
+                "       lowPriorityTaskIdentifiers:'minor', normalPriorityTaskIdentifiers:'todo', highPriorityTaskIdentifiers:'fixme')]) {\n" +
+                "           sh 'mvn package verify'\n" +
+                "    }\n" +
+                "}";
+
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-openTasksPublisher-publisher-config");
+        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+
+        String message = "[withMaven] Skip '" + displayName + "' disabled by configuration";
+        jenkinsRule.assertLogNotContains(message, build);
+    }
+
+    @Test
     public void maven_build_maven_jar_with_flatten_pom_project_on_master_succeeds() throws Exception {
         loadMavenJarWithFlattenPomProjectInGitRepo(this.gitRepoRule);
 
