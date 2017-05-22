@@ -257,7 +257,7 @@ public class JunitTestsPublisher extends MavenPublisher {
                 } catch(ClassNotFoundException e){
                     listener.getLogger().print("[withMaven] Jenkins ");
                     listener.hyperlink("https://wiki.jenkins-ci.org/display/JENKINS/JUnit+Attachments+Plugin", "JUnit Attachments Plugin");
-                    listener.getLogger().print(" not found, can't publish test attachments ");
+                    listener.getLogger().print(" not found, can't publish test attachments.");
                 } catch (IllegalAccessException|InstantiationException e) {
                     PrintWriter err = listener.error("[withMaven] Failure to publish test attachments, exception instantiating '" + className + "'");
                     e.printStackTrace(err);
