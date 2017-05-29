@@ -938,8 +938,7 @@ class WithMavenStepExecution extends StepExecution {
      * @return the temporary dir
      */
     private static FilePath tempDir(FilePath ws) {
-        // TODO replace with WorkspaceList.tempDir(ws) after 1.652
-        return ws.sibling(ws.getName() + System.getProperty(WorkspaceList.class.getName(), "@") + "tmp");
+        return WorkspaceList.tempDir(ws);
     }
 
     /**
