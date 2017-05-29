@@ -93,7 +93,7 @@ public class MavenSpyLogProcessor implements Serializable {
 
                 Element mavenSpyLogsElt = documentBuilder.parse(mavenSpyLogsInputStream).getDocumentElement();
 
-                List<MavenPublisher> mavenPublishers = MavenPublisher.buildReportersList(options, listener);
+                List<MavenPublisher> mavenPublishers = MavenPublisher.buildPublishersList(options, listener);
                 for (MavenPublisher mavenPublisher : mavenPublishers){
                     String skipFileName =  mavenPublisher.getDescriptor().getSkipFileName();
                     if (Boolean.TRUE.equals(mavenPublisher.isDisabled())) {

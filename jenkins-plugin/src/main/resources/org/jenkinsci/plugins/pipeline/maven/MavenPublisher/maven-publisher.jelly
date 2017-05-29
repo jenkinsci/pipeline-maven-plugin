@@ -26,33 +26,7 @@ THE SOFTWARE.
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
-    <st:include page="maven-publisher" class="${descriptor.clazz}"/>
-
-    <f:section title="${%Source Code}">
-        <f:entry title="Pattern" field="pattern">
-            <f:textbox/>
-        </f:entry>
-        <f:entry title="Exclude Pattern" field="excludePattern">
-            <f:textbox/>
-        </f:entry>
-    </f:section>
-
-    <f:section title="${%Task Identifiers}">
-        <f:entry title="High Priority Tasks" field="highPriorityTaskIdentifiers">
-            <f:textbox/>
-        </f:entry>
-        <f:entry title="Normal Priority Tasks" field="normalPriorityTaskIdentifiers">
-            <f:textbox/>
-        </f:entry>
-        <f:entry title="Low Priority Tasks" field="lowPriorityTaskIdentifiers">
-            <f:textbox/>
-        </f:entry>
-        <f:entry title="${%Ignore Case}" field="ignoreCase">
-            <f:checkbox/>
-        </f:entry>
-        <f:entry title="${%As Regexp}" field="asRegexp">
-            <f:checkbox/>
-        </f:entry>
-    </f:section>
-
+    <f:entry title="${%Disabled}" field="disabled">
+        <f:checkbox/>
+    </f:entry>
 </j:jelly>

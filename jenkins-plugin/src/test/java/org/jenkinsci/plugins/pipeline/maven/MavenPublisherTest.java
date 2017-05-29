@@ -32,7 +32,7 @@ public class MavenPublisherTest {
     public void listMavenReporters() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        List<MavenPublisher> mavenPublishers = MavenPublisher.buildReportersList(Collections.<MavenPublisher>emptyList(), new StreamTaskListener(baos));
+        List<MavenPublisher> mavenPublishers = MavenPublisher.buildPublishersList(Collections.<MavenPublisher>emptyList(), new StreamTaskListener(baos));
         Assert.assertThat(mavenPublishers.size(), CoreMatchers.is(4));
 
         Map<String, MavenPublisher> reportersByDescriptorId = new HashMap<>();
