@@ -49,6 +49,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -107,7 +108,7 @@ public class WithMavenStepGlobalConfigurationTest {
 
         GlobalPipelineMavenConfig globalPipelineMavenConfig = GlobalPipelineMavenConfig.get();
 
-        globalPipelineMavenConfig.setPublisherOptions(publisher);
+        globalPipelineMavenConfig.setPublisherOptions(Collections.singletonList(publisher));
         try {
 
 
@@ -163,7 +164,7 @@ public class WithMavenStepGlobalConfigurationTest {
 
         GlobalPipelineMavenConfig globalPipelineMavenConfig = GlobalPipelineMavenConfig.get();
 
-        globalPipelineMavenConfig.setPublisherOptions(publisher);
+        globalPipelineMavenConfig.setPublisherOptions(Collections.singletonList(publisher));
         try {
 
 

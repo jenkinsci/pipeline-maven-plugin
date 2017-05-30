@@ -45,17 +45,14 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     @DataBoundSetter
     public void setPublisherOptions(List<MavenPublisher> publisherOptions) {
         this.publisherOptions = publisherOptions;
-        save();
-    }
-
-    public void setPublisherOptions(MavenPublisher... publishers) {
-        this.publisherOptions = Arrays.asList(publishers);
-        save();
     }
 
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
         req.bindJSON(this, json);
+        // stapler oddity, empty lists coming from the HTTP request are not set on bean by  "req.bindJSON(this, json)"
+        this.publisherOptions = req.bindJSONToList(MavenPublisher.class, json.get("publisherOptions"));
+        save();
         return true;
     }
 
