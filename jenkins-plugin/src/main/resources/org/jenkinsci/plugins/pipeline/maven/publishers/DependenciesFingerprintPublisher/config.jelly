@@ -27,5 +27,17 @@ THE SOFTWARE.
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
     <st:include page="maven-publisher" class="${descriptor.clazz}"/>
+    <f:section title="Dependencies filtering">
+        <f:entry title="${%Include versions}">
+            <f:checkbox title="${%Snapshots}" field="includeSnapshotVersions"/>
+            <f:checkbox title="${%Releases}" field="includeReleaseVersions"/>
+        </f:entry>
 
+        <f:entry title="${%Include Scopes}">
+            <f:checkbox title="${%Compile}" field="includeScopeCompile"/>
+            <f:checkbox title="${%Runtime}" field="includeScopeRuntime"/>
+            <f:checkbox title="${%Provided}" field="includeScopeProvided"/>
+            <f:checkbox title="${%Test}" field="includeScopeTest"/>
+        </f:entry>
+    </f:section>
 </j:jelly>

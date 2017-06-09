@@ -13,6 +13,8 @@ import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -48,6 +50,11 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
     private boolean includeScopeTest;
 
     private boolean includeScopeProvided = true;
+
+    @DataBoundConstructor
+    public DependenciesFingerprintPublisher() {
+        super();
+    }
 
     protected Set<String> getIncludedScopes() {
         Set<String> includedScopes = new TreeSet<>();
@@ -179,14 +186,69 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
                 Element fileElt = XmlUtils.getUniqueChildElementOrNull(dependencyElt, "file");
                 if (fileElt == null | fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
                     LOGGER.log(Level.WARNING, "listDependencies: no associated file found for " + dependencyArtifact + " in " + XmlUtils.toString(dependencyElt));
+                } else {
+                    dependencyArtifact.file = StringUtils.trim(fileElt.getTextContent());
                 }
-                dependencyArtifact.file = StringUtils.trim(fileElt.getTextContent());
 
                 result.add(dependencyArtifact);
             }
         }
 
         return result;
+    }
+
+    public boolean isIncludeSnapshotVersions() {
+        return includeSnapshotVersions;
+    }
+
+    @DataBoundSetter
+    public void setIncludeSnapshotVersions(boolean includeSnapshotVersions) {
+        this.includeSnapshotVersions = includeSnapshotVersions;
+    }
+
+    public boolean isIncludeReleaseVersions() {
+        return includeReleaseVersions;
+    }
+
+    @DataBoundSetter
+    public void setIncludeReleaseVersions(boolean includeReleaseVersions) {
+        this.includeReleaseVersions = includeReleaseVersions;
+    }
+
+    public boolean isIncludeScopeCompile() {
+        return includeScopeCompile;
+    }
+
+    @DataBoundSetter
+    public void setIncludeScopeCompile(boolean includeScopeCompile) {
+        this.includeScopeCompile = includeScopeCompile;
+    }
+
+    public boolean isIncludeScopeRuntime() {
+        return includeScopeRuntime;
+    }
+
+    @DataBoundSetter
+    public void setIncludeScopeRuntime(boolean includeScopeRuntime) {
+        this.includeScopeRuntime = includeScopeRuntime;
+    }
+
+    public boolean isIncludeScopeTest() {
+        return includeScopeTest;
+    }
+
+    @DataBoundSetter
+    public void setIncludeScopeTest(boolean includeScopeTest) {
+        this.includeScopeTest = includeScopeTest;
+    }
+
+    public boolean isIncludeScopeProvided() {
+        return includeScopeProvided;
+    }
+
+    @DataBoundSetter
+    public void setIncludeScopeProvided(boolean includeScopeProvided) {
+        this.includeScopeProvided = includeScopeProvided;
     }
 
     @Symbol("dependenciesFingerprintPublisher")

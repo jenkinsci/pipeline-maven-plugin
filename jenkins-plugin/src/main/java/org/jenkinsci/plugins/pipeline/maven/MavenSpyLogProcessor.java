@@ -169,7 +169,7 @@ public class MavenSpyLogProcessor implements Serializable {
         }
 
         public void setScope(String scope) {
-            this.scope = scope;
+            this.scope = scope == null || scope.isEmpty() ? null : scope;
         }
 
         @Override

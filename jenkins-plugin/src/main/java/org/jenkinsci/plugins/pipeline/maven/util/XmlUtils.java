@@ -67,7 +67,7 @@ public class XmlUtils {
     public static MavenSpyLogProcessor.MavenDependency newMavenDependency(Element dependencyElt) {
         MavenSpyLogProcessor.MavenDependency dependency = new MavenSpyLogProcessor.MavenDependency();
         loadMavenArtifact(dependencyElt, dependency);
-        dependency.scope = dependencyElt.getAttribute("scope");
+        dependency.setScope(dependencyElt.getAttribute("scope"));
         dependency.optional = Boolean.valueOf(dependencyElt.getAttribute("optional"));
 
         return dependency;
