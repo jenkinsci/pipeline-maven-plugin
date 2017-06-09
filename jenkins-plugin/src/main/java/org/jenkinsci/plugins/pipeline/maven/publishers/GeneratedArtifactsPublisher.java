@@ -204,8 +204,9 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                     LOGGER.log(Level.FINE, "listArtifacts: Project " + projectArtifact + ":  no associated file found for " +
                             mavenArtifact + " in " + XmlUtils.toString(artifactElt));
                 }
+            } else {
+                mavenArtifact.file = StringUtils.trim(fileElt.getTextContent());
             }
-            mavenArtifact.file = StringUtils.trim(fileElt.getTextContent());
             result.add(mavenArtifact);
         }
 
@@ -251,8 +252,9 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                         LOGGER.log(Level.FINER, "Project " + projectArtifact + ", no associated file found for attached artifact " +
                                 attachedMavenArtifact + " in " + XmlUtils.toString(attachedArtifactElt));
                     }
+                } else {
+                    attachedMavenArtifact.file = StringUtils.trim(fileElt.getTextContent());
                 }
-                attachedMavenArtifact.file = StringUtils.trim(fileElt.getTextContent());
                 result.add(attachedMavenArtifact);
             }
 
