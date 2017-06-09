@@ -72,7 +72,7 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
         for (MavenSpyLogProcessor.MavenArtifact mavenArtifact : join) {
             try {
                 if (StringUtils.isEmpty(mavenArtifact.file)) {
-                    if (LOGGER.isLoggable(Level.FINE)) {
+                    if (LOGGER.isLoggable(Level.FINER)) {
                         listener.getLogger().println("[withMaven] Can't archive maven artifact with no file attached: " + mavenArtifact);
                     }
                     continue;
@@ -199,10 +199,14 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
             }
 
             Element fileElt = XmlUtils.getUniqueChildElementOrNull(artifactElt, "file");
-            if (fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
-                LOGGER.log(Level.WARNING, "listArtifacts: Project " + projectArtifact + ":  no associated file found for " + mavenArtifact + " in " + XmlUtils.toString(artifactElt));
+            if (fileElt == null || fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
+                if (LOGGER.isLoggable(Level.FINER)) {
+                    LOGGER.log(Level.FINE, "listArtifacts: Project " + projectArtifact + ":  no associated file found for " +
+                            mavenArtifact + " in " + XmlUtils.toString(artifactElt));
+                }
+            } else {
+                mavenArtifact.file = StringUtils.trim(fileElt.getTextContent());
             }
-            mavenArtifact.file = StringUtils.trim(fileElt.getTextContent());
             result.add(mavenArtifact);
         }
 
@@ -243,10 +247,14 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                 MavenSpyLogProcessor.MavenArtifact attachedMavenArtifact = XmlUtils.newMavenArtifact(attachedArtifactElt);
 
                 Element fileElt = XmlUtils.getUniqueChildElementOrNull(attachedArtifactElt, "file");
-                if (fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
-                    LOGGER.log(Level.WARNING, "Project " + projectArtifact + ", no associated file found for attached artifact " + attachedMavenArtifact + " in " + XmlUtils.toString(attachedArtifactElt));
+                if (fileElt == null || fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
+                    if (LOGGER.isLoggable(Level.FINER)) {
+                        LOGGER.log(Level.FINER, "Project " + projectArtifact + ", no associated file found for attached artifact " +
+                                attachedMavenArtifact + " in " + XmlUtils.toString(attachedArtifactElt));
+                    }
+                } else {
+                    attachedMavenArtifact.file = StringUtils.trim(fileElt.getTextContent());
                 }
-                attachedMavenArtifact.file = StringUtils.trim(fileElt.getTextContent());
                 result.add(attachedMavenArtifact);
             }
 
