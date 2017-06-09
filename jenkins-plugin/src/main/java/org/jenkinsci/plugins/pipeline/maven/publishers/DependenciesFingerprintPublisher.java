@@ -78,25 +78,31 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
 
         List<MavenSpyLogProcessor.MavenDependency> dependencies = listDependencies(mavenSpyLogsElt);
 
+        if (LOGGER.isLoggable(Level.FINE)) {
+            listener.getLogger().println("[withMaven] dependenciesFingerprintPublisher - filter: " +
+                    "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "], " +
+                    "scopes:" + getIncludedScopes());
+        }
+
         Map<String, String> artifactsToFingerPrint = new HashMap<>(); // artifactPathInFingerprintZone -> artifactMd5
         for (MavenSpyLogProcessor.MavenDependency dependency : dependencies) {
             if (dependency.isSnapshot()) {
                 if (!includeSnapshotVersions) {
-                    if (LOGGER.isLoggable(Level.FINE)) {
+                    if (LOGGER.isLoggable(Level.FINER)) {
                         listener.getLogger().println("[withMaven] Skip fingerprinting snapshot dependency: " + dependency);
                     }
                     continue;
                 }
             } else {
                 if (!includeReleaseVersions) {
-                    if (LOGGER.isLoggable(Level.FINE)) {
+                    if (LOGGER.isLoggable(Level.FINER)) {
                         listener.getLogger().println("[withMaven] Skip fingerprinting release dependency: " + dependency);
                     }
                     continue;
                 }
             }
             if (!getIncludedScopes().contains(dependency.getScope())) {
-                if (LOGGER.isLoggable(Level.FINE)) {
+                if (LOGGER.isLoggable(Level.FINER)) {
                     listener.getLogger().println("[withMaven] Skip fingerprinting dependency with ignored scope: " + dependency);
                 }
                 continue;
@@ -152,7 +158,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
         for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
             String artifactPathInFingerprintZone = artifactToFingerprint.getKey();
             String artifactMd5 = artifactToFingerprint.getValue();
-            fingerprintMap.getOrCreate(run, artifactPathInFingerprintZone, artifactMd5);
+            fingerprintMap.getOrCreate(run, artifactPathInFingerprintZone, artifactMd5).addFor(run);
         }
 
         // add action
