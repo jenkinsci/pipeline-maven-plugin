@@ -190,7 +190,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
                 MavenSpyLogProcessor.MavenDependency dependencyArtifact = XmlUtils.newMavenDependency(dependencyElt);
 
                 Element fileElt = XmlUtils.getUniqueChildElementOrNull(dependencyElt, "file");
-                if (fileElt == null | fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
+                if (fileElt == null || fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
                     LOGGER.log(Level.WARNING, "listDependencies: no associated file found for " + dependencyArtifact + " in " + XmlUtils.toString(dependencyElt));
                 } else {
                     dependencyArtifact.file = StringUtils.trim(fileElt.getTextContent());
