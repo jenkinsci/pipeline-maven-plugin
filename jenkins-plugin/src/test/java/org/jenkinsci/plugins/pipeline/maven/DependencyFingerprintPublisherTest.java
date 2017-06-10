@@ -80,15 +80,14 @@ public class DependencyFingerprintPublisherTest {
         { // first job using commons-lang3:3.5
             firstPipeline = jenkinsRule.createProject(WorkflowJob.class, "build-mono-dependency-maven-project-1");
             firstPipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-            WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, firstPipeline.scheduleBuild2(0));
+            jenkinsRule.assertBuildStatus(Result.SUCCESS, firstPipeline.scheduleBuild2(0));
 
             Fingerprint fingerprint = jenkinsRule.jenkins.getFingerprintMap().get(commonsLang3version35Md5);
             assertThat(fingerprint, not(nullValue()));
 
-            Fingerprint.BuildPtr original = fingerprint.getOriginal();
             assertThat(fingerprint.getFileName(), is("org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar"));
-            assertThat(original.getName(), is(firstPipeline.getName()));
-            assertThat(original.getNumber(), is(1));
+            Fingerprint.BuildPtr original = fingerprint.getOriginal();
+            assertThat(original, is(nullValue()));
             Hashtable<String, Fingerprint.RangeSet> usages = fingerprint.getUsages();
             assertThat(usages.size(), is(1));
             assertThat(usages.containsKey(firstPipeline.getName()), is(true));
@@ -96,7 +95,7 @@ public class DependencyFingerprintPublisherTest {
         { // second job using commons-lang3:3.5
             WorkflowJob secondPipeline = jenkinsRule.createProject(WorkflowJob.class, "build-mono-dependency-maven-project-2");
             secondPipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-            WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, secondPipeline.scheduleBuild2(0));
+            jenkinsRule.assertBuildStatus(Result.SUCCESS, secondPipeline.scheduleBuild2(0));
 
             Fingerprint fingerprint = jenkinsRule.jenkins.getFingerprintMap().get(commonsLang3version35Md5);
             assertThat(fingerprint, not(nullValue()));

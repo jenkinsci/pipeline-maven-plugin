@@ -158,7 +158,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
         for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
             String artifactPathInFingerprintZone = artifactToFingerprint.getKey();
             String artifactMd5 = artifactToFingerprint.getValue();
-            fingerprintMap.getOrCreate(run, artifactPathInFingerprintZone, artifactMd5).addFor(run);
+            fingerprintMap.getOrCreate(null, artifactPathInFingerprintZone, artifactMd5).addFor(run);
         }
 
         // add action
