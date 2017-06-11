@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Nonnull;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -141,6 +142,10 @@ public class MavenSpyLogProcessor implements Serializable {
             return artifactId + "-" + version + ((classifier == null || classifier.isEmpty()) ? "" : "-" + classifier) + "." + extension;
         }
 
+        public boolean isSnapshot() {
+            return version != null && version.endsWith("-SNAPSHOT");
+        }
+
         @Override
         public String toString() {
             return "MavenArtifact{" +
@@ -149,6 +154,34 @@ public class MavenSpyLogProcessor implements Serializable {
                     type +
                     (classifier == null ? "" : ":" + classifier) + ":" +
                     version +
+                    (file == null ? "" : " " + file) +
+                    '}';
+        }
+    }
+    public static class MavenDependency extends MavenArtifact {
+
+        private String scope;
+        public boolean optional;
+
+        @Nonnull
+        public String getScope() {
+            return scope == null ? "compile" : scope;
+        }
+
+        public void setScope(String scope) {
+            this.scope = scope == null || scope.isEmpty() ? null : scope;
+        }
+
+        @Override
+        public String toString() {
+            return "MavenDependency{" +
+                    groupId + ":" +
+                    artifactId + ":" +
+                    type +
+                    (classifier == null ? "" : ":" + classifier) + ":" +
+                    version + ", " +
+                    "scope: " + scope + ", " +
+                    " optional: " + optional +
                     (file == null ? "" : " " + file) +
                     '}';
         }
