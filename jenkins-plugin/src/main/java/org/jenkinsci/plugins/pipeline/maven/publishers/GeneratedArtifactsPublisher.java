@@ -134,7 +134,7 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
         for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
             String artifactPathInArchiveZone = artifactToFingerprint.getKey();
             String artifactMd5 = artifactToFingerprint.getValue();
-            fingerprintMap.getOrCreate(run, artifactPathInArchiveZone, artifactMd5);
+            fingerprintMap.getOrCreate(run, artifactPathInArchiveZone, artifactMd5).addFor(run);
         }
 
         // add action
