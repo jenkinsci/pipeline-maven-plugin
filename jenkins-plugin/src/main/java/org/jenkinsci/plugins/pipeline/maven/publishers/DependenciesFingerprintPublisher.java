@@ -45,7 +45,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
 
     private boolean includeScopeCompile = true;
 
-    private boolean includeScopeRuntime;
+    private boolean includeScopeRuntime = true;
 
     private boolean includeScopeTest;
 
@@ -170,6 +170,14 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
         }
     }
 
+    @Override
+    public String toString() {
+        return getClass().getName() + "[" +
+                "disabled=" + isDisabled() + ", " +
+                "scopes=" + getIncludedScopes() + ", " +
+                "versions={snapshot:" + isIncludeSnapshotVersions() + ", release:" + isIncludeReleaseVersions() + "}" +
+                ']';
+    }
     /**
      * @param mavenSpyLogs Root XML element
      * @return list of {@link MavenSpyLogProcessor.MavenArtifact}
