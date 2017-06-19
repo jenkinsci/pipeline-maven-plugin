@@ -69,6 +69,7 @@ public class XmlUtils {
         loadMavenArtifact(dependencyElt, dependency);
         dependency.setScope(dependencyElt.getAttribute("scope"));
         dependency.optional = Boolean.valueOf(dependencyElt.getAttribute("optional"));
+        dependency.snapshot = Boolean.valueOf(dependencyElt.getAttribute("snapshot"));
 
         return dependency;
     }

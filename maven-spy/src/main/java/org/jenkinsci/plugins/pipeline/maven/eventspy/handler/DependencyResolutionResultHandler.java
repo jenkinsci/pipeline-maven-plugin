@@ -100,6 +100,7 @@ public class DependencyResolutionResultHandler extends AbstractMavenEventHandler
             dependencyElt.setAttribute("extension", artifact.getExtension());
             dependencyElt.setAttribute("scope", dependency.getScope());
             dependencyElt.setAttribute("optional", Boolean.toString(dependency.isOptional()));
+            dependencyElt.setAttribute("snapshot", Boolean.toString(artifact.isSnapshot()));
 
             dependenciesElt.addChild(dependencyElt);
         }
