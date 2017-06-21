@@ -24,8 +24,7 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import hudson.model.Item;
-
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -33,30 +32,40 @@ import javax.annotation.Nonnull;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public interface PipelineMavenPluginDao {
+public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
+    @Override
+    public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope) {
 
-    void recordDependency(@Nonnull String jobFullName, int buildNumber, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nonnull String scope);
+    }
 
-    void recordGeneratedArtifact(@Nonnull String jobFullName, int buildNumber, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type);
+    @Override
+    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type) {
 
-    void renameJob(@Nonnull String oldFullName, @Nonnull String newFullName);
+    }
 
-    void deleteJob(@Nonnull String jobFullName);
+    @Override
+    public void renameJob(String oldFullName, String newFullName) {
 
-    void deleteBuild(@Nonnull String jobFullName, int buildNumber);
+    }
 
-    /**
-     *
-     * @param jobFullName
-     * @param buildNumber
-     * @return list of job full names
-     * @see Item#getFullName()
-     */
+    @Override
+    public void deleteJob(String jobFullName) {
+
+    }
+
+    @Override
+    public void deleteBuild(String jobFullName, int buildNumber) {
+
+    }
+
     @Nonnull
-    List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber);
+    @Override
+    public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+        return Collections.emptyList();
+    }
 
-    /**
-     * Routine task to cleanup the database
-     */
-    void cleanup();
+    @Override
+    public void cleanup() {
+
+    }
 }

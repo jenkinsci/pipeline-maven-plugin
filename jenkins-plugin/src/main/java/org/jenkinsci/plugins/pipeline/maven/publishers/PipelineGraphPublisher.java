@@ -1,39 +1,19 @@
-/*
- * The MIT License
- *
- * Copyright (c) 2016, CloudBees, Inc.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.FingerprintMap;
+import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.Fingerprinter;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -57,10 +37,10 @@ import javax.annotation.Nonnull;
  *
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class DependenciesFingerprintPublisher extends MavenPublisher {
+public class PipelineGraphPublisher extends MavenPublisher {
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(DependenciesFingerprintPublisher.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PipelineGraphPublisher.class.getName());
 
     private boolean includeSnapshotVersions = true;
 
@@ -75,7 +55,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
     private boolean includeScopeProvided = true;
 
     @DataBoundConstructor
-    public DependenciesFingerprintPublisher() {
+    public PipelineGraphPublisher() {
         super();
     }
 
@@ -97,101 +77,116 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
         Run run = context.get(Run.class);
         TaskListener listener = context.get(TaskListener.class);
 
-        FilePath workspace = context.get(FilePath.class);
+        PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
 
+        recordDependencies(mavenSpyLogsElt, run, listener, dao);
+        recordGeneratedArtifacts(mavenSpyLogsElt,run,listener, dao);
+    }
+
+    protected void recordDependencies(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         List<MavenSpyLogProcessor.MavenDependency> dependencies = listDependencies(mavenSpyLogsElt);
 
         if (LOGGER.isLoggable(Level.FINE)) {
-            listener.getLogger().println("[withMaven] dependenciesFingerprintPublisher - filter: " +
+            listener.getLogger().println("[withMaven] pipelineGraphPublisher - filter: " +
                     "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "], " +
                     "scopes:" + getIncludedScopes());
         }
 
-        Map<String, String> artifactsToFingerPrint = new HashMap<>(); // artifactPathInFingerprintZone -> artifactMd5
         for (MavenSpyLogProcessor.MavenDependency dependency : dependencies) {
             if (dependency.isSnapshot()) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] Skip fingerprinting snapshot dependency: " + dependency);
+                        listener.getLogger().println("[withMaven] Skip recording snapshot dependency: " + dependency);
                     }
                     continue;
                 }
             } else {
                 if (!includeReleaseVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] Skip fingerprinting release dependency: " + dependency);
+                        listener.getLogger().println("[withMaven] Skip recording release dependency: " + dependency);
                     }
                     continue;
                 }
             }
             if (!getIncludedScopes().contains(dependency.getScope())) {
                 if (LOGGER.isLoggable(Level.FINER)) {
-                    listener.getLogger().println("[withMaven] Skip fingerprinting dependency with ignored scope: " + dependency);
+                    listener.getLogger().println("[withMaven] Skip recording dependency with ignored scope: " + dependency);
                 }
                 continue;
             }
 
             try {
-                if (StringUtils.isEmpty(dependency.file)) {
-                    if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] Can't fingerprint maven dependency with no file attached: " + dependency);
-                    }
-                    continue;
-                }
+                LOGGER.log(Level.FINE, "Record dependency {0}", new Object[]{dependency});
 
-                FilePath dependencyFilePath = new FilePath(workspace, dependency.file);
+                dao.recordDependency(run.getParent().getFullName(), run.getNumber(), dependency.groupId, dependency.artifactId, dependency.version, dependency.type, dependency.getScope());
 
-                if (!(dependency.file.endsWith("." + dependency.extension))) {
-                    if (dependencyFilePath.isDirectory()) {
-                        if (LOGGER.isLoggable(Level.FINE)) {
-                            listener.getLogger().println("[withMaven] Skip fingerprinting of maven dependency of type directory " + dependency);
-                        }
-                        continue;
-                    }
-                }
-
-                String dependencyMavenRepoStyleFilePath =
-                        dependency.groupId.replace('.', '/') + "/" +
-                                dependency.artifactId + "/" +
-                                dependency.version + "/" +
-                                dependency.getFileName();
-
-
-                if (dependencyFilePath.exists()) {
-                    // the subsequent call to digest could test the existence but we don't want to prematurely optimize performances
-                    if (LOGGER.isLoggable(Level.FINE)) {
-                        listener.getLogger().println("[withMaven] Fingerprint dependency " + dependencyMavenRepoStyleFilePath);
-                    }
-                    String artifactDigest = dependencyFilePath.digest();
-                    artifactsToFingerPrint.put(dependencyMavenRepoStyleFilePath, artifactDigest);
-                } else {
-                    listener.getLogger().println("[withMaven] FAILURE to fingerprint " + dependencyMavenRepoStyleFilePath + ", file not found");
-                }
-
-            } catch (IOException | RuntimeException e) {
-                listener.error("[withMaven] WARNING: Exception fingerprinting " + dependency + ", skip");
+            } catch (RuntimeException e) {
+                listener.error("[withMaven] WARNING: Exception recording " + dependency + ", skip");
                 e.printStackTrace(listener.getLogger());
                 listener.getLogger().flush();
             }
         }
-        LOGGER.log(Level.FINER, "Fingerprint {0}", artifactsToFingerPrint);
+    }
 
-        // FINGERPRINT GENERATED MAVEN ARTIFACT
-        FingerprintMap fingerprintMap = Jenkins.getInstance().getFingerprintMap();
-        for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
-            String artifactPathInFingerprintZone = artifactToFingerprint.getKey();
-            String artifactMd5 = artifactToFingerprint.getValue();
-            fingerprintMap.getOrCreate(null, artifactPathInFingerprintZone, artifactMd5).addFor(run);
-        }
-
-        // add action
-        Fingerprinter.FingerprintAction fingerprintAction = run.getAction(Fingerprinter.FingerprintAction.class);
-        if (fingerprintAction == null) {
-            run.addAction(new Fingerprinter.FingerprintAction(run, artifactsToFingerPrint));
-        } else {
-            fingerprintAction.add(artifactsToFingerPrint);
+    protected void recordGeneratedArtifacts(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+        List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts = listArtifacts(mavenSpyLogsElt);
+        for(MavenSpyLogProcessor.MavenArtifact artifact: generatedArtifacts) {
+            LOGGER.log(Level.FINE, "Record generated {0}", new Object[]{artifact});
+            dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(), artifact.groupId, artifact.artifactId, artifact.version, artifact.type);
         }
     }
+
+    /**
+     * @param mavenSpyLogs Root XML element
+     * @return list of {@link MavenSpyLogProcessor.MavenArtifact}
+     */
+    /*
+    <artifact artifactId="demo-pom" groupId="com.example" id="com.example:demo-pom:pom:0.0.1-SNAPSHOT" type="pom" version="0.0.1-SNAPSHOT">
+      <file/>
+    </artifact>
+     */
+    @Nonnull
+    public List<MavenSpyLogProcessor.MavenArtifact> listArtifacts(Element mavenSpyLogs) {
+
+        List<MavenSpyLogProcessor.MavenArtifact> result = new ArrayList<>();
+
+        for (Element projectSucceededElt : XmlUtils.getExecutionEvents(mavenSpyLogs, "ProjectSucceeded")) {
+
+            Element projectElt = XmlUtils.getUniqueChildElement(projectSucceededElt, "project");
+            MavenSpyLogProcessor.MavenArtifact projectArtifact = XmlUtils.newMavenArtifact(projectElt);
+
+            MavenSpyLogProcessor.MavenArtifact pomArtifact = new MavenSpyLogProcessor.MavenArtifact();
+            pomArtifact.groupId = projectArtifact.groupId;
+            pomArtifact.artifactId = projectArtifact.artifactId;
+            pomArtifact.version = projectArtifact.version;
+            pomArtifact.type = "pom";
+            pomArtifact.extension = "pom";
+            pomArtifact.file = projectElt.getAttribute("file");
+
+            result.add(pomArtifact);
+
+            Element artifactElt = XmlUtils.getUniqueChildElement(projectSucceededElt, "artifact");
+            MavenSpyLogProcessor.MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(artifactElt);
+            if ("pom".equals(mavenArtifact.type)) {
+                // NO file is generated by Maven for pom projects, skip
+                continue;
+            }
+
+            Element fileElt = XmlUtils.getUniqueChildElementOrNull(artifactElt, "file");
+            if (fileElt == null || fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
+                if (LOGGER.isLoggable(Level.FINER)) {
+                    LOGGER.log(Level.FINE, "listArtifacts: Project " + projectArtifact + ":  no associated file found for " +
+                            mavenArtifact + " in " + XmlUtils.toString(artifactElt));
+                }
+            } else {
+                mavenArtifact.file = StringUtils.trim(fileElt.getTextContent());
+            }
+            result.add(mavenArtifact);
+        }
+
+        return result;
+    }
+
 
     @Override
     public String toString() {
@@ -288,13 +283,13 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
         this.includeScopeProvided = includeScopeProvided;
     }
 
-    @Symbol("dependenciesFingerprintPublisher")
+    @Symbol("pipelineGraphPublisher")
     @Extension
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @Nonnull
         @Override
         public String getDisplayName() {
-            return "Dependencies Fingerprint Publisher";
+            return "Pipeline GraphPublisher";
         }
 
         @Override
@@ -305,7 +300,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
         @Nonnull
         @Override
         public String getSkipFileName() {
-            return ".skip-fingerprint-maven-dependencies";
+            return ".skip-pipeline-graph";
         }
     }
 }

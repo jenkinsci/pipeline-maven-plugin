@@ -37,7 +37,7 @@ import javax.annotation.Nonnull;
  */
 public class GeneratedArtifactsPublisher extends MavenPublisher {
 
-    private static final Logger LOGGER = Logger.getLogger(MavenSpyLogProcessor.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GeneratedArtifactsPublisher.class.getName());
 
     private static final long serialVersionUID = 1L;
 
