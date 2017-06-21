@@ -86,7 +86,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
 
         Map<String, String> artifactsToFingerPrint = new HashMap<>(); // artifactPathInFingerprintZone -> artifactMd5
         for (MavenSpyLogProcessor.MavenDependency dependency : dependencies) {
-            if (dependency.isSnapshot()) {
+            if (dependency.snapshot) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
                         listener.getLogger().println("[withMaven] Skip fingerprinting snapshot dependency: " + dependency);

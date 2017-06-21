@@ -137,13 +137,10 @@ public class MavenSpyLogProcessor implements Serializable {
     public static class MavenArtifact {
         public String groupId, artifactId, version, type, classifier, extension;
         public String file;
+        public boolean snapshot;
 
         public String getFileName() {
             return artifactId + "-" + version + ((classifier == null || classifier.isEmpty()) ? "" : "-" + classifier) + "." + extension;
-        }
-
-        public boolean isSnapshot() {
-            return version != null && version.endsWith("-SNAPSHOT");
         }
 
         @Override
@@ -182,6 +179,7 @@ public class MavenSpyLogProcessor implements Serializable {
                     version + ", " +
                     "scope: " + scope + ", " +
                     " optional: " + optional +
+                    " snapshot: " + snapshot +
                     (file == null ? "" : " " + file) +
                     '}';
         }
