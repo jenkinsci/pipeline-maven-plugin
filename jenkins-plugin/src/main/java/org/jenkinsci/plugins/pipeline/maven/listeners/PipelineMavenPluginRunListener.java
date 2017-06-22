@@ -39,6 +39,12 @@ public class PipelineMavenPluginRunListener extends RunListener<WorkflowRun> {
 
     @Override
     public void onCompleted(WorkflowRun upstreamBuild, @Nonnull TaskListener listener) {
+        LOGGER.log(Level.FINE, "onCompleted({0})", new Object[]{upstreamBuild});
+
+        if (!GlobalPipelineMavenConfig.getTriggerDownstreamBuildsCriteria().contains(upstreamBuild.getResult())) {
+            LOGGER.log(Level.FINE,"Ignore non successful build {0}", upstreamBuild);
+        }
+
         WorkflowJob upstreamPipeline = upstreamBuild.getParent();
         List<String> downstreamPipelines = GlobalPipelineMavenConfig.getDao().listDownstreamJobs(upstreamPipeline.getFullName(), upstreamBuild.getNumber());
 
@@ -60,12 +66,13 @@ public class PipelineMavenPluginRunListener extends RunListener<WorkflowRun> {
             }
 
             if (isDownstreamPipelineVisibleByUpstreamPipeline(upstreamPipeline, downstreamPipeline, listener)) {
-               listener.getLogger().println("[withMaven] Trigger downstream pipeline " + downstreamPipeline.getFullDisplayName());
+                listener.getLogger().println("[withMaven] Trigger downstream pipeline " + downstreamPipeline.getFullDisplayName());
             } else {
                 // downstream job not visible from upstream job, don't display message
             }
             LOGGER.log(Level.FINE, "Triggering downstream pipeline {0} from upstream build {1}", new Object[]{downstreamPipeline, upstreamBuild});
-            downstreamPipelineTrigger.start(downstreamPipeline, false);
+            // downstreamPipelineTrigger.start(downstreamPipeline, false); DOES NOT WORK
+            // FIXME trigger downstream build
         }
 
     }
@@ -95,7 +102,9 @@ public class PipelineMavenPluginRunListener extends RunListener<WorkflowRun> {
         }
         SecurityContext orig = ACL.impersonate(auth);
         try {
-            if (jenkins.getItemByFullName(upstreamPipeline.getFullName()) != upstreamPipeline) {
+            WorkflowJob upstreamPipelineObtainedAsImpersonated = jenkins.getItemByFullName(upstreamPipeline.getFullName(), WorkflowJob.class);
+
+            if (upstreamPipelineObtainedAsImpersonated != upstreamPipeline) { // shouldn't it be a check on upstreamPipelineObtainedAsImpersonated == null
                 if (downstreamVisible) {
                     // TODO ModelHyperlink
                     listener.getLogger().println(Messages.ReverseBuildTrigger_running_as_cannot_even_see_for_trigger_f(auth.getName(), upstreamPipeline.getFullName(), downstreamPipeline.getFullName()));

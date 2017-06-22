@@ -23,11 +23,14 @@ public class PipelineMavenPluginItemListener extends ItemListener {
         if (item instanceof WorkflowJob) {
             WorkflowJob pipeline = (WorkflowJob) item;
             onDeleted(pipeline);
+        } else {
+            LOGGER.log(Level.FINE, "Ignore onDeleted({0})", new Object[]{item});
         }
     }
 
     public void onDeleted(WorkflowJob pipeline) {
         LOGGER.log(Level.FINE, "onDeleted({0})", pipeline);
+        GlobalPipelineMavenConfig.getDao().deleteJob(pipeline.getFullName());
     }
 
     @Override
@@ -35,6 +38,8 @@ public class PipelineMavenPluginItemListener extends ItemListener {
         if (item instanceof WorkflowJob) {
             WorkflowJob pipeline = (WorkflowJob) item;
             onRenamed(pipeline, oldName, newName);
+        } else {
+            LOGGER.log(Level.FINE, "Ignore onRenamed({0}, {1}, {2})", new Object[]{item, oldName, newName});
         }
     }
 
@@ -54,6 +59,16 @@ public class PipelineMavenPluginItemListener extends ItemListener {
 
     @Override
     public void onLocationChanged(Item item, String oldFullName, String newFullName) {
-        super.onLocationChanged(item, oldFullName, newFullName);
+        if (item instanceof WorkflowJob) {
+            WorkflowJob pipeline = (WorkflowJob) item;
+            onLocationChanged(pipeline, oldFullName, newFullName);
+        } else {
+            LOGGER.log(Level.FINE, "Ignore onLocationChanged({0}, {1}, {2})", new Object[]{item, oldFullName, newFullName});
+        }
+    }
+
+    public void onLocationChanged(WorkflowJob pipeline, String oldFullName, String newFullName) {
+        LOGGER.log(Level.FINE, "onLocationChanged({0}, {1}, {2})", new Object[]{pipeline, oldFullName, newFullName});
+        GlobalPipelineMavenConfig.getDao().renameJob(oldFullName, newFullName);
     }
 }

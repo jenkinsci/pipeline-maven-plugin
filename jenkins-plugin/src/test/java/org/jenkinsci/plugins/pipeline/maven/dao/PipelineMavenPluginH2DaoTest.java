@@ -175,6 +175,35 @@ public class PipelineMavenPluginH2DaoTest {
     }
 
     @Test
+    public void move_build() throws Exception {
+
+        dao.recordDependency("my-pipeline", 1, "com.h2database", "h2", "1.4.196", "jar", "compile");
+        dao.renameJob("my-pipeline", "my-new-pipeline");
+
+        SqlTestsUtils.dump("select * from JENKINS_BUILD LEFT OUTER JOIN JENKINS_JOB ON JENKINS_BUILD.JOB_ID = JENKINS_JOB.ID", jdbcConnectionPool, System.out);
+        SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", jdbcConnectionPool, System.out);
+        SqlTestsUtils.dump("select * from MAVEN_DEPENDENCY", jdbcConnectionPool, System.out);
+
+        assertThat(
+                SqlTestsUtils.countRows("select * from JENKINS_JOB", jdbcConnectionPool),
+                is(1));
+        assertThat(
+                SqlTestsUtils.countRows("select * from JENKINS_JOB where full_name='my-new-pipeline'", jdbcConnectionPool),
+                is(1));
+
+        assertThat(
+                SqlTestsUtils.countRows("select * from JENKINS_BUILD", jdbcConnectionPool),
+                is(1));
+
+        assertThat(
+                SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", jdbcConnectionPool),
+                is(1));
+        assertThat(
+                SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", jdbcConnectionPool),
+                is(1));
+    }
+
+    @Test
     public void record_two_generated_artifacts_on_the_same_build() throws Exception {
 
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar");

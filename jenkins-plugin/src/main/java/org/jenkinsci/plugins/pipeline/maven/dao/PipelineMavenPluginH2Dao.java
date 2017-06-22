@@ -370,37 +370,41 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     @Nonnull
     @Override
     public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+        LOGGER.log(Level.FINER, "listDownstreamJobs({0}, {1})", new Object[]{jobFullName, buildNumber});
         String generatedArtifactsSql = "SELECT DISTINCT GENERATED_MAVEN_ARTIFACT.ARTIFACT_ID " +
-                " FROM GENERATED_MAVEN_ARTIFACT, JENKINS_BUILD AS UPSTREAM_BUILD, JENKINS_JOB AS UPSTREAM_JOB " +
+                " FROM GENERATED_MAVEN_ARTIFACT " +
+                " INNER JOIN JENKINS_BUILD AS UPSTREAM_BUILD ON GENERATED_MAVEN_ARTIFACT.BUILD_ID = UPSTREAM_BUILD.ID " +
+                " INNER JOIN JENKINS_JOB AS UPSTREAM_JOB ON UPSTREAM_BUILD.JOB_ID = UPSTREAM_JOB.ID " +
                 " WHERE " +
-                "   GENERATED_MAVEN_ARTIFACT.BUILD_ID = UPSTREAM_BUILD.ID AND" +
-                "   UPSTREAM_BUILD.JOB_ID = UPSTREAM_JOB.ID AND" +
                 "   UPSTREAM_JOB.FULL_NAME = ? AND" +
                 "   UPSTREAM_BUILD.NUMBER = ?";
 
         String sql = "SELECT DISTINCT DOWNSTREAM_JOB.FULL_NAME " +
-                " FROM JENKINS_JOB AS DOWNSTREAM_JOB, JENKINS_BUILD AS DOWNSTREAM_BUILD, MAVEN_DEPENDENCY" +
+                " FROM JENKINS_JOB AS DOWNSTREAM_JOB" +
+                " INNER JOIN JENKINS_BUILD AS DOWNSTREAM_BUILD ON DOWNSTREAM_JOB.ID = DOWNSTREAM_BUILD.JOB_ID " +
+                " INNER JOIN MAVEN_DEPENDENCY ON DOWNSTREAM_BUILD.ID = MAVEN_DEPENDENCY.BUILD_ID" +
                 " WHERE " +
-                "   DOWNSTREAM_JOB.ID = DOWNSTREAM_BUILD.JOB_ID AND" +
-                "   DOWNSTREAM_BUILD.ID = MAVEN_DEPENDENCY.BUILD_ID AND " +
-                "   MAVEN_DEPENDENCY.ID IN (" + generatedArtifactsSql + ") " +
+                "   MAVEN_DEPENDENCY.ARTIFACT_ID IN (" + generatedArtifactsSql + ") " +
                 " ORDER BY DOWNSTREAM_JOB.FULL_NAME";
 
         List<String> downstreamJobsFullNames = new ArrayList<>();
+        LOGGER.log(Level.FINEST, sql);
 
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             try (PreparedStatement stmt = cnn.prepareStatement(sql)) {
                 stmt.setString(1, jobFullName);
                 stmt.setInt(2, buildNumber);
                 try (ResultSet rst = stmt.executeQuery()) {
-                    while(rst.next()) {
+                    while (rst.next()) {
                         downstreamJobsFullNames.add(rst.getString(1));
                     }
                 }
             }
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeSqlException(e);
         }
+        LOGGER.log(Level.FINE, "listDownstreamJobs({0}, {1}): {2}", new Object[]{jobFullName, buildNumber, downstreamJobsFullNames});
+
         return downstreamJobsFullNames;
     }
 }

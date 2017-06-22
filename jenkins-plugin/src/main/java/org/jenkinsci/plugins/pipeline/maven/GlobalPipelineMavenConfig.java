@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import hudson.Extension;
+import hudson.model.Result;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
@@ -15,11 +16,14 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -82,6 +86,11 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
             }
         }
         return DAO;
+    }
+
+    @Nonnull
+    public static Set<Result> getTriggerDownstreamBuildsCriteria(){
+        return Collections.singleton(Result.SUCCESS);
     }
 
     @Nullable
