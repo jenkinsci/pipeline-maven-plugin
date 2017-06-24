@@ -43,11 +43,11 @@ public class GitSampleRepoRuleUtils {
                 new SimpleFileVisitor<Path>() {
                     @Override
                     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-                        Path targetdir = target.resolve(source.relativize(dir));
+                        Path targetDir = target.resolve(source.relativize(dir));
                         try {
-                            Files.copy(dir, targetdir);
+                            Files.copy(dir, targetDir);
                         } catch (FileAlreadyExistsException e) {
-                            if (!Files.isDirectory(targetdir))
+                            if (!Files.isDirectory(targetDir))
                                 throw e;
                         }
                         return CONTINUE;
@@ -55,6 +55,7 @@ public class GitSampleRepoRuleUtils {
 
                     @Override
                     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                        System.out.println("copy " + file + " to " + source.relativize(file) + " / target=" + target);
                         Files.copy(file, target.resolve(source.relativize(file)));
                         return CONTINUE;
                     }
