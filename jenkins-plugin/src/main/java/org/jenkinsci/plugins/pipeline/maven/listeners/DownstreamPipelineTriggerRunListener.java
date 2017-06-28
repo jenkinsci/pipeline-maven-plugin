@@ -1,21 +1,19 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
+import com.cloudbees.hudson.plugins.folder.computed.ComputedFolder;
 import hudson.Extension;
 import hudson.console.ModelHyperlinkNote;
-import hudson.model.Action;
 import hudson.model.Cause;
-import hudson.model.CauseAction;
 import hudson.model.Item;
-import hudson.model.Job;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Queue;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
-import hudson.model.queue.QueueTaskFuture;
 import hudson.model.queue.Tasks;
 import hudson.security.ACL;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
+import jenkins.branch.MultiBranchProject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.security.QueueItemAuthenticatorConfiguration;
@@ -27,8 +25,8 @@ import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -38,19 +36,23 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
+ * Trigger downstream pipelines.
+ *
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 @Extension
-public class PipelineMavenPluginRunListener extends RunListener<WorkflowRun> {
+public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRun> {
 
-    private final static Logger LOGGER = Logger.getLogger(PipelineMavenPluginRunListener.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(DownstreamPipelineTriggerRunListener.class.getName());
 
     @Override
     public void onCompleted(WorkflowRun upstreamBuild, @Nonnull TaskListener listener) {
         LOGGER.log(Level.FINE, "onCompleted({0})", new Object[]{upstreamBuild});
 
         if (!GlobalPipelineMavenConfig.getTriggerDownstreamBuildsCriteria().contains(upstreamBuild.getResult())) {
-            LOGGER.log(Level.FINE, "Ignore non successful build {0}", upstreamBuild);
+            LOGGER.log(Level.FINE, "Skip downstream job triggering for upstream build with ignored result status {0}: {1}",
+                    new Object[]{upstreamBuild, upstreamBuild.getResult()});
+            return;
         }
 
         WorkflowJob upstreamPipeline = upstreamBuild.getParent();
@@ -69,13 +71,13 @@ public class PipelineMavenPluginRunListener extends RunListener<WorkflowRun> {
             }
 
             if (isParameterizedPipeline(downstreamPipeline)) {
-                LOGGER.log(Level.FINE, "Don't trigger parameterized job {0} from upstream build (1}", new Object[]{downstreamPipeline, upstreamBuild});
+                LOGGER.log(Level.FINE, "Skip triggering of parameterized downstream pipeline {0} from upstream build (1}", new Object[]{downstreamPipeline, upstreamBuild});
                 continue;
             }
 
             WorkflowJobDependencyTrigger downstreamPipelineTrigger = getWorkflowJobDependencyTrigger(downstreamPipeline);
             if (downstreamPipelineTrigger == null) {
-                LOGGER.log(Level.FINE, "Skip triggering of downstream pipeline {0} linked to upstream build {1}: dependency trigger not configured", new Object[]{downstreamPipeline, upstreamBuild});
+                LOGGER.log(Level.FINE, "Skip triggering of downstream pipeline {0} from upstream build {1}: dependency trigger not configured", new Object[]{downstreamPipeline, upstreamBuild});
                 continue;
             }
 
@@ -86,9 +88,8 @@ public class PipelineMavenPluginRunListener extends RunListener<WorkflowRun> {
                 // downstream job not visible from upstream job, don't display message
             }
 
-            // FIXME trigger downstream build
             // see https://github.com/jenkinsci/pipeline-build-step-plugin/blob/master/src/main/java/org/jenkinsci/plugins/workflow/support/steps/build/BuildTriggerStepExecution.java#L60
-
+            // FIXME don't display upstream pipeline as the cause if permissions don't match
             downstreamPipeline.scheduleBuild(new Cause.UpstreamCause(upstreamBuild));
         }
 
@@ -111,6 +112,28 @@ public class PipelineMavenPluginRunListener extends RunListener<WorkflowRun> {
             if (trigger instanceof WorkflowJobDependencyTrigger) {
                 return (WorkflowJobDependencyTrigger) trigger;
             }
+        }
+
+        if (parameterizedJob.getParent() instanceof WorkflowMultiBranchProject) {
+            // search for the triggers of MultiBranch pipelines
+            WorkflowMultiBranchProject multiBranchProject = (WorkflowMultiBranchProject) parameterizedJob.getParent();
+            for (Trigger trigger : multiBranchProject.getTriggers().values()) {
+                if (trigger instanceof WorkflowJobDependencyTrigger) {
+                    return (WorkflowJobDependencyTrigger) trigger;
+                }
+            }
+
+            if (multiBranchProject.getParent() instanceof ComputedFolder) {
+                // search for the triggers of GitHubOrg folders / Bitbucket folders
+                ComputedFolder grandParent = (ComputedFolder) multiBranchProject.getParent();
+                Map<TriggerDescriptor,Trigger<?>> grandParentTriggers = grandParent.getTriggers();
+                for(Trigger trigger : grandParentTriggers.values()){
+                    if (trigger instanceof WorkflowJobDependencyTrigger) {
+                        return (WorkflowJobDependencyTrigger) trigger;
+                    }
+                }
+            }
+
         }
         return null;
     }
@@ -148,8 +171,4 @@ public class PipelineMavenPluginRunListener extends RunListener<WorkflowRun> {
         }
     }
 
-    @Override
-    public void onDeleted(WorkflowRun run) {
-        GlobalPipelineMavenConfig.getDao().deleteBuild(run.getParent().getFullName(), run.getNumber());
-    }
 }

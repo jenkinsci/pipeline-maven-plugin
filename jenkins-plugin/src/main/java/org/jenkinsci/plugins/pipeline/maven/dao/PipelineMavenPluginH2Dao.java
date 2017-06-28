@@ -61,7 +61,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         rootDir.getClass(); // check non null
 
         File databaseFile = new File(rootDir, "jenkins-jobs");
-        String jdbcUrl = "jdbc:h2:file:" + databaseFile.getAbsolutePath() + ";AUTO_SERVER=TRUE";
+        String jdbcUrl = "jdbc:h2:file:" + databaseFile.getAbsolutePath() + ";AUTO_SERVER=TRUE;MULTI_THREADED=1";
         jdbcConnectionPool = JdbcConnectionPool.create(jdbcUrl, "sa", "sa");
         LOGGER.log(Level.FINE, "Open database {0}", jdbcUrl);
 
@@ -384,7 +384,8 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 " INNER JOIN JENKINS_BUILD AS DOWNSTREAM_BUILD ON DOWNSTREAM_JOB.ID = DOWNSTREAM_BUILD.JOB_ID " +
                 " INNER JOIN MAVEN_DEPENDENCY ON DOWNSTREAM_BUILD.ID = MAVEN_DEPENDENCY.BUILD_ID" +
                 " WHERE " +
-                "   MAVEN_DEPENDENCY.ARTIFACT_ID IN (" + generatedArtifactsSql + ") " +
+                "   MAVEN_DEPENDENCY.ARTIFACT_ID IN (" + generatedArtifactsSql + ") AND " +
+                "   DOWNSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE DOWNSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID)" +
                 " ORDER BY DOWNSTREAM_JOB.FULL_NAME";
 
         List<String> downstreamJobsFullNames = new ArrayList<>();

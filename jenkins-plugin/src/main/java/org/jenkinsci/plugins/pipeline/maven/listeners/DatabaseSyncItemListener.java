@@ -12,11 +12,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Maintains the database in sync with the jobs and builds.
+ *
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 @Extension
-public class PipelineMavenPluginItemListener extends ItemListener {
-    private final static Logger LOGGER = Logger.getLogger(PipelineMavenPluginItemListener.class.getName());
+public class DatabaseSyncItemListener extends ItemListener {
+    private final static Logger LOGGER = Logger.getLogger(DatabaseSyncItemListener.class.getName());
 
     @Override
     public void onDeleted(Item item) {
