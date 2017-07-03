@@ -11,6 +11,7 @@ import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
 import hudson.model.queue.Tasks;
 import hudson.security.ACL;
+import hudson.security.ACLContext;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import jenkins.branch.MultiBranchProject;
@@ -29,6 +30,7 @@ import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -82,15 +84,23 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             }
 
             LOGGER.log(Level.FINE, "Triggering downstream pipeline {0} from upstream build {1}", new Object[]{downstreamPipeline, upstreamBuild});
-            if (isDownstreamPipelineVisibleByUpstreamPipeline(upstreamPipeline, downstreamPipeline, listener)) {
-                listener.getLogger().println("[withMaven] Scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamPipeline));
-            } else {
-                // downstream job not visible from upstream job, don't display message
-            }
 
-            // see https://github.com/jenkinsci/pipeline-build-step-plugin/blob/master/src/main/java/org/jenkinsci/plugins/workflow/support/steps/build/BuildTriggerStepExecution.java#L60
-            // FIXME don't display upstream pipeline as the cause if permissions don't match
-            downstreamPipeline.scheduleBuild(new Cause.UpstreamCause(upstreamBuild));
+            boolean downstreamVisibleByUpstreamBuildAuth = isDownstreamVisibleByUpstreamBuildAuth(downstreamPipeline);
+            boolean upstreamVisibleByDownstreamBuildAuth = isUpstreamBuildVisibleByDownstreamBuildAuth(upstreamPipeline, downstreamPipeline);
+
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.log(Level.FINE,
+                        "upstreamPipeline (" + upstreamPipeline + ", visibleByDownstreamBuildAuth: " + upstreamVisibleByDownstreamBuildAuth + "), " +
+                                " downstreamPipeline (" + downstreamPipeline + ", visibleByUpstreamBuildAuth: " + downstreamVisibleByUpstreamBuildAuth + "), " +
+                                "upstreamBuildAuth: " + Jenkins.getAuthentication());
+            }
+            if (downstreamVisibleByUpstreamBuildAuth && upstreamVisibleByDownstreamBuildAuth) {
+                listener.getLogger().println("[withMaven] Scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + "...");
+                downstreamPipeline.scheduleBuild(new Cause.UpstreamCause(upstreamBuild));
+            } else {
+                LOGGER.log(Level.FINE, "Skip triggering of {0} by {1}: downstreamVisibleByUpstreamBuildAuth:{2}, upstreamVisibleByDownstreamBuildAuth:{3}",
+                        new Object[]{downstreamPipeline, upstreamBuild, downstreamVisibleByUpstreamBuildAuth, upstreamVisibleByDownstreamBuildAuth});
+            }
         }
 
     }
@@ -101,8 +111,9 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             return false;
         } else if (pdp.getParameterDefinitionNames().isEmpty()) {
             return false;
+        } else {
+            return true;
         }
-        return true;
     }
 
     @Nullable
@@ -126,8 +137,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             if (multiBranchProject.getParent() instanceof ComputedFolder) {
                 // search for the triggers of GitHubOrg folders / Bitbucket folders
                 ComputedFolder grandParent = (ComputedFolder) multiBranchProject.getParent();
-                Map<TriggerDescriptor,Trigger<?>> grandParentTriggers = grandParent.getTriggers();
-                for(Trigger trigger : grandParentTriggers.values()){
+                Map<TriggerDescriptor, Trigger<?>> grandParentTriggers = grandParent.getTriggers();
+                for (Trigger trigger : grandParentTriggers.values()) {
                     if (trigger instanceof WorkflowJobDependencyTrigger) {
                         return (WorkflowJobDependencyTrigger) trigger;
                     }
@@ -138,37 +149,26 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         return null;
     }
 
-    protected boolean isDownstreamPipelineVisibleByUpstreamPipeline(@Nonnull WorkflowJob upstreamPipeline, @Nonnull Item downstreamPipeline, TaskListener listener) {
-        // TODO see jenkins.triggers.ReverseBuildTrigger.shouldTrigger()
 
-        Jenkins jenkins = Jenkins.getInstance();
-
-        // This checks Item.READ also on parent folders; note we are checking as the upstream auth currently:
-        boolean downstreamVisible = jenkins.getItemByFullName(downstreamPipeline.getFullName()) == downstreamPipeline;
-        Authentication originalAuth = Jenkins.getAuthentication();
-        Authentication auth = Tasks.getAuthenticationOf((Queue.Task) downstreamPipeline);
+    protected boolean isUpstreamBuildVisibleByDownstreamBuildAuth(@Nonnull WorkflowJob upstreamPipeline, @Nonnull Queue.Task downstreamPipeline) {
+        Authentication auth = Tasks.getAuthenticationOf(downstreamPipeline);
+        Authentication downstreamPipelineAuth;
         if (auth.equals(ACL.SYSTEM) && !QueueItemAuthenticatorConfiguration.get().getAuthenticators().isEmpty()) {
-            auth = Jenkins.ANONYMOUS; // cf. BuildTrigger
+            downstreamPipelineAuth = Jenkins.ANONYMOUS; // cf. BuildTrigger
+        } else {
+            downstreamPipelineAuth = auth;
         }
-        SecurityContext orig = ACL.impersonate(auth);
-        try {
-            WorkflowJob upstreamPipelineObtainedAsImpersonated = jenkins.getItemByFullName(upstreamPipeline.getFullName(), WorkflowJob.class);
 
-            if (upstreamPipelineObtainedAsImpersonated != upstreamPipeline) { // shouldn't it be a check on upstreamPipelineObtainedAsImpersonated == null
-                if (downstreamVisible) {
-                    // TODO ModelHyperlink
-                    listener.getLogger().println(Messages.ReverseBuildTrigger_running_as_cannot_even_see_for_trigger_f(auth.getName(), upstreamPipeline.getFullName(), downstreamPipeline.getFullName()));
-                } else {
-                    LOGGER.log(Level.WARNING, "Running as {0} cannot even see {1} for trigger from {2} (but cannot tell {3} that)", new Object[]{auth.getName(), upstreamPipeline, downstreamPipeline, originalAuth.getName()});
-                }
-                return false;
-            }
-
-            // No need to check Item.BUILD on downstream, because the downstream project’s configurer has asked for this.
-            return true;
-        } finally {
-            SecurityContextHolder.setContext(orig);
+        try (ACLContext _ = ACL.as(downstreamPipelineAuth)) {
+            WorkflowJob upstreamPipelineObtainedAsImpersonated = Jenkins.getInstance().getItemByFullName(upstreamPipeline.getFullName(), WorkflowJob.class);
+            LOGGER.log(Level.FINE, "isUpstreamBuildVisibleByDownstreamBuildAuth({0}, {1}): taskAuth: {2}, downstreamPipelineAuth: {3}, upstreamPipelineObtainedAsImpersonated:{4}",
+                    new Object[]{upstreamPipeline, downstreamPipeline, auth, downstreamPipelineAuth, upstreamPipelineObtainedAsImpersonated});
+            return (upstreamPipelineObtainedAsImpersonated != null);
         }
+    }
+
+    protected boolean isDownstreamVisibleByUpstreamBuildAuth(@Nonnull Item downstreamPipeline) {
+        return Jenkins.getInstance().getItemByFullName(downstreamPipeline.getFullName()) != null;
     }
 
 }
