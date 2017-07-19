@@ -222,11 +222,11 @@ public class XmlUtils {
             sanitizedWorkspaceRemote = workspaceRemote;
         }
 
-        if (!sanitizedAbsoluteFilePath.startsWith(sanitizedWorkspaceRemote)) {
+        if (!StringUtils.startsWithIgnoreCase(sanitizedAbsoluteFilePath, sanitizedWorkspaceRemote)) {
             throw new IllegalArgumentException("Cannot relativize '" + absoluteFilePath + "' relatively to '" + workspace.getRemote() + "'");
         }
 
-        String relativePath = StringUtils.substringAfter(sanitizedAbsoluteFilePath, sanitizedWorkspaceRemote);
+        String relativePath = StringUtils.removeStartIgnoreCase(sanitizedAbsoluteFilePath, sanitizedWorkspaceRemote);
         String fileSeparator = windows ? "\\" : "/";
 
         if (relativePath.startsWith(fileSeparator)) {
