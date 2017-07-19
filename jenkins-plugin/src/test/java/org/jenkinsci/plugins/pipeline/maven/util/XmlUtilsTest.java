@@ -5,6 +5,7 @@ import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.jvnet.hudson.test.Issue;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -174,6 +175,17 @@ public class XmlUtilsTest {
         String absolutePath = "C:\\path\\to\\spring-petclinic\\target/abc.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "target\\abc.xml";
+        Assert.assertThat(actual, CoreMatchers.is(expected));
+    }
+
+    @Issue("JENKINS-45221")
+    @Test
+    public void test_getPathInWorkspace_windows_mixed_case_ok_JENKINS_45221() {
+        // lowercase versus uppercase "d:\"
+        String workspace = "d:\\jenkins\\workspace\\d.admin_feature_Jenkinsfile-SCSMHLROYAGBAWY5ZNNG6ALR77MVLEH3F3EFF3O7XN3RO5BL6AMA";
+        String absolutePath = "D:\\jenkins\\workspace\\d.admin_feature_Jenkinsfile-SCSMHLROYAGBAWY5ZNNG6ALR77MVLEH3F3EFF3O7XN3RO5BL6AMA\\admin\\xyz\\target\\pad-admin-xyz-2.4.0-SNAPSHOT-tests.jar";
+        String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
+        String expected = "admin\\xyz\\target\\pad-admin-xyz-2.4.0-SNAPSHOT-tests.jar";
         Assert.assertThat(actual, CoreMatchers.is(expected));
     }
 
