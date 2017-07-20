@@ -113,6 +113,13 @@
       <optional>true</optional>
     </dependency>
     <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>htmlpublisher</artifactId>
+      <version>1.14</version>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
       <groupId>org.jvnet.hudson.plugins</groupId>
       <artifactId>findbugs</artifactId>
       <version>4.70</version>
