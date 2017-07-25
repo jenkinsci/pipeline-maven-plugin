@@ -33,6 +33,7 @@ import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.DependencyResolutio
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.DependencyResolutionResultHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.FailsafeTestExecutionHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.InvokerRunExecutionHandler;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.InvokerStartExecutionHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.JarJarExecutionHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.MavenEventHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.MavenExecutionRequestHandler;
@@ -53,6 +54,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.inject.Named;
@@ -117,6 +119,7 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
         handlers.add(new SurefireTestExecutionHandler(reporter));
         handlers.add(new JarJarExecutionHandler(reporter));
         handlers.add(new InvokerRunExecutionHandler(reporter));
+        handlers.add(new InvokerStartExecutionHandler(reporter));
         handlers.add(new DefaultSettingsBuildingRequestHandler(reporter));
         handlers.add(new MavenExecutionRequestHandler(reporter));
         handlers.add(new DependencyResolutionRequestHandler(reporter));
