@@ -36,6 +36,16 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * Handler to alter the <code>org.apache.maven.plugins:maven-invoker-plugin:run</code> goal :
+ * it will append the <code>JENKINS_MAVEN_AGENT_DISABLED</code> (set to <code>true</code>) to
+ * the environment.
+ * <p>
+ * Thus our spy will not run during Invoker integration tests, to avoid recording integration
+ * tests artefacts and dependencies.
+ * @author <a href="mailto:benoit.guerin1@free.fr">Benoit Guérin</a>
+ *
+ */
 public class InvokerStartExecutionHandler extends AbstractExecutionHandler {
 
     public InvokerStartExecutionHandler(final MavenEventReporter reporter) {
@@ -64,13 +74,17 @@ public class InvokerStartExecutionHandler extends AbstractExecutionHandler {
     public boolean _handle(final ExecutionEvent executionEvent) {
         final boolean result = super._handle(executionEvent);
 
+        //TODO move from "system.out.println" to a real logger
         System.out.println("[jenkins-maven-event-spy] INFO start of goal " + getSupportedPluginGoal() + ", disabling spy in IT tests.");
 
+        // First retrieve the "environmentVariables" configuration of the captured Mojo
         Xpp3Dom env = executionEvent.getMojoExecution().getConfiguration().getChild("environmentVariables");
         if (env == null) {
+            // if the mojo does not have such a configuration, create an empty one
             env = new Xpp3Dom("environmentVariables");
             executionEvent.getMojoExecution().getConfiguration().addChild(env);
         }
+        // Finally, adding our environment variable to disable our spy during the integration tests runs
         Xpp3Dom disableSpy = new Xpp3Dom(DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME);
         disableSpy.setValue("true");
         env.addChild(disableSpy);
