@@ -87,7 +87,7 @@ public class InvokerRunsPublisher extends MavenPublisher {
         } catch (ClassNotFoundException e) {
             listener.getLogger().print("[withMaven] Jenkins ");
             listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/Maven+Invoker+Plugin", "Maven Invoker Plugin");
-            listener.getLogger().print(" not found, don't display " + GROUP_ID + ":" + ARTIFACT_ID + ":" + GOAL + " results in pipeline screen.");
+            listener.getLogger().println(" not found, don't display " + GROUP_ID + ":" + ARTIFACT_ID + ":" + GOAL + " results in pipeline screen.");
             return;
         }
 
