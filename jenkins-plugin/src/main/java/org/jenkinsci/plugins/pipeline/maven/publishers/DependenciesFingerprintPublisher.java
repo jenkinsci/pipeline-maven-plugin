@@ -37,7 +37,7 @@ import javax.annotation.Nonnull;
 public class DependenciesFingerprintPublisher extends MavenPublisher {
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MavenSpyLogProcessor.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DependenciesFingerprintPublisher.class.getName());
 
     private boolean includeSnapshotVersions = true;
 

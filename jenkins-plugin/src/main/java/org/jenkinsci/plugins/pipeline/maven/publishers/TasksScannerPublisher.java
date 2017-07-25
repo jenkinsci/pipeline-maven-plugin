@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
  * @see hudson.plugins.tasks.TasksPublisher
  */
 public class TasksScannerPublisher extends MavenPublisher {
-    private static final Logger LOGGER = Logger.getLogger(FindbugsAnalysisPublisher.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(TasksScannerPublisher.class.getName());
 
     private static final long serialVersionUID = 1L;
 

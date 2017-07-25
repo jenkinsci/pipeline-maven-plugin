@@ -79,7 +79,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
             listener.getLogger().print("[withMaven] Jenkins ");
             listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/HTML+Publisher+Plugin",
                     "HTML Publisher Plugin");
-            listener.getLogger().print(" not found, do not archive concordion reports.");
+            listener.getLogger().println(" not found, do not archive concordion reports.");
             return;
         }
 
