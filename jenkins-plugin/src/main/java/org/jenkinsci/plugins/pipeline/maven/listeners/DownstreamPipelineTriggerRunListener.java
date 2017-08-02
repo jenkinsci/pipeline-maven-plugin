@@ -4,6 +4,7 @@ import com.cloudbees.hudson.plugins.folder.computed.ComputedFolder;
 import hudson.Extension;
 import hudson.console.ModelHyperlinkNote;
 import hudson.model.Cause;
+import hudson.model.CauseAction;
 import hudson.model.Item;
 import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Queue;
@@ -72,8 +73,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 continue;
             }
 
-            if (isParameterizedPipeline(downstreamPipeline)) {
-                LOGGER.log(Level.FINE, "Skip triggering of parameterized downstream pipeline {0} from upstream build (1}", new Object[]{downstreamPipeline, upstreamBuild});
+            if (!downstreamPipeline.isBuildable()) {
+                LOGGER.log(Level.FINE, "Skip triggering of disabled downstream pipeline {0} from upstream build (1}", new Object[]{downstreamPipeline, upstreamBuild});
                 continue;
             }
 
@@ -95,25 +96,19 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                                 "upstreamBuildAuth: " + Jenkins.getAuthentication());
             }
             if (downstreamVisibleByUpstreamBuildAuth && upstreamVisibleByDownstreamBuildAuth) {
-                listener.getLogger().println("[withMaven] Scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + "...");
-                downstreamPipeline.scheduleBuild(new Cause.UpstreamCause(upstreamBuild));
+                // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
+                String name = ModelHyperlinkNote.encodeTo(downstreamPipeline) + " #" + downstreamPipeline.getNextBuildNumber();
+                if (ParameterizedJobMixIn.scheduleBuild2(downstreamPipeline, -1, new CauseAction(new Cause.UpstreamCause(upstreamBuild))) != null) {
+                    listener.getLogger().println("[withMaven] Scheduling downstream pipeline " + name + "...");
+                } else {
+                    listener.getLogger().println("[withMaven] Not scheduling downstream pipeline " + name + ", it is already in the queue.");
+                }
             } else {
                 LOGGER.log(Level.FINE, "Skip triggering of {0} by {1}: downstreamVisibleByUpstreamBuildAuth:{2}, upstreamVisibleByDownstreamBuildAuth:{3}",
                         new Object[]{downstreamPipeline, upstreamBuild, downstreamVisibleByUpstreamBuildAuth, upstreamVisibleByDownstreamBuildAuth});
             }
         }
 
-    }
-
-    protected boolean isParameterizedPipeline(@Nonnull WorkflowJob job) {
-        ParametersDefinitionProperty pdp = job.getProperty(ParametersDefinitionProperty.class);
-        if (pdp == null) {
-            return false;
-        } else if (pdp.getParameterDefinitionNames().isEmpty()) {
-            return false;
-        } else {
-            return true;
-        }
     }
 
     @Nullable
