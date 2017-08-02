@@ -45,6 +45,9 @@ import hudson.model.TaskListener;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class JGivenTestsPublisher extends MavenPublisher {
+
+    public static final String REPORTS_DIR = "jgiven-reports";
+
     private static final Logger LOGGER = Logger.getLogger(JGivenTestsPublisher.class.getName());
 
     private static final long serialVersionUID = 1L;
@@ -64,6 +67,20 @@ public class JGivenTestsPublisher extends MavenPublisher {
             listener = new StreamBuildListener((OutputStream) System.err);
         }
 
+        final FilePath workspace = context.get(FilePath.class);
+        final Run run = context.get(Run.class);
+        final Launcher launcher = context.get(Launcher.class);
+
+        final String pattern = "**/" + REPORTS_DIR + "/*";
+        final FilePath[] paths = workspace.list(pattern);
+        if (paths == null || paths.length == 0) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                listener.getLogger().println("[withMaven] Pattern \"" + pattern
+                        + "\" does not match any file on workspace, aborting.");
+            }
+            return;
+        }
+
         try {
             Class.forName("org.jenkinsci.plugins.jgiven.JgivenReportGenerator");
         } catch (final ClassNotFoundException e) {
@@ -72,10 +89,6 @@ public class JGivenTestsPublisher extends MavenPublisher {
             listener.getLogger().println(" not found, do not archive jgiven reports.");
             return;
         }
-
-        final FilePath workspace = context.get(FilePath.class);
-        final Run run = context.get(Run.class);
-        final Launcher launcher = context.get(Launcher.class);
 
         final JgivenReportGenerator generator = new JgivenReportGenerator(new ArrayList<ReportConfig>());
 
