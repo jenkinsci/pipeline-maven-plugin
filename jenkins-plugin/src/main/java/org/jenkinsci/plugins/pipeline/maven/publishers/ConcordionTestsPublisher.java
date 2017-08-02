@@ -89,7 +89,6 @@ public class ConcordionTestsPublisher extends MavenPublisher {
     private void executeReporter(final StepContext context, final TaskListener listener)
             throws IOException, InterruptedException {
         final FilePath workspace = context.get(FilePath.class);
-        final String fileSeparatorOnAgent = XmlUtils.getFileSeparatorOnRemote(workspace);
 
         final Run run = context.get(Run.class);
         final Launcher launcher = context.get(Launcher.class);
@@ -102,6 +101,14 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         }
 
         final FilePath[] paths = workspace.list(pattern);
+        if (paths == null || paths.length == 0) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                listener.getLogger().println(
+                        "[withMaven] Pattern \"" + pattern + "\" does not match any file, aborting.");
+            }
+            return;
+        }
+
         listener.getLogger().println(
                 "[withMaven] Pattern \"" + pattern + "\" matched " + paths.length + " file(s).");
 
