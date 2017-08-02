@@ -30,7 +30,6 @@ import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
-import hudson.tasks.junit.JUnitResultArchiver;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.maveninvoker.MavenInvokerRecorder;
@@ -82,6 +81,15 @@ public class InvokerRunsPublisher extends MavenPublisher {
             listener = new StreamBuildListener((OutputStream) System.err);
         }
 
+        List<Element> sureFireTestEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, GOAL);
+
+        if (sureFireTestEvents.isEmpty()) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                listener.getLogger().println("[withMaven] No " + GROUP_ID + ":" + ARTIFACT_ID + ":" + GOAL + " execution found");
+            }
+            return;
+        }
+
         try {
             Class.forName("org.jenkinsci.plugins.maveninvoker.MavenInvokerRecorder");
         } catch (ClassNotFoundException e) {
@@ -91,7 +99,6 @@ public class InvokerRunsPublisher extends MavenPublisher {
             return;
         }
 
-        List<Element> sureFireTestEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, GOAL);
 
         executeReporter(context, listener, sureFireTestEvents);
     }
@@ -99,16 +106,8 @@ public class InvokerRunsPublisher extends MavenPublisher {
     private void executeReporter(StepContext context, TaskListener listener, List<Element> testEvents) throws IOException, InterruptedException {
         FilePath workspace = context.get(FilePath.class);
         final String fileSeparatorOnAgent = XmlUtils.getFileSeparatorOnRemote(workspace);
-
         Run run = context.get(Run.class);
         Launcher launcher = context.get(Launcher.class);
-
-        if (testEvents.isEmpty()) {
-            if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println("[withMaven] No " + GROUP_ID + ":" + ARTIFACT_ID + ":" + GOAL + " execution found");
-            }
-            return;
-        }
 
         for (Element testEvent : testEvents) {
             String surefireEventType = testEvent.getAttribute("type");
