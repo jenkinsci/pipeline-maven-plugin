@@ -73,23 +73,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
             listener = new StreamBuildListener((OutputStream) System.err);
         }
 
-        try {
-            Class.forName("htmlpublisher.HtmlPublisher");
-        } catch (final ClassNotFoundException e) {
-            listener.getLogger().print("[withMaven] Jenkins ");
-            listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/HTML+Publisher+Plugin",
-                    "HTML Publisher Plugin");
-            listener.getLogger().println(" not found, do not archive concordion reports.");
-            return;
-        }
-
-        executeReporter(context, listener);
-    }
-
-    private void executeReporter(final StepContext context, final TaskListener listener)
-            throws IOException, InterruptedException {
         final FilePath workspace = context.get(FilePath.class);
-
         final Run run = context.get(Run.class);
         final Launcher launcher = context.get(Launcher.class);
 
@@ -112,6 +96,16 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         listener.getLogger().println(
                 "[withMaven] Pattern \"" + pattern + "\" matched " + paths.length + " file(s).");
 
+        try {
+            Class.forName("htmlpublisher.HtmlPublisher");
+        } catch (final ClassNotFoundException e) {
+            listener.getLogger().print("[withMaven] Jenkins ");
+            listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/HTML+Publisher+Plugin",
+                    "HTML Publisher Plugin");
+            listener.getLogger().println(" not found, do not archive concordion reports.");
+            return;
+        }
+
         final List<String> files = new ArrayList<String>();
         for (final FilePath path : paths) {
             files.add(XmlUtils.getPathInWorkspace(path.getRemote(), workspace));
@@ -129,7 +123,6 @@ public class ConcordionTestsPublisher extends MavenPublisher {
             listener.error("[withMaven] Silently ignore exception archiving Concordion reports: " + e);
             LOGGER.log(Level.WARNING, "Exception processing Concordion reports archiving", e);
         }
-
     }
 
     @CheckForNull
