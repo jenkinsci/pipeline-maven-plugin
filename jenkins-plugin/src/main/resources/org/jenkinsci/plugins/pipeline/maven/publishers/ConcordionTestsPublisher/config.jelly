@@ -28,7 +28,4 @@ THE SOFTWARE.
 
     <st:include page="maven-publisher" class="${descriptor.clazz}"/>
 
-    <f:entry title="${%Pattern}" field="pattern">
-        <f:textbox/>
-    </f:entry>
 </j:jelly>

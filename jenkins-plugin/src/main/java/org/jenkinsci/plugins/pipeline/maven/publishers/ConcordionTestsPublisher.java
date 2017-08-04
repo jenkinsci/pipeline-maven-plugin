@@ -18,6 +18,8 @@
 
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
@@ -30,7 +32,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -52,17 +57,30 @@ import hudson.model.TaskListener;
  */
 public class ConcordionTestsPublisher extends MavenPublisher {
     private static final Logger LOGGER = Logger.getLogger(ConcordionTestsPublisher.class.getName());
+    private static final String GROUP_ID = "org.apache.maven.plugins";
+    private static final String SUREFIRE_ID = "maven-surefire-plugin";
+    private static final String FAILSAFE_ID = "maven-failsafe-plugin";
+    private static final String SUREFIRE_GOAL = "test";
+    private static final String FAILSAFE_GOAL = "integration-test";
 
     private static final long serialVersionUID = 1L;
-
-    @CheckForNull
-    private String pattern = "**/target/*concordion*/**";
 
     @DataBoundConstructor
     public ConcordionTestsPublisher() {
 
     }
 
+    /*
+<ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-08-04 22:09:34.205">
+    <project ... />
+    <plugin executionId="default" goal="integration-test" groupId="org.apache.maven.plugins" artifactId="maven-failsafe-plugin" version="2.19.1">
+      <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
+      <systemPropertyVariables>
+        <concordion.output.dir>target/concordion-reports</concordion.output.dir>
+      </systemPropertyVariables>
+    </plugin>
+  </ExecutionEvent>
+     */
     @Override
     public void process(@Nonnull final StepContext context, @Nonnull final Element mavenSpyLogsElt)
             throws IOException, InterruptedException {
@@ -77,24 +95,31 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         final Run run = context.get(Run.class);
         final Launcher launcher = context.get(Launcher.class);
 
-        if (pattern == null || pattern.isEmpty()) {
+        Set<String> patterns = new HashSet<String>();
+        patterns.addAll(findPatterns(XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL)));
+        patterns.addAll(findPatterns(XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL)));
+
+        if (patterns.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger().println("[withMaven] No pattern given, aborting.");
             }
             return;
         }
 
-        final FilePath[] paths = workspace.list(pattern);
-        if (paths == null || paths.length == 0) {
+        List<FilePath> paths = new ArrayList<FilePath>();
+        for (String pattern : patterns) {
+            paths.addAll(newArrayList(workspace.list(pattern)));
+        }
+        if (paths.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger().println(
-                        "[withMaven] Pattern \"" + pattern + "\" does not match any file, aborting.");
+                        "[withMaven] Did not found any concordion reports directory, aborting.");
             }
             return;
         }
 
         listener.getLogger().println(
-                "[withMaven] Pattern \"" + pattern + "\" matched " + paths.length + " file(s).");
+                "[withMaven] Found " + paths.size() + " file(s) in concordion reports directory.");
 
         try {
             Class.forName("htmlpublisher.HtmlPublisher");
@@ -125,14 +150,18 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         }
     }
 
-    @CheckForNull
-    public String getPattern() {
-        return pattern;
-    }
-
-    @DataBoundSetter
-    public void setPattern(@Nullable final String pattern) {
-        this.pattern = pattern;
+    private Collection<String> findPatterns(List<Element> elements) {
+        List<String> result = new ArrayList<String>();
+        for (Element element : elements) {
+            Element envVars = XmlUtils.getUniqueChildElementOrNull(XmlUtils.getUniqueChildElement(element, "plugin"), "systemPropertyVariables");
+            if (envVars != null) {
+                Element concordionOutputDir = XmlUtils.getUniqueChildElementOrNull(envVars, "concordion.output.dir");
+                if (concordionOutputDir != null) {
+                    result.add("**/" + concordionOutputDir.getTextContent().trim() + "/**");
+                }
+            }
+        }
+        return result;
     }
 
     @Symbol("concordionPublisher")
