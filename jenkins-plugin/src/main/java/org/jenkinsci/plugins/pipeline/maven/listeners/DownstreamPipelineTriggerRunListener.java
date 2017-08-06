@@ -64,8 +64,9 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         for (String downstreamPipelineFullName : downstreamPipelines) {
             final WorkflowJob downstreamPipeline = Jenkins.getInstance().getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
             if (downstreamPipeline == null) {
-                LOGGER.log(Level.FINE, "Downstream pipeline {0} not found from upstream build {1}", new Object[]{downstreamPipelineFullName, upstreamBuild});
-                // job not found
+                LOGGER.log(Level.FINE, "Downstream pipeline {0} not found from upstream build {1} with authentication {2}. Database synchronization issue?",
+                        new Object[]{downstreamPipelineFullName, upstreamBuild, Jenkins.getAuthentication()});
+                // job not found, the database was probably out of sync
                 continue;
             }
             if (downstreamPipeline.equals(upstreamPipeline)) {
@@ -74,7 +75,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             }
 
             if (!downstreamPipeline.isBuildable()) {
-                LOGGER.log(Level.FINE, "Skip triggering of disabled downstream pipeline {0} from upstream build (1}", new Object[]{downstreamPipeline, upstreamBuild});
+                LOGGER.log(Level.FINE, "Skip triggering of non buildable (disabled: {0}, isHoldOffBuildUntilSave: {1}) downstream pipeline {2} from upstream build {3}",
+                        new Object[]{downstreamPipeline.isDisabled(), downstreamPipeline.isHoldOffBuildUntilSave(), downstreamPipeline, upstreamBuild});
                 continue;
             }
 
@@ -84,24 +86,22 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 continue;
             }
 
-            LOGGER.log(Level.FINE, "Triggering downstream pipeline {0} from upstream build {1}", new Object[]{downstreamPipeline, upstreamBuild});
-
             boolean downstreamVisibleByUpstreamBuildAuth = isDownstreamVisibleByUpstreamBuildAuth(downstreamPipeline);
             boolean upstreamVisibleByDownstreamBuildAuth = isUpstreamBuildVisibleByDownstreamBuildAuth(upstreamPipeline, downstreamPipeline);
 
-            if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE,
+            if (LOGGER.isLoggable(Level.FINER)) {
+                LOGGER.log(Level.FINER,
                         "upstreamPipeline (" + upstreamPipeline + ", visibleByDownstreamBuildAuth: " + upstreamVisibleByDownstreamBuildAuth + "), " +
                                 " downstreamPipeline (" + downstreamPipeline + ", visibleByUpstreamBuildAuth: " + downstreamVisibleByUpstreamBuildAuth + "), " +
                                 "upstreamBuildAuth: " + Jenkins.getAuthentication());
             }
             if (downstreamVisibleByUpstreamBuildAuth && upstreamVisibleByDownstreamBuildAuth) {
                 // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
-                String name = ModelHyperlinkNote.encodeTo(downstreamPipeline) + " #" + downstreamPipeline.getNextBuildNumber();
-                if (ParameterizedJobMixIn.scheduleBuild2(downstreamPipeline, -1, new CauseAction(new Cause.UpstreamCause(upstreamBuild))) != null) {
-                    listener.getLogger().println("[withMaven] Scheduling downstream pipeline " + name + "...");
+                Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(downstreamPipeline, -1, new CauseAction(new Cause.UpstreamCause(upstreamBuild)));
+                if (queuedItem == null) {
+                    listener.getLogger().println("[withMaven] Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + ", it is already in the queue.");
                 } else {
-                    listener.getLogger().println("[withMaven] Not scheduling downstream pipeline " + name + ", it is already in the queue.");
+                    listener.getLogger().println("[withMaven] Scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + "#" + downstreamPipeline.getNextBuildNumber() + "...");
                 }
             } else {
                 LOGGER.log(Level.FINE, "Skip triggering of {0} by {1}: downstreamVisibleByUpstreamBuildAuth:{2}, upstreamVisibleByDownstreamBuildAuth:{3}",
@@ -156,14 +156,19 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
 
         try (ACLContext _ = ACL.as(downstreamPipelineAuth)) {
             WorkflowJob upstreamPipelineObtainedAsImpersonated = Jenkins.getInstance().getItemByFullName(upstreamPipeline.getFullName(), WorkflowJob.class);
-            LOGGER.log(Level.FINE, "isUpstreamBuildVisibleByDownstreamBuildAuth({0}, {1}): taskAuth: {2}, downstreamPipelineAuth: {3}, upstreamPipelineObtainedAsImpersonated:{4}",
-                    new Object[]{upstreamPipeline, downstreamPipeline, auth, downstreamPipelineAuth, upstreamPipelineObtainedAsImpersonated});
-            return (upstreamPipelineObtainedAsImpersonated != null);
+            boolean result = upstreamPipelineObtainedAsImpersonated != null;
+            LOGGER.log(Level.FINE, "isUpstreamBuildVisibleByDownstreamBuildAuth({0}, {1}): taskAuth: {2}, downstreamPipelineAuth: {3}, upstreamPipelineObtainedAsImpersonated:{4}, result: {5}",
+                    new Object[]{upstreamPipeline, downstreamPipeline, auth, downstreamPipelineAuth, upstreamPipelineObtainedAsImpersonated, result});
+            return result;
         }
     }
 
     protected boolean isDownstreamVisibleByUpstreamBuildAuth(@Nonnull Item downstreamPipeline) {
-        return Jenkins.getInstance().getItemByFullName(downstreamPipeline.getFullName()) != null;
+        boolean result = Jenkins.getInstance().getItemByFullName(downstreamPipeline.getFullName()) != null;
+        LOGGER.log(Level.FINE, "isDownstreamVisibleByUpstreamBuildAuth({0}, auth: {1}): {2}",
+                new Object[]{downstreamPipeline, Jenkins.getAuthentication(), result});
+
+        return result;
     }
 
 }
