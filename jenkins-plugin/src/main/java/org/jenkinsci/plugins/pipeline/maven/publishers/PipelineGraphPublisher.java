@@ -291,7 +291,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
         @Nonnull
         @Override
         public String getDisplayName() {
-            return "Pipeline GraphPublisher";
+            return "Pipeline Graph Publisher";
         }
 
         @Override
