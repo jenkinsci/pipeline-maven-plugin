@@ -18,14 +18,11 @@
 
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -39,9 +36,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import htmlpublisher.HtmlPublisher;
 import htmlpublisher.HtmlPublisherTarget;
@@ -108,18 +103,18 @@ public class ConcordionTestsPublisher extends MavenPublisher {
 
         List<FilePath> paths = new ArrayList<FilePath>();
         for (String pattern : patterns) {
-            paths.addAll(newArrayList(workspace.list(pattern)));
+            paths.addAll(Arrays.asList(workspace.list(pattern)));
         }
         if (paths.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger().println(
-                        "[withMaven] Did not found any concordion reports directory, aborting.");
+                        "[withMaven] Did not found any Concordion reports directory, skip.");
             }
             return;
         }
 
         listener.getLogger().println(
-                "[withMaven] Found " + paths.size() + " file(s) in concordion reports directory.");
+                "[withMaven] Found " + paths.size() + " file(s) in Concordion reports directory.");
 
         try {
             Class.forName("htmlpublisher.HtmlPublisher");
@@ -140,7 +135,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
 
         try {
             listener.getLogger().println(
-                    "[withMaven] Publishing HTML named \"Concordion reports\" with the following files: "
+                    "[withMaven] Publishing HTML reports named \"Concordion reports\" with the following files: "
                             + target.getReportFiles());
             HtmlPublisher.publishReports(run, workspace, launcher, listener, Arrays.asList(target),
                     HtmlPublisher.class);
@@ -150,7 +145,8 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         }
     }
 
-    private Collection<String> findPatterns(List<Element> elements) {
+    @Nonnull
+    private Collection<String> findPatterns(@Nonnull List<Element> elements) {
         List<String> result = new ArrayList<String>();
         for (Element element : elements) {
             Element envVars = XmlUtils.getUniqueChildElementOrNull(XmlUtils.getUniqueChildElement(element, "plugin"), "systemPropertyVariables");
