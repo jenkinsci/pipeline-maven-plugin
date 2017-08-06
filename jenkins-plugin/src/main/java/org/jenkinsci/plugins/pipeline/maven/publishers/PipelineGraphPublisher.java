@@ -93,7 +93,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
         }
 
         for (MavenSpyLogProcessor.MavenDependency dependency : dependencies) {
-            if (dependency.isSnapshot()) {
+            if (dependency.snapshot) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
                         listener.getLogger().println("[withMaven] Skip recording snapshot dependency: " + dependency);
@@ -116,7 +116,9 @@ public class PipelineGraphPublisher extends MavenPublisher {
             }
 
             try {
-                LOGGER.log(Level.FINE, "Record dependency {0}", new Object[]{dependency});
+                if (LOGGER.isLoggable(Level.FINE)) {
+                    listener.getLogger().println("[withMaven] Record dependency: " + dependency);
+                }
 
                 dao.recordDependency(run.getParent().getFullName(), run.getNumber(), dependency.groupId, dependency.artifactId, dependency.version, dependency.type, dependency.getScope());
 
