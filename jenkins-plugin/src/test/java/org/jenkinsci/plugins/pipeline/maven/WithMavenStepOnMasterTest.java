@@ -71,31 +71,7 @@ import java.util.Map;
 /**
  * TODO migrate to {@link WithMavenStepTest} once we have implemented a GitRepoRule that can be used on remote agents
  */
-public class WithMavenStepOnMasterTest {
-
-    @ClassRule
-    public static BuildWatcher buildWatcher = new BuildWatcher();
-
-    @Rule
-    public JenkinsRule jenkinsRule = new JenkinsRule();
-
-    @Rule
-    public GitSampleRepoRule gitRepoRule = new GitSampleRepoRule();
-
-    private String mavenInstallationName;
-
-    @Before
-    public void setup() throws Exception {
-        // Maven.MavenInstallation maven3 = ToolInstallations.configureMaven35();
-        Maven.MavenInstallation maven3 = ExtendedToolInstallations.configureMaven35();
-
-        mavenInstallationName = maven3.getName();
-
-        GlobalMavenConfig globalMavenConfig = jenkinsRule.get(GlobalMavenConfig.class);
-        globalMavenConfig.setGlobalSettingsProvider(new DefaultGlobalSettingsProvider());
-        globalMavenConfig.setSettingsProvider(new DefaultSettingsProvider());
-
-    }
+public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
     @Test
     public void maven_build_on_master_with_specified_maven_installation_succeeds() throws Exception {
@@ -777,30 +753,5 @@ public class WithMavenStepOnMasterTest {
         } finally {
             GlobalConfigFiles.get().remove(mavenSettingsConfig.id);
         }
-    }
-
-    private void loadMavenJarProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_project/");
-    }
-
-    private void loadMavenJarWithFlattenPomProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_with_flatten_pom_project/");
-    }
-
-    private void loadMavenPluginProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_plugin_project/");
-    }
-
-    private void loadJenkinsPluginProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_hpi_project/");
-    }
-
-    private void loadSourceCodeInGitRepository(GitSampleRepoRule gitRepo, String name) throws Exception {
-        gitRepo.init();
-        Path mavenProjectRoot = Paths.get(WithMavenStepOnMasterTest.class.getResource(name).toURI());
-        if (!Files.exists(mavenProjectRoot)) {
-            throw new IllegalStateException("Folder '" + mavenProjectRoot + "' not found");
-        }
-        GitSampleRepoRuleUtils.addFilesAndCommit(mavenProjectRoot, this.gitRepoRule);
     }
 }

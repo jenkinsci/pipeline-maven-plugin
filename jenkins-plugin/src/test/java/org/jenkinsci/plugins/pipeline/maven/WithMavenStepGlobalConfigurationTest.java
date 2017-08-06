@@ -55,31 +55,7 @@ import java.util.List;
 /**
  * TODO migrate to {@link WithMavenStepTest} once we have implemented a GitRepoRule that can be used on remote agents
  */
-public class WithMavenStepGlobalConfigurationTest {
-
-    @ClassRule
-    public static BuildWatcher buildWatcher = new BuildWatcher();
-
-    @Rule
-    public JenkinsRule jenkinsRule = new JenkinsRule();
-
-    @Rule
-    public GitSampleRepoRule gitRepoRule = new GitSampleRepoRule();
-
-    private String mavenInstallationName;
-
-    @Before
-    public void setup() throws Exception {
-        // Maven.MavenInstallation maven3 = ToolInstallations.configureMaven35();
-        Maven.MavenInstallation maven3 = ExtendedToolInstallations.configureMaven35();
-
-        mavenInstallationName = maven3.getName();
-
-        GlobalMavenConfig globalMavenConfig = jenkinsRule.get(GlobalMavenConfig.class);
-        globalMavenConfig.setGlobalSettingsProvider(new DefaultGlobalSettingsProvider());
-        globalMavenConfig.setSettingsProvider(new DefaultSettingsProvider());
-
-    }
+public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTest {
 
     @Test
     public void maven_build_jar_project_on_master_disable_globally_findbugs_publisher_succeeds() throws Exception {
@@ -193,16 +169,5 @@ public class WithMavenStepGlobalConfigurationTest {
         }
     }
 
-    private void loadMavenJarProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_project/");
-    }
 
-    private void loadSourceCodeInGitRepository(GitSampleRepoRule gitRepo, String name) throws Exception {
-        gitRepo.init();
-        Path mavenProjectRoot = Paths.get(WithMavenStepGlobalConfigurationTest.class.getResource(name).toURI());
-        if (!Files.exists(mavenProjectRoot)) {
-            throw new IllegalStateException("Folder '" + mavenProjectRoot + "' not found");
-        }
-        GitSampleRepoRuleUtils.addFilesAndCommit(mavenProjectRoot, this.gitRepoRule);
-    }
 }

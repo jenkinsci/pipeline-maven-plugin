@@ -32,30 +32,7 @@ import static org.junit.Assert.*;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class DependencyFingerprintPublisherTest {
-    @ClassRule
-    public static BuildWatcher buildWatcher = new BuildWatcher();
-
-    @Rule
-    public JenkinsRule jenkinsRule = new JenkinsRule();
-
-    @Rule
-    public GitSampleRepoRule gitRepoRule = new GitSampleRepoRule();
-
-    String mavenInstallationName;
-
-    @Before
-    public void setup() throws Exception {
-        // Maven.MavenInstallation maven3 = ToolInstallations.configureMaven35();
-        Maven.MavenInstallation maven3 = ExtendedToolInstallations.configureMaven35();
-
-        mavenInstallationName = maven3.getName();
-
-        GlobalMavenConfig globalMavenConfig = jenkinsRule.get(GlobalMavenConfig.class);
-        globalMavenConfig.setGlobalSettingsProvider(new DefaultGlobalSettingsProvider());
-        globalMavenConfig.setSettingsProvider(new DefaultSettingsProvider());
-
-    }
+public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest {
 
     /**
      * Two (2) pipeline maven jobs consume the same commons-lang3-3.5.jar dependency.
@@ -105,18 +82,5 @@ public class DependencyFingerprintPublisherTest {
             assertThat(usages.containsKey(secondPipeline.getName()), is(true));
         }
 
-    }
-
-    private void loadMonoDependencyMavenProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/mono_dependency_maven_jar_project/");
-    }
-
-    private void loadSourceCodeInGitRepository(GitSampleRepoRule gitRepo, String name) throws Exception {
-        gitRepo.init();
-        Path mavenProjectRoot = Paths.get(WithMavenStepOnMasterTest.class.getResource(name).toURI());
-        if (!Files.exists(mavenProjectRoot)) {
-            throw new IllegalStateException("Folder '" + mavenProjectRoot + "' not found");
-        }
-        GitSampleRepoRuleUtils.addFilesAndCommit(mavenProjectRoot, this.gitRepoRule);
     }
 }

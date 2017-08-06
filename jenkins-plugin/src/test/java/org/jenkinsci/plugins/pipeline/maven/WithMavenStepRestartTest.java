@@ -23,13 +23,6 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
-import hudson.model.Node;
-import hudson.model.Result;
-import hudson.plugins.sshslaves.SSHLauncher;
-import hudson.slaves.DumbSlave;
-import hudson.slaves.NodeProperty;
-import hudson.slaves.RetentionStrategy;
-import org.apache.commons.io.FileUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -42,11 +35,7 @@ import org.junit.Test;
 import org.junit.runners.model.Statement;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.RestartableJenkinsRule;
-
-import java.io.File;
-import java.util.Collections;
 
 public class WithMavenStepRestartTest {
 

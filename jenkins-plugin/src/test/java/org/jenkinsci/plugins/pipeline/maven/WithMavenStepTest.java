@@ -52,33 +52,14 @@ import org.jvnet.hudson.test.JenkinsRule;
 import java.io.File;
 import java.util.Collections;
 
-public class WithMavenStepTest {
-
-    @ClassRule
-    public static BuildWatcher buildWatcher = new BuildWatcher();
-
-    @Rule
-    public JenkinsRule jenkinsRule = new JenkinsRule();
-
-    @Rule
-    public GitSampleRepoRule gitRepoRule = new GitSampleRepoRule();
+public class WithMavenStepTest extends AbstractIntegrationTest {
 
     @Rule
     public DockerRule<JavaGitContainer> slaveRule = new DockerRule<>(JavaGitContainer.class);
 
-    private String mavenInstallationName;
-
     @Before
     public void setup() throws Exception {
-        // Maven.MavenInstallation maven3 = ToolInstallations.configureMaven35();
-        Maven.MavenInstallation maven3 = ExtendedToolInstallations.configureMaven35();
-
-        mavenInstallationName = maven3.getName();
-
-        GlobalMavenConfig globalMavenConfig = jenkinsRule.get(GlobalMavenConfig.class);
-        globalMavenConfig.setGlobalSettingsProvider(new DefaultGlobalSettingsProvider());
-        globalMavenConfig.setSettingsProvider(new DefaultSettingsProvider());
-
+        super.setup();
 
         JavaGitContainer slaveContainer = slaveRule.get();
 
