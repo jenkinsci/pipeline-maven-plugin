@@ -67,7 +67,9 @@ public class ConcordionTestsPublisher extends MavenPublisher {
 
     /*
 <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-08-04 22:09:34.205">
-    <project ... />
+    <project baseDir="/path/to/spring-petclinic" file="/path/to/spring-petclinic/pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+      <build directory="/path/to/spring-petclinic/target"/>
+    </project>
     <plugin executionId="default" goal="integration-test" groupId="org.apache.maven.plugins" artifactId="maven-failsafe-plugin" version="2.19.1">
       <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
       <systemPropertyVariables>
@@ -90,36 +92,37 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         final Run run = context.get(Run.class);
         final Launcher launcher = context.get(Launcher.class);
 
-        Set<String> patterns = new HashSet<String>();
-        patterns.addAll(findPatterns(XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL)));
-        patterns.addAll(findPatterns(XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL)));
+        Set<String> concordionOutputDirPatterns = new HashSet<String>();
+        concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL)));
+        concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL)));
 
-        if (patterns.isEmpty()) {
+        if (concordionOutputDirPatterns.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println("[withMaven] No pattern given, aborting.");
+                listener.getLogger().println("[withMaven - concordionPublisher] No concordion output dir pattern given, skip.");
             }
             return;
         }
 
         List<FilePath> paths = new ArrayList<FilePath>();
-        for (String pattern : patterns) {
+        for (String pattern : concordionOutputDirPatterns) {
             paths.addAll(Arrays.asList(workspace.list(pattern)));
         }
         if (paths.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger().println(
-                        "[withMaven] Did not found any Concordion reports directory, skip.");
+                        "[withMaven - concordionPublisher] Did not found any Concordion reports directory, skip.");
             }
             return;
         }
 
         listener.getLogger().println(
-                "[withMaven] Found " + paths.size() + " file(s) in Concordion reports directory.");
+                "[withMaven - concordionPublisher] Found " + paths.size() + " file(s) in Concordion reports directory.");
+
 
         try {
             Class.forName("htmlpublisher.HtmlPublisher");
         } catch (final ClassNotFoundException e) {
-            listener.getLogger().print("[withMaven] Jenkins ");
+            listener.getLogger().print("[withMaven - concordionPublisher] Jenkins ");
             listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/HTML+Publisher+Plugin",
                     "HTML Publisher Plugin");
             listener.getLogger().println(" not found, do not archive concordion reports.");
@@ -130,29 +133,32 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         for (final FilePath path : paths) {
             files.add(XmlUtils.getPathInWorkspace(path.getRemote(), workspace));
         }
+
         final HtmlPublisherTarget target = new HtmlPublisherTarget("Concordion reports", ".",
                 XmlUtils.join(files, ","), true, true, true);
 
         try {
             listener.getLogger().println(
-                    "[withMaven] Publishing HTML reports named \"Concordion reports\" with the following files: "
-                            + target.getReportFiles());
+                    "[withMaven - concordionPublisher] Publishing HTML reports named \"" + target.getReportName()  +
+                            "\" with the following files: " + target.getReportFiles());
             HtmlPublisher.publishReports(run, workspace, launcher, listener, Arrays.asList(target),
                     HtmlPublisher.class);
         } catch (final Exception e) {
-            listener.error("[withMaven] Silently ignore exception archiving Concordion reports: " + e);
+            listener.error("[withMaven - concordionPublisher] Silently ignore exception archiving Concordion reports: " + e);
             LOGGER.log(Level.WARNING, "Exception processing Concordion reports archiving", e);
         }
     }
 
     @Nonnull
-    private Collection<String> findPatterns(@Nonnull List<Element> elements) {
+    private Collection<String> findConcordionOutputDirPatterns(@Nonnull List<Element> elements) {
         List<String> result = new ArrayList<String>();
         for (Element element : elements) {
             Element envVars = XmlUtils.getUniqueChildElementOrNull(XmlUtils.getUniqueChildElement(element, "plugin"), "systemPropertyVariables");
             if (envVars != null) {
                 Element concordionOutputDir = XmlUtils.getUniqueChildElementOrNull(envVars, "concordion.output.dir");
                 if (concordionOutputDir != null) {
+                    // TODO Cyrille Le Clerc 2017-08-06: couldn't we find the root relative path?
+                    // isn't it getPathInWorkspace(${executionEvent.project.baseDir} + ${concordionOutputDir}) ?
                     result.add("**/" + concordionOutputDir.getTextContent().trim() + "/**");
                 }
             }
