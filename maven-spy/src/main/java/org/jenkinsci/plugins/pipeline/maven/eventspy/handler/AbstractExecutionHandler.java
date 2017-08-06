@@ -99,7 +99,10 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
             plugin.setAttribute("executionId", execution.getExecutionId());
 
             for (String configurationParameter : configurationParameters) {
-                plugin.addChild(newElement(configurationParameter, getMojoConfigurationValue(execution, configurationParameter)));
+                Xpp3Dom element = fullClone(configurationParameter, execution.getConfiguration().getChild(configurationParameter));
+                if (element != null) {
+                    plugin.addChild(element);
+                }
             }
         }
 
@@ -134,7 +137,26 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
     @Nullable
     protected String getMojoConfigurationValue(@Nonnull MojoExecution execution, @Nonnull String elementName) {
         Xpp3Dom element = execution.getConfiguration().getChild(elementName);
-        return element.getValue() == null ? element.getAttribute("default-value") : element.getValue();
+        return element == null ? null : element.getValue() == null ? element.getAttribute("default-value") : element.getValue();
     }
 
+    @Nullable
+    protected Xpp3Dom fullClone(@Nonnull String elementName, @Nullable Xpp3Dom element) {
+        if (element == null) {
+            return null;
+        }
+
+        Xpp3Dom result = new Xpp3Dom(elementName);
+
+        Xpp3Dom[] childs = element.getChildren();
+        if (childs != null && childs.length > 0) {
+            for (Xpp3Dom child : childs) {
+                result.addChild(fullClone(child.getName(), child));
+            }
+        } else {
+            result.setValue(element.getValue() == null ? element.getAttribute("default-value") : element.getValue());
+        }
+
+        return result;
+    }
 }

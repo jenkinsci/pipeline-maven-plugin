@@ -56,6 +56,6 @@ public class SurefireTestExecutionHandler extends AbstractExecutionHandler {
     @Nonnull
     @Override
     protected List<String> getConfigurationParametersToReport(ExecutionEvent executionEvent) {
-        return Arrays.asList("reportsDirectory");
+        return Arrays.asList("reportsDirectory", "systemPropertyVariables");
     }
 }
