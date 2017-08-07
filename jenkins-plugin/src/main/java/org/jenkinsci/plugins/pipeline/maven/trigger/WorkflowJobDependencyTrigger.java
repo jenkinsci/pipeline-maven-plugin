@@ -1,13 +1,14 @@
 package org.jenkinsci.plugins.pipeline.maven.trigger;
 
 import hudson.Extension;
-import hudson.model.Cause;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import jenkins.branch.MultiBranchProject;
 import jenkins.branch.OrganizationFolder;
+
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -21,6 +22,7 @@ public class WorkflowJobDependencyTrigger extends Trigger<Job<?, ?>> {
 
     }
 
+    @Symbol("snapshotDependencies")
     @Extension
     public static class DescriptorImpl extends TriggerDescriptor {
         @Override
