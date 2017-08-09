@@ -189,6 +189,17 @@ public class XmlUtilsTest {
         Assert.assertThat(actual, CoreMatchers.is(expected));
     }
 
+    @Issue("JENKINS-46084")
+    @Test
+    public void test_getPathInWorkspace_symlink_on_workspace_ok_JENKINS_JENKINS_46084() {
+        // relativize to "/workspace/"
+        String workspace = "/var/lib/jenkins/workspace/testjob";
+        String absolutePath = "/app/Jenkins/home/workspace/testjob/pom.xml";
+        String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
+        String expected = "pom.xml";
+        Assert.assertThat(actual, CoreMatchers.is(expected));
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void test_getPathInWorkspace_windows_ko(){
         String workspace = "C:\\path\\to\\spring-petclinic";

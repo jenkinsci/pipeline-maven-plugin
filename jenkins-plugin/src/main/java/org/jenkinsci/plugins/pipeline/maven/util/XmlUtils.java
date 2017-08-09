@@ -32,6 +32,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import java.io.File;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -195,6 +196,10 @@ public class XmlUtils {
     /**
      * Relativize path
      *
+     * TODO replace all the workarounds (JENKINS-44088, JENKINS-46084, mac special folders...) by a unique call to
+     * {@link File#getCanonicalPath()} on the workspace for the whole "MavenSpyLogProcessor#processMavenSpyLogs" code block.
+     * We donb't want to pay an RPC call to {@link File#getCanonicalPath()} each time.
+     *
      * @return relativized path
      * @throws IllegalArgumentException if {@code other} is not a {@code Path} that can be relativized
      *                                  against this path
@@ -206,13 +211,14 @@ public class XmlUtils {
 
         final String workspaceRemote = workspace.getRemote();
 
-        final String sanitizedAbsoluteFilePath;
-        final String sanitizedWorkspaceRemote;
+        String sanitizedAbsoluteFilePath;
+        String sanitizedWorkspaceRemote;
         if (windows) {
-            // sanitize see JENKINS-44088
+            // sanitize to workaround JENKINS-44088
             sanitizedWorkspaceRemote = workspaceRemote.replace('/', '\\');
             sanitizedAbsoluteFilePath = absoluteFilePath.replace('/', '\\');
         } else if (workspaceRemote.startsWith("/var/") && absoluteFilePath.startsWith("/private/var/")) {
+            // workaround MacOSX special folders path
             // eg String workspace = "/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven";
             // eg String absolutePath = "/private/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven/pom.xml";
             sanitizedWorkspaceRemote = workspaceRemote;
@@ -222,7 +228,15 @@ public class XmlUtils {
             sanitizedWorkspaceRemote = workspaceRemote;
         }
 
-        if (!StringUtils.startsWithIgnoreCase(sanitizedAbsoluteFilePath, sanitizedWorkspaceRemote)) {
+        if (StringUtils.startsWithIgnoreCase(sanitizedAbsoluteFilePath, sanitizedWorkspaceRemote)) {
+            // OK
+        } else if (sanitizedWorkspaceRemote.contains("/workspace/") && sanitizedAbsoluteFilePath.contains("/workspace/")) {
+            // workaround JENKINS-46084
+            // sanitizedAbsoluteFilePath = '/app/Jenkins/home/workspace/testjob/pom.xml'
+            // sanitizedWorkspaceRemote = '/var/lib/jenkins/workspace/testjob'
+            sanitizedAbsoluteFilePath = "/workspace/" + StringUtils.substringAfter(sanitizedAbsoluteFilePath, "/workspace/");
+            sanitizedWorkspaceRemote = "/workspace/" + StringUtils.substringAfter(sanitizedWorkspaceRemote, "/workspace/");
+        } else {
             throw new IllegalArgumentException("Cannot relativize '" + absoluteFilePath + "' relatively to '" + workspace.getRemote() + "'");
         }
 
