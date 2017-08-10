@@ -51,10 +51,14 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
     @Override
     public void onCompleted(WorkflowRun upstreamBuild, @Nonnull TaskListener listener) {
         LOGGER.log(Level.FINE, "onCompleted({0})", new Object[]{upstreamBuild});
+        if(LOGGER.isLoggable(Level.FINE)) {
+            listener.getLogger().println("[withMaven] pipelineGraphPublisher - triggerDownstreamPipelines");
+        }
 
         if (!GlobalPipelineMavenConfig.getTriggerDownstreamBuildsCriteria().contains(upstreamBuild.getResult())) {
-            LOGGER.log(Level.FINE, "Skip downstream job triggering for upstream build with ignored result status {0}: {1}",
-                    new Object[]{upstreamBuild, upstreamBuild.getResult()});
+            if (LOGGER.isLoggable(Level.FINE)) {
+                listener.getLogger().println("Skip downstream job triggering for upstream build with ignored result status " + upstreamBuild + ": " + upstreamBuild.getResult());
+            }
             return;
         }
 

@@ -73,14 +73,14 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
             try {
                 if (StringUtils.isEmpty(mavenArtifact.file)) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] Can't archive maven artifact with no file attached: " + mavenArtifact);
+                        listener.getLogger().println("[withMaven] artifactsPublisher - Can't archive maven artifact with no file attached: " + mavenArtifact);
                     }
                     continue;
                 } else if (!(mavenArtifact.file.endsWith("." + mavenArtifact.extension))) {
                     FilePath mavenGeneratedArtifact = workspace.child(XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace));
                     if (mavenGeneratedArtifact.isDirectory()) {
                         if (LOGGER.isLoggable(Level.FINE)) {
-                            listener.getLogger().println("[withMaven] Skip archiving for generated maven artifact of type directory (it's likely to be target/classes, see JENKINS-43714) " + mavenArtifact);
+                            listener.getLogger().println("[withMaven] artifactsPublisher - Skip archiving for generated maven artifact of type directory (it's likely to be target/classes, see JENKINS-43714) " + mavenArtifact);
                         }
                         continue;
                     }
@@ -94,29 +94,29 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
 
                 String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace);
                 if (StringUtils.isEmpty(artifactPathInWorkspace)) {
-                    listener.error("[withMaven] Invalid path in the workspace (" + workspace.getRemote() + ") for artifact " + mavenArtifact);
+                    listener.error("[withMaven] artifactsPublisher - Invalid path in the workspace (" + workspace.getRemote() + ") for artifact " + mavenArtifact);
                 } else if (Objects.equals(artifactPathInArchiveZone, mavenArtifact.file)) { // troubleshoot JENKINS-44088
-                    listener.error("[withMaven] Failed to relativize '" + mavenArtifact.file + "' in workspace '" + workspace.getRemote() + "' with file separator '" + fileSeparatorOnAgent + "'");
+                    listener.error("[withMaven] artifactsPublisher - Failed to relativize '" + mavenArtifact.file + "' in workspace '" + workspace.getRemote() + "' with file separator '" + fileSeparatorOnAgent + "'");
                 } else {
                     FilePath artifactFilePath = new FilePath(workspace, artifactPathInWorkspace);
                     if (artifactFilePath.exists()) {
                         // the subsequent call to digest could test the existence but we don't want to prematurely optimize performances
-                        listener.getLogger().println("[withMaven] Archive artifact " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone);
+                        listener.getLogger().println("[withMaven] artifactsPublisher - Archive artifact " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone);
                         artifactsToArchive.put(artifactPathInArchiveZone, artifactPathInWorkspace);
                         String artifactDigest = artifactFilePath.digest();
                         artifactsToFingerPrint.put(artifactPathInArchiveZone, artifactDigest);
                     } else {
-                        listener.getLogger().println("[withMaven] FAILURE to archive " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone + ", file not found in workspace " + workspace);
+                        listener.getLogger().println("[withMaven] artifactsPublisher - FAILURE to archive " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone + ", file not found in workspace " + workspace);
                     }
                 }
             } catch (IOException | RuntimeException e) {
-                listener.error("[withMaven] WARNING: Exception archiving and fingerprinting " + mavenArtifact + ", skip archiving of the artifacts");
+                listener.error("[withMaven] artifactsPublisher - WARNING: Exception archiving and fingerprinting " + mavenArtifact + ", skip archiving of the artifacts");
                 e.printStackTrace(listener.getLogger());
                 listener.getLogger().flush();
             }
         }
         if (LOGGER.isLoggable(Level.FINE)) {
-            listener.getLogger().println("[withMaven] Archive and fingerprint artifacts " + artifactsToArchive + " located in workspace " + workspace.getRemote());
+            listener.getLogger().println("[withMaven] artifactsPublisher - Archive and fingerprint artifacts " + artifactsToArchive + " located in workspace " + workspace.getRemote());
         }
 
         // ARCHIVE GENERATED MAVEN ARTIFACT

@@ -175,7 +175,7 @@ class WithMavenStepExecution extends StepExecution {
         ConsoleLogFilter consFilter = BodyInvoker.mergeConsoleLogFilters(getContext().get(ConsoleLogFilter.class), new MavenConsoleFilter(getComputer().getDefaultCharset().name()));
         EnvironmentExpander envEx = EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), new ExpanderImpl(envOverride));
 
-        LOGGER.log(Level.FINE, "envOverride: {0}", envOverride); // JENKINS-40484
+        LOGGER.log(Level.FINEST, "envOverride: {0}", envOverride); // JENKINS-40484
 
         body = getContext().newBodyInvoker().withContexts(envEx, consFilter).withCallback(new Callback(tempBinDir, step.getOptions())).start();
 
@@ -509,7 +509,7 @@ class WithMavenStepExecution extends StepExecution {
         c.append(argList.toString()).append(isUnix ? " \"$@\"" : " %*").append(lineSep);
 
         String content = c.toString();
-        LOGGER.log(Level.FINE, "Generated wrapper: {0}", content);
+        LOGGER.log(Level.FINER, "Generated wrapper: {0}", content);
         return content;
     }
 

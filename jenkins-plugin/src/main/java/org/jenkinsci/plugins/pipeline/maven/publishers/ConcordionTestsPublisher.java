@@ -98,7 +98,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
 
         if (concordionOutputDirPatterns.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println("[withMaven - concordionPublisher] No concordion output dir pattern given, skip.");
+                listener.getLogger().println("[withMaven] concordionPublisher - No concordion output dir pattern given, skip.");
             }
             return;
         }
@@ -110,19 +110,19 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         if (paths.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger().println(
-                        "[withMaven - concordionPublisher] Did not found any Concordion reports directory, skip.");
+                        "[withMaven] concordionPublisher - Did not found any Concordion reports directory, skip.");
             }
             return;
         }
 
         listener.getLogger().println(
-                "[withMaven - concordionPublisher] Found " + paths.size() + " file(s) in Concordion reports directory.");
+                "[withMaven] concordionPublisher - Found " + paths.size() + " file(s) in Concordion reports directory.");
 
 
         try {
             Class.forName("htmlpublisher.HtmlPublisher");
         } catch (final ClassNotFoundException e) {
-            listener.getLogger().print("[withMaven - concordionPublisher] Jenkins ");
+            listener.getLogger().print("[withMaven] concordionPublisher - Jenkins ");
             listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/HTML+Publisher+Plugin",
                     "HTML Publisher Plugin");
             listener.getLogger().println(" not found, do not archive concordion reports.");
@@ -139,12 +139,12 @@ public class ConcordionTestsPublisher extends MavenPublisher {
 
         try {
             listener.getLogger().println(
-                    "[withMaven - concordionPublisher] Publishing HTML reports named \"" + target.getReportName()  +
+                    "[withMaven] concordionPublisher - Publishing HTML reports named \"" + target.getReportName()  +
                             "\" with the following files: " + target.getReportFiles());
             HtmlPublisher.publishReports(run, workspace, launcher, listener, Arrays.asList(target),
                     HtmlPublisher.class);
         } catch (final Exception e) {
-            listener.error("[withMaven - concordionPublisher] Silently ignore exception archiving Concordion reports: " + e);
+            listener.error("[withMaven] concordionPublisher - Silently ignore exception archiving Concordion reports: " + e);
             LOGGER.log(Level.WARNING, "Exception processing Concordion reports archiving", e);
         }
     }
