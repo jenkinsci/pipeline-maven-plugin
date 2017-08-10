@@ -92,11 +92,12 @@ public class DependencyResolutionResultHandler extends AbstractMavenEventHandler
             dependencyElt.setAttribute("groupId", artifact.getGroupId());
             dependencyElt.setAttribute("artifactId", artifact.getArtifactId());
             dependencyElt.setAttribute("version", artifact.getVersion());
+            dependencyElt.setAttribute("baseVersion", artifact.getBaseVersion());
             if (artifact.getClassifier() != null) {
                 dependencyElt.setAttribute("classifier", artifact.getClassifier());
             }
             dependencyElt.setAttribute("type", artifact.getExtension());
-            dependencyElt.setAttribute("id", artifact.getVersion());
+            dependencyElt.setAttribute("id", artifact.getArtifactId());
             dependencyElt.setAttribute("extension", artifact.getExtension());
             dependencyElt.setAttribute("scope", dependency.getScope());
             dependencyElt.setAttribute("optional", Boolean.toString(dependency.isOptional()));

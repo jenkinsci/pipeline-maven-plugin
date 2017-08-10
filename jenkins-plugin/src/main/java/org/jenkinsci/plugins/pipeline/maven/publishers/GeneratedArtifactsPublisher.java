@@ -89,8 +89,8 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                 String artifactPathInArchiveZone =
                         mavenArtifact.groupId.replace(".", fileSeparatorOnAgent) + fileSeparatorOnAgent +
                                 mavenArtifact.artifactId + fileSeparatorOnAgent +
-                                mavenArtifact.version + fileSeparatorOnAgent +
-                                mavenArtifact.getFileName();
+                                mavenArtifact.baseVersion + fileSeparatorOnAgent +
+                                mavenArtifact.getFileNameWithBaseVersion();
 
                 String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace);
                 if (StringUtils.isEmpty(artifactPathInWorkspace)) {
@@ -180,11 +180,12 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
 
             Element projectElt = XmlUtils.getUniqueChildElement(projectSucceededElt, "project");
             MavenSpyLogProcessor.MavenArtifact projectArtifact = XmlUtils.newMavenArtifact(projectElt);
-
             MavenSpyLogProcessor.MavenArtifact pomArtifact = new MavenSpyLogProcessor.MavenArtifact();
             pomArtifact.groupId = projectArtifact.groupId;
             pomArtifact.artifactId = projectArtifact.artifactId;
+            pomArtifact.baseVersion = projectArtifact.baseVersion;
             pomArtifact.version = projectArtifact.version;
+            pomArtifact.snapshot = projectArtifact.snapshot;
             pomArtifact.type = "pom";
             pomArtifact.extension = "pom";
             pomArtifact.file = projectElt.getAttribute("file");

@@ -129,7 +129,7 @@ public class TasksScannerPublisher extends MavenPublisher {
 
             if (workspace.child(sourceDirectoryRelativePath).exists()) {
                 sourceDirectoriesPatterns.add(sourceDirectoryRelativePath + fileSeparatorOnAgent + "**" + fileSeparatorOnAgent + "*");
-                listener.getLogger().println("[withMaven] openTasksPublisher - Scan Tasks for Maven artifact " + mavenArtifact.toString() + " in source directory " + sourceDirectoryRelativePath);
+                listener.getLogger().println("[withMaven] openTasksPublisher - Scan Tasks for Maven artifact " + mavenArtifact.getId() + " in source directory " + sourceDirectoryRelativePath);
             } else {
                 LOGGER.log(Level.FINE, "Skip task scanning for {0}, folder {1} does not exist", new Object[]{mavenArtifact, sourceDirectoryRelativePath});
             }

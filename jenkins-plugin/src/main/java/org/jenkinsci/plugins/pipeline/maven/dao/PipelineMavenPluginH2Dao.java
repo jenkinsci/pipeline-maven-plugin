@@ -108,15 +108,16 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     }
 
     @Override
-    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type) {
+    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion) {
         LOGGER.log(Level.FINE, "recordGeneratedArtifact({0}#{1}, {2}:{3}:{4}:{5}})", new Object[]{jobFullName, buildNumber, groupId, artifactId, version, type});
         long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
-        long artifactPrimaryKey = getOrCreateArtifactPrimaryKey(groupId, artifactId, version, type);
+        long artifactPrimaryKey = getOrCreateArtifactPrimaryKey(groupId, artifactId, baseVersion, type);
 
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
-            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO GENERATED_MAVEN_ARTIFACT(ARTIFACT_ID, BUILD_ID) VALUES (?, ?)")) {
+            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO GENERATED_MAVEN_ARTIFACT(ARTIFACT_ID, BUILD_ID, VERSION) VALUES (?, ?, ?)")) {
                 stmt.setLong(1, artifactPrimaryKey);
                 stmt.setLong(2, buildPrimaryKey);
+                stmt.setString(3, version);
                 stmt.execute();
             }
         } catch (SQLException e) {

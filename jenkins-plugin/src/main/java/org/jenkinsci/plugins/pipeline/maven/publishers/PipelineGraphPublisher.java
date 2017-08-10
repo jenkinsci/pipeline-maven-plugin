@@ -1,13 +1,8 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.Extension;
-import hudson.FilePath;
-import hudson.model.FingerprintMap;
-import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.tasks.Fingerprinter;
-import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
@@ -22,9 +17,7 @@ import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -120,7 +113,8 @@ public class PipelineGraphPublisher extends MavenPublisher {
                     listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record dependency: " + dependency);
                 }
 
-                dao.recordDependency(run.getParent().getFullName(), run.getNumber(), dependency.groupId, dependency.artifactId, dependency.version, dependency.type, dependency.getScope());
+                dao.recordDependency(run.getParent().getFullName(), run.getNumber(),
+                        dependency.groupId, dependency.artifactId, dependency.version, dependency.type, dependency.getScope());
 
             } catch (RuntimeException e) {
                 listener.error("[withMaven] pipelineGraphPublisher - WARNING: Exception recording " + dependency + " on build, skip");
@@ -141,7 +135,8 @@ public class PipelineGraphPublisher extends MavenPublisher {
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact);
             }
-            dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(), artifact.groupId, artifact.artifactId, artifact.version, artifact.type);
+            dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
+                    artifact.groupId, artifact.artifactId, artifact.version, artifact.type, artifact.baseVersion);
         }
     }
 
@@ -167,7 +162,9 @@ public class PipelineGraphPublisher extends MavenPublisher {
             MavenSpyLogProcessor.MavenArtifact pomArtifact = new MavenSpyLogProcessor.MavenArtifact();
             pomArtifact.groupId = projectArtifact.groupId;
             pomArtifact.artifactId = projectArtifact.artifactId;
+            pomArtifact.baseVersion = projectArtifact.baseVersion;
             pomArtifact.version = projectArtifact.version;
+            pomArtifact.snapshot = projectArtifact.snapshot;
             pomArtifact.type = "pom";
             pomArtifact.extension = "pom";
             pomArtifact.file = projectElt.getAttribute("file");
