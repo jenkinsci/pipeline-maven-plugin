@@ -153,8 +153,8 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
                 String dependencyMavenRepoStyleFilePath =
                         dependency.groupId.replace('.', '/') + "/" +
                                 dependency.artifactId + "/" +
-                                dependency.version + "/" +
-                                dependency.getFileName();
+                                dependency.baseVersion + "/" +
+                                dependency.getFileNameWithBaseVersion();
 
 
                 if (dependencyFilePath.exists()) {

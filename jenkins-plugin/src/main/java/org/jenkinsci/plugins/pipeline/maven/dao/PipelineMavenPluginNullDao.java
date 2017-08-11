@@ -39,7 +39,7 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     }
 
     @Override
-    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type) {
+    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion) {
 
     }
 

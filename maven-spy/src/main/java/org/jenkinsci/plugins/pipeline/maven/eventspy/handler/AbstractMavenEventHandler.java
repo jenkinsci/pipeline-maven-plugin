@@ -180,7 +180,9 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
 
         element.setAttribute("groupId", artifact.getGroupId());
         element.setAttribute("artifactId", artifact.getArtifactId());
+        element.setAttribute("baseVersion", artifact.getBaseVersion());
         element.setAttribute("version", artifact.getVersion());
+        element.setAttribute("snapshot", String.valueOf(artifact.isSnapshot()));
         if (artifact.getClassifier() != null) {
             element.setAttribute("classifier", artifact.getClassifier());
         }

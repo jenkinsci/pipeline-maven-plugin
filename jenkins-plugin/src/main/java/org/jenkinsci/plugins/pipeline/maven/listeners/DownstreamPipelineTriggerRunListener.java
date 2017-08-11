@@ -69,7 +69,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             final WorkflowJob downstreamPipeline = Jenkins.getInstance().getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
             if (downstreamPipeline == null) {
                 LOGGER.log(Level.FINE, "Downstream pipeline {0} not found from upstream build {1} with authentication {2}. Database synchronization issue?",
-                        new Object[]{downstreamPipelineFullName, upstreamBuild, Jenkins.getAuthentication()});
+                        new Object[]{downstreamPipelineFullName, upstreamBuild.getFullDisplayName(), Jenkins.getAuthentication()});
                 // job not found, the database was probably out of sync
                 continue;
             }
@@ -80,13 +80,13 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
 
             if (!downstreamPipeline.isBuildable()) {
                 LOGGER.log(Level.FINE, "Skip triggering of non buildable (disabled: {0}, isHoldOffBuildUntilSave: {1}) downstream pipeline {2} from upstream build {3}",
-                        new Object[]{downstreamPipeline.isDisabled(), downstreamPipeline.isHoldOffBuildUntilSave(), downstreamPipeline, upstreamBuild});
+                        new Object[]{downstreamPipeline.isDisabled(), downstreamPipeline.isHoldOffBuildUntilSave(), downstreamPipeline.getFullName(), upstreamBuild.getFullDisplayName()});
                 continue;
             }
 
             WorkflowJobDependencyTrigger downstreamPipelineTrigger = getWorkflowJobDependencyTrigger(downstreamPipeline);
             if (downstreamPipelineTrigger == null) {
-                LOGGER.log(Level.FINE, "Skip triggering of downstream pipeline {0} from upstream build {1}: dependency trigger not configured", new Object[]{downstreamPipeline, upstreamBuild});
+                LOGGER.log(Level.FINE, "Skip triggering of downstream pipeline {0} from upstream build {1}: dependency trigger not configured", new Object[]{downstreamPipeline.getFullName(), upstreamBuild.getFullDisplayName()});
                 continue;
             }
 
@@ -95,8 +95,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
 
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.log(Level.FINER,
-                        "upstreamPipeline (" + upstreamPipeline + ", visibleByDownstreamBuildAuth: " + upstreamVisibleByDownstreamBuildAuth + "), " +
-                                " downstreamPipeline (" + downstreamPipeline + ", visibleByUpstreamBuildAuth: " + downstreamVisibleByUpstreamBuildAuth + "), " +
+                        "upstreamPipeline (" + upstreamPipeline.getFullName() + ", visibleByDownstreamBuildAuth: " + upstreamVisibleByDownstreamBuildAuth + "), " +
+                                " downstreamPipeline (" + downstreamPipeline.getFullName() + ", visibleByUpstreamBuildAuth: " + downstreamVisibleByUpstreamBuildAuth + "), " +
                                 "upstreamBuildAuth: " + Jenkins.getAuthentication());
             }
             if (downstreamVisibleByUpstreamBuildAuth && upstreamVisibleByDownstreamBuildAuth) {
@@ -108,8 +108,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                     listener.getLogger().println("[withMaven] Scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + "#" + downstreamPipeline.getNextBuildNumber() + "...");
                 }
             } else {
-                LOGGER.log(Level.FINE, "Skip triggering of {0} by {1}: downstreamVisibleByUpstreamBuildAuth:{2}, upstreamVisibleByDownstreamBuildAuth:{3}",
-                        new Object[]{downstreamPipeline, upstreamBuild, downstreamVisibleByUpstreamBuildAuth, upstreamVisibleByDownstreamBuildAuth});
+                LOGGER.log(Level.FINE, "Skip triggering of {0} by {1}: downstreamVisibleByUpstreamBuildAuth: {2}, upstreamVisibleByDownstreamBuildAuth: {3}",
+                        new Object[]{downstreamPipeline.getFullName(), upstreamBuild.getFullDisplayName(), downstreamVisibleByUpstreamBuildAuth, upstreamVisibleByDownstreamBuildAuth});
             }
         }
 

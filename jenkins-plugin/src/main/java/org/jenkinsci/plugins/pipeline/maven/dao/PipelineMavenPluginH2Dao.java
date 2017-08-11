@@ -96,29 +96,34 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         long artifactPrimaryKey = getOrCreateArtifactPrimaryKey(groupId, artifactId, version, type);
 
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            cnn.setAutoCommit(false);
             try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO MAVEN_DEPENDENCY(ARTIFACT_ID, BUILD_ID, SCOPE) VALUES (?, ?, ?)")) {
                 stmt.setLong(1, artifactPrimaryKey);
                 stmt.setLong(2, buildPrimaryKey);
                 stmt.setString(3, scope);
                 stmt.execute();
             }
+            cnn.commit();
         } catch (SQLException e) {
             throw new RuntimeSqlException(e);
         }
     }
 
     @Override
-    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type) {
-        LOGGER.log(Level.FINE, "recordGeneratedArtifact({0}#{1}, {2}:{3}:{4}:{5}})", new Object[]{jobFullName, buildNumber, groupId, artifactId, version, type});
+    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion) {
+        LOGGER.log(Level.FINE, "recordGeneratedArtifact({0}#{1}, {2}:{3}:{4}:{5}, version:{6})", new Object[]{jobFullName, buildNumber, groupId, artifactId, baseVersion, type, version});
         long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
-        long artifactPrimaryKey = getOrCreateArtifactPrimaryKey(groupId, artifactId, version, type);
+        long artifactPrimaryKey = getOrCreateArtifactPrimaryKey(groupId, artifactId, baseVersion, type);
 
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
-            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO GENERATED_MAVEN_ARTIFACT(ARTIFACT_ID, BUILD_ID) VALUES (?, ?)")) {
+            cnn.setAutoCommit(false);
+            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO GENERATED_MAVEN_ARTIFACT(ARTIFACT_ID, BUILD_ID, VERSION) VALUES (?, ?, ?)")) {
                 stmt.setLong(1, artifactPrimaryKey);
                 stmt.setLong(2, buildPrimaryKey);
+                stmt.setString(3, version);
                 stmt.execute();
             }
+            cnn.commit();
         } catch (SQLException e) {
             throw new RuntimeSqlException(e);
         }
@@ -128,12 +133,14 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     public void renameJob(String oldFullName, String newFullName) {
         LOGGER.log(Level.FINER, "renameJob({0}, {1})", new Object[]{oldFullName, newFullName});
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            cnn.setAutoCommit(false);
             try (PreparedStatement stmt = cnn.prepareStatement("UPDATE JENKINS_JOB SET FULL_NAME = ? WHERE FULL_NAME = ?")) {
                 stmt.setString(1, newFullName);
                 stmt.setString(2, oldFullName);
                 int count = stmt.executeUpdate();
                 LOGGER.log(Level.FINE, "renameJob({0}, {1}): {2}", new Object[]{oldFullName, newFullName, count});
             }
+            cnn.commit();
         } catch (SQLException e) {
             throw new RuntimeSqlException(e);
         }
@@ -143,11 +150,13 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     public void deleteJob(String jobFullName) {
         LOGGER.log(Level.FINER, "deleteJob({0})", new Object[]{jobFullName});
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            cnn.setAutoCommit(false);
             try (PreparedStatement stmt = cnn.prepareStatement("DELETE FROM JENKINS_JOB WHERE FULL_NAME = ?")) {
                 stmt.setString(1, jobFullName);
                 int count = stmt.executeUpdate();
                 LOGGER.log(Level.FINE, "deleteJob({0}): {1}", new Object[]{jobFullName, count});
             }
+            cnn.commit();
         } catch (SQLException e) {
             throw new RuntimeSqlException(e);
         }
@@ -157,6 +166,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     public void deleteBuild(String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "deleteBuild({0}#{1})", new Object[]{jobFullName, buildNumber});
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            cnn.setAutoCommit(false);
             Long jobPrimaryKey;
             try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM JENKINS_JOB WHERE FULL_NAME = ?")) {
                 stmt.setString(1, jobFullName);
@@ -179,6 +189,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 int count = stmt.executeUpdate();
                 LOGGER.log(Level.FINE, "deleteJob({0}#{1}): {2}", new Object[]{jobFullName, buildNumber, count});
             }
+            cnn.commit();
         } catch (SQLException e) {
             throw new RuntimeSqlException(e);
         }
@@ -187,11 +198,13 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     @Override
     public void cleanup() {
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            cnn.setAutoCommit(false);
             String sql = "DELETE FROM MAVEN_ARTIFACT WHERE ID NOT IN (SELECT DISTINCT ARTIFACT_ID FROM MAVEN_DEPENDENCY UNION SELECT DISTINCT ARTIFACT_ID FROM GENERATED_MAVEN_ARTIFACT)";
             try (Statement stmt = cnn.createStatement()) {
                 int count = stmt.executeUpdate(sql);
                 LOGGER.log(Level.FINE, "cleanup(): {0}", new Object[]{count});
             }
+            cnn.commit();
         } catch (SQLException e) {
             throw new RuntimeSqlException(e);
         }
@@ -199,6 +212,8 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
     protected long getOrCreateBuildPrimaryKey(String jobFullName, int buildNumber) {
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            cnn.setAutoCommit(false);
+
             Long jobPrimaryKey = null;
             try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM JENKINS_JOB WHERE FULL_NAME=?")) {
                 stmt.setString(1, jobFullName);
@@ -246,6 +261,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                     }
                 }
             }
+            cnn.commit();
             return buildPrimaryKey;
         } catch (SQLException e) {
             throw new RuntimeSqlException(e);
@@ -254,6 +270,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
     protected long getOrCreateArtifactPrimaryKey(String groupId, String artifactId, String version, String type) {
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            cnn.setAutoCommit(false);
             // get or create build record
             Long artifactPrimaryKey = null;
             try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM MAVEN_ARTIFACT WHERE GROUP_ID = ? AND ARTIFACT_ID = ? AND VERSION = ? AND TYPE = ?")) {
@@ -284,6 +301,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                     }
                 }
             }
+            cnn.commit();
             return artifactPrimaryKey;
         } catch (SQLException e) {
             throw new RuntimeSqlException(e);
@@ -292,6 +310,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
     protected synchronized void initializeDatabase() {
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            cnn.setAutoCommit(false);
             int initialSchemaVersion = getSchemaVersion(cnn);
 
             LOGGER.log(Level.FINE, "Initialise database. Current schema version: {0}", new Object[]{initialSchemaVersion});
@@ -313,6 +332,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                         throw new RuntimeIoException("Exception reading " + sqlScriptPath, e);
                     }
                 }
+                cnn.commit();
             }
             int newSchemaVersion = getSchemaVersion(cnn);
 
@@ -389,7 +409,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 " ORDER BY DOWNSTREAM_JOB.FULL_NAME";
 
         List<String> downstreamJobsFullNames = new ArrayList<>();
-        LOGGER.log(Level.FINEST, sql);
+        LOGGER.log(Level.FINER, "sql: {0}, jobFullName:{1}, buildNumber: {2}", new Object[]{sql, jobFullName, buildNumber});
 
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             try (PreparedStatement stmt = cnn.prepareStatement(sql)) {

@@ -1,13 +1,8 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.Extension;
-import hudson.FilePath;
-import hudson.model.FingerprintMap;
-import hudson.model.Job;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.tasks.Fingerprinter;
-import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
@@ -22,9 +17,7 @@ import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -96,34 +89,35 @@ public class PipelineGraphPublisher extends MavenPublisher {
             if (dependency.snapshot) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording snapshot dependency: " + dependency);
+                        listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording snapshot dependency: " + dependency.getId());
                     }
                     continue;
                 }
             } else {
                 if (!includeReleaseVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording release dependency: " + dependency);
+                        listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording release dependency: " + dependency.getId());
                     }
                     continue;
                 }
             }
             if (!getIncludedScopes().contains(dependency.getScope())) {
                 if (LOGGER.isLoggable(Level.FINER)) {
-                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording dependency with ignored scope: " + dependency);
+                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording dependency with ignored scope: " + dependency.getId());
                 }
                 continue;
             }
 
             try {
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record dependency: " + dependency);
+                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record dependency: " + dependency.getId());
                 }
 
-                dao.recordDependency(run.getParent().getFullName(), run.getNumber(), dependency.groupId, dependency.artifactId, dependency.version, dependency.type, dependency.getScope());
+                dao.recordDependency(run.getParent().getFullName(), run.getNumber(),
+                        dependency.groupId, dependency.artifactId, dependency.baseVersion, dependency.type, dependency.getScope());
 
             } catch (RuntimeException e) {
-                listener.error("[withMaven] pipelineGraphPublisher - WARNING: Exception recording " + dependency + " on build, skip");
+                listener.error("[withMaven] pipelineGraphPublisher - WARNING: Exception recording " + dependency.getId() + " on build, skip");
                 e.printStackTrace(listener.getLogger());
                 listener.getLogger().flush();
             }
@@ -132,16 +126,18 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
     protected void recordGeneratedArtifacts(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
-            listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordGeneratedArtifacts");
+            listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordGeneratedArtifacts...");
         }
         List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts = listArtifacts(mavenSpyLogsElt);
         for(MavenSpyLogProcessor.MavenArtifact artifact: generatedArtifacts) {
-            LOGGER.log(Level.FINE, "Build {0}#{1} - record generated {2}:{3}:{4}:{5}",
-                    new Object[]{run.getParent().getFullName(), run.getNumber(), artifact.groupId, artifact.artifactId, artifact.version, artifact.type});
+
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact);
+                LOGGER.log(Level.FINE, "Build {0}#{1} - record generated {2}:{3}, version:{4}",
+                        new Object[]{run.getParent().getFullName(), run.getNumber(), artifact.getId(), artifact.type, artifact.version});
+                listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact.getId() + ", version: " + artifact.version + ", file: " + artifact.file);
             }
-            dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(), artifact.groupId, artifact.artifactId, artifact.version, artifact.type);
+            dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
+                    artifact.groupId, artifact.artifactId, artifact.version, artifact.type, artifact.baseVersion);
         }
     }
 
@@ -167,7 +163,9 @@ public class PipelineGraphPublisher extends MavenPublisher {
             MavenSpyLogProcessor.MavenArtifact pomArtifact = new MavenSpyLogProcessor.MavenArtifact();
             pomArtifact.groupId = projectArtifact.groupId;
             pomArtifact.artifactId = projectArtifact.artifactId;
+            pomArtifact.baseVersion = projectArtifact.baseVersion;
             pomArtifact.version = projectArtifact.version;
+            pomArtifact.snapshot = projectArtifact.snapshot;
             pomArtifact.type = "pom";
             pomArtifact.extension = "pom";
             pomArtifact.file = projectElt.getAttribute("file");

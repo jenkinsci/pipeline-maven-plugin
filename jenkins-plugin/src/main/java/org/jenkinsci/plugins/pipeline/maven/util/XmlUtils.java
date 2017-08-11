@@ -70,7 +70,6 @@ public class XmlUtils {
         loadMavenArtifact(dependencyElt, dependency);
         dependency.setScope(dependencyElt.getAttribute("scope"));
         dependency.optional = Boolean.valueOf(dependencyElt.getAttribute("optional"));
-        dependency.snapshot = Boolean.valueOf(dependencyElt.getAttribute("snapshot"));
 
         return dependency;
     }
@@ -79,6 +78,11 @@ public class XmlUtils {
         mavenArtifact.groupId = artifactElt.getAttribute("groupId");
         mavenArtifact.artifactId = artifactElt.getAttribute("artifactId");
         mavenArtifact.version = artifactElt.getAttribute("version");
+        mavenArtifact.baseVersion = artifactElt.getAttribute("baseVersion");
+        if (mavenArtifact.baseVersion == null || mavenArtifact.baseVersion.isEmpty()) {
+            mavenArtifact.baseVersion = mavenArtifact.version;
+        }
+        mavenArtifact.snapshot = Boolean.valueOf(artifactElt.getAttribute("snapshot"));
         mavenArtifact.type = artifactElt.getAttribute("type");
         mavenArtifact.classifier = artifactElt.hasAttribute("classifier") ? artifactElt.getAttribute("classifier") : null;
         mavenArtifact.extension = artifactElt.getAttribute("extension");
