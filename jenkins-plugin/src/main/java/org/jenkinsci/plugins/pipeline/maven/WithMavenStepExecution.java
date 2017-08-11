@@ -175,7 +175,7 @@ class WithMavenStepExecution extends StepExecution {
         ConsoleLogFilter consFilter = BodyInvoker.mergeConsoleLogFilters(getContext().get(ConsoleLogFilter.class), new MavenConsoleFilter(getComputer().getDefaultCharset().name()));
         EnvironmentExpander envEx = EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), new ExpanderImpl(envOverride));
 
-        LOGGER.log(Level.FINEST, "envOverride: {0}", envOverride); // JENKINS-40484
+        LOGGER.log(Level.ALL, "envOverride: {0}", envOverride); // JENKINS-40484
 
         body = getContext().newBodyInvoker().withContexts(envEx, consFilter).withCallback(new Callback(tempBinDir, step.getOptions())).start();
 
@@ -829,7 +829,7 @@ class WithMavenStepExecution extends StepExecution {
         private final Map<String, String> overrides;
 
         private ExpanderImpl(EnvVars overrides) {
-            LOGGER.log(Level.FINER, "ExpanderImpl(overrides: {0})", new Object[]{overrides});
+            LOGGER.log(Level.ALL, "ExpanderImpl(overrides: {0})", new Object[]{overrides});
             this.overrides = new HashMap<>();
             for (Entry<String, String> entry : overrides.entrySet()) {
                 this.overrides.put(entry.getKey(), entry.getValue());
@@ -838,9 +838,9 @@ class WithMavenStepExecution extends StepExecution {
 
         @Override
         public void expand(EnvVars env) throws IOException, InterruptedException {
-            LOGGER.log(Level.FINER, "ExpanderImpl.expand - env before expand: {0}", new Object[]{env}); // JENKINS-40484
+            LOGGER.log(Level.ALL, "ExpanderImpl.expand - env before expand: {0}", new Object[]{env}); // JENKINS-40484
             env.overrideAll(overrides);
-            LOGGER.log(Level.FINER, "ExpanderImpl.expand - env after expand: {0}", new Object[]{env}); // JENKINS-40484
+            LOGGER.log(Level.ALL, "ExpanderImpl.expand - env after expand: {0}", new Object[]{env}); // JENKINS-40484
         }
     }
 
