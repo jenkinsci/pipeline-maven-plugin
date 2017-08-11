@@ -75,7 +75,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
         final FilePath[] paths = workspace.list(pattern);
         if (paths == null || paths.length == 0) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println("[withMaven] Pattern \"" + pattern
+                listener.getLogger().println("[withMaven] jgivenPublisher - Pattern \"" + pattern
                         + "\" does not match any file on workspace, aborting.");
             }
             return;
@@ -84,7 +84,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
         try {
             Class.forName("org.jenkinsci.plugins.jgiven.JgivenReportGenerator");
         } catch (final ClassNotFoundException e) {
-            listener.getLogger().print("[withMaven] Jenkins ");
+            listener.getLogger().print("[withMaven] jgivenPublisher - Jenkins ");
             listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/JGiven+Plugin", "JGiven Plugin");
             listener.getLogger().println(" not found, do not archive jgiven reports.");
             return;
@@ -93,10 +93,11 @@ public class JGivenTestsPublisher extends MavenPublisher {
         final JgivenReportGenerator generator = new JgivenReportGenerator(new ArrayList<ReportConfig>());
 
         try {
-            listener.getLogger().println("[withMaven] Running JGiven report generator");
+            listener.getLogger().println("[withMaven] jgivenPublisher - Running JGiven report generator");
             generator.perform(run, workspace, launcher, listener);
         } catch (final Exception e) {
-            listener.error("[withMaven] Silently ignore exception archiving JGiven reports: " + e);
+            listener.error(
+                    "[withMaven] jgivenPublisher - Silently ignore exception archiving JGiven reports: " + e);
             LOGGER.log(Level.WARNING, "Exception processing JGiven reports archiving", e);
         }
     }
