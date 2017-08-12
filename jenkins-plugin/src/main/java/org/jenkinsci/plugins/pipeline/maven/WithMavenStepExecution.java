@@ -47,6 +47,8 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 
+import com.cloudbees.plugins.credentials.Credentials;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -726,6 +728,8 @@ class WithMavenStepExecution extends StepExecution {
 
             final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
 
+            CredentialsProvider.trackAll(build, new ArrayList(resolvedCredentials.values()));
+
             String mavenSettingsFileContent;
             if (resolvedCredentials.isEmpty()) {
                 mavenSettingsFileContent = mavenSettingsConfig.content;
@@ -776,6 +780,8 @@ class WithMavenStepExecution extends StepExecution {
             final List<ServerCredentialMapping> serverCredentialMappings = Objects.firstNonNull(mavenGlobalSettingsConfig.getServerCredentialMappings(), Collections.<ServerCredentialMapping>emptyList());
 
             final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
+
+            CredentialsProvider.trackAll(build, new ArrayList(resolvedCredentials.values()));
 
             String mavenGlobalSettingsFileContent;
             if (resolvedCredentials.isEmpty()) {
