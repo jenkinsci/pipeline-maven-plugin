@@ -47,6 +47,10 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
     private boolean includeScopeProvided = true;
 
+    private boolean skipDownstreamTriggers;
+
+    private boolean ignoreUpstreamTriggers;
+
     @DataBoundConstructor
     public PipelineGraphPublisher() {
         super();
@@ -110,11 +114,12 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
             try {
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record dependency: " + dependency.getId());
+                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record dependency: " + dependency.getId() + ", ignoreUpstreamTriggers: " + ignoreUpstreamTriggers);
                 }
 
                 dao.recordDependency(run.getParent().getFullName(), run.getNumber(),
-                        dependency.groupId, dependency.artifactId, dependency.baseVersion, dependency.type, dependency.getScope());
+                        dependency.groupId, dependency.artifactId, dependency.baseVersion, dependency.type, dependency.getScope(),
+                        this.ignoreUpstreamTriggers);
 
             } catch (RuntimeException e) {
                 listener.error("[withMaven] pipelineGraphPublisher - WARNING: Exception recording " + dependency.getId() + " on build, skip");
@@ -132,12 +137,14 @@ public class PipelineGraphPublisher extends MavenPublisher {
         for(MavenSpyLogProcessor.MavenArtifact artifact: generatedArtifacts) {
 
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, "Build {0}#{1} - record generated {2}:{3}, version:{4}",
-                        new Object[]{run.getParent().getFullName(), run.getNumber(), artifact.getId(), artifact.type, artifact.version});
-                listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact.getId() + ", version: " + artifact.version + ", file: " + artifact.file);
+                LOGGER.log(Level.FINE, "Build {0}#{1} - record generated {2}:{3}, version:{4}, skipDownstreamTriggers:{5}",
+                        new Object[]{run.getParent().getFullName(), run.getNumber(), artifact.getId(), artifact.type, artifact.version, skipDownstreamTriggers});
+                listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact.getId() + ", version: " + artifact.version + ", skipDownstreamTriggers: " + skipDownstreamTriggers +
+                        ", file: " + artifact.file);
             }
             dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
-                    artifact.groupId, artifact.artifactId, artifact.version, artifact.type, artifact.baseVersion);
+                    artifact.groupId, artifact.artifactId, artifact.version, artifact.type, artifact.baseVersion,
+                    this.skipDownstreamTriggers);
         }
     }
 
@@ -288,6 +295,24 @@ public class PipelineGraphPublisher extends MavenPublisher {
     @DataBoundSetter
     public void setIncludeScopeProvided(boolean includeScopeProvided) {
         this.includeScopeProvided = includeScopeProvided;
+    }
+
+    public boolean isSkipDownstreamTriggers() {
+        return skipDownstreamTriggers;
+    }
+
+    @DataBoundSetter
+    public void setSkipDownstreamTriggers(boolean skipDownstreamTriggers) {
+        this.skipDownstreamTriggers = skipDownstreamTriggers;
+    }
+
+    public boolean isIgnoreUpstreamTriggers() {
+        return ignoreUpstreamTriggers;
+    }
+
+    @DataBoundSetter
+    public void setIgnoreUpstreamTriggers(boolean ignoreUpstreamTriggers) {
+        this.ignoreUpstreamTriggers = ignoreUpstreamTriggers;
     }
 
     @Symbol("pipelineGraphPublisher")

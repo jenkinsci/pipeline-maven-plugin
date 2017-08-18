@@ -35,9 +35,13 @@ import javax.annotation.Nonnull;
  */
 public interface PipelineMavenPluginDao {
 
-    void recordDependency(@Nonnull String jobFullName, int buildNumber, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nonnull String scope);
+    void recordDependency(@Nonnull String jobFullName, int buildNumber,
+                          @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nonnull String scope,
+                          boolean ignoreUpstreamTriggers);
 
-    void recordGeneratedArtifact(@Nonnull String jobFullName, int buildNumber, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nonnull String baseVersion);
+    void recordGeneratedArtifact(@Nonnull String jobFullName, int buildNumber,
+                                 @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nonnull String baseVersion,
+                                 boolean skipDownstreamTriggers);
 
     void renameJob(@Nonnull String oldFullName, @Nonnull String newFullName);
 
