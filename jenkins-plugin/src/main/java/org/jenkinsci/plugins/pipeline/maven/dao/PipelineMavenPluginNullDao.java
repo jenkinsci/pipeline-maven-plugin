@@ -34,12 +34,12 @@ import javax.annotation.Nonnull;
  */
 public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     @Override
-    public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope) {
+    public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope, boolean ignoreUpstreamTriggers) {
 
     }
 
     @Override
-    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion) {
+    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion, boolean skipDownstreamTriggers) {
 
     }
 

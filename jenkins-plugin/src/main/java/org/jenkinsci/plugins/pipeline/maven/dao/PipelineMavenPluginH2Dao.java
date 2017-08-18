@@ -90,17 +90,19 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     }
 
     @Override
-    public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope) {
-        LOGGER.log(Level.FINE, "recordDependency({0}#{1}, {2}:{3}:{4}:{5}, {6}})", new Object[]{jobFullName, buildNumber, groupId, artifactId, version, type, scope});
+    public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope, boolean ignoreUpstreamTriggers) {
+        LOGGER.log(Level.FINE, "recordDependency({0}#{1}, {2}:{3}:{4}:{5}, {6}, ignoreUpstreamTriggers:{7}})",
+                new Object[]{jobFullName, buildNumber, groupId, artifactId, version, type, scope, ignoreUpstreamTriggers});
         long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
         long artifactPrimaryKey = getOrCreateArtifactPrimaryKey(groupId, artifactId, version, type);
 
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             cnn.setAutoCommit(false);
-            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO MAVEN_DEPENDENCY(ARTIFACT_ID, BUILD_ID, SCOPE) VALUES (?, ?, ?)")) {
+            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO MAVEN_DEPENDENCY(ARTIFACT_ID, BUILD_ID, SCOPE, IGNORE_UPSTREAM_TRIGGERS) VALUES (?, ?, ?, ?)")) {
                 stmt.setLong(1, artifactPrimaryKey);
                 stmt.setLong(2, buildPrimaryKey);
                 stmt.setString(3, scope);
+                stmt.setBoolean(4, ignoreUpstreamTriggers);
                 stmt.execute();
             }
             cnn.commit();
@@ -110,17 +112,19 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     }
 
     @Override
-    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion) {
-        LOGGER.log(Level.FINE, "recordGeneratedArtifact({0}#{1}, {2}:{3}:{4}:{5}, version:{6})", new Object[]{jobFullName, buildNumber, groupId, artifactId, baseVersion, type, version});
+    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion, boolean skipDownstreamTriggers) {
+        LOGGER.log(Level.FINE, "recordGeneratedArtifact({0}#{1}, {2}:{3}:{4}:{5}, version:{6}, skipDownstreamTriggers:{7})",
+                new Object[]{jobFullName, buildNumber, groupId, artifactId, baseVersion, type, version, skipDownstreamTriggers});
         long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
         long artifactPrimaryKey = getOrCreateArtifactPrimaryKey(groupId, artifactId, baseVersion, type);
 
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             cnn.setAutoCommit(false);
-            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO GENERATED_MAVEN_ARTIFACT(ARTIFACT_ID, BUILD_ID, VERSION) VALUES (?, ?, ?)")) {
+            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO GENERATED_MAVEN_ARTIFACT(ARTIFACT_ID, BUILD_ID, VERSION, SKIP_DOWNSTREAM_TRIGGERS) VALUES (?, ?, ?, ?)")) {
                 stmt.setLong(1, artifactPrimaryKey);
                 stmt.setLong(2, buildPrimaryKey);
                 stmt.setString(3, version);
+                stmt.setBoolean(4, skipDownstreamTriggers);
                 stmt.execute();
             }
             cnn.commit();
@@ -397,7 +401,8 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 " INNER JOIN JENKINS_JOB AS UPSTREAM_JOB ON UPSTREAM_BUILD.JOB_ID = UPSTREAM_JOB.ID " +
                 " WHERE " +
                 "   UPSTREAM_JOB.FULL_NAME = ? AND" +
-                "   UPSTREAM_BUILD.NUMBER = ?";
+                "   UPSTREAM_BUILD.NUMBER = ? AND " +
+                "   GENERATED_MAVEN_ARTIFACT.SKIP_DOWNSTREAM_TRIGGERS = FALSE";
 
         String sql = "SELECT DISTINCT DOWNSTREAM_JOB.FULL_NAME " +
                 " FROM JENKINS_JOB AS DOWNSTREAM_JOB" +
@@ -405,6 +410,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 " INNER JOIN MAVEN_DEPENDENCY ON DOWNSTREAM_BUILD.ID = MAVEN_DEPENDENCY.BUILD_ID" +
                 " WHERE " +
                 "   MAVEN_DEPENDENCY.ARTIFACT_ID IN (" + generatedArtifactsSql + ") AND " +
+                "   MAVEN_DEPENDENCY.IGNORE_UPSTREAM_TRIGGERS = FALSE AND " +
                 "   DOWNSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE DOWNSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID)" +
                 " ORDER BY DOWNSTREAM_JOB.FULL_NAME";
 

@@ -39,5 +39,10 @@ THE SOFTWARE.
             <f:checkbox title="${%Provided}" field="includeScopeProvided" default="true"/>
             <f:checkbox title="${%Test}" field="includeScopeTest"/>
         </f:entry>
+
+        <f:entry title="${%Triggers}" field="triggers">
+            <f:checkbox title="${%Skip Downstream Triggers}" field="skipDownstreamTriggers" />
+            <f:checkbox title="${%Ignore Upstream Triggers}" field="ignoreUpstreamTriggers" />
+        </f:entry>
     </f:section>
 </j:jelly>
