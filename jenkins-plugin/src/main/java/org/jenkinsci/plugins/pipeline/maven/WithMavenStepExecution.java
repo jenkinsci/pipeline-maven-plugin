@@ -28,14 +28,12 @@ package org.jenkinsci.plugins.pipeline.maven;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.Serializable;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.security.CodeSource;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -49,10 +47,13 @@ import javax.annotation.Nonnull;
 
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.IdCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
+import com.cloudbees.plugins.credentials.common.UsernameCredentials;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -65,7 +66,6 @@ import hudson.Launcher.ProcStarter;
 import hudson.Proc;
 import hudson.Util;
 import hudson.console.ConsoleLogFilter;
-import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
 import hudson.model.Computer;
 import hudson.model.JDK;
@@ -75,7 +75,6 @@ import hudson.model.TaskListener;
 import hudson.slaves.WorkspaceList;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
-import hudson.tasks._maven.MavenConsoleAnnotator;
 import hudson.util.ArgumentListBuilder;
 import jenkins.model.Jenkins;
 import jenkins.mvn.DefaultGlobalSettingsProvider;
@@ -94,6 +93,8 @@ import org.jenkinsci.plugins.configfiles.maven.job.MvnGlobalSettingsProvider;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnSettingsProvider;
 import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
 import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
+import org.jenkinsci.plugins.pipeline.maven.console.MaskPasswordsConsoleLogFilter;
+import org.jenkinsci.plugins.pipeline.maven.console.MavenColorizerConsoleLogFilter;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
 import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
 import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
@@ -172,14 +173,29 @@ class WithMavenStepExecution extends StepExecution {
         withContainer = detectWithContainer();
 
         setupJDK();
-        setupMaven();
 
-        ConsoleLogFilter consFilter = BodyInvoker.mergeConsoleLogFilters(getContext().get(ConsoleLogFilter.class), new MavenConsoleFilter(getComputer().getDefaultCharset().name()));
+        // list of credentials injected by withMaven. They will be tracked and masked in the logs
+        Collection<Credentials> credentials = new ArrayList<>();
+        setupMaven(credentials);
+
+        if (LOGGER.isLoggable(Level.FINE)) {
+            LOGGER.log(Level.FINE, this.build +  " - Track usage and mask password of credentials " + Joiner.on(", ").join(Collections2.transform(credentials, new CredentialsToPrettyString())));
+        }
+        CredentialsProvider.trackAll(build, new ArrayList<>(credentials));
+
+        ConsoleLogFilter originalFilter = getContext().get(ConsoleLogFilter.class);
+        ConsoleLogFilter maskSecretsFilter = MaskPasswordsConsoleLogFilter.newMaskPasswordsConsoleLogFilter(credentials, getComputer().getDefaultCharset());
+        MavenColorizerConsoleLogFilter mavenColorizerFilter = new MavenColorizerConsoleLogFilter(getComputer().getDefaultCharset().name());
+
+        ConsoleLogFilter newFilter = BodyInvoker.mergeConsoleLogFilters(
+                BodyInvoker.mergeConsoleLogFilters(originalFilter, maskSecretsFilter),
+                mavenColorizerFilter);
+
         EnvironmentExpander envEx = EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), new ExpanderImpl(envOverride));
 
         LOGGER.log(Level.ALL, "envOverride: {0}", envOverride); // JENKINS-40484
 
-        body = getContext().newBodyInvoker().withContexts(envEx, consFilter).withCallback(new Callback(tempBinDir, step.getOptions())).start();
+        body = getContext().newBodyInvoker().withContexts(envEx, newFilter).withCallback(new WorkspaceCleanupCallback(tempBinDir, step.getOptions())).start();
 
         return false;
     }
@@ -246,7 +262,14 @@ class WithMavenStepExecution extends StepExecution {
 
     }
 
-    private void setupMaven() throws AbortException, IOException, InterruptedException {
+    /**
+     *
+     * @param credentials list of credentials injected by withMaven. They will be tracked and masked in the logs.
+     * @throws AbortException
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    private void setupMaven(@Nonnull Collection<Credentials> credentials) throws AbortException, IOException, InterruptedException {
         String mvnExecPath = obtainMavenExec();
 
         // Temp dir with the wrapper that will be prepended to the path
@@ -273,7 +296,7 @@ class WithMavenStepExecution extends StepExecution {
                 "-Dorg.jenkinsci.plugins.pipeline.maven.reportsFolder=\"" + this.tempBinDir.getRemote() + "\" ";
         envOverride.put("JAVA_TOOL_OPTIONS", javaToolsOptions);
 
-        String content = mavenWrapperContent(mvnExec, setupSettingFile(), setupGlobalSettingFile(), setupMavenLocalRepo());
+        String content = mavenWrapperContent(mvnExec, setupSettingFile(credentials), setupGlobalSettingFile(credentials), setupMavenLocalRepo());
 
         createWrapperScript(tempBinDir, mvnExec.getName(), content);
 
@@ -559,18 +582,19 @@ class WithMavenStepExecution extends StepExecution {
      * file existence is checked on the build agent, if not found, it will be checked and copied from the master. The
      * file will be generated/copied to the workspace temp folder to make sure docker container can access it.
      *
+     * @param credentials list of credentials injected by withMaven. They will be tracked and masked in the logs.
      * @return the maven settings file path on the agent or {@code null} if none defined
      * @throws InterruptedException when processing remote calls
      * @throws IOException          when reading files
      */
     @Nullable
-    private String setupSettingFile() throws IOException, InterruptedException {
+    private String setupSettingFile(@Nonnull Collection<Credentials> credentials) throws IOException, InterruptedException {
         final FilePath settingsDest = tempBinDir.child("settings.xml");
 
         // Settings from Config File Provider
         if (StringUtils.isNotEmpty(step.getMavenSettingsConfig())) {
             console.format("[withMaven] use Maven settings provided by the Jenkins Managed Configuration File '%s' %n", step.getMavenSettingsConfig());
-            settingsFromConfig(step.getMavenSettingsConfig(), settingsDest);
+            settingsFromConfig(step.getMavenSettingsConfig(), settingsDest, credentials);
             envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         }
@@ -597,7 +621,7 @@ class WithMavenStepExecution extends StepExecution {
         if (settingsProvider instanceof MvnSettingsProvider) {
             MvnSettingsProvider mvnSettingsProvider = (MvnSettingsProvider) settingsProvider;
             console.format("[withMaven] use Maven settings provided by the Jenkins global configuration '%s' %n", mvnSettingsProvider.getSettingsConfigId());
-            settingsFromConfig(mvnSettingsProvider.getSettingsConfigId(), settingsDest);
+            settingsFromConfig(mvnSettingsProvider.getSettingsConfigId(), settingsDest, credentials);
             envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         } else if (settingsProvider instanceof FilePathSettingsProvider) {
@@ -630,18 +654,19 @@ class WithMavenStepExecution extends StepExecution {
      * file existence is checked on the build agent, if not found, it will be checked and copied from the master. The
      * file will be generated/copied to the workspace temp folder to make sure docker container can access it.
      *
-     * @return the mavne global settings file path on the agent or {@code null} if none defined
+     * @param credentials list of credentials injected by withMaven. They will be tracked and masked in the logs.
+     * @return the maven global settings file path on the agent or {@code null} if none defined
      * @throws InterruptedException when processing remote calls
      * @throws IOException          when reading files
      */
     @Nullable
-    private String setupGlobalSettingFile() throws IOException, InterruptedException {
+    private String setupGlobalSettingFile(@Nonnull Collection<Credentials> credentials) throws IOException, InterruptedException {
         final FilePath settingsDest = tempBinDir.child("globalSettings.xml");
 
         // Global settings from Config File Provider
         if (StringUtils.isNotEmpty(step.getGlobalMavenSettingsConfig())) {
             console.format("[withMaven] use Maven global settings provided by the Jenkins Managed Configuration File '%s' %n", step.getGlobalMavenSettingsConfig());
-            globalSettingsFromConfig(step.getGlobalMavenSettingsConfig(), settingsDest);
+            globalSettingsFromConfig(step.getGlobalMavenSettingsConfig(), settingsDest, credentials);
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         }
@@ -667,7 +692,7 @@ class WithMavenStepExecution extends StepExecution {
         if (globalSettingsProvider instanceof MvnGlobalSettingsProvider) {
             MvnGlobalSettingsProvider mvnGlobalSettingsProvider = (MvnGlobalSettingsProvider) globalSettingsProvider;
             console.format("[withMaven] use Maven global settings provided by the Jenkins global configuration '%s' %n", mvnGlobalSettingsProvider.getSettingsConfigId());
-            globalSettingsFromConfig(mvnGlobalSettingsProvider.getSettingsConfigId(), settingsDest);
+            globalSettingsFromConfig(mvnGlobalSettingsProvider.getSettingsConfigId(), settingsDest, credentials);
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
         } else if (globalSettingsProvider instanceof FilePathGlobalSettingsProvider) {
@@ -701,10 +726,11 @@ class WithMavenStepExecution extends StepExecution {
      *
      * @param mavenSettingsConfigId config file id from Config File Provider
      * @param mavenSettingsFile path to write te content to
+     * @param credentials
      * @return the {@link FilePath} to the settings file
      * @throws AbortException in case of error
      */
-    private void settingsFromConfig(String mavenSettingsConfigId, FilePath mavenSettingsFile) throws AbortException {
+    private void settingsFromConfig(String mavenSettingsConfigId, FilePath mavenSettingsFile, @Nonnull Collection<Credentials> credentials) throws AbortException {
 
         Config c = ConfigFiles.getByIdOrNull(build, mavenSettingsConfigId);
         if (c == null) {
@@ -728,7 +754,7 @@ class WithMavenStepExecution extends StepExecution {
 
             final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
 
-            CredentialsProvider.trackAll(build, new ArrayList(resolvedCredentials.values()));
+            credentials.addAll(resolvedCredentials.values());
 
             String mavenSettingsFileContent;
             if (resolvedCredentials.isEmpty()) {
@@ -755,10 +781,11 @@ class WithMavenStepExecution extends StepExecution {
      *
      * @param mavenGlobalSettingsConfigId global config file id from Config File Provider
      * @param mavenGlobalSettingsFile path to write te content to
+     * @param credentials
      * @return the {@link FilePath} to the settings file
      * @throws AbortException in case of error
      */
-    private void globalSettingsFromConfig(String mavenGlobalSettingsConfigId, FilePath mavenGlobalSettingsFile) throws AbortException {
+    private void globalSettingsFromConfig(String mavenGlobalSettingsConfigId, FilePath mavenGlobalSettingsFile, Collection<Credentials> credentials) throws AbortException {
 
         Config c = ConfigFiles.getByIdOrNull(build, mavenGlobalSettingsConfigId);
         if (c == null) {
@@ -781,7 +808,7 @@ class WithMavenStepExecution extends StepExecution {
 
             final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
 
-            CredentialsProvider.trackAll(build, new ArrayList(resolvedCredentials.values()));
+            credentials.addAll(resolvedCredentials.values());
 
             String mavenGlobalSettingsFileContent;
             if (resolvedCredentials.isEmpty()) {
@@ -804,27 +831,6 @@ class WithMavenStepExecution extends StepExecution {
             throw new IllegalStateException("Exception injecting Maven settings.xml " + mavenGlobalSettingsConfig.id +
                     " during the build: " + build + ": " + e.getMessage(), e);
         }
-    }
-
-    /**
-     * Filter to apply {@link MavenConsoleAnnotator} to a pipeline job: pretty print maven output.
-     */
-    private static class MavenConsoleFilter extends ConsoleLogFilter implements Serializable {
-        private static final long serialVersionUID = 1;
-        String charset;
-
-        public MavenConsoleFilter(String charset) {
-            this.charset = charset;
-        }
-
-        @SuppressWarnings("rawtypes") // inherited
-        @Override
-        public OutputStream decorateLogger(AbstractBuild _ignore, final OutputStream logger)
-                throws IOException, InterruptedException {
-            return new MavenConsoleAnnotator(logger, Charset.forName(charset));
-        }
-
-        ;
     }
 
     /**
@@ -853,14 +859,14 @@ class WithMavenStepExecution extends StepExecution {
     /**
      * Callback to cleanup tmp script after finishing the job
      */
-    private static class Callback extends BodyExecutionCallback.TailCall {
+    private static class WorkspaceCleanupCallback extends BodyExecutionCallback.TailCall {
         private final FilePath tempBinDir;
 
         private final List<MavenPublisher> options;
 
         private final MavenSpyLogProcessor mavenSpyLogProcessor = new MavenSpyLogProcessor();
 
-        public Callback(@Nonnull FilePath tempBinDir, @Nonnull List<MavenPublisher> options) {
+        public WorkspaceCleanupCallback(@Nonnull FilePath tempBinDir, @Nonnull List<MavenPublisher> options) {
             this.tempBinDir = tempBinDir;
             this.options = options;
         }
@@ -907,8 +913,8 @@ class WithMavenStepExecution extends StepExecution {
      * @return the computer
      * @throws AbortException in case of error.
      */
-    private @Nonnull
-    Computer getComputer() throws AbortException {
+    @Nonnull
+    private Computer getComputer() throws AbortException {
         if (computer != null) {
             return computer;
         }
@@ -968,6 +974,27 @@ class WithMavenStepExecution extends StepExecution {
                     "username: '" + credentials.getUsername() + "', " +
                     "type: '" + ClassUtils.getShortName(credentials.getClass()) +
                     "']";
+        }
+    }
+
+    private static class CredentialsToPrettyString implements Function<Credentials, String> {
+        @Override
+        public String apply(@javax.annotation.Nullable Credentials credentials) {
+            if (credentials == null)
+                return "null";
+
+            String result = ClassUtils.getShortName(credentials.getClass()) + "[";
+            if (credentials instanceof IdCredentials) {
+                IdCredentials idCredentials = (IdCredentials) credentials;
+                result += "id: " + idCredentials.getId() + ",";
+            }
+
+            if (credentials instanceof UsernameCredentials) {
+                UsernameCredentials usernameCredentials = (UsernameCredentials) credentials;
+                result += "username" + usernameCredentials.getUsername() + "";
+            }
+            result += "]";
+            return result;
         }
     }
 }
