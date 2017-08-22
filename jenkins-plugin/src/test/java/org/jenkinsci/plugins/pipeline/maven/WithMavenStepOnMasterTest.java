@@ -793,6 +793,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         }
     }
 
+    @Issue("JENKINS-27395")
     @Test
     public void maven_build_test_results_by_stage_and_branch() throws Exception {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
