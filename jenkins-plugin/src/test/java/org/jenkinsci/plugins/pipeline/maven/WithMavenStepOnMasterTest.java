@@ -30,15 +30,11 @@ import hudson.model.Fingerprint;
 import hudson.model.Result;
 import hudson.plugins.tasks.TasksResultAction;
 import hudson.tasks.Fingerprinter;
-import hudson.tasks.Maven;
 import hudson.tasks.junit.TestResultAction;
-import jenkins.mvn.DefaultGlobalSettingsProvider;
-import jenkins.mvn.DefaultSettingsProvider;
+import hudson.tasks.junit.pipeline.JUnitResultsStepTest;
 import jenkins.mvn.FilePathGlobalSettingsProvider;
 import jenkins.mvn.FilePathSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
-import jenkins.plugins.git.GitSampleRepoRule;
-import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
 import org.apache.commons.io.FileUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.configfiles.GlobalConfigFiles;
@@ -53,19 +49,10 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.BuildWatcher;
-import org.jvnet.hudson.test.ExtendedToolInstallations;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Level;
@@ -805,4 +792,42 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             GlobalConfigFiles.get().remove(mavenSettingsConfig.id);
         }
     }
+
+    @Test
+    public void maven_build_test_results_by_stage_and_branch() throws Exception {
+        loadMavenJarProjectInGitRepo(this.gitRepoRule);
+
+        String pipelineScript = "stage('first') {\n" +
+                "    parallel(a: {\n" +
+                "        node('master') {\n" +
+                "            git($/" + gitRepoRule.toString() + "/$)\n" +
+                "            withMaven() {\n" +
+                "                sh 'mvn package verify'\n" +
+                "            }\n" +
+                "        }\n" +
+                "    },\n" +
+                "    b: {\n" +
+                "        node('master') {\n" +
+                "            git($/" + gitRepoRule.toString() + "/$)\n" +
+                "            withMaven() {\n" +
+                "                sh 'mvn package verify'\n" +
+                "            }\n" +
+                "        }\n" +
+                "    })\n" +
+                "}";
+
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
+        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun build = jenkinsRule.buildAndAssertSuccess(pipeline);
+
+        TestResultAction testResultAction = build.getAction(TestResultAction.class);
+        assertThat(testResultAction.getTotalCount(), is(6));
+        assertThat(testResultAction.getFailCount(), is(0));
+
+        JUnitResultsStepTest.assertStageResults(build, 4, 6, "first");
+
+        JUnitResultsStepTest.assertBranchResults(build, 2, 3, "a", "first");
+        JUnitResultsStepTest.assertBranchResults(build, 2, 3, "b", "first");
+    }
+
 }
