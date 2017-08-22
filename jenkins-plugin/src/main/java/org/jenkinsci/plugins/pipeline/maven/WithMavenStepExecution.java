@@ -991,7 +991,7 @@ class WithMavenStepExecution extends StepExecution {
 
             if (credentials instanceof UsernameCredentials) {
                 UsernameCredentials usernameCredentials = (UsernameCredentials) credentials;
-                result += "username" + usernameCredentials.getUsername() + "";
+                result += "username: " + usernameCredentials.getUsername() + "";
             }
             result += "]";
             return result;
