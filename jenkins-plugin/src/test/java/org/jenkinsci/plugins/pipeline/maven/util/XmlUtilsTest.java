@@ -191,10 +191,19 @@ public class XmlUtilsTest {
 
     @Issue("JENKINS-46084")
     @Test
-    public void test_getPathInWorkspace_symlink_on_workspace_ok_JENKINS_JENKINS_46084() {
-        // relativize to "/workspace/"
+    public void test_getPathInWorkspace_symlink_on_workspace_ok_JENKINS_46084() {
         String workspace = "/var/lib/jenkins/workspace/testjob";
         String absolutePath = "/app/Jenkins/home/workspace/testjob/pom.xml";
+        String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
+        String expected = "pom.xml";
+        Assert.assertThat(actual, CoreMatchers.is(expected));
+    }
+
+    @Issue("JENKINS-46084")
+    @Test
+    public void test_getPathInWorkspace_symlink_on_workspace_ok_JENKINS_46084_scenario_2() {
+        String workspace = "/var/lib/jenkins/jobs/Test-Pipeline/workspace";
+        String absolutePath = "/storage/jenkins/jobs/Test-Pipeline/workspace/pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "pom.xml";
         Assert.assertThat(actual, CoreMatchers.is(expected));

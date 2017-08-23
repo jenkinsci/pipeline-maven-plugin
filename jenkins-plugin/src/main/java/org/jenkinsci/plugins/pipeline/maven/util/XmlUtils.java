@@ -240,6 +240,11 @@ public class XmlUtils {
             // sanitizedWorkspaceRemote = '/var/lib/jenkins/workspace/testjob'
             sanitizedAbsoluteFilePath = "/workspace/" + StringUtils.substringAfter(sanitizedAbsoluteFilePath, "/workspace/");
             sanitizedWorkspaceRemote = "/workspace/" + StringUtils.substringAfter(sanitizedWorkspaceRemote, "/workspace/");
+        } else if (sanitizedWorkspaceRemote.endsWith("/workspace") && sanitizedAbsoluteFilePath.contains("/workspace/")) {
+            // workspace = "/var/lib/jenkins/jobs/Test-Pipeline/workspace";
+            // absolutePath = "/storage/jenkins/jobs/Test-Pipeline/workspace/pom.xml";
+            sanitizedAbsoluteFilePath = "workspace/" + StringUtils.substringAfter(sanitizedAbsoluteFilePath, "/workspace/");
+            sanitizedWorkspaceRemote = "workspace/";
         } else {
             throw new IllegalArgumentException("Cannot relativize '" + absoluteFilePath + "' relatively to '" + workspace.getRemote() + "'");
         }
