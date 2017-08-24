@@ -6,7 +6,6 @@ import hudson.console.ModelHyperlinkNote;
 import hudson.model.Cause;
 import hudson.model.CauseAction;
 import hudson.model.Item;
-import hudson.model.ParametersDefinitionProperty;
 import hudson.model.Queue;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
@@ -15,23 +14,17 @@ import hudson.security.ACL;
 import hudson.security.ACLContext;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
-import jenkins.branch.MultiBranchProject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import jenkins.security.QueueItemAuthenticatorConfiguration;
-import jenkins.triggers.Messages;
 import org.acegisecurity.Authentication;
-import org.acegisecurity.context.SecurityContext;
-import org.acegisecurity.context.SecurityContextHolder;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -124,9 +117,9 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             }
         }
 
-        if (parameterizedJob.getParent() instanceof WorkflowMultiBranchProject) {
+        if (parameterizedJob.getParent() instanceof ComputedFolder) {
             // search for the triggers of MultiBranch pipelines
-            WorkflowMultiBranchProject multiBranchProject = (WorkflowMultiBranchProject) parameterizedJob.getParent();
+            ComputedFolder<?> multiBranchProject = (ComputedFolder) parameterizedJob.getParent();
             for (Trigger trigger : multiBranchProject.getTriggers().values()) {
                 if (trigger instanceof WorkflowJobDependencyTrigger) {
                     return (WorkflowJobDependencyTrigger) trigger;
@@ -135,7 +128,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
 
             if (multiBranchProject.getParent() instanceof ComputedFolder) {
                 // search for the triggers of GitHubOrg folders / Bitbucket folders
-                ComputedFolder grandParent = (ComputedFolder) multiBranchProject.getParent();
+                ComputedFolder<?> grandParent = (ComputedFolder) multiBranchProject.getParent();
                 Map<TriggerDescriptor, Trigger<?>> grandParentTriggers = grandParent.getTriggers();
                 for (Trigger trigger : grandParentTriggers.values()) {
                     if (trigger instanceof WorkflowJobDependencyTrigger) {
