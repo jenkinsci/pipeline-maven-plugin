@@ -154,6 +154,12 @@
       <version>1.4.2</version>
       <scope>compile</scope>
       <optional>true</optional>
+      <exclusions>
+        <exclusion> <!-- TODO pending https://github.com/jenkinsci/junit-attachments-plugin/pull/18 -->
+          <groupId>org.kohsuke.stapler</groupId>
+          <artifactId>stapler</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
