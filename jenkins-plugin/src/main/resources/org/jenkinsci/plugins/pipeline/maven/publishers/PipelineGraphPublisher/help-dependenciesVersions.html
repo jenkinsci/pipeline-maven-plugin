@@ -1,0 +1,10 @@
+<div>
+    <p>
+        Type of version, "release" or "snapshot", of the Maven dependencies tracked to trigger this pipeline.
+        For example, it may not be desired to trigger this pipeline if a released dependency has changed.
+        <br/>
+        Excluding "release" dependencies is an optimization to reduce the size of the database of the
+        graph of jobs and maven artifacts. Will become less important when the pipeline-maven-plugin will
+        be able to store data in an external database instead of the embedded H2 database.
+    </p>
+</div>

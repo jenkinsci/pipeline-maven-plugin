@@ -28,19 +28,19 @@ THE SOFTWARE.
 
     <st:include page="maven-publisher" class="${descriptor.clazz}"/>
     <f:section title="Dependencies filtering">
-        <f:entry title="${%Include versions}">
+        <f:entry title="${%Include versions}" field="dependenciesVersions">
             <f:checkbox title="${%Snapshots}" field="includeSnapshotVersions" default="true"/>
             <f:checkbox title="${%Releases}" field="includeReleaseVersions"/>
         </f:entry>
 
-        <f:entry title="${%Include Scopes}">
+        <f:entry title="${%Include Scopes}" field="dependenciesScopes">
             <f:checkbox title="${%Compile}" field="includeScopeCompile" default="true"/>
             <f:checkbox title="${%Runtime}" field="includeScopeRuntime" default="true"/>
             <f:checkbox title="${%Provided}" field="includeScopeProvided" default="true"/>
             <f:checkbox title="${%Test}" field="includeScopeTest"/>
         </f:entry>
 
-        <f:entry title="${%Triggers}" field="triggers">
+        <f:entry title="${%Triggers}" field="dependenciesTriggers">
             <f:checkbox title="${%Skip Downstream Triggers}" field="skipDownstreamTriggers" />
             <f:checkbox title="${%Ignore Upstream Triggers}" field="ignoreUpstreamTriggers" />
         </f:entry>
