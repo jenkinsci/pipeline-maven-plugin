@@ -27,10 +27,17 @@ THE SOFTWARE.
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
     <f:section title="${%Pipeline Maven Configuration}">
+        <f:entry title="${%Trigger downstream upon result}" field="triggerDownstreamUponResult" >
+            <f:checkbox title="${%Success}" field="triggerDownstreamUponResultSuccess" default="true" />
+            <f:checkbox title="${%Unstable}" field="triggerDownstreamUponResultUnstable" />
+            <f:checkbox title="${%Failure}" field="triggerDownstreamUponResultFailure" />
+            <f:checkbox title="${%Not Built}" field="triggerDownstreamUponResultNotBuilt" />
+            <f:checkbox title="${%Aborted}" field="triggerDownstreamUponResultAborted" />
+        </f:entry>
         <f:entry title="${%Options}">
             <f:repeatableHeteroProperty field="publisherOptions" targetType="org.jenkinsci.plugins.pipeline.maven.MavenPublisher"
                                         addCaption="${%Add Publisher Options}" hasHeader="true" oneEach="true"/>
         </f:entry>
-    </f:section>
+     </f:section>
 
 </j:jelly>
