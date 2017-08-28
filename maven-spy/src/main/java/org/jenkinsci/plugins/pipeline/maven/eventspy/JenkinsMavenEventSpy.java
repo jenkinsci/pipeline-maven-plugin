@@ -31,6 +31,7 @@ import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.CatchAllExecutionHa
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.DefaultSettingsBuildingRequestHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.DependencyResolutionRequestHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.DependencyResolutionResultHandler;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.DeployDeployExecutionHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.FailsafeTestExecutionHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.InvokerRunExecutionHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.InvokerStartExecutionHandler;
@@ -126,6 +127,7 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
         handlers.add(new DependencyResolutionResultHandler(reporter));
         handlers.add(new MavenExecutionResultHandler(reporter));
         handlers.add(new SessionEndedHandler(reporter));
+        handlers.add(new DeployDeployExecutionHandler(reporter));
 
         handlers.add(new CatchAllExecutionHandler(reporter));
 
