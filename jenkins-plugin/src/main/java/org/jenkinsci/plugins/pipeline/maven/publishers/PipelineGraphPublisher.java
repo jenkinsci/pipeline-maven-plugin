@@ -18,6 +18,7 @@ import org.w3c.dom.Element;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -48,6 +49,12 @@ public class PipelineGraphPublisher extends MavenPublisher {
     private boolean includeScopeProvided = true;
 
     private boolean skipDownstreamTriggers;
+
+    /**
+     * Skip trigger of downstream pipelines if the artifact has just been
+     * packaged (mvn package) or installed locally (mvn install)
+     */
+    private boolean skipDownstreamTriggersForNonDeployedArtifacts;
 
     private boolean ignoreUpstreamTriggers;
 
@@ -82,7 +89,10 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
     protected void recordDependencies(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         List<MavenSpyLogProcessor.MavenDependency> dependencies = listDependencies(mavenSpyLogsElt);
+        recordDependencies(dependencies, run, listener, dao);
+    }
 
+    protected void recordDependencies(List<MavenSpyLogProcessor.MavenDependency> dependencies, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordDependencies - filter: " +
                     "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "], " +
@@ -130,10 +140,14 @@ public class PipelineGraphPublisher extends MavenPublisher {
     }
 
     protected void recordGeneratedArtifacts(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+        List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts = listArtifacts(mavenSpyLogsElt);
+        recordGeneratedArtifacts(generatedArtifacts, run, listener, dao);
+    }
+
+    protected void recordGeneratedArtifacts(List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordGeneratedArtifacts...");
         }
-        List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts = listArtifacts(mavenSpyLogsElt);
         for(MavenSpyLogProcessor.MavenArtifact artifact: generatedArtifacts) {
 
             if (LOGGER.isLoggable(Level.FINE)) {
@@ -142,9 +156,11 @@ public class PipelineGraphPublisher extends MavenPublisher {
                 listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact.getId() + ", version: " + artifact.version + ", skipDownstreamTriggers: " + skipDownstreamTriggers +
                         ", file: " + artifact.file);
             }
+            boolean skipDownstreamPipelines = this.skipDownstreamTriggers ||
+                    (this.skipDownstreamTriggersForNonDeployedArtifacts && !Objects.equals(artifact.baseVersion, artifact.version));
             dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
                     artifact.groupId, artifact.artifactId, artifact.version, artifact.type, artifact.baseVersion,
-                    this.skipDownstreamTriggers);
+                    skipDownstreamPipelines);
         }
     }
 
@@ -313,6 +329,15 @@ public class PipelineGraphPublisher extends MavenPublisher {
     @DataBoundSetter
     public void setIgnoreUpstreamTriggers(boolean ignoreUpstreamTriggers) {
         this.ignoreUpstreamTriggers = ignoreUpstreamTriggers;
+    }
+
+    public boolean isSkipDownstreamTriggersForNonDeployedArtifacts() {
+        return skipDownstreamTriggersForNonDeployedArtifacts;
+    }
+
+    @DataBoundSetter
+    public void setSkipDownstreamTriggersForNonDeployedArtifacts(boolean skipDownstreamTriggersForNonDeployedArtifacts) {
+        this.skipDownstreamTriggersForNonDeployedArtifacts = skipDownstreamTriggersForNonDeployedArtifacts;
     }
 
     @Symbol("pipelineGraphPublisher")
