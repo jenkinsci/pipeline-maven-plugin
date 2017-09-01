@@ -74,7 +74,7 @@ public class FileMavenEventReporter implements MavenEventReporter {
         }
 
         String now = new SimpleDateFormat("yyyyMMdd-HHmmss-S").format(new Date());
-        outFile = new File(reportsFolder, "maven-spy-" + now + ".log");
+        outFile = File.createTempFile("maven-spy-" + now, ".log", reportsFolder);
         out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(outFile), "UTF-8"));
         xmlWriter = new PrettyPrintXMLWriter(out);
         xmlWriter.startElement("mavenExecution");
