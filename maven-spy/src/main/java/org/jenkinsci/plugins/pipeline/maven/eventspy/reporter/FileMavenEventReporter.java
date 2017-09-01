@@ -54,6 +54,8 @@ public class FileMavenEventReporter implements MavenEventReporter {
     @GuardedBy("this")
     XMLWriter xmlWriter;
 
+    boolean isOpen;
+
     public FileMavenEventReporter() throws IOException {
         String reportsFolderPath = System.getProperty("org.jenkinsci.plugins.pipeline.maven.reportsFolder");
         File reportsFolder;
@@ -85,6 +87,7 @@ public class FileMavenEventReporter implements MavenEventReporter {
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
+        isOpen = true;
     }
 
     @Override
@@ -102,13 +105,17 @@ public class FileMavenEventReporter implements MavenEventReporter {
 
     @Override
     public synchronized void close() {
-        xmlWriter.endElement();
+        if (isOpen) {
+            xmlWriter.endElement();
+            out.close();
 
-        out.close();
-        try {
-            System.out.println("[jenkins-maven-event-spy] INFO generated " + outFile.getCanonicalPath());
-        } catch (IOException e) {
-            throw new RuntimeIOException(e);
+            isOpen = false;
+
+            try {
+                System.out.println("[jenkins-maven-event-spy] INFO generated " + outFile.getCanonicalPath());
+            } catch (IOException e) {
+                throw new RuntimeIOException(e);
+            }
         }
     }
 
