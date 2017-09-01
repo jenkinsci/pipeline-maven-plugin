@@ -111,4 +111,8 @@ public class FileMavenEventReporter implements MavenEventReporter {
             throw new RuntimeIOException(e);
         }
     }
+
+    public File getOutFile() {
+        return outFile;
+    }
 }
