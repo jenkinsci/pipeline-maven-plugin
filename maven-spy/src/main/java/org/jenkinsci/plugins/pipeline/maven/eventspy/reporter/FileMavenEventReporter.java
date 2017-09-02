@@ -140,7 +140,7 @@ public class FileMavenEventReporter implements MavenEventReporter {
     /**
      * Visible for test
      */
-    protected synchronized File getFinalFile() {
+    public synchronized File getFinalFile() {
         return outFile;
     }
 }
