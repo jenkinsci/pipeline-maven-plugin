@@ -54,6 +54,8 @@ public class FileMavenEventReporter implements MavenEventReporter {
     @GuardedBy("this")
     XMLWriter xmlWriter;
 
+    boolean isOpen;
+
     public FileMavenEventReporter() throws IOException {
         String reportsFolderPath = System.getProperty("org.jenkinsci.plugins.pipeline.maven.reportsFolder");
         File reportsFolder;
@@ -74,7 +76,7 @@ public class FileMavenEventReporter implements MavenEventReporter {
         }
 
         String now = new SimpleDateFormat("yyyyMMdd-HHmmss-S").format(new Date());
-        outFile = new File(reportsFolder, "maven-spy-" + now + ".log");
+        outFile = File.createTempFile("maven-spy-" + now, ".log", reportsFolder);
         out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(outFile), "UTF-8"));
         xmlWriter = new PrettyPrintXMLWriter(out);
         xmlWriter.startElement("mavenExecution");
@@ -85,6 +87,7 @@ public class FileMavenEventReporter implements MavenEventReporter {
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
+        isOpen = true;
     }
 
     @Override
@@ -102,13 +105,21 @@ public class FileMavenEventReporter implements MavenEventReporter {
 
     @Override
     public synchronized void close() {
-        xmlWriter.endElement();
+        if (isOpen) {
+            xmlWriter.endElement();
+            out.close();
 
-        out.close();
-        try {
-            System.out.println("[jenkins-maven-event-spy] INFO generated " + outFile.getCanonicalPath());
-        } catch (IOException e) {
-            throw new RuntimeIOException(e);
+            isOpen = false;
+
+            try {
+                System.out.println("[jenkins-maven-event-spy] INFO generated " + outFile.getCanonicalPath());
+            } catch (IOException e) {
+                throw new RuntimeIOException(e);
+            }
         }
+    }
+
+    public File getOutFile() {
+        return outFile;
     }
 }
