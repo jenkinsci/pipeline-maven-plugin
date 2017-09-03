@@ -18,7 +18,6 @@ import org.w3c.dom.Element;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -141,24 +140,40 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
     protected void recordGeneratedArtifacts(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts = listArtifacts(mavenSpyLogsElt);
-        recordGeneratedArtifacts(generatedArtifacts, run, listener, dao);
+        List<Element> mvnDeployEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, "MojoSucceeded", "org.apache.maven.plugins", "maven-deploy-plugin", "deploy");
+        List<Element> nexusDeployEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, "MojoSucceeded", "org.sonatype.plugins", "nexus-staging-maven-plugin", "deploy");
+
+        boolean artifactsHaveBeenMvnDeployed = !mvnDeployEvents.isEmpty() || !nexusDeployEvents.isEmpty();
+
+        recordGeneratedArtifacts(generatedArtifacts, artifactsHaveBeenMvnDeployed, run, listener, dao);
     }
 
-    protected void recordGeneratedArtifacts(List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+    /**
+     *
+     * @param generatedArtifacts deployed artifacts
+     * @param artifactsHaveBeenMvnDeployed artifacts have been deployed using "mvn deploy" or "mvn nexus-staging-maven-plugin:deploy"
+     * @param run
+     * @param listener
+     * @param dao
+     */
+    protected void recordGeneratedArtifacts(List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts, boolean artifactsHaveBeenMvnDeployed, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordGeneratedArtifacts...");
         }
         for(MavenSpyLogProcessor.MavenArtifact artifact: generatedArtifacts) {
+            boolean skipDownstreamPipelines = this.skipDownstreamTriggers ||
+                    (this.skipDownstreamTriggersForNonDeployedArtifacts && !artifactsHaveBeenMvnDeployed);
 
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, "Build {0}#{1} - record generated {2}:{3}, version:{4}, skipDownstreamTriggers:{5}",
-                        new Object[]{run.getParent().getFullName(), run.getNumber(), artifact.getId(), artifact.type, artifact.version, skipDownstreamTriggers});
-                listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact.getId() + ", version: " + artifact.version + ", skipDownstreamTriggers: " + skipDownstreamTriggers +
+                LOGGER.log(Level.FINE, "Build {0}#{1} - record generated {2}:{3}, version:{4}, skipDownstreamTriggers:{5}, artifactsHaveBeenMvnDeployed: {6}",
+                        new Object[]{run.getParent().getFullName(), run.getNumber(),
+                                artifact.getId(), artifact.type, artifact.version,
+                                skipDownstreamTriggers, artifactsHaveBeenMvnDeployed});
+                listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact.getId() + ", version: " + artifact.version +
+                        ", skipDownstreamTriggers: " + skipDownstreamTriggers + ", artifactsHaveBeenMvnDeployed:" + artifactsHaveBeenMvnDeployed +
                         ", file: " + artifact.file);
             }
-            boolean skipDownstreamPipelines = this.skipDownstreamTriggers ||
-                    (this.skipDownstreamTriggersForNonDeployedArtifacts && !Objects.equals(artifact.baseVersion, artifact.version));
-            dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
+             dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
                     artifact.groupId, artifact.artifactId, artifact.version, artifact.type, artifact.baseVersion,
                     skipDownstreamPipelines);
         }

@@ -1,0 +1,1607 @@
+<mavenExecution _time="2017-09-01 15:41:01.777">
+    <context _time="2017-09-01 15:41:01.784">
+        <systemProperties/>
+        <versionProperties/>
+        <workingDirectory/>
+        <userProperties/>
+        <plexus/>
+    </context>
+    <!-- 2017-09-01 15:41:01.788 - new File(.):                                 -->
+    <!-- /path/to/jmxtrans-agent/target/checkout      -->
+
+    <DefaultSettingsBuildingRequest class="org.apache.maven.settings.building.DefaultSettingsBuildingRequest" _time="2017-09-01 15:41:01.926">
+        <userSettingsFile>/private/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/release-settings1997633273122836122.xml</userSettingsFile>
+        <globalSettings>/path/to/maven/3.5.0/libexec/conf/settings.xml</globalSettings>
+    </DefaultSettingsBuildingRequest>
+    <MavenExecutionRequest class="org.apache.maven.execution.DefaultMavenExecutionRequest" _time="2017-09-01 15:41:01.964">
+        <pom>/path/to/jmxtrans-agent/target/checkout/pom.xml</pom>
+        <globalSettingsFile>/path/to/maven/3.5.0/libexec/conf/settings.xml</globalSettingsFile>
+        <userSettingsFile>/private/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/release-settings1997633273122836122.xml</userSettingsFile>
+        <baseDirectory>/path/to/jmxtrans-agent/target/checkout</baseDirectory>
+    </MavenExecutionRequest>
+    <ExecutionEvent type="ProjectDiscoveryStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:02.186">
+        <project/>
+        <no-execution-found/>
+    </ExecutionEvent>
+    <ExecutionEvent type="SessionStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:03.084">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <no-execution-found/>
+    </ExecutionEvent>
+    <ExecutionEvent type="ProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:03.095">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <no-execution-found/>
+    </ExecutionEvent>
+    <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest" _time="2017-09-01 15:41:03.316">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+    </DependencyResolutionRequest>
+    <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult" _time="2017-09-01 15:41:03.577">
+        <resolvedDependencies>
+            <dependency extension="jar" baseVersion="2.0.1" groupId="com.google.code.findbugs" scope="compile" name="jsr305-2.0.1.jar" classifier="" artifactId="jsr305" optional="true" id="jsr305" type="jar" version="2.0.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/google/code/findbugs/jsr305/2.0.1/jsr305-2.0.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.0.0" groupId="com.google.code.findbugs" scope="compile" name="annotations-3.0.0.jar" classifier="" artifactId="annotations" optional="true" id="annotations" type="jar" version="3.0.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/google/code/findbugs/annotations/3.0.0/annotations-3.0.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.2" groupId="joda-time" scope="test" name="joda-time-2.2.jar" classifier="" artifactId="joda-time" optional="false" id="joda-time" type="jar" version="2.2" snapshot="false">
+                <file>/path/to/home/.m2/repository/joda-time/joda-time/2.2/joda-time-2.2.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.12" groupId="junit" scope="test" name="junit-4.12.jar" classifier="" artifactId="junit" optional="false" id="junit" type="jar" version="4.12" snapshot="false">
+                <file>/path/to/home/.m2/repository/junit/junit/4.12/junit-4.12.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.3" groupId="org.hamcrest" scope="test" name="hamcrest-core-1.3.jar" classifier="" artifactId="hamcrest-core" optional="false" id="hamcrest-core" type="jar" version="1.3" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.3" groupId="org.hamcrest" scope="test" name="hamcrest-all-1.3.jar" classifier="" artifactId="hamcrest-all" optional="false" id="hamcrest-all" type="jar" version="1.3" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/hamcrest/hamcrest-all/1.3/hamcrest-all-1.3.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.2.3" groupId="org.skyscreamer" scope="test" name="jsonassert-1.2.3.jar" classifier="" artifactId="jsonassert" optional="false" id="jsonassert" type="jar" version="1.2.3" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/skyscreamer/jsonassert/1.2.3/jsonassert-1.2.3.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="20090211" groupId="org.json" scope="test" name="json-20090211.jar" classifier="" artifactId="json" optional="false" id="json" type="jar" version="20090211" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/json/json/20090211/json-20090211.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.5.1" groupId="com.github.tomakehurst" scope="test" name="wiremock-2.5.1.jar" classifier="" artifactId="wiremock" optional="false" id="wiremock" type="jar" version="2.5.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/github/tomakehurst/wiremock/2.5.1/wiremock-2.5.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-server-9.2.13.v20150730.jar" classifier="" artifactId="jetty-server" optional="false" id="jetty-server" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-server/9.2.13.v20150730/jetty-server-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.1.0" groupId="javax.servlet" scope="test" name="javax.servlet-api-3.1.0.jar" classifier="" artifactId="javax.servlet-api" optional="false" id="javax.servlet-api" type="jar" version="3.1.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-http-9.2.13.v20150730.jar" classifier="" artifactId="jetty-http" optional="false" id="jetty-http" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-http/9.2.13.v20150730/jetty-http-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-io-9.2.13.v20150730.jar" classifier="" artifactId="jetty-io" optional="false" id="jetty-io" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-io/9.2.13.v20150730/jetty-io-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-servlet-9.2.13.v20150730.jar" classifier="" artifactId="jetty-servlet" optional="false" id="jetty-servlet" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-servlet/9.2.13.v20150730/jetty-servlet-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-security-9.2.13.v20150730.jar" classifier="" artifactId="jetty-security" optional="false" id="jetty-security" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-security/9.2.13.v20150730/jetty-security-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-servlets-9.2.13.v20150730.jar" classifier="" artifactId="jetty-servlets" optional="false" id="jetty-servlets" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-servlets/9.2.13.v20150730/jetty-servlets-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-continuation-9.2.13.v20150730.jar" classifier="" artifactId="jetty-continuation" optional="false" id="jetty-continuation" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-continuation/9.2.13.v20150730/jetty-continuation-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-util-9.2.13.v20150730.jar" classifier="" artifactId="jetty-util" optional="false" id="jetty-util" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-util/9.2.13.v20150730/jetty-util-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-webapp-9.2.13.v20150730.jar" classifier="" artifactId="jetty-webapp" optional="false" id="jetty-webapp" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-webapp/9.2.13.v20150730/jetty-webapp-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-xml-9.2.13.v20150730.jar" classifier="" artifactId="jetty-xml" optional="false" id="jetty-xml" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-xml/9.2.13.v20150730/jetty-xml-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="18.0" groupId="com.google.guava" scope="test" name="guava-18.0.jar" classifier="" artifactId="guava" optional="false" id="guava" type="jar" version="18.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/google/guava/guava/18.0/guava-18.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.6.1" groupId="com.fasterxml.jackson.core" scope="test" name="jackson-core-2.6.1.jar" classifier="" artifactId="jackson-core" optional="false" id="jackson-core" type="jar" version="2.6.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.6.1/jackson-core-2.6.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.6.1" groupId="com.fasterxml.jackson.core" scope="test" name="jackson-annotations-2.6.1.jar" classifier="" artifactId="jackson-annotations" optional="false" id="jackson-annotations" type="jar" version="2.6.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.6.1/jackson-annotations-2.6.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.6.1" groupId="com.fasterxml.jackson.core" scope="test" name="jackson-databind-2.6.1.jar" classifier="" artifactId="jackson-databind" optional="false" id="jackson-databind" type="jar" version="2.6.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.6.1/jackson-databind-2.6.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.5.1" groupId="org.apache.httpcomponents" scope="test" name="httpclient-4.5.1.jar" classifier="" artifactId="httpclient" optional="false" id="httpclient" type="jar" version="4.5.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/apache/httpcomponents/httpclient/4.5.1/httpclient-4.5.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.4.3" groupId="org.apache.httpcomponents" scope="test" name="httpcore-4.4.3.jar" classifier="" artifactId="httpcore" optional="false" id="httpcore" type="jar" version="4.4.3" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/apache/httpcomponents/httpcore/4.4.3/httpcore-4.4.3.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.2" groupId="commons-logging" scope="test" name="commons-logging-1.2.jar" classifier="" artifactId="commons-logging" optional="false" id="commons-logging" type="jar" version="1.2" snapshot="false">
+                <file>/path/to/home/.m2/repository/commons-logging/commons-logging/1.2/commons-logging-1.2.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.9" groupId="commons-codec" scope="test" name="commons-codec-1.9.jar" classifier="" artifactId="commons-codec" optional="false" id="commons-codec" type="jar" version="1.9" snapshot="false">
+                <file>/path/to/home/.m2/repository/commons-codec/commons-codec/1.9/commons-codec-1.9.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.3.0" groupId="org.xmlunit" scope="test" name="xmlunit-core-2.3.0.jar" classifier="" artifactId="xmlunit-core" optional="false" id="xmlunit-core" type="jar" version="2.3.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/xmlunit/xmlunit-core/2.3.0/xmlunit-core-2.3.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.3.0" groupId="org.xmlunit" scope="test" name="xmlunit-legacy-2.3.0.jar" classifier="" artifactId="xmlunit-legacy" optional="false" id="xmlunit-legacy" type="jar" version="2.3.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/xmlunit/xmlunit-legacy/2.3.0/xmlunit-legacy-2.3.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.2.0" groupId="com.jayway.jsonpath" scope="test" name="json-path-2.2.0.jar" classifier="" artifactId="json-path" optional="false" id="json-path" type="jar" version="2.2.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/jayway/jsonpath/json-path/2.2.0/json-path-2.2.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.2.1" groupId="net.minidev" scope="test" name="json-smart-2.2.1.jar" classifier="" artifactId="json-smart" optional="false" id="json-smart" type="jar" version="2.2.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/net/minidev/json-smart/2.2.1/json-smart-2.2.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.1" groupId="net.minidev" scope="test" name="accessors-smart-1.1.jar" classifier="" artifactId="accessors-smart" optional="false" id="accessors-smart" type="jar" version="1.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/net/minidev/accessors-smart/1.1/accessors-smart-1.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="5.0.3" groupId="org.ow2.asm" scope="test" name="asm-5.0.3.jar" classifier="" artifactId="asm" optional="false" id="asm" type="jar" version="5.0.3" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/ow2/asm/asm/5.0.3/asm-5.0.3.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.7.12" groupId="org.slf4j" scope="test" name="slf4j-api-1.7.12.jar" classifier="" artifactId="slf4j-api" optional="false" id="slf4j-api" type="jar" version="1.7.12" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/slf4j/slf4j-api/1.7.12/slf4j-api-1.7.12.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.9" groupId="net.sf.jopt-simple" scope="test" name="jopt-simple-4.9.jar" classifier="" artifactId="jopt-simple" optional="false" id="jopt-simple" type="jar" version="4.9" snapshot="false">
+                <file>/path/to/home/.m2/repository/net/sf/jopt-simple/jopt-simple/4.9/jopt-simple-4.9.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.4" groupId="org.apache.commons" scope="test" name="commons-lang3-3.4.jar" classifier="" artifactId="commons-lang3" optional="false" id="commons-lang3" type="jar" version="3.4" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="0.2.1" groupId="com.flipkart.zjsonpatch" scope="test" name="zjsonpatch-0.2.1.jar" classifier="" artifactId="zjsonpatch" optional="false" id="zjsonpatch" type="jar" version="0.2.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/flipkart/zjsonpatch/zjsonpatch/0.2.1/zjsonpatch-0.2.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.0" groupId="org.apache.commons" scope="test" name="commons-collections4-4.0.jar" classifier="" artifactId="commons-collections4" optional="false" id="commons-collections4" type="jar" version="4.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/apache/commons/commons-collections4/4.0/commons-collections4-4.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.0.6" groupId="com.github.jknack" scope="test" name="handlebars-4.0.6.jar" classifier="" artifactId="handlebars" optional="false" id="handlebars" type="jar" version="4.0.6" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/github/jknack/handlebars/4.0.6/handlebars-4.0.6.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.5.1-1" groupId="org.antlr" scope="test" name="antlr4-runtime-4.5.1-1.jar" classifier="" artifactId="antlr4-runtime" optional="false" id="antlr4-runtime" type="jar" version="4.5.1-1" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/antlr/antlr4-runtime/4.5.1-1/antlr4-runtime-4.5.1-1.jar</file>
+            </dependency>
+        </resolvedDependencies>
+    </DependencyResolutionResult>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:03.584">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="enforce-maven" goal="enforce" groupId="org.apache.maven.plugins" artifactId="maven-enforcer-plugin" version="1.4.1">
+            <fail>${enforcer.fail}</fail>
+            <failFast>${enforcer.failFast}</failFast>
+            <ignoreCache>${enforcer.ignoreCache}</ignoreCache>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <project>${project}</project>
+            <rules>
+                <requireMavenVersion>
+                    <version>3.3</version>
+                    <message>Maven 2.1.0 and 2.2.0 produce incorrect GPG signatures and checksums respectively.</message>
+                </requireMavenVersion>
+                <requireJavaVersion>
+                    <version>1.7</version>
+                </requireJavaVersion>
+            </rules>
+            <session>${session}</session>
+            <skip>${enforcer.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:04.044">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="enforce-maven" goal="enforce" groupId="org.apache.maven.plugins" artifactId="maven-enforcer-plugin" version="1.4.1">
+            <fail>${enforcer.fail}</fail>
+            <failFast>${enforcer.failFast}</failFast>
+            <ignoreCache>${enforcer.ignoreCache}</ignoreCache>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <project>${project}</project>
+            <rules>
+                <requireMavenVersion>
+                    <version>3.3</version>
+                    <message>Maven 2.1.0 and 2.2.0 produce incorrect GPG signatures and checksums respectively.</message>
+                </requireMavenVersion>
+                <requireJavaVersion>
+                    <version>1.7</version>
+                </requireJavaVersion>
+            </rules>
+            <session>${session}</session>
+            <skip>${enforcer.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:04.045">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-resources" goal="resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.resources}</resources>
+            <session>${session}</session>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>true</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:04.189">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-resources" goal="resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.resources}</resources>
+            <session>${session}</session>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>true</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:04.189">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-compile" goal="compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.6.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <compilePath>${project.compileClasspathElements}</compilePath>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <failOnWarning>${maven.compiler.failOnWarning}</failOnWarning>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <project>${project}</project>
+            <projectArtifact>${project.artifact}</projectArtifact>
+            <release>${maven.compiler.release}</release>
+            <session>${session}</session>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skipMain>${maven.main.skip}</skipMain>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>1.7</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>1.7</target>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:06.444">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-compile" goal="compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.6.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <compilePath>${project.compileClasspathElements}</compilePath>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <failOnWarning>${maven.compiler.failOnWarning}</failOnWarning>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <project>${project}</project>
+            <projectArtifact>${project.artifact}</projectArtifact>
+            <release>${maven.compiler.release}</release>
+            <session>${session}</session>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skipMain>${maven.main.skip}</skipMain>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>1.7</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>1.7</target>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:06.445">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-testResources" goal="testResources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.testResources}</resources>
+            <session>${session}</session>
+            <skip>${maven.test.skip}</skip>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>true</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:06.477">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-testResources" goal="testResources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.testResources}</resources>
+            <session>${session}</session>
+            <skip>${maven.test.skip}</skip>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>true</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:06.478">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-testCompile" goal="testCompile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.6.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <compilePath>${project.compileClasspathElements}</compilePath>
+            <compileSourceRoots>${project.testCompileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <failOnWarning>${maven.compiler.failOnWarning}</failOnWarning>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/test-annotations</generatedTestSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <project>${project}</project>
+            <release>${maven.compiler.release}</release>
+            <session>${session}</session>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skip>${maven.test.skip}</skip>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>1.7</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>1.7</target>
+            <testPath>${project.testClasspathElements}</testPath>
+            <testRelease>${maven.compiler.testRelease}</testRelease>
+            <testSource>${maven.compiler.testSource}</testSource>
+            <testTarget>${maven.compiler.testTarget}</testTarget>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:07.037">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-testCompile" goal="testCompile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.6.1">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <compilePath>${project.compileClasspathElements}</compilePath>
+            <compileSourceRoots>${project.testCompileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <failOnWarning>${maven.compiler.failOnWarning}</failOnWarning>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/test-annotations</generatedTestSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <project>${project}</project>
+            <release>${maven.compiler.release}</release>
+            <session>${session}</session>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skip>${maven.test.skip}</skip>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>1.7</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>1.7</target>
+            <testPath>${project.testClasspathElements}</testPath>
+            <testRelease>${maven.compiler.testRelease}</testRelease>
+            <testSource>${maven.compiler.testSource}</testSource>
+            <testTarget>${maven.compiler.testTarget}</testTarget>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:41:07.038">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
+            <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
+            <argLine>${argLine}</argLine>
+            <basedir>${basedir}</basedir>
+            <childDelegation>${childDelegation}</childDelegation>
+            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+            <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
+            <debugForkedProcess>${maven.surefire.debug}</debugForkedProcess>
+            <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
+            <disableXmlReport>${disableXmlReport}</disableXmlReport>
+            <enableAssertions>${enableAssertions}</enableAssertions>
+            <excludedGroups>org.jmxtrans.agent.IntegrationTest</excludedGroups>
+            <excludesFile>${surefire.excludesFile}</excludesFile>
+            <failIfNoSpecifiedTests>${surefire.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
+            <failIfNoTests>${failIfNoTests}</failIfNoTests>
+            <forkCount>${forkCount}</forkCount>
+            <forkMode>${forkMode}</forkMode>
+            <forkedProcessTimeoutInSeconds>${surefire.timeout}</forkedProcessTimeoutInSeconds>
+            <groups>${groups}</groups>
+            <includesFile>${surefire.includesFile}</includesFile>
+            <junitArtifactName>${junitArtifactName}</junitArtifactName>
+            <jvm>${jvm}</jvm>
+            <localRepository>${localRepository}</localRepository>
+            <objectFactory>${objectFactory}</objectFactory>
+            <parallel>${parallel}</parallel>
+            <parallelMavenExecution>${session.parallel}</parallelMavenExecution>
+            <parallelOptimized>${parallelOptimized}</parallelOptimized>
+            <parallelTestsTimeoutForcedInSeconds>${surefire.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
+            <parallelTestsTimeoutInSeconds>${surefire.parallel.timeout}</parallelTestsTimeoutInSeconds>
+            <perCoreThreadCount>${perCoreThreadCount}</perCoreThreadCount>
+            <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
+            <pluginDescriptor>${plugin}</pluginDescriptor>
+            <printSummary>${surefire.printSummary}</printSummary>
+            <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <remoteRepositories>${project.pluginArtifactRepositories}</remoteRepositories>
+            <reportFormat>${surefire.reportFormat}</reportFormat>
+            <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
+            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+            <rerunFailingTestsCount>${surefire.rerunFailingTestsCount}</rerunFailingTestsCount>
+            <reuseForks>${reuseForks}</reuseForks>
+            <runOrder>${surefire.runOrder}</runOrder>
+            <shutdown>${surefire.shutdown}</shutdown>
+            <skip>${maven.test.skip}</skip>
+            <skipAfterFailureCount>${surefire.skipAfterFailureCount}</skipAfterFailureCount>
+            <skipExec>${maven.test.skip.exec}</skipExec>
+            <skipTests>${skipTests}</skipTests>
+            <suiteXmlFiles>${surefire.suiteXmlFiles}</suiteXmlFiles>
+            <test>${test}</test>
+            <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
+            <testFailureIgnore>${maven.test.failure.ignore}</testFailureIgnore>
+            <testNGArtifactName>${testNGArtifactName}</testNGArtifactName>
+            <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+            <threadCount>${threadCount}</threadCount>
+            <threadCountClasses>${threadCountClasses}</threadCountClasses>
+            <threadCountMethods>${threadCountMethods}</threadCountMethods>
+            <threadCountSuites>${threadCountSuites}</threadCountSuites>
+            <trimStackTrace>${trimStackTrace}</trimStackTrace>
+            <useFile>${surefire.useFile}</useFile>
+            <useManifestOnlyJar>${surefire.useManifestOnlyJar}</useManifestOnlyJar>
+            <useSystemClassLoader>${surefire.useSystemClassLoader}</useSystemClassLoader>
+            <useUnlimitedThreads>${useUnlimitedThreads}</useUnlimitedThreads>
+            <workingDirectory>${basedir}</workingDirectory>
+            <project>${project}</project>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:44:54.048">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
+            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:44:54.049">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-jar" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="3.0.2">
+            <archive>
+                <manifest>
+                    <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                    <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+                </manifest>
+                <manifestEntries>
+                    <Main-Class>org.jmxtrans.agent.JmxTransAgent</Main-Class>
+                    <Premain-Class>org.jmxtrans.agent.JmxTransAgent</Premain-Class>
+                    <Agent-Class>org.jmxtrans.agent.JmxTransAgent</Agent-Class>
+                </manifestEntries>
+            </archive>
+            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${maven.jar.forceCreation}</forceCreation>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <session>${session}</session>
+            <skipIfEmpty>false</skipIfEmpty>
+            <useDefaultManifestFile>${jar.useDefaultManifestFile}</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:44:54.661">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-jar" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="3.0.2">
+            <finalName>${project.build.finalName}</finalName>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:44:54.662">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="attach-sources" goal="jar-no-fork" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin" version="2.1.2">
+            <attach>${attach}</attach>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <excludeResources>${source.excludeResources}</excludeResources>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${source.forceCreation}</forceCreation>
+            <includePom>${source.includePom}</includePom>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <useDefaultManifestFile>false</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:44:55.499">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="attach-sources" goal="jar-no-fork" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin" version="2.1.2">
+            <attach>${attach}</attach>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <excludeResources>${source.excludeResources}</excludeResources>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${source.forceCreation}</forceCreation>
+            <includePom>${source.includePom}</includePom>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <useDefaultExcludes>true</useDefaultExcludes>
+            <useDefaultManifestFile>false</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:44:55.5">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="attach-javadocs" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-javadoc-plugin" version="2.7">
+            <additionalJOption>${additionalJOption}</additionalJOption>
+            <additionalparam>${additionalparam}</additionalparam>
+            <aggregate>${aggregate}</aggregate>
+            <attach>${attach}</attach>
+            <author>${author}</author>
+            <bootclasspath>${bootclasspath}</bootclasspath>
+            <bootclasspathArtifacts>${bootclasspathArtifacts}</bootclasspathArtifacts>
+            <bottom>${bottom}</bottom>
+            <breakiterator>${breakiterator}</breakiterator>
+            <charset>${charset}</charset>
+            <debug>${debug}</debug>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <destDir>${destDir}</destDir>
+            <detectJavaApiLink>${detectJavaApiLink}</detectJavaApiLink>
+            <detectLinks>${detectLinks}</detectLinks>
+            <detectOfflineLinks>${detectOfflineLinks}</detectOfflineLinks>
+            <docencoding>${docencoding}</docencoding>
+            <docfilessubdirs>${docfilessubdirs}</docfilessubdirs>
+            <doclet>${doclet}</doclet>
+            <docletArtifact>${docletArtifact}</docletArtifact>
+            <docletArtifacts>${docletArtifacts}</docletArtifacts>
+            <docletPath>${docletPath}</docletPath>
+            <doctitle>${doctitle}</doctitle>
+            <encoding>${encoding}</encoding>
+            <excludePackageNames>${excludePackageNames}</excludePackageNames>
+            <excludedocfilessubdir>${excludedocfilessubdir}</excludedocfilessubdir>
+            <extdirs>${extdirs}</extdirs>
+            <failOnError>${maven.javadoc.failOnError}</failOnError>
+            <finalName>${project.build.finalName}</finalName>
+            <footer>${footer}</footer>
+            <groups>${groups}</groups>
+            <header>${header}</header>
+            <helpfile>${helpfile}</helpfile>
+            <includeDependencySources>false</includeDependencySources>
+            <includeTransitiveDependencySources>false</includeTransitiveDependencySources>
+            <isOffline>${settings.offline}</isOffline>
+            <jarOutputDirectory>${project.build.directory}</jarOutputDirectory>
+            <javaApiLinks>${javaApiLinks}</javaApiLinks>
+            <javadocDirectory>${basedir}/src/main/javadoc</javadocDirectory>
+            <javadocExecutable>${javadocExecutable}</javadocExecutable>
+            <javadocOptionsDir>${project.build.directory}/javadoc-bundle-options</javadocOptionsDir>
+            <javadocVersion>${javadocVersion}</javadocVersion>
+            <keywords>${keywords}</keywords>
+            <links>${links}</links>
+            <linksource>${linksource}</linksource>
+            <localRepository>${localRepository}</localRepository>
+            <locale>${locale}</locale>
+            <maxmemory>${maxmemory}</maxmemory>
+            <minmemory>${minmemory}</minmemory>
+            <nocomment>${nocomment}</nocomment>
+            <nodeprecated>${nodeprecated}</nodeprecated>
+            <nodeprecatedlist>${nodeprecatedlist}</nodeprecatedlist>
+            <nohelp>${nohelp}</nohelp>
+            <noindex>${noindex}</noindex>
+            <nonavbar>${nonavbar}</nonavbar>
+            <nooverview>${nooverview}</nooverview>
+            <noqualifier>${noqualifier}</noqualifier>
+            <nosince>${nosince}</nosince>
+            <notimestamp>${notimestamp}</notimestamp>
+            <notree>${notree}</notree>
+            <offlineLinks>${offlineLinks}</offlineLinks>
+            <old>${old}</old>
+            <outputDirectory>${destDir}</outputDirectory>
+            <overview>${overview}</overview>
+            <packagesheader>${packagesheader}</packagesheader>
+            <project>${project}</project>
+            <proxyHost>${proxyHost}</proxyHost>
+            <proxyPort>${proxyPort}</proxyPort>
+            <quiet>${quiet}</quiet>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <remoteRepositories>${project.remoteArtifactRepositories}</remoteRepositories>
+            <resourcesArtifacts>${resourcesArtifacts}</resourcesArtifacts>
+            <serialwarn>${serialwarn}</serialwarn>
+            <session>${session}</session>
+            <settings>${settings}</settings>
+            <show>${show}</show>
+            <skip>${maven.javadoc.skip}</skip>
+            <source>${source}</source>
+            <sourceDependencyCacheDir>${project.build.directory}/distro-javadoc-sources</sourceDependencyCacheDir>
+            <sourcepath>${sourcepath}</sourcepath>
+            <sourcetab>${sourcetab}</sourcetab>
+            <splitindex>${splitindex}</splitindex>
+            <stylesheet>${stylesheet}</stylesheet>
+            <stylesheetfile>${stylesheetfile}</stylesheetfile>
+            <subpackages>${subpackages}</subpackages>
+            <taglet>${taglet}</taglet>
+            <tagletArtifact>${tagletArtifact}</tagletArtifact>
+            <tagletArtifacts>${tagletArtifacts}</tagletArtifacts>
+            <tagletpath>${tagletpath}</tagletpath>
+            <taglets>${taglets}</taglets>
+            <tags>${tags}</tags>
+            <top>${top}</top>
+            <use>${use}</use>
+            <useDefaultManifestFile>false</useDefaultManifestFile>
+            <useStandardDocletOptions>${useStandardDocletOptions}</useStandardDocletOptions>
+            <verbose>${verbose}</verbose>
+            <version>${version}</version>
+            <windowtitle>${windowtitle}</windowtitle>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:03.214">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="attach-javadocs" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-javadoc-plugin" version="2.7">
+            <additionalJOption>${additionalJOption}</additionalJOption>
+            <additionalparam>${additionalparam}</additionalparam>
+            <aggregate>${aggregate}</aggregate>
+            <attach>${attach}</attach>
+            <author>${author}</author>
+            <bootclasspath>${bootclasspath}</bootclasspath>
+            <bootclasspathArtifacts>${bootclasspathArtifacts}</bootclasspathArtifacts>
+            <bottom>${bottom}</bottom>
+            <breakiterator>${breakiterator}</breakiterator>
+            <charset>${charset}</charset>
+            <debug>${debug}</debug>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <destDir>${destDir}</destDir>
+            <detectJavaApiLink>${detectJavaApiLink}</detectJavaApiLink>
+            <detectLinks>${detectLinks}</detectLinks>
+            <detectOfflineLinks>${detectOfflineLinks}</detectOfflineLinks>
+            <docencoding>${docencoding}</docencoding>
+            <docfilessubdirs>${docfilessubdirs}</docfilessubdirs>
+            <doclet>${doclet}</doclet>
+            <docletArtifact>${docletArtifact}</docletArtifact>
+            <docletArtifacts>${docletArtifacts}</docletArtifacts>
+            <docletPath>${docletPath}</docletPath>
+            <doctitle>${doctitle}</doctitle>
+            <encoding>${encoding}</encoding>
+            <excludePackageNames>${excludePackageNames}</excludePackageNames>
+            <excludedocfilessubdir>${excludedocfilessubdir}</excludedocfilessubdir>
+            <extdirs>${extdirs}</extdirs>
+            <failOnError>${maven.javadoc.failOnError}</failOnError>
+            <finalName>${project.build.finalName}</finalName>
+            <footer>${footer}</footer>
+            <groups>${groups}</groups>
+            <header>${header}</header>
+            <helpfile>${helpfile}</helpfile>
+            <includeDependencySources>false</includeDependencySources>
+            <includeTransitiveDependencySources>false</includeTransitiveDependencySources>
+            <isOffline>${settings.offline}</isOffline>
+            <jarOutputDirectory>${project.build.directory}</jarOutputDirectory>
+            <javaApiLinks>${javaApiLinks}</javaApiLinks>
+            <javadocDirectory>${basedir}/src/main/javadoc</javadocDirectory>
+            <javadocExecutable>${javadocExecutable}</javadocExecutable>
+            <javadocOptionsDir>${project.build.directory}/javadoc-bundle-options</javadocOptionsDir>
+            <javadocVersion>${javadocVersion}</javadocVersion>
+            <keywords>${keywords}</keywords>
+            <links>${links}</links>
+            <linksource>${linksource}</linksource>
+            <localRepository>${localRepository}</localRepository>
+            <locale>${locale}</locale>
+            <maxmemory>${maxmemory}</maxmemory>
+            <minmemory>${minmemory}</minmemory>
+            <nocomment>${nocomment}</nocomment>
+            <nodeprecated>${nodeprecated}</nodeprecated>
+            <nodeprecatedlist>${nodeprecatedlist}</nodeprecatedlist>
+            <nohelp>${nohelp}</nohelp>
+            <noindex>${noindex}</noindex>
+            <nonavbar>${nonavbar}</nonavbar>
+            <nooverview>${nooverview}</nooverview>
+            <noqualifier>${noqualifier}</noqualifier>
+            <nosince>${nosince}</nosince>
+            <notimestamp>${notimestamp}</notimestamp>
+            <notree>${notree}</notree>
+            <offlineLinks>${offlineLinks}</offlineLinks>
+            <old>${old}</old>
+            <outputDirectory>${destDir}</outputDirectory>
+            <overview>${overview}</overview>
+            <packagesheader>${packagesheader}</packagesheader>
+            <project>${project}</project>
+            <proxyHost>${proxyHost}</proxyHost>
+            <proxyPort>${proxyPort}</proxyPort>
+            <quiet>${quiet}</quiet>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <remoteRepositories>${project.remoteArtifactRepositories}</remoteRepositories>
+            <resourcesArtifacts>${resourcesArtifacts}</resourcesArtifacts>
+            <serialwarn>${serialwarn}</serialwarn>
+            <session>${session}</session>
+            <settings>${settings}</settings>
+            <show>${show}</show>
+            <skip>${maven.javadoc.skip}</skip>
+            <source>${source}</source>
+            <sourceDependencyCacheDir>${project.build.directory}/distro-javadoc-sources</sourceDependencyCacheDir>
+            <sourcepath>${sourcepath}</sourcepath>
+            <sourcetab>${sourcetab}</sourcetab>
+            <splitindex>${splitindex}</splitindex>
+            <stylesheet>${stylesheet}</stylesheet>
+            <stylesheetfile>${stylesheetfile}</stylesheetfile>
+            <subpackages>${subpackages}</subpackages>
+            <taglet>${taglet}</taglet>
+            <tagletArtifact>${tagletArtifact}</tagletArtifact>
+            <tagletArtifacts>${tagletArtifacts}</tagletArtifacts>
+            <tagletpath>${tagletpath}</tagletpath>
+            <taglets>${taglets}</taglets>
+            <tags>${tags}</tags>
+            <top>${top}</top>
+            <use>${use}</use>
+            <useDefaultManifestFile>false</useDefaultManifestFile>
+            <useStandardDocletOptions>${useStandardDocletOptions}</useStandardDocletOptions>
+            <verbose>${verbose}</verbose>
+            <version>${version}</version>
+            <windowtitle>${windowtitle}</windowtitle>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:03.214">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default" goal="integration-test" groupId="org.apache.maven.plugins" artifactId="maven-failsafe-plugin" version="2.19.1">
+            <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
+            <argLine>${argLine}</argLine>
+            <basedir>${basedir}</basedir>
+            <childDelegation>${childDelegation}</childDelegation>
+            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+            <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
+            <debugForkedProcess>${maven.failsafe.debug}</debugForkedProcess>
+            <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
+            <disableXmlReport>${disableXmlReport}</disableXmlReport>
+            <enableAssertions>${enableAssertions}</enableAssertions>
+            <encoding>${encoding}</encoding>
+            <excludedGroups>${excludedGroups}</excludedGroups>
+            <excludesFile>${failsafe.excludesFile}</excludesFile>
+            <failIfNoSpecifiedTests>${it.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
+            <failIfNoTests>${failIfNoTests}</failIfNoTests>
+            <forkCount>${forkCount}</forkCount>
+            <forkMode>${forkMode}</forkMode>
+            <forkedProcessTimeoutInSeconds>${failsafe.timeout}</forkedProcessTimeoutInSeconds>
+            <groups>org.jmxtrans.agent.IntegrationTest</groups>
+            <includes>
+                <include>**/*.java</include>
+            </includes>
+            <includesFile>${failsafe.includesFile}</includesFile>
+            <junitArtifactName>${junitArtifactName}</junitArtifactName>
+            <jvm>${jvm}</jvm>
+            <localRepository>${localRepository}</localRepository>
+            <objectFactory>${objectFactory}</objectFactory>
+            <parallel>${parallel}</parallel>
+            <parallelMavenExecution>${session.parallel}</parallelMavenExecution>
+            <parallelOptimized>${parallelOptimized}</parallelOptimized>
+            <parallelTestsTimeoutForcedInSeconds>${failsafe.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
+            <parallelTestsTimeoutInSeconds>${failsafe.parallel.timeout}</parallelTestsTimeoutInSeconds>
+            <perCoreThreadCount>${perCoreThreadCount}</perCoreThreadCount>
+            <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
+            <pluginDescriptor>${plugin}</pluginDescriptor>
+            <printSummary>${failsafe.printSummary}</printSummary>
+            <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <remoteRepositories>${project.pluginArtifactRepositories}</remoteRepositories>
+            <reportFormat>${failsafe.reportFormat}</reportFormat>
+            <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
+            <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
+            <rerunFailingTestsCount>${failsafe.rerunFailingTestsCount}</rerunFailingTestsCount>
+            <reuseForks>${reuseForks}</reuseForks>
+            <runOrder>${failsafe.runOrder}</runOrder>
+            <shutdown>${failsafe.shutdown}</shutdown>
+            <skip>${maven.test.skip}</skip>
+            <skipAfterFailureCount>${failsafe.skipAfterFailureCount}</skipAfterFailureCount>
+            <skipExec>${maven.test.skip.exec}</skipExec>
+            <skipITs>${skipITs}</skipITs>
+            <skipTests>${skipTests}</skipTests>
+            <suiteXmlFiles>${failsafe.suiteXmlFiles}</suiteXmlFiles>
+            <summaryFile>${project.build.directory}/failsafe-reports/failsafe-summary.xml</summaryFile>
+            <test>${it.test}</test>
+            <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
+            <testNGArtifactName>${testNGArtifactName}</testNGArtifactName>
+            <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+            <threadCount>${threadCount}</threadCount>
+            <threadCountClasses>${threadCountClasses}</threadCountClasses>
+            <threadCountMethods>${threadCountMethods}</threadCountMethods>
+            <threadCountSuites>${threadCountSuites}</threadCountSuites>
+            <trimStackTrace>${trimStackTrace}</trimStackTrace>
+            <useFile>${failsafe.useFile}</useFile>
+            <useManifestOnlyJar>${failsafe.useManifestOnlyJar}</useManifestOnlyJar>
+            <useSystemClassLoader>${failsafe.useSystemClassLoader}</useSystemClassLoader>
+            <useUnlimitedThreads>${useUnlimitedThreads}</useUnlimitedThreads>
+            <workingDirectory>${basedir}</workingDirectory>
+            <project>${project}</project>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:04.81">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default" goal="integration-test" groupId="org.apache.maven.plugins" artifactId="maven-failsafe-plugin" version="2.19.1">
+            <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:04.81">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
+            <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <debug>${findbugs.debug}</debug>
+            <effort>${findbugs.effort}</effort>
+            <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
+            <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
+            <failOnError>${findbugs.failOnError}</failOnError>
+            <findbugsXmlOutput>true</findbugsXmlOutput>
+            <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
+            <fork>${findbugs.fork}</fork>
+            <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
+            <includeTests>${findbugs.includeTests}</includeTests>
+            <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
+            <localRepository>${localRepository}</localRepository>
+            <maxHeap>${findbugs.maxHeap}</maxHeap>
+            <maxRank>${findbugs.maxRank}</maxRank>
+            <nested>${findbugs.nested}</nested>
+            <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
+            <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+            <outputEncoding>${outputEncoding}</outputEncoding>
+            <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
+            <pluginList>${findbugs.pluginList}</pluginList>
+            <project>${project}</project>
+            <relaxed>${findbugs.relaxed}</relaxed>
+            <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
+            <skip>${findbugs.skip}</skip>
+            <sourceEncoding>${encoding}</sourceEncoding>
+            <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
+            <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
+            <threshold>${findbugs.threshold}</threshold>
+            <timeout>${findbugs.timeout}</timeout>
+            <trace>${findbugs.trace}</trace>
+            <visitors>${findbugs.visitors}</visitors>
+            <xmlEncoding>UTF-8</xmlEncoding>
+            <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
+            <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+            <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
+            <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkedProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:04.811">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
+            <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <debug>${findbugs.debug}</debug>
+            <effort>${findbugs.effort}</effort>
+            <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
+            <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
+            <failOnError>${findbugs.failOnError}</failOnError>
+            <findbugsXmlOutput>true</findbugsXmlOutput>
+            <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
+            <fork>${findbugs.fork}</fork>
+            <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
+            <includeTests>${findbugs.includeTests}</includeTests>
+            <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
+            <localRepository>${localRepository}</localRepository>
+            <maxHeap>${findbugs.maxHeap}</maxHeap>
+            <maxRank>${findbugs.maxRank}</maxRank>
+            <nested>${findbugs.nested}</nested>
+            <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
+            <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+            <outputEncoding>${outputEncoding}</outputEncoding>
+            <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
+            <pluginList>${findbugs.pluginList}</pluginList>
+            <project>${project}</project>
+            <relaxed>${findbugs.relaxed}</relaxed>
+            <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
+            <skip>${findbugs.skip}</skip>
+            <sourceEncoding>${encoding}</sourceEncoding>
+            <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
+            <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
+            <threshold>${findbugs.threshold}</threshold>
+            <timeout>${findbugs.timeout}</timeout>
+            <trace>${findbugs.trace}</trace>
+            <visitors>${findbugs.visitors}</visitors>
+            <xmlEncoding>UTF-8</xmlEncoding>
+            <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
+            <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+            <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
+            <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
+        </plugin>
+    </ExecutionEvent>
+    <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest" _time="2017-09-01 15:45:04.812">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+    </DependencyResolutionRequest>
+    <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult" _time="2017-09-01 15:45:04.837">
+        <resolvedDependencies>
+            <dependency extension="jar" baseVersion="2.0.1" groupId="com.google.code.findbugs" scope="compile" name="jsr305-2.0.1.jar" classifier="" artifactId="jsr305" optional="true" id="jsr305" type="jar" version="2.0.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/google/code/findbugs/jsr305/2.0.1/jsr305-2.0.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.0.0" groupId="com.google.code.findbugs" scope="compile" name="annotations-3.0.0.jar" classifier="" artifactId="annotations" optional="true" id="annotations" type="jar" version="3.0.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/google/code/findbugs/annotations/3.0.0/annotations-3.0.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.2" groupId="joda-time" scope="test" name="joda-time-2.2.jar" classifier="" artifactId="joda-time" optional="false" id="joda-time" type="jar" version="2.2" snapshot="false">
+                <file>/path/to/home/.m2/repository/joda-time/joda-time/2.2/joda-time-2.2.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.12" groupId="junit" scope="test" name="junit-4.12.jar" classifier="" artifactId="junit" optional="false" id="junit" type="jar" version="4.12" snapshot="false">
+                <file>/path/to/home/.m2/repository/junit/junit/4.12/junit-4.12.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.3" groupId="org.hamcrest" scope="test" name="hamcrest-core-1.3.jar" classifier="" artifactId="hamcrest-core" optional="false" id="hamcrest-core" type="jar" version="1.3" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.3" groupId="org.hamcrest" scope="test" name="hamcrest-all-1.3.jar" classifier="" artifactId="hamcrest-all" optional="false" id="hamcrest-all" type="jar" version="1.3" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/hamcrest/hamcrest-all/1.3/hamcrest-all-1.3.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.2.3" groupId="org.skyscreamer" scope="test" name="jsonassert-1.2.3.jar" classifier="" artifactId="jsonassert" optional="false" id="jsonassert" type="jar" version="1.2.3" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/skyscreamer/jsonassert/1.2.3/jsonassert-1.2.3.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="20090211" groupId="org.json" scope="test" name="json-20090211.jar" classifier="" artifactId="json" optional="false" id="json" type="jar" version="20090211" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/json/json/20090211/json-20090211.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.5.1" groupId="com.github.tomakehurst" scope="test" name="wiremock-2.5.1.jar" classifier="" artifactId="wiremock" optional="false" id="wiremock" type="jar" version="2.5.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/github/tomakehurst/wiremock/2.5.1/wiremock-2.5.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-server-9.2.13.v20150730.jar" classifier="" artifactId="jetty-server" optional="false" id="jetty-server" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-server/9.2.13.v20150730/jetty-server-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.1.0" groupId="javax.servlet" scope="test" name="javax.servlet-api-3.1.0.jar" classifier="" artifactId="javax.servlet-api" optional="false" id="javax.servlet-api" type="jar" version="3.1.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/javax/servlet/javax.servlet-api/3.1.0/javax.servlet-api-3.1.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-http-9.2.13.v20150730.jar" classifier="" artifactId="jetty-http" optional="false" id="jetty-http" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-http/9.2.13.v20150730/jetty-http-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-io-9.2.13.v20150730.jar" classifier="" artifactId="jetty-io" optional="false" id="jetty-io" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-io/9.2.13.v20150730/jetty-io-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-servlet-9.2.13.v20150730.jar" classifier="" artifactId="jetty-servlet" optional="false" id="jetty-servlet" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-servlet/9.2.13.v20150730/jetty-servlet-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-security-9.2.13.v20150730.jar" classifier="" artifactId="jetty-security" optional="false" id="jetty-security" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-security/9.2.13.v20150730/jetty-security-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-servlets-9.2.13.v20150730.jar" classifier="" artifactId="jetty-servlets" optional="false" id="jetty-servlets" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-servlets/9.2.13.v20150730/jetty-servlets-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-continuation-9.2.13.v20150730.jar" classifier="" artifactId="jetty-continuation" optional="false" id="jetty-continuation" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-continuation/9.2.13.v20150730/jetty-continuation-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-util-9.2.13.v20150730.jar" classifier="" artifactId="jetty-util" optional="false" id="jetty-util" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-util/9.2.13.v20150730/jetty-util-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-webapp-9.2.13.v20150730.jar" classifier="" artifactId="jetty-webapp" optional="false" id="jetty-webapp" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-webapp/9.2.13.v20150730/jetty-webapp-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="9.2.13.v20150730" groupId="org.eclipse.jetty" scope="test" name="jetty-xml-9.2.13.v20150730.jar" classifier="" artifactId="jetty-xml" optional="false" id="jetty-xml" type="jar" version="9.2.13.v20150730" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/eclipse/jetty/jetty-xml/9.2.13.v20150730/jetty-xml-9.2.13.v20150730.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="18.0" groupId="com.google.guava" scope="test" name="guava-18.0.jar" classifier="" artifactId="guava" optional="false" id="guava" type="jar" version="18.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/google/guava/guava/18.0/guava-18.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.6.1" groupId="com.fasterxml.jackson.core" scope="test" name="jackson-core-2.6.1.jar" classifier="" artifactId="jackson-core" optional="false" id="jackson-core" type="jar" version="2.6.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.6.1/jackson-core-2.6.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.6.1" groupId="com.fasterxml.jackson.core" scope="test" name="jackson-annotations-2.6.1.jar" classifier="" artifactId="jackson-annotations" optional="false" id="jackson-annotations" type="jar" version="2.6.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.6.1/jackson-annotations-2.6.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.6.1" groupId="com.fasterxml.jackson.core" scope="test" name="jackson-databind-2.6.1.jar" classifier="" artifactId="jackson-databind" optional="false" id="jackson-databind" type="jar" version="2.6.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.6.1/jackson-databind-2.6.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.5.1" groupId="org.apache.httpcomponents" scope="test" name="httpclient-4.5.1.jar" classifier="" artifactId="httpclient" optional="false" id="httpclient" type="jar" version="4.5.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/apache/httpcomponents/httpclient/4.5.1/httpclient-4.5.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.4.3" groupId="org.apache.httpcomponents" scope="test" name="httpcore-4.4.3.jar" classifier="" artifactId="httpcore" optional="false" id="httpcore" type="jar" version="4.4.3" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/apache/httpcomponents/httpcore/4.4.3/httpcore-4.4.3.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.2" groupId="commons-logging" scope="test" name="commons-logging-1.2.jar" classifier="" artifactId="commons-logging" optional="false" id="commons-logging" type="jar" version="1.2" snapshot="false">
+                <file>/path/to/home/.m2/repository/commons-logging/commons-logging/1.2/commons-logging-1.2.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.9" groupId="commons-codec" scope="test" name="commons-codec-1.9.jar" classifier="" artifactId="commons-codec" optional="false" id="commons-codec" type="jar" version="1.9" snapshot="false">
+                <file>/path/to/home/.m2/repository/commons-codec/commons-codec/1.9/commons-codec-1.9.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.3.0" groupId="org.xmlunit" scope="test" name="xmlunit-core-2.3.0.jar" classifier="" artifactId="xmlunit-core" optional="false" id="xmlunit-core" type="jar" version="2.3.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/xmlunit/xmlunit-core/2.3.0/xmlunit-core-2.3.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.3.0" groupId="org.xmlunit" scope="test" name="xmlunit-legacy-2.3.0.jar" classifier="" artifactId="xmlunit-legacy" optional="false" id="xmlunit-legacy" type="jar" version="2.3.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/xmlunit/xmlunit-legacy/2.3.0/xmlunit-legacy-2.3.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.2.0" groupId="com.jayway.jsonpath" scope="test" name="json-path-2.2.0.jar" classifier="" artifactId="json-path" optional="false" id="json-path" type="jar" version="2.2.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/jayway/jsonpath/json-path/2.2.0/json-path-2.2.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.2.1" groupId="net.minidev" scope="test" name="json-smart-2.2.1.jar" classifier="" artifactId="json-smart" optional="false" id="json-smart" type="jar" version="2.2.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/net/minidev/json-smart/2.2.1/json-smart-2.2.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.1" groupId="net.minidev" scope="test" name="accessors-smart-1.1.jar" classifier="" artifactId="accessors-smart" optional="false" id="accessors-smart" type="jar" version="1.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/net/minidev/accessors-smart/1.1/accessors-smart-1.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="5.0.3" groupId="org.ow2.asm" scope="test" name="asm-5.0.3.jar" classifier="" artifactId="asm" optional="false" id="asm" type="jar" version="5.0.3" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/ow2/asm/asm/5.0.3/asm-5.0.3.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.7.12" groupId="org.slf4j" scope="test" name="slf4j-api-1.7.12.jar" classifier="" artifactId="slf4j-api" optional="false" id="slf4j-api" type="jar" version="1.7.12" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/slf4j/slf4j-api/1.7.12/slf4j-api-1.7.12.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.9" groupId="net.sf.jopt-simple" scope="test" name="jopt-simple-4.9.jar" classifier="" artifactId="jopt-simple" optional="false" id="jopt-simple" type="jar" version="4.9" snapshot="false">
+                <file>/path/to/home/.m2/repository/net/sf/jopt-simple/jopt-simple/4.9/jopt-simple-4.9.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.4" groupId="org.apache.commons" scope="test" name="commons-lang3-3.4.jar" classifier="" artifactId="commons-lang3" optional="false" id="commons-lang3" type="jar" version="3.4" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/apache/commons/commons-lang3/3.4/commons-lang3-3.4.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="0.2.1" groupId="com.flipkart.zjsonpatch" scope="test" name="zjsonpatch-0.2.1.jar" classifier="" artifactId="zjsonpatch" optional="false" id="zjsonpatch" type="jar" version="0.2.1" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/flipkart/zjsonpatch/zjsonpatch/0.2.1/zjsonpatch-0.2.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.0" groupId="org.apache.commons" scope="test" name="commons-collections4-4.0.jar" classifier="" artifactId="commons-collections4" optional="false" id="commons-collections4" type="jar" version="4.0" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/apache/commons/commons-collections4/4.0/commons-collections4-4.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.0.6" groupId="com.github.jknack" scope="test" name="handlebars-4.0.6.jar" classifier="" artifactId="handlebars" optional="false" id="handlebars" type="jar" version="4.0.6" snapshot="false">
+                <file>/path/to/home/.m2/repository/com/github/jknack/handlebars/4.0.6/handlebars-4.0.6.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="4.5.1-1" groupId="org.antlr" scope="test" name="antlr4-runtime-4.5.1-1.jar" classifier="" artifactId="antlr4-runtime" optional="false" id="antlr4-runtime" type="jar" version="4.5.1-1" snapshot="false">
+                <file>/path/to/home/.m2/repository/org/antlr/antlr4-runtime/4.5.1-1/antlr4-runtime-4.5.1-1.jar</file>
+            </dependency>
+        </resolvedDependencies>
+    </DependencyResolutionResult>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:04.844">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="findbugs" goal="findbugs" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
+            <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <debug>${findbugs.debug}</debug>
+            <effort>${findbugs.effort}</effort>
+            <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
+            <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
+            <failOnError>${findbugs.failOnError}</failOnError>
+            <findbugsXmlOutput>true</findbugsXmlOutput>
+            <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
+            <fork>${findbugs.fork}</fork>
+            <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
+            <includeTests>${findbugs.includeTests}</includeTests>
+            <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
+            <localRepository>${localRepository}</localRepository>
+            <maxHeap>${findbugs.maxHeap}</maxHeap>
+            <maxRank>${findbugs.maxRank}</maxRank>
+            <nested>${findbugs.nested}</nested>
+            <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
+            <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+            <outputEncoding>${outputEncoding}</outputEncoding>
+            <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
+            <pluginList>${findbugs.pluginList}</pluginList>
+            <project>${project}</project>
+            <relaxed>${findbugs.relaxed}</relaxed>
+            <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
+            <remoteRepositories>${project.remoteArtifactRepositories}</remoteRepositories>
+            <skip>${findbugs.skip}</skip>
+            <skipEmptyReport>${findbugs.skipEmptyReport}</skipEmptyReport>
+            <sourceEncoding>${encoding}</sourceEncoding>
+            <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
+            <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
+            <threshold>${findbugs.threshold}</threshold>
+            <timeout>${findbugs.timeout}</timeout>
+            <trace>${findbugs.trace}</trace>
+            <userPrefs>${findbugs.userPrefs}</userPrefs>
+            <visitors>${findbugs.visitors}</visitors>
+            <xmlEncoding>UTF-8</xmlEncoding>
+            <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
+            <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+            <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
+            <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:39.781">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="findbugs" goal="findbugs" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
+            <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <debug>${findbugs.debug}</debug>
+            <effort>${findbugs.effort}</effort>
+            <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
+            <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
+            <failOnError>${findbugs.failOnError}</failOnError>
+            <findbugsXmlOutput>true</findbugsXmlOutput>
+            <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
+            <fork>${findbugs.fork}</fork>
+            <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
+            <includeTests>${findbugs.includeTests}</includeTests>
+            <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
+            <localRepository>${localRepository}</localRepository>
+            <maxHeap>${findbugs.maxHeap}</maxHeap>
+            <maxRank>${findbugs.maxRank}</maxRank>
+            <nested>${findbugs.nested}</nested>
+            <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
+            <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+            <outputEncoding>${outputEncoding}</outputEncoding>
+            <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
+            <pluginList>${findbugs.pluginList}</pluginList>
+            <project>${project}</project>
+            <relaxed>${findbugs.relaxed}</relaxed>
+            <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
+            <remoteRepositories>${project.remoteArtifactRepositories}</remoteRepositories>
+            <skip>${findbugs.skip}</skip>
+            <skipEmptyReport>${findbugs.skipEmptyReport}</skipEmptyReport>
+            <sourceEncoding>${encoding}</sourceEncoding>
+            <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
+            <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
+            <threshold>${findbugs.threshold}</threshold>
+            <timeout>${findbugs.timeout}</timeout>
+            <trace>${findbugs.trace}</trace>
+            <userPrefs>${findbugs.userPrefs}</userPrefs>
+            <visitors>${findbugs.visitors}</visitors>
+            <xmlEncoding>UTF-8</xmlEncoding>
+            <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
+            <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+            <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
+            <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkedProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:39.781">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
+            <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <debug>${findbugs.debug}</debug>
+            <effort>${findbugs.effort}</effort>
+            <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
+            <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
+            <failOnError>${findbugs.failOnError}</failOnError>
+            <findbugsXmlOutput>true</findbugsXmlOutput>
+            <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
+            <fork>${findbugs.fork}</fork>
+            <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
+            <includeTests>${findbugs.includeTests}</includeTests>
+            <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
+            <localRepository>${localRepository}</localRepository>
+            <maxHeap>${findbugs.maxHeap}</maxHeap>
+            <maxRank>${findbugs.maxRank}</maxRank>
+            <nested>${findbugs.nested}</nested>
+            <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
+            <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+            <outputEncoding>${outputEncoding}</outputEncoding>
+            <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
+            <pluginList>${findbugs.pluginList}</pluginList>
+            <project>${project}</project>
+            <relaxed>${findbugs.relaxed}</relaxed>
+            <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
+            <skip>${findbugs.skip}</skip>
+            <sourceEncoding>${encoding}</sourceEncoding>
+            <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
+            <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
+            <threshold>${findbugs.threshold}</threshold>
+            <timeout>${findbugs.timeout}</timeout>
+            <trace>${findbugs.trace}</trace>
+            <visitors>${findbugs.visitors}</visitors>
+            <xmlEncoding>UTF-8</xmlEncoding>
+            <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
+            <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+            <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
+            <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:39.782">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
+            <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <debug>${findbugs.debug}</debug>
+            <effort>${findbugs.effort}</effort>
+            <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
+            <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
+            <failOnError>${findbugs.failOnError}</failOnError>
+            <findbugsXmlOutput>true</findbugsXmlOutput>
+            <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
+            <fork>${findbugs.fork}</fork>
+            <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
+            <includeTests>${findbugs.includeTests}</includeTests>
+            <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
+            <localRepository>${localRepository}</localRepository>
+            <maxHeap>${findbugs.maxHeap}</maxHeap>
+            <maxRank>${findbugs.maxRank}</maxRank>
+            <nested>${findbugs.nested}</nested>
+            <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
+            <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+            <outputEncoding>${outputEncoding}</outputEncoding>
+            <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
+            <pluginList>${findbugs.pluginList}</pluginList>
+            <project>${project}</project>
+            <relaxed>${findbugs.relaxed}</relaxed>
+            <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
+            <skip>${findbugs.skip}</skip>
+            <sourceEncoding>${encoding}</sourceEncoding>
+            <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
+            <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
+            <threshold>${findbugs.threshold}</threshold>
+            <timeout>${findbugs.timeout}</timeout>
+            <trace>${findbugs.trace}</trace>
+            <visitors>${findbugs.visitors}</visitors>
+            <xmlEncoding>UTF-8</xmlEncoding>
+            <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
+            <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+            <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
+            <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:39.786">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
+            <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <debug>${findbugs.debug}</debug>
+            <effort>${findbugs.effort}</effort>
+            <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
+            <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
+            <failOnError>${findbugs.failOnError}</failOnError>
+            <findbugsXmlOutput>true</findbugsXmlOutput>
+            <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
+            <fork>${findbugs.fork}</fork>
+            <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
+            <includeTests>${findbugs.includeTests}</includeTests>
+            <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
+            <localRepository>${localRepository}</localRepository>
+            <maxHeap>${findbugs.maxHeap}</maxHeap>
+            <maxRank>${findbugs.maxRank}</maxRank>
+            <nested>${findbugs.nested}</nested>
+            <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
+            <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+            <outputEncoding>${outputEncoding}</outputEncoding>
+            <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
+            <pluginList>${findbugs.pluginList}</pluginList>
+            <project>${project}</project>
+            <relaxed>${findbugs.relaxed}</relaxed>
+            <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
+            <skip>${findbugs.skip}</skip>
+            <sourceEncoding>${encoding}</sourceEncoding>
+            <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
+            <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
+            <threshold>${findbugs.threshold}</threshold>
+            <timeout>${findbugs.timeout}</timeout>
+            <trace>${findbugs.trace}</trace>
+            <visitors>${findbugs.visitors}</visitors>
+            <xmlEncoding>UTF-8</xmlEncoding>
+            <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
+            <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+            <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
+            <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:39.879">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default" goal="check" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
+            <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <debug>${findbugs.debug}</debug>
+            <effort>${findbugs.effort}</effort>
+            <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
+            <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
+            <failOnError>${findbugs.failOnError}</failOnError>
+            <findbugsXmlOutput>true</findbugsXmlOutput>
+            <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
+            <fork>${findbugs.fork}</fork>
+            <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
+            <includeTests>${findbugs.includeTests}</includeTests>
+            <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
+            <localRepository>${localRepository}</localRepository>
+            <maxHeap>${findbugs.maxHeap}</maxHeap>
+            <maxRank>${findbugs.maxRank}</maxRank>
+            <nested>${findbugs.nested}</nested>
+            <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
+            <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+            <outputEncoding>${outputEncoding}</outputEncoding>
+            <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
+            <pluginList>${findbugs.pluginList}</pluginList>
+            <project>${project}</project>
+            <relaxed>${findbugs.relaxed}</relaxed>
+            <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
+            <skip>${findbugs.skip}</skip>
+            <sourceEncoding>${encoding}</sourceEncoding>
+            <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
+            <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
+            <threshold>${findbugs.threshold}</threshold>
+            <timeout>${findbugs.timeout}</timeout>
+            <trace>${findbugs.trace}</trace>
+            <visitors>${findbugs.visitors}</visitors>
+            <xmlEncoding>UTF-8</xmlEncoding>
+            <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
+            <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+            <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
+            <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:39.879">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="sign-artifacts" goal="sign" groupId="org.apache.maven.plugins" artifactId="maven-gpg-plugin" version="1.6">
+            <ascDirectory>${project.build.directory}/gpg</ascDirectory>
+            <defaultKeyring>${gpg.defaultKeyring}</defaultKeyring>
+            <executable>${gpg.executable}</executable>
+            <homedir>${gpg.homedir}</homedir>
+            <interactive>${settings.interactiveMode}</interactive>
+            <keyname>${gpg.keyname}</keyname>
+            <lockMode>${gpg.lockMode}</lockMode>
+            <passphrase>${gpg.passphrase}</passphrase>
+            <passphraseServerId>${gpg.passphraseServerId}</passphraseServerId>
+            <project>${project}</project>
+            <publicKeyring>${gpg.publicKeyring}</publicKeyring>
+            <secretKeyring>${gpg.secretKeyring}</secretKeyring>
+            <settings>${settings}</settings>
+            <skip>${gpg.skip}</skip>
+            <useAgent>${gpg.useagent}</useAgent>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:40.186">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="sign-artifacts" goal="sign" groupId="org.apache.maven.plugins" artifactId="maven-gpg-plugin" version="1.6">
+            <ascDirectory>${project.build.directory}/gpg</ascDirectory>
+            <defaultKeyring>${gpg.defaultKeyring}</defaultKeyring>
+            <executable>${gpg.executable}</executable>
+            <homedir>${gpg.homedir}</homedir>
+            <interactive>${settings.interactiveMode}</interactive>
+            <keyname>${gpg.keyname}</keyname>
+            <lockMode>${gpg.lockMode}</lockMode>
+            <passphrase>${gpg.passphrase}</passphrase>
+            <passphraseServerId>${gpg.passphraseServerId}</passphraseServerId>
+            <project>${project}</project>
+            <publicKeyring>${gpg.publicKeyring}</publicKeyring>
+            <secretKeyring>${gpg.secretKeyring}</secretKeyring>
+            <settings>${settings}</settings>
+            <skip>${gpg.skip}</skip>
+            <useAgent>${gpg.useagent}</useAgent>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:40.186">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-install" goal="install" groupId="org.apache.maven.plugins" artifactId="maven-install-plugin" version="2.4">
+            <artifact>${project.artifact}</artifact>
+            <attachedArtifacts>${project.attachedArtifacts}</attachedArtifacts>
+            <createChecksum>${createChecksum}</createChecksum>
+            <localRepository>${localRepository}</localRepository>
+            <packaging>${project.packaging}</packaging>
+            <pomFile>${project.file}</pomFile>
+            <skip>${maven.install.skip}</skip>
+            <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:40.288">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="default-install" goal="install" groupId="org.apache.maven.plugins" artifactId="maven-install-plugin" version="2.4">
+            <artifact>${project.artifact}</artifact>
+            <attachedArtifacts>${project.attachedArtifacts}</attachedArtifacts>
+            <createChecksum>${createChecksum}</createChecksum>
+            <localRepository>${localRepository}</localRepository>
+            <packaging>${project.packaging}</packaging>
+            <pomFile>${project.file}</pomFile>
+            <skip>${maven.install.skip}</skip>
+            <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:45:40.288">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="injected-nexus-deploy" goal="deploy" groupId="org.sonatype.plugins" artifactId="nexus-staging-maven-plugin" version="1.6.7">
+            <altStagingDirectory>${altStagingDirectory}</altStagingDirectory>
+            <artifact>${project.artifact}</artifact>
+            <attachedArtifacts>${project.attachedArtifacts}</attachedArtifacts>
+            <autoDropAfterRelease>${autoDropAfterRelease}</autoDropAfterRelease>
+            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+            <detectBuildFailures>${detectBuildFailures}</detectBuildFailures>
+            <keepStagingRepositoryOnCloseRuleFailure>${keepStagingRepositoryOnCloseRuleFailure}</keepStagingRepositoryOnCloseRuleFailure>
+            <keepStagingRepositoryOnFailure>${keepStagingRepositoryOnFailure}</keepStagingRepositoryOnFailure>
+            <mavenSession>${session}</mavenSession>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+            <offline>${settings.offline}</offline>
+            <packaging>${project.packaging}</packaging>
+            <pluginArtifactId>${plugin.artifactId}</pluginArtifactId>
+            <pluginGroupId>${plugin.groupId}</pluginGroupId>
+            <pluginVersion>${plugin.version}</pluginVersion>
+            <pomFile>${project.file}</pomFile>
+            <serverId>sonatype-nexus-staging</serverId>
+            <skipLocalStaging>${skipLocalStaging}</skipLocalStaging>
+            <skipNexusStagingDeployMojo>${skipNexusStagingDeployMojo}</skipNexusStagingDeployMojo>
+            <skipRemoteStaging>${skipRemoteStaging}</skipRemoteStaging>
+            <skipStaging>${skipStaging}</skipStaging>
+            <skipStagingRepositoryClose>${skipStagingRepositoryClose}</skipStagingRepositoryClose>
+            <sslAllowAll>${maven.wagon.http.ssl.allowall}</sslAllowAll>
+            <sslInsecure>${maven.wagon.http.ssl.insecure}</sslInsecure>
+            <stagingDescription>${stagingDescription}</stagingDescription>
+            <stagingProfileId>${stagingProfileId}</stagingProfileId>
+            <stagingProgressPauseDurationSeconds>${stagingProgressPauseDurationSeconds}</stagingProgressPauseDurationSeconds>
+            <stagingProgressTimeoutMinutes>${stagingProgressTimeoutMinutes}</stagingProgressTimeoutMinutes>
+            <stagingRepositoryId>${stagingRepositoryId}</stagingRepositoryId>
+            <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:46:49.64">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <plugin executionId="injected-nexus-deploy" goal="deploy" groupId="org.sonatype.plugins" artifactId="nexus-staging-maven-plugin" version="1.6.7">
+            <altStagingDirectory>${altStagingDirectory}</altStagingDirectory>
+            <artifact>${project.artifact}</artifact>
+            <attachedArtifacts>${project.attachedArtifacts}</attachedArtifacts>
+            <autoDropAfterRelease>${autoDropAfterRelease}</autoDropAfterRelease>
+            <autoReleaseAfterClose>true</autoReleaseAfterClose>
+            <detectBuildFailures>${detectBuildFailures}</detectBuildFailures>
+            <keepStagingRepositoryOnCloseRuleFailure>${keepStagingRepositoryOnCloseRuleFailure}</keepStagingRepositoryOnCloseRuleFailure>
+            <keepStagingRepositoryOnFailure>${keepStagingRepositoryOnFailure}</keepStagingRepositoryOnFailure>
+            <mavenSession>${session}</mavenSession>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+            <offline>${settings.offline}</offline>
+            <packaging>${project.packaging}</packaging>
+            <pluginArtifactId>${plugin.artifactId}</pluginArtifactId>
+            <pluginGroupId>${plugin.groupId}</pluginGroupId>
+            <pluginVersion>${plugin.version}</pluginVersion>
+            <pomFile>${project.file}</pomFile>
+            <serverId>sonatype-nexus-staging</serverId>
+            <skipLocalStaging>${skipLocalStaging}</skipLocalStaging>
+            <skipNexusStagingDeployMojo>${skipNexusStagingDeployMojo}</skipNexusStagingDeployMojo>
+            <skipRemoteStaging>${skipRemoteStaging}</skipRemoteStaging>
+            <skipStaging>${skipStaging}</skipStaging>
+            <skipStagingRepositoryClose>${skipStagingRepositoryClose}</skipStagingRepositoryClose>
+            <sslAllowAll>${maven.wagon.http.ssl.allowall}</sslAllowAll>
+            <sslInsecure>${maven.wagon.http.ssl.insecure}</sslInsecure>
+            <stagingDescription>${stagingDescription}</stagingDescription>
+            <stagingProfileId>${stagingProfileId}</stagingProfileId>
+            <stagingProgressPauseDurationSeconds>${stagingProgressPauseDurationSeconds}</stagingProgressPauseDurationSeconds>
+            <stagingProgressTimeoutMinutes>${stagingProgressTimeoutMinutes}</stagingProgressTimeoutMinutes>
+            <stagingRepositoryId>${stagingRepositoryId}</stagingRepositoryId>
+            <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-01 15:46:49.641">
+        <project baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" version="1.2.6">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </project>
+        <no-execution-found/>
+        <artifact extension="jar" baseVersion="1.2.6" groupId="org.jmxtrans.agent" artifactId="jmxtrans-agent" id="org.jmxtrans.agent:jmxtrans-agent:jar:1.2.6" type="jar" version="1.2.6" snapshot="false">
+            <file>/path/to/jmxtrans-agent/target/checkout/target/jmxtrans-agent-1.2.6.jar</file>
+        </artifact>
+        <attachedArtifacts>
+            <artifact extension="jar" baseVersion="1.2.6" groupId="org.jmxtrans.agent" classifier="sources" artifactId="jmxtrans-agent" id="org.jmxtrans.agent:jmxtrans-agent:java-source:sources:1.2.6" type="java-source" version="1.2.6" snapshot="false">
+                <file>/path/to/jmxtrans-agent/target/checkout/target/jmxtrans-agent-1.2.6-sources.jar</file>
+            </artifact>
+            <artifact extension="jar" baseVersion="1.2.6" groupId="org.jmxtrans.agent" classifier="javadoc" artifactId="jmxtrans-agent" id="org.jmxtrans.agent:jmxtrans-agent:javadoc:javadoc:1.2.6" type="javadoc" version="1.2.6" snapshot="false">
+                <file>/path/to/jmxtrans-agent/target/checkout/target/jmxtrans-agent-1.2.6-javadoc.jar</file>
+            </artifact>
+            <artifact extension="jar.asc" baseVersion="1.2.6" groupId="org.jmxtrans.agent" artifactId="jmxtrans-agent" id="org.jmxtrans.agent:jmxtrans-agent:jar.asc:1.2.6" type="jar.asc" version="1.2.6" snapshot="false">
+                <file>/path/to/jmxtrans-agent/target/checkout/target/jmxtrans-agent-1.2.6.jar.asc</file>
+            </artifact>
+            <artifact extension="pom.asc" baseVersion="1.2.6" groupId="org.jmxtrans.agent" artifactId="jmxtrans-agent" id="org.jmxtrans.agent:jmxtrans-agent:pom.asc:1.2.6" type="pom.asc" version="1.2.6" snapshot="false">
+                <file>/path/to/jmxtrans-agent/target/checkout/target/jmxtrans-agent-1.2.6.pom.asc</file>
+            </artifact>
+            <artifact extension="jar.asc" baseVersion="1.2.6" groupId="org.jmxtrans.agent" classifier="sources" artifactId="jmxtrans-agent" id="org.jmxtrans.agent:jmxtrans-agent:jar.asc:sources:1.2.6" type="jar.asc" version="1.2.6" snapshot="false">
+                <file>/path/to/jmxtrans-agent/target/checkout/target/jmxtrans-agent-1.2.6-sources.jar.asc</file>
+            </artifact>
+            <artifact extension="jar.asc" baseVersion="1.2.6" groupId="org.jmxtrans.agent" classifier="javadoc" artifactId="jmxtrans-agent" id="org.jmxtrans.agent:jmxtrans-agent:jar.asc:javadoc:1.2.6" type="jar.asc" version="1.2.6" snapshot="false">
+                <file>/path/to/jmxtrans-agent/target/checkout/target/jmxtrans-agent-1.2.6-javadoc.jar.asc</file>
+            </artifact>
+        </attachedArtifacts>
+    </ExecutionEvent>
+    <MavenExecutionResult class="org.apache.maven.execution.DefaultMavenExecutionResult" _time="2017-09-01 15:46:49.962">
+        <buildSummary baseDir="/path/to/jmxtrans-agent/target/checkout" file="/path/to/jmxtrans-agent/target/checkout/pom.xml" groupId="org.jmxtrans.agent" name="JMX metrics exporter agent" artifactId="jmxtrans-agent" time="346547" version="1.2.6" class="org.apache.maven.execution.BuildSuccess">
+            <build sourceDirectory="/path/to/jmxtrans-agent/target/checkout/src/main/java" directory="/path/to/jmxtrans-agent/target/checkout/target"/>
+        </buildSummary>
+    </MavenExecutionResult>
+    <!-- 2017-09-01 15:46:49.962 - close:                                       -->
+    <!-- ignored:[org.eclipse.aether.RepositoryEvent,                           -->
+    <!-- org.apache.maven.settings.building.DefaultSettingsBuildingResult],     -->
+    <!-- blackListed: []                                                        -->
+
+</mavenExecution>
