@@ -48,12 +48,19 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public class FileMavenEventReporter implements MavenEventReporter {
+    /**
+     * report file gets initially created with a "maven-spy-*.log.tmp" file extension and gets renamed "maven-spy-*.log"
+     * at the end of the execution
+     */
+    @GuardedBy("this")
     File outFile;
     @GuardedBy("this")
     PrintWriter out;
     @GuardedBy("this")
     XMLWriter xmlWriter;
-
+    /**
+     * used to support multiple calls of {@link #close()} }
+     */
     boolean isOpen;
 
     public FileMavenEventReporter() throws IOException {
@@ -76,7 +83,8 @@ public class FileMavenEventReporter implements MavenEventReporter {
         }
 
         String now = new SimpleDateFormat("yyyyMMdd-HHmmss-S").format(new Date());
-        outFile = File.createTempFile("maven-spy-" + now, ".log", reportsFolder);
+        outFile = File.createTempFile("maven-spy-" + now, ".log.tmp", reportsFolder);
+
         out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(outFile), "UTF-8"));
         xmlWriter = new PrettyPrintXMLWriter(out);
         xmlWriter.startElement("mavenExecution");
@@ -111,6 +119,16 @@ public class FileMavenEventReporter implements MavenEventReporter {
 
             isOpen = false;
 
+            String filePath = outFile.getAbsolutePath();
+            filePath = filePath.substring(0, filePath.length() - ".tmp".length());
+            File finalFile = new File(filePath);
+
+            boolean result = outFile.renameTo(finalFile);
+            if (result == false) {
+                System.out.println("[jenkins-maven-event-spy] WARNING failure to rename " + outFile + " into " + finalFile);
+            } else {
+                outFile = finalFile;
+            }
             try {
                 System.out.println("[jenkins-maven-event-spy] INFO generated " + outFile.getCanonicalPath());
             } catch (IOException e) {
@@ -119,7 +137,10 @@ public class FileMavenEventReporter implements MavenEventReporter {
         }
     }
 
-    public File getOutFile() {
+    /**
+     * Visible for test
+     */
+    public synchronized File getFinalFile() {
         return outFile;
     }
 }

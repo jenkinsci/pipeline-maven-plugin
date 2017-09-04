@@ -25,7 +25,6 @@
 package org.jenkinsci.plugins.pipeline.maven.eventspy;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -44,15 +43,11 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
-import org.eclipse.sisu.bean.IgnoreSetters;
 import org.hamcrest.CoreMatchers;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.FileMavenEventReporter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.internal.runners.statements.Fail;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 public class JenkinsMavenEventSpyMTTest {
 
@@ -156,7 +151,7 @@ public class JenkinsMavenEventSpyMTTest {
 
         for (JenkinsMavenEventSpy spy : spyList) {
             spy.close();
-            File outFile = ((FileMavenEventReporter) spy.getReporter()).getOutFile();
+            File outFile = ((FileMavenEventReporter) spy.getReporter()).getFinalFile();
             System.out.println("Generated file: " + outFile);
             String actual = FileUtils.fileRead(outFile);
             Assert.assertThat(actual, CoreMatchers.containsString("MavenExecutionRequest"));
@@ -224,7 +219,7 @@ public class JenkinsMavenEventSpyMTTest {
         }
 
         spy.close();
-        File outFile = ((FileMavenEventReporter) spy.getReporter()).getOutFile();
+        File outFile = ((FileMavenEventReporter) spy.getReporter()).getFinalFile();
         System.out.println("Generated file: " + outFile);
         String actual = FileUtils.fileRead(outFile);
         Assert.assertThat(actual, CoreMatchers.containsString("MavenExecutionRequest"));
