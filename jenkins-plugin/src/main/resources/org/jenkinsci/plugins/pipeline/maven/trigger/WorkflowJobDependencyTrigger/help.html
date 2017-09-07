@@ -1,8 +1,8 @@
 <div>
-  Trigger the build of this pipeline when a Maven SNAPSHOT dependency is being built by this Jenkins instance.
+  Trigger the build of this pipeline when a Maven SNAPSHOT dependency is built by this Jenkins instance.
 
   Jenkins discovers all the dependencies of the Maven builds of this pipeline invoked in a <code>withMaven(){...}</code> wrapping step and
-  will trigger the build if one of these dependencies is being built (typically a SNAPSHOT version).
+  will trigger the build if one of these dependencies has been built (typically a SNAPSHOT version).
 
   This is convenient for automatically performing continuous integration. Jenkins will check the snapshot dependencies from the <code>&lt;dependency&gt;</code> element in the POM.
 
