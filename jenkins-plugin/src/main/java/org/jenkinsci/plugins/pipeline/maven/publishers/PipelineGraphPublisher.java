@@ -49,6 +49,12 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
     private boolean skipDownstreamTriggers;
 
+    /**
+     * Skip trigger of downstream pipelines if the artifact has just been
+     * packaged (mvn package) or installed locally (mvn install)
+     */
+    private boolean skipDownstreamTriggersForNonDeployedArtifacts;
+
     private boolean ignoreUpstreamTriggers;
 
     @DataBoundConstructor
@@ -82,7 +88,10 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
     protected void recordDependencies(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         List<MavenSpyLogProcessor.MavenDependency> dependencies = listDependencies(mavenSpyLogsElt);
+        recordDependencies(dependencies, run, listener, dao);
+    }
 
+    protected void recordDependencies(List<MavenSpyLogProcessor.MavenDependency> dependencies, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordDependencies - filter: " +
                     "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "], " +
@@ -130,21 +139,43 @@ public class PipelineGraphPublisher extends MavenPublisher {
     }
 
     protected void recordGeneratedArtifacts(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+        List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts = listArtifacts(mavenSpyLogsElt);
+        List<Element> mvnDeployEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, "MojoSucceeded", "org.apache.maven.plugins", "maven-deploy-plugin", "deploy");
+        List<Element> nexusDeployEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, "MojoSucceeded", "org.sonatype.plugins", "nexus-staging-maven-plugin", "deploy");
+
+        boolean artifactsHaveBeenMvnDeployed = !mvnDeployEvents.isEmpty() || !nexusDeployEvents.isEmpty();
+
+        recordGeneratedArtifacts(generatedArtifacts, artifactsHaveBeenMvnDeployed, run, listener, dao);
+    }
+
+    /**
+     *
+     * @param generatedArtifacts deployed artifacts
+     * @param artifactsHaveBeenMvnDeployed artifacts have been deployed using "mvn deploy" or "mvn nexus-staging-maven-plugin:deploy"
+     * @param run
+     * @param listener
+     * @param dao
+     */
+    protected void recordGeneratedArtifacts(List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts, boolean artifactsHaveBeenMvnDeployed, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordGeneratedArtifacts...");
         }
-        List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts = listArtifacts(mavenSpyLogsElt);
         for(MavenSpyLogProcessor.MavenArtifact artifact: generatedArtifacts) {
+            boolean skipDownstreamPipelines = this.skipDownstreamTriggers ||
+                    (this.skipDownstreamTriggersForNonDeployedArtifacts && !artifactsHaveBeenMvnDeployed);
 
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, "Build {0}#{1} - record generated {2}:{3}, version:{4}, skipDownstreamTriggers:{5}",
-                        new Object[]{run.getParent().getFullName(), run.getNumber(), artifact.getId(), artifact.type, artifact.version, skipDownstreamTriggers});
-                listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact.getId() + ", version: " + artifact.version + ", skipDownstreamTriggers: " + skipDownstreamTriggers +
+                LOGGER.log(Level.FINE, "Build {0}#{1} - record generated {2}:{3}, version:{4}, skipDownstreamTriggers:{5}, artifactsHaveBeenMvnDeployed: {6}",
+                        new Object[]{run.getParent().getFullName(), run.getNumber(),
+                                artifact.getId(), artifact.type, artifact.version,
+                                skipDownstreamTriggers, artifactsHaveBeenMvnDeployed});
+                listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact.getId() + ", version: " + artifact.version +
+                        ", skipDownstreamTriggers: " + skipDownstreamTriggers + ", artifactsHaveBeenMvnDeployed:" + artifactsHaveBeenMvnDeployed +
                         ", file: " + artifact.file);
             }
-            dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
+             dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
                     artifact.groupId, artifact.artifactId, artifact.version, artifact.type, artifact.baseVersion,
-                    this.skipDownstreamTriggers);
+                    skipDownstreamPipelines);
         }
     }
 
@@ -313,6 +344,15 @@ public class PipelineGraphPublisher extends MavenPublisher {
     @DataBoundSetter
     public void setIgnoreUpstreamTriggers(boolean ignoreUpstreamTriggers) {
         this.ignoreUpstreamTriggers = ignoreUpstreamTriggers;
+    }
+
+    public boolean isSkipDownstreamTriggersForNonDeployedArtifacts() {
+        return skipDownstreamTriggersForNonDeployedArtifacts;
+    }
+
+    @DataBoundSetter
+    public void setSkipDownstreamTriggersForNonDeployedArtifacts(boolean skipDownstreamTriggersForNonDeployedArtifacts) {
+        this.skipDownstreamTriggersForNonDeployedArtifacts = skipDownstreamTriggersForNonDeployedArtifacts;
     }
 
     @Symbol("pipelineGraphPublisher")

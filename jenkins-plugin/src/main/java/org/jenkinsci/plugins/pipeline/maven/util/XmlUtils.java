@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -197,9 +198,54 @@ public class XmlUtils {
         return result;
     }
 
+    /*
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-02 23:03:17.06">
+      <project artifactIdId="supplychain-portal" groupId="com.acmewidgets.supplychain" name="supplychain-portal" version="0.0.7" />
+      <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.18.1">
+         <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+      </plugin>
+    </ExecutionEvent>
+     */
+
+    /**
+     *
+     * @param mavenSpyLogs
+     * @param eventType e.g. "MojoSucceeded"
+     * @param pluginGroupId e.g. "org.apache.maven.plugins" artifactId=
+     * @param pluginArtifactId e.g. "maven-surefire-plugin"
+     * @param pluginGoal e.g. "test"
+     * @return
+     */
+    @Nonnull
+    public static List<Element> getExecutionEvents(@Nonnull Element mavenSpyLogs, String eventType, String pluginGroupId, String pluginArtifactId, String pluginGoal) {
+        List<Element> result = new ArrayList<>();
+        for (Element executionEventElt : getChildrenElements(mavenSpyLogs, "ExecutionEvent")) {
+
+            if (executionEventElt.getAttribute("type").equals(eventType)) {
+                Element pluginElt = XmlUtils.getUniqueChildElementOrNull(executionEventElt, "plugin");
+                if (pluginElt == null) {
+                    // ignore unexpected
+                } else {
+                    if (pluginElt.getAttribute("groupId").equals(pluginGroupId) &&
+                            pluginElt.getAttribute("artifactId").equals(pluginArtifactId) &&
+                            pluginElt.getAttribute("goal").equals(pluginGoal)) {
+                        result.add(executionEventElt);
+                    } else {
+                        // ignore non matching plugin
+                    }
+                }
+            } else {
+                // ignore not supported event type
+            }
+
+        }
+        return result;
+    }
+
+
     /**
      * Relativize path
-     *
+     * <p>
      * TODO replace all the workarounds (JENKINS-44088, JENKINS-46084, mac special folders...) by a unique call to
      * {@link File#getCanonicalPath()} on the workspace for the whole "MavenSpyLogProcessor#processMavenSpyLogs" code block.
      * We donb't want to pay an RPC call to {@link File#getCanonicalPath()} each time.
