@@ -1,0 +1,24 @@
+<div>
+    <p>
+        Threshold to trigger downstream pipelines based on the <a href="https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html">Maven lifecycle</a>
+        phase successfully reached during the Maven execution.
+    </p>
+    <p>
+        If "install" is selected then downstream pipelines will be triggered for "<code>mvn clean install</code>", "<code>mvn clean deploy</code>"
+        but NOT "<code>mvn clean verify</code>" or "<code>mvn clean package</code>".
+    </p>
+
+    <h2>Example</h2>
+    <p>Configure a Jenkins Multibranch Pipeline with
+    <ul>
+        <li>Threshold: "<code>deploy</code>"</li>
+        <li>execution of "<code>mvn clean deploy</code>" on branches (incl. master) and execution of "<code>mvn clean
+            verify</code> on pull requests</li>
+    </ul>
+    So that:
+    <ul>
+        <li>The builds of branches (incl. "master") would upload the generated jar/war file to your enterprise Maven repository and would trigger downstream pipelines</li>
+        <li>The builds of pull request would only build the package but NOT upload the generated jar/war file to your enterprise Maven repository and would NOT trigger downstream pipelines</li>
+    </ul>
+    </p>
+</div>
