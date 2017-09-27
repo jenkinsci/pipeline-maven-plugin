@@ -6,16 +6,22 @@ import hudson.model.Result;
 import jenkins.branch.BranchSource;
 import jenkins.plugins.git.GitSCMSource;
 import jenkins.plugins.git.GitSampleRepoRule;
+import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.pipeline.maven.util.WorkflowMultibranchProjectTestsUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Future;
+
+import javax.inject.Inject;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -28,6 +34,23 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
     @Rule
     public GitSampleRepoRule mavenWarRepoRule = new GitSampleRepoRule();
 
+    @Inject
+    public GlobalPipelineMavenConfig globalPipelineMavenConfig;
+
+    @Before
+    @Override
+    public void setup() throws Exception {
+        super.setup();
+        PipelineGraphPublisher publisher = new PipelineGraphPublisher();
+        publisher.setLifecycleThreshold("install");
+
+        List<MavenPublisher> publisherOptions = GlobalPipelineMavenConfig.get().getPublisherOptions();
+        if (publisherOptions == null) {
+            publisherOptions = new ArrayList<>();
+            GlobalPipelineMavenConfig.get().setPublisherOptions(publisherOptions);
+        }
+        publisherOptions.add(publisher);
+    }
 
     /**
      * The maven-war-app has a dependency on the maven-jar-app

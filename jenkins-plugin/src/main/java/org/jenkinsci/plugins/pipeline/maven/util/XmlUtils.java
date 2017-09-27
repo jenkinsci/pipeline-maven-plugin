@@ -242,6 +242,30 @@ public class XmlUtils {
         return result;
     }
 
+    /*
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-26 23:55:44.188">
+    <project baseDir="/Users/cyrilleleclerc/git/cyrille-leclerc/my-jar" file="/Users/cyrilleleclerc/git/cyrille-leclerc/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+      <build sourceDirectory="/Users/cyrilleleclerc/git/cyrille-leclerc/my-jar/src/main/java" directory="/Users/cyrilleleclerc/git/cyrille-leclerc/my-jar/target"/>
+    </project>
+    <plugin executionId="default-jar" goal="jar" lifecyclePhase="package" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="2.4">
+      <finalName>${jar.finalName}</finalName>
+      <outputDirectory>${project.build.directory}</outputDirectory>
+    </plugin>
+  </ExecutionEvent>
+     */
+    @Nonnull
+    public static List<String> getExecutedLifecyclePhases(@Nonnull Element mavenSpyLogs) {
+        List<String> lifecyclePhases = new ArrayList<>();
+        for (Element mojoSucceededEvent :getExecutionEvents(mavenSpyLogs, "MojoSucceeded")) {
+            Element pluginElement = getUniqueChildElement(mojoSucceededEvent, "plugin");
+            String lifecyclePhase = pluginElement.getAttribute("lifecyclePhase");
+            if (!lifecyclePhases.contains(lifecyclePhase)) {
+                lifecyclePhases.add(lifecyclePhase);
+            }
+        }
+
+        return lifecyclePhases;
+    }
 
     /**
      * Relativize path

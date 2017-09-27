@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 import hudson.Extension;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.util.ListBoxModel;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
@@ -50,10 +51,10 @@ public class PipelineGraphPublisher extends MavenPublisher {
     private boolean skipDownstreamTriggers;
 
     /**
-     * Skip trigger of downstream pipelines if the artifact has just been
-     * packaged (mvn package) or installed locally (mvn install)
+     * Lifecycle phase threshold to trigger downstream pipelines, "deploy" or "install" or "package" or ...
+     * If this phase has not been successfully reached during the build, then we don't trigger downstream pipelines
      */
-    private boolean skipDownstreamTriggersForNonDeployedArtifacts;
+    private String lifecycleThreshold = "deploy";
 
     private boolean ignoreUpstreamTriggers;
 
@@ -83,7 +84,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
         PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
 
         recordDependencies(mavenSpyLogsElt, run, listener, dao);
-        recordGeneratedArtifacts(mavenSpyLogsElt,run,listener, dao);
+        recordGeneratedArtifacts(mavenSpyLogsElt, run, listener, dao);
     }
 
     protected void recordDependencies(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
@@ -140,40 +141,40 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
     protected void recordGeneratedArtifacts(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts = listArtifacts(mavenSpyLogsElt);
-        List<Element> mvnDeployEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, "MojoSucceeded", "org.apache.maven.plugins", "maven-deploy-plugin", "deploy");
-        List<Element> nexusDeployEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, "MojoSucceeded", "org.sonatype.plugins", "nexus-staging-maven-plugin", "deploy");
 
-        boolean artifactsHaveBeenMvnDeployed = !mvnDeployEvents.isEmpty() || !nexusDeployEvents.isEmpty();
-
-        recordGeneratedArtifacts(generatedArtifacts, artifactsHaveBeenMvnDeployed, run, listener, dao);
+        List<String> executedLifecyclePhases = XmlUtils.getExecutedLifecyclePhases(mavenSpyLogsElt);
+        recordGeneratedArtifacts(generatedArtifacts, executedLifecyclePhases, run, listener, dao);
     }
 
     /**
-     *
-     * @param generatedArtifacts deployed artifacts
-     * @param artifactsHaveBeenMvnDeployed artifacts have been deployed using "mvn deploy" or "mvn nexus-staging-maven-plugin:deploy"
+     * @param generatedArtifacts           deployed artifacts
+     * @param executedLifecyclePhases Maven lifecycle phases that have been gone through during the Maven execution (e.g. "..., compile, test, package..." )
      * @param run
      * @param listener
      * @param dao
      */
-    protected void recordGeneratedArtifacts(List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts, boolean artifactsHaveBeenMvnDeployed, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+    protected void recordGeneratedArtifacts(List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts, List<String> executedLifecyclePhases, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordGeneratedArtifacts...");
         }
-        for(MavenSpyLogProcessor.MavenArtifact artifact: generatedArtifacts) {
+        for (MavenSpyLogProcessor.MavenArtifact artifact : generatedArtifacts) {
             boolean skipDownstreamPipelines = this.skipDownstreamTriggers ||
-                    (this.skipDownstreamTriggersForNonDeployedArtifacts && !artifactsHaveBeenMvnDeployed);
+                    (!executedLifecyclePhases.contains(this.lifecycleThreshold));
 
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, "Build {0}#{1} - record generated {2}:{3}, version:{4}, skipDownstreamTriggers:{5}, artifactsHaveBeenMvnDeployed: {6}",
+                LOGGER.log(Level.FINE, "Build {0}#{1} - record generated {2}:{3}, version:{4}, " +
+                                "executedLifecyclePhases: {5}, " +
+                                "skipDownstreamTriggers:{6}, lifecycleThreshold: {7}",
                         new Object[]{run.getParent().getFullName(), run.getNumber(),
                                 artifact.getId(), artifact.type, artifact.version,
-                                skipDownstreamTriggers, artifactsHaveBeenMvnDeployed});
+                                executedLifecyclePhases,
+                                skipDownstreamTriggers, lifecycleThreshold});
                 listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact.getId() + ", version: " + artifact.version +
-                        ", skipDownstreamTriggers: " + skipDownstreamTriggers + ", artifactsHaveBeenMvnDeployed:" + artifactsHaveBeenMvnDeployed +
+                        ", executedLifecyclePhases: " + executedLifecyclePhases +
+                        ", skipDownstreamTriggers: " + skipDownstreamTriggers + ", lifecycleThreshold:" + lifecycleThreshold +
                         ", file: " + artifact.file);
             }
-             dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
+            dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
                     artifact.groupId, artifact.artifactId, artifact.version, artifact.type, artifact.baseVersion,
                     skipDownstreamPipelines);
         }
@@ -241,6 +242,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
                 "versions={snapshot:" + isIncludeSnapshotVersions() + ", release:" + isIncludeReleaseVersions() + "}" +
                 ']';
     }
+
     /**
      * @param mavenSpyLogs Root XML element
      * @return list of {@link MavenSpyLogProcessor.MavenArtifact}
@@ -346,13 +348,13 @@ public class PipelineGraphPublisher extends MavenPublisher {
         this.ignoreUpstreamTriggers = ignoreUpstreamTriggers;
     }
 
-    public boolean isSkipDownstreamTriggersForNonDeployedArtifacts() {
-        return skipDownstreamTriggersForNonDeployedArtifacts;
+    public String getLifecycleThreshold() {
+        return lifecycleThreshold;
     }
 
     @DataBoundSetter
-    public void setSkipDownstreamTriggersForNonDeployedArtifacts(boolean skipDownstreamTriggersForNonDeployedArtifacts) {
-        this.skipDownstreamTriggersForNonDeployedArtifacts = skipDownstreamTriggersForNonDeployedArtifacts;
+    public void setLifecycleThreshold(String lifecycleThreshold) {
+        this.lifecycleThreshold = lifecycleThreshold;
     }
 
     @Symbol("pipelineGraphPublisher")
@@ -373,6 +375,20 @@ public class PipelineGraphPublisher extends MavenPublisher {
         @Override
         public String getSkipFileName() {
             return ".skip-pipeline-graph";
+        }
+
+        /**
+         * Only propose "package", "install" and "deploy" because the other lifecycle phases are unlikely to be useful
+         * @return
+         */
+        public ListBoxModel doFillLifecycleThresholdItems() {
+            ListBoxModel options = new ListBoxModel();
+
+            options.add("package");
+            options.add("install");
+            options.add("deploy");
+
+            return options;
         }
     }
 }
