@@ -1,11 +1,17 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
+import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import hudson.model.Cause;
 import hudson.model.CauseAction;
 import hudson.model.Result;
 import jenkins.branch.BranchSource;
 import jenkins.plugins.git.GitSCMSource;
 import jenkins.plugins.git.GitSampleRepoRule;
+import org.hamcrest.Matchers;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.pipeline.maven.util.WorkflowMultibranchProjectTestsUtils;
@@ -19,9 +25,10 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Future;
 
-import javax.inject.Inject;
+import javax.annotation.Nullable;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -34,8 +41,11 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
     @Rule
     public GitSampleRepoRule mavenWarRepoRule = new GitSampleRepoRule();
 
+    /*
+    Does not work
     @Inject
     public GlobalPipelineMavenConfig globalPipelineMavenConfig;
+    */
 
     @Before
     @Override
@@ -174,5 +184,58 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         Cause.UpstreamCause upstreamCause = mavenWarPipelineLastRun.getCause(Cause.UpstreamCause.class);
         assertThat(upstreamCause, notNullValue());
 
+    }
+
+    @Test
+    public void verify_osgi_bundle_recorded_as_bundle_and_as_jar() throws Exception {
+        loadOsgiBundleProjectInGitRepo(gitRepoRule);
+
+
+        String pipelineScript = "node('master') {\n" +
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven() {\n" +
+                "        sh 'mvn package'\n" +
+                "    }\n" +
+                "}";
+
+        // TRIGGER maven-jar#1 to record that "build-maven-jar"
+        WorkflowJob multiModuleBundleProjectPipeline = jenkinsRule.createProject(WorkflowJob.class, "build-multi-module-bundle");
+        multiModuleBundleProjectPipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, multiModuleBundleProjectPipeline.scheduleBuild2(0));
+
+        PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.getDao();
+        if (!(dao instanceof PipelineMavenPluginH2Dao))
+            throw new IllegalStateException();
+
+        PipelineMavenPluginH2Dao h2Dao = (PipelineMavenPluginH2Dao) dao;
+        List<Map<String, String>> generatedArtifacts = h2Dao.getGeneratedArtifacts(multiModuleBundleProjectPipeline.getFullName(), build.getNumber());
+
+        /*
+        [{skip_downstream_triggers=TRUE, type=pom, gav=jenkins.mvn.test.bundle:bundle-parent:0.0.1-SNAPSHOT},
+        {skip_downstream_triggers=TRUE, type=bundle, gav=jenkins.mvn.test.bundle:print-api:0.0.1-SNAPSHOT},
+        {skip_downstream_triggers=TRUE, type=jar, gav=jenkins.mvn.test.bundle:print-impl:0.0.1-SNAPSHOT},
+        {skip_downstream_triggers=TRUE, type=jar, gav=jenkins.mvn.test.bundle:print-api:0.0.1-SNAPSHOT},
+        {skip_downstream_triggers=TRUE, type=pom, gav=jenkins.mvn.test.bundle:print-api:0.0.1-SNAPSHOT},
+        {skip_downstream_triggers=TRUE, type=pom, gav=jenkins.mvn.test.bundle:print-impl:0.0.1-SNAPSHOT}]
+
+         */
+        System.out.println("generated artifacts" + generatedArtifacts);
+
+        Iterable<Map<String, String>> matchingGeneratedArtifacts =Iterables.filter(generatedArtifacts, new Predicate<Map<String, String>>() {
+            @Override
+            public boolean apply(@Nullable Map<String, String> input) {
+                return input != null &&  "jenkins.mvn.test.bundle:print-api:0.0.1-SNAPSHOT".equals(input.get("gav"));
+            }
+        });
+
+        Iterable<String> matchingArtifactTypes = Iterables.transform(matchingGeneratedArtifacts, new Function<Map<String, String>, String>() {
+            @Override
+            public String apply(@Nullable Map<String, String> input) {
+                return input.get("type");
+            }
+        });
+
+
+        assertThat(matchingArtifactTypes, Matchers.containsInAnyOrder("jar", "bundle", "pom"));
     }
 }
