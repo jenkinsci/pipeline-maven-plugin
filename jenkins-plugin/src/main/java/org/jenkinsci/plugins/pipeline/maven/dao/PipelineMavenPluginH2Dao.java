@@ -460,21 +460,22 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
         List<Map<String, String>> results = new ArrayList<>();
         try (Connection cnn = this.jdbcConnectionPool.getConnection()) {
-            PreparedStatement stmt = cnn.prepareStatement(generatedArtifactsSql);
-            stmt.setString(1, jobFullName);
-            stmt.setInt(2, buildNumber);
-            try (ResultSet rst = stmt.executeQuery()) {
-                while (rst.next()) {
-                    Map<String, String> artifact = new HashMap<>();
+            try (PreparedStatement stmt = cnn.prepareStatement(generatedArtifactsSql)) {
+                stmt.setString(1, jobFullName);
+                stmt.setInt(2, buildNumber);
+                try (ResultSet rst = stmt.executeQuery()) {
+                    while (rst.next()) {
+                        Map<String, String> artifact = new HashMap<>();
 
-                    String gav =
-                            rst.getString("maven_artifact.group_id") + ":" +
-                                    rst.getString("maven_artifact.artifact_id") + ":" +
-                                    rst.getString("maven_artifact.version");
-                    artifact.put("gav", gav);
-                    artifact.put("type", rst.getString("maven_artifact.type"));
-                    artifact.put("skip_downstream_triggers", rst.getString("generated_maven_artifact.skip_downstream_triggers"));
-                    results.add(artifact);
+                        String gav =
+                                rst.getString("maven_artifact.group_id") + ":" +
+                                        rst.getString("maven_artifact.artifact_id") + ":" +
+                                        rst.getString("maven_artifact.version");
+                        artifact.put("gav", gav);
+                        artifact.put("type", rst.getString("maven_artifact.type"));
+                        artifact.put("skip_downstream_triggers", rst.getString("generated_maven_artifact.skip_downstream_triggers"));
+                        results.add(artifact);
+                    }
                 }
             }
         } catch(SQLException e) {
