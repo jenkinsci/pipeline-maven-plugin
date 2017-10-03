@@ -14,9 +14,8 @@ import java.util.List;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class DependenciesFingerprintPublisherTest {
+public class DependenciesListerTest {
     Document doc;
-    DependenciesFingerprintPublisher dependenciesFingerprintPublisher = new DependenciesFingerprintPublisher();
 
     @Before
     public void before() throws Exception {
@@ -27,7 +26,7 @@ public class DependenciesFingerprintPublisherTest {
 
     @Test
     public void listArtifactDependencies() throws Exception {
-        List<MavenSpyLogProcessor.MavenDependency> mavenArtifacts = dependenciesFingerprintPublisher.listDependencies(doc.getDocumentElement());
+        List<MavenSpyLogProcessor.MavenDependency> mavenArtifacts = DependenciesLister.listDependencies(doc.getDocumentElement(), null);
         System.out.println(mavenArtifacts);
         Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
 
