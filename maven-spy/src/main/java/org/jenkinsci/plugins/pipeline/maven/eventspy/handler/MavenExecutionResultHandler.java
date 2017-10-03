@@ -24,6 +24,7 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildSummary;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
@@ -54,6 +55,33 @@ public class MavenExecutionResultHandler extends AbstractMavenEventHandler<Maven
                 root.addChild(buildSummary);
                 buildSummary.setAttribute("class", summary.getClass().getName());
                 buildSummary.setAttribute("time", Long.toString(summary.getTime()));
+            }
+        }
+        if (!result.getTopologicallySortedProjects().isEmpty()) {
+            MavenProject parent = result.getTopologicallySortedProjects().get(0).getParent();
+            if (parent != null) {
+                Artifact parentArtifact = parent.getArtifact();
+                Xpp3Dom parentElt = new Xpp3Dom("parent");
+
+                if (parentArtifact.getFile() != null) {
+                    parentElt.addChild(newElement("file", parentArtifact.getFile().getAbsolutePath()));
+                    parentElt.setAttribute("name", parentArtifact.getFile().getName());
+                }
+                parentElt.setAttribute("groupId", parentArtifact.getGroupId());
+                parentElt.setAttribute("artifactId", parentArtifact.getArtifactId());
+                parentElt.setAttribute("version", parentArtifact.getVersion());
+                parentElt.setAttribute("baseVersion", parentArtifact.getBaseVersion());
+                if (parentArtifact.getClassifier() != null) {
+                    parentElt.setAttribute("classifier", parentArtifact.getClassifier());
+                }
+                parentElt.setAttribute("type", "pom");
+                parentElt.setAttribute("id", parentArtifact.getArtifactId());
+                parentElt.setAttribute("extension", "xml");
+                parentElt.setAttribute("scope", "compile");
+                parentElt.setAttribute("optional", Boolean.toString(false));
+                parentElt.setAttribute("snapshot", Boolean.toString(parentArtifact.isSnapshot()));
+
+                root.addChild(parentElt);
             }
         }
         for(Throwable throwable: result.getExceptions()) {
