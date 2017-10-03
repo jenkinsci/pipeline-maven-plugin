@@ -23,6 +23,8 @@
  */
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
+
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.FingerprintMap;
@@ -99,7 +101,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
 
         FilePath workspace = context.get(FilePath.class);
 
-        List<MavenSpyLogProcessor.MavenDependency> dependencies = listDependencies(mavenSpyLogsElt);
+        List<MavenSpyLogProcessor.MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
 
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] dependenciesFingerprintPublisher - filter: " +
@@ -200,38 +202,6 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
                 "scopes=" + getIncludedScopes() + ", " +
                 "versions={snapshot:" + isIncludeSnapshotVersions() + ", release:" + isIncludeReleaseVersions() + "}" +
                 ']';
-    }
-    /**
-     * @param mavenSpyLogs Root XML element
-     * @return list of {@link MavenSpyLogProcessor.MavenArtifact}
-     */
-    @Nonnull
-    public List<MavenSpyLogProcessor.MavenDependency> listDependencies(Element mavenSpyLogs) {
-
-        List<MavenSpyLogProcessor.MavenDependency> result = new ArrayList<>();
-
-        for (Element dependencyResolutionResult : XmlUtils.getChildrenElements(mavenSpyLogs, "DependencyResolutionResult")) {
-            Element resolvedDependenciesElt = XmlUtils.getUniqueChildElementOrNull(dependencyResolutionResult, "resolvedDependencies");
-
-            if (resolvedDependenciesElt == null) {
-                continue;
-            }
-
-            for (Element dependencyElt : XmlUtils.getChildrenElements(resolvedDependenciesElt, "dependency")) {
-                MavenSpyLogProcessor.MavenDependency dependencyArtifact = XmlUtils.newMavenDependency(dependencyElt);
-
-                Element fileElt = XmlUtils.getUniqueChildElementOrNull(dependencyElt, "file");
-                if (fileElt == null || fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
-                    LOGGER.log(Level.WARNING, "listDependencies: no associated file found for " + dependencyArtifact + " in " + XmlUtils.toString(dependencyElt));
-                } else {
-                    dependencyArtifact.file = StringUtils.trim(fileElt.getTextContent());
-                }
-
-                result.add(dependencyArtifact);
-            }
-        }
-
-        return result;
     }
 
     public boolean isIncludeSnapshotVersions() {

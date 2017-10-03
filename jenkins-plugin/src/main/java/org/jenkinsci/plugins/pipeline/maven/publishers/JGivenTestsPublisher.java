@@ -18,10 +18,13 @@
 
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
+
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.jgiven.JgivenReportGenerator;
 import org.jenkinsci.plugins.jgiven.JgivenReportGenerator.ReportConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
+import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
@@ -29,6 +32,7 @@ import org.w3c.dom.Element;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -71,12 +75,17 @@ public class JGivenTestsPublisher extends MavenPublisher {
         final Run run = context.get(Run.class);
         final Launcher launcher = context.get(Launcher.class);
 
-        final String pattern = "**/" + REPORTS_DIR + "/*";
-        final FilePath[] paths = workspace.list(pattern);
-        if (paths == null || paths.length == 0) {
+        boolean foundJGivenDependency = false;
+        List<MavenSpyLogProcessor.MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
+        for (MavenSpyLogProcessor.MavenDependency dependency : dependencies) {
+            if (dependency.artifactId.contains("jgiven")) {
+                foundJGivenDependency = true;
+                break;
+            }
+        }
+        if (!foundJGivenDependency) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println("[withMaven] jgivenPublisher - Pattern \"" + pattern
-                        + "\" does not match any file on workspace, aborting.");
+                listener.getLogger().println("[withMaven] jgivenPublisher - JGiven not found within your project dependencies, aborting.");
             }
             return;
         }
@@ -87,6 +96,16 @@ public class JGivenTestsPublisher extends MavenPublisher {
             listener.getLogger().print("[withMaven] jgivenPublisher - Jenkins ");
             listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/JGiven+Plugin", "JGiven Plugin");
             listener.getLogger().println(" not found, do not archive jgiven reports.");
+            return;
+        }
+
+        final String pattern = "**/" + REPORTS_DIR + "/*";
+        final FilePath[] paths = workspace.list(pattern);
+        if (paths == null || paths.length == 0) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                listener.getLogger().println("[withMaven] jgivenPublisher - Pattern \"" + pattern
+                        + "\" does not match any file on workspace, aborting.");
+            }
             return;
         }
 
