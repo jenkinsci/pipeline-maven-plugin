@@ -246,7 +246,10 @@ public class PipelineGraphPublisher extends MavenPublisher {
         return getClass().getName() + "[" +
                 "disabled=" + isDisabled() + ", " +
                 "scopes=" + getIncludedScopes() + ", " +
-                "versions={snapshot:" + isIncludeSnapshotVersions() + ", release:" + isIncludeReleaseVersions() + "}" +
+                "versions={snapshot:" + isIncludeSnapshotVersions() + ", release:" + isIncludeReleaseVersions() + "}, " +
+                "skipDownstreamTriggers=" + isSkipDownstreamTriggers() + ", " +
+                "lifecycleThreshold=" + getLifecycleThreshold() + ", " +
+                "ignoreUpstreamTriggers=" + isIgnoreUpstreamTriggers() +
                 ']';
     }
 
