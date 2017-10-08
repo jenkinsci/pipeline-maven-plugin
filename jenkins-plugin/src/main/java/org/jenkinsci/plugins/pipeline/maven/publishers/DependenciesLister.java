@@ -28,6 +28,12 @@ public class DependenciesLister {
 
         final List<MavenSpyLogProcessor.MavenDependency> result = new ArrayList<>();
 
+        Element mavenExecutionResult = XmlUtils.getUniqueChildElementOrNull(mavenSpyLogs, "MavenExecutionResult");
+        Element parent = XmlUtils.getUniqueChildElementOrNull(mavenExecutionResult, "parent");
+        if (parent != null) {
+            result.add(XmlUtils.newMavenDependency(parent));
+        }
+
         for (final Element dependencyResolutionResult : XmlUtils.getChildrenElements(mavenSpyLogs,
                 "DependencyResolutionResult")) {
             final Element resolvedDependenciesElt = XmlUtils.getUniqueChildElementOrNull(
