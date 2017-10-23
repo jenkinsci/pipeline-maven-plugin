@@ -68,4 +68,9 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     public void cleanup() {
 
     }
+
+    @Override
+    public String toPrettyString() {
+        return "PipelineMavenPluginNullDao";
+    }
 }

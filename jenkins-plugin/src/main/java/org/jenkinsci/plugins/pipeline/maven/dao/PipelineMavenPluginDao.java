@@ -113,4 +113,9 @@ public interface PipelineMavenPluginDao {
      * Routine task to cleanup the database and reclaim disk space (if possible in the underlying database).
      */
     void cleanup();
+
+    /**
+     * Human readable toString
+     */
+    String toPrettyString();
 }
