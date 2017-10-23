@@ -96,7 +96,10 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
             plugin.setAttribute("artifactId", execution.getArtifactId());
             plugin.setAttribute("goal", execution.getGoal());
             plugin.setAttribute("version", execution.getVersion());
-            plugin.setAttribute("executionId", execution.getExecutionId());
+            if (execution.getExecutionId() != null) {
+                // See JENKINS-47508, caused by plugin being declared and invoked by the <reports> section
+                plugin.setAttribute("executionId", execution.getExecutionId());
+            }
             if (execution.getLifecyclePhase() != null) {
                 // protect against null lifecyclePhase. cause is NOT clear
                 plugin.setAttribute("lifecyclePhase", execution.getLifecyclePhase());
