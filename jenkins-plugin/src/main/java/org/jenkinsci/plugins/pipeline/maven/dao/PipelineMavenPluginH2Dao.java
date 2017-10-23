@@ -484,4 +484,37 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
         return results;
     }
+
+    @Override
+    public String toPrettyString() {
+        List<String> prettyStrings = new ArrayList<>();
+        try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            prettyStrings.add("jdbc.url: " + cnn.getMetaData().getURL());
+            List<String> tables = Arrays.asList("MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT");
+            for (String table : tables) {
+                try (Statement stmt = cnn.createStatement()) {
+                    try (ResultSet rst = stmt.executeQuery("SELECT count(*) FROM " + table)) {
+                        if (rst.next()) {
+                            int count = rst.getInt(1);
+                            prettyStrings.add("Table " + table + ": " + count + " rows");
+                        } else {
+                            prettyStrings.add("Table " + table + ": #IllegalStateException 'select count(*)' didn't return any row#");
+                        }
+                    }
+                } catch (SQLException e) {
+                    prettyStrings.add("Table " + table + ": "+ e);
+                    LOGGER.log(Level.WARNING, "SQLException counting rows on " + table, e);
+                }
+            }
+        } catch (SQLException e) {
+            prettyStrings.add("SQLException getting a connection to " + jdbcConnectionPool + ": " + e);
+            LOGGER.log(Level.WARNING, "SQLException getting a connection to " + jdbcConnectionPool, e);
+        }
+
+        String result = "PipelineMavenPluginH2Dao ";
+        for (String prettyString : prettyStrings) {
+            result += "\r\n\t" + prettyString;
+        }
+        return result;
+    }
 }
