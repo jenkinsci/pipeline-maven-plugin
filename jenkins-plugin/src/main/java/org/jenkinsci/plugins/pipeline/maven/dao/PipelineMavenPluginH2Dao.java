@@ -511,10 +511,10 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
             LOGGER.log(Level.WARNING, "SQLException getting a connection to " + jdbcConnectionPool, e);
         }
 
-        String result = "PipelineMavenPluginH2Dao ";
+        StringBuilder result = new StringBuilder("PipelineMavenPluginH2Dao ");
         for (String prettyString : prettyStrings) {
-            result += "\r\n\t" + prettyString;
+            result.append("\r\n\t" + prettyString);
         }
-        return result;
+        return result.toString();
     }
 }
