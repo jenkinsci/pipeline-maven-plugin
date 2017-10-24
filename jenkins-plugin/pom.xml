@@ -324,40 +324,30 @@
   </dependencyManagement>
   <build>
     <plugins>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>3.0.0</version>
-          <executions>
-            <execution>
-              <id>copy-maven-spy-jar</id>
-              <phase>process-resources</phase>
-              <goals>
-                <goal>copy</goal>
-              </goals>
-              <configuration>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>${project.groupId} </groupId>
-                    <artifactId>pipeline-maven-spy</artifactId>
-                    <version>${project.version}</version>
-                    <type>jar</type>
-                    <outputDirectory>${project.build.outputDirectory}/META-INF/lib/</outputDirectory>
-                  </artifactItem>
-                </artifactItems>
-                <stripVersion>true</stripVersion>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
       <plugin>
-        <!--
-        TODO remove once https://github.com/jenkinsci/jenkins-test-harness-tools/pull/5 is merged
-        -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <version>3.0.0</version>
         <executions>
+          <execution>
+            <id>copy-maven-spy-jar</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>pipeline-maven-spy</artifactId>
+                  <version>${project.version}</version>
+                  <type>jar</type>
+                  <outputDirectory>${project.build.outputDirectory}/META-INF/lib/</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+              <stripVersion>true</stripVersion>
+            </configuration>
+          </execution>
           <execution>
             <id>copy-binary-files</id>
             <phase>process-test-resources</phase>
