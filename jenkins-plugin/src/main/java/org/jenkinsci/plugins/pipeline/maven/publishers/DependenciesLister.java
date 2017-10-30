@@ -14,6 +14,7 @@ import javax.annotation.Nonnull;
 
 /**
  * List dependencies from the spy log.
+ *
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class DependenciesLister {
@@ -24,7 +25,7 @@ public class DependenciesLister {
      */
     @Nonnull
     public static List<MavenSpyLogProcessor.MavenDependency> listDependencies(final Element mavenSpyLogs,
-            final Logger logger) {
+                                                                              final Logger logger) {
 
         final List<MavenSpyLogProcessor.MavenDependency> result = new ArrayList<>();
 
@@ -53,6 +54,38 @@ public class DependenciesLister {
 
                 result.add(dependencyArtifact);
             }
+        }
+
+        return result;
+    }
+
+    /**
+     * @param mavenSpyLogs Root XML element
+     * @return list of {@link MavenSpyLogProcessor.MavenArtifact}
+     */
+    @Nonnull
+    public static List<MavenSpyLogProcessor.MavenArtifact> listParentProjects(final Element mavenSpyLogs,
+                                                                              final Logger logger) {
+
+        final List<MavenSpyLogProcessor.MavenArtifact> result = new ArrayList<>();
+
+        for (final Element dependencyResolutionResult : XmlUtils.getExecutionEvents(mavenSpyLogs,
+                "ProjectStarted")) {
+            final Element parentProjectElt = XmlUtils.getUniqueChildElementOrNull(
+                    dependencyResolutionResult, "parentProject");
+
+            if (parentProjectElt == null) {
+                continue;
+            }
+            final MavenSpyLogProcessor.MavenArtifact parentProject = new MavenSpyLogProcessor.MavenArtifact();
+
+            parentProject.groupId = parentProjectElt.getAttribute("groupId");
+            parentProject.artifactId = parentProjectElt.getAttribute("artifactId");
+            parentProject.version = parentProjectElt.getAttribute("version");
+            parentProject.baseVersion = parentProject.version;
+            parentProject.snapshot = parentProject.version.endsWith("-SNAPSHOT");
+
+            result.add(parentProject);
         }
 
         return result;

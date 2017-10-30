@@ -25,6 +25,8 @@
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
 import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
 import java.util.Collections;
@@ -54,5 +56,22 @@ public class ProjectStartedExecutionHandler extends AbstractExecutionHandler {
     @Override
     public boolean _handle(@Nonnull ExecutionEvent executionEvent) {
         return super._handle(executionEvent);
+    }
+
+    @Override
+    protected void addDetails(@Nonnull ExecutionEvent executionEvent, @Nonnull Xpp3Dom root) {
+        super.addDetails(executionEvent, root);
+        MavenProject parentProject = executionEvent.getProject().getParent();
+        if (parentProject == null) {
+            // nothing to do
+        } else {
+            Xpp3Dom parentProjectElt = new Xpp3Dom("parentProject");
+            root.addChild(parentProjectElt);
+            parentProjectElt.setAttribute("name", parentProject.getName());
+            parentProjectElt.setAttribute("groupId", parentProject.getGroupId());
+
+            parentProjectElt.setAttribute("artifactId", parentProject.getArtifactId());
+            parentProjectElt.setAttribute("version", parentProject.getVersion());
+        }
     }
 }

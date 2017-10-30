@@ -116,6 +116,27 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     }
 
     @Override
+    public void recordParentProject(@Nonnull String jobFullName, int buildNumber, @Nonnull String parentGroupId, @Nonnull String parentArtifactId, @Nonnull String parentVersion, boolean ignoreUpstreamTriggers) {
+        LOGGER.log(Level.FINE, "recordParentProject({0}#{1}, {2}:{3} ignoreUpstreamTriggers:{5}})",
+                new Object[]{jobFullName, buildNumber, parentGroupId, parentArtifactId, parentVersion, ignoreUpstreamTriggers});
+        long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
+        long parentArtifactPrimaryKey = getOrCreateArtifactPrimaryKey(parentGroupId, parentArtifactId, parentVersion, "pom");
+
+        try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            cnn.setAutoCommit(false);
+            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO MAVEN_PARENT_PROJECT(ARTIFACT_ID, BUILD_ID, IGNORE_UPSTREAM_TRIGGERS) VALUES (?, ?, ?)")) {
+                stmt.setLong(1, parentArtifactPrimaryKey);
+                stmt.setLong(2, buildPrimaryKey);
+                stmt.setBoolean(3, ignoreUpstreamTriggers);
+                stmt.execute();
+            }
+            cnn.commit();
+        } catch (SQLException e) {
+            throw new RuntimeSqlException(e);
+        }
+    }
+
+    @Override
     public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion, boolean skipDownstreamTriggers) {
         LOGGER.log(Level.FINE, "recordGeneratedArtifact({0}#{1}, {2}:{3}:{4}:{5}, version:{6}, skipDownstreamTriggers:{7})",
                 new Object[]{jobFullName, buildNumber, groupId, artifactId, baseVersion, type, version, skipDownstreamTriggers});
@@ -377,7 +398,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
      */
     protected synchronized void testDatabase() throws RuntimeSqlException {
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
-            List<String> tables = Arrays.asList("MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT");
+            List<String> tables = Arrays.asList("MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT", "MAVEN_PARENT_PROJECT");
             for (String table : tables) {
                 try (Statement stmt = cnn.createStatement()) {
                     try (ResultSet rst = stmt.executeQuery("SELECT count(*) FROM " + table)) {
@@ -398,6 +419,12 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     @Nonnull
     @Override
     public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+        List<String> downstreamJobs = listDownstreamPipelinesBasedOnMavenDependencies(jobFullName, buildNumber);
+        downstreamJobs.addAll(listDownstreamPipelinesBasedOnParentProjectDependencies(jobFullName, buildNumber));
+        return downstreamJobs;
+    }
+
+    protected List<String> listDownstreamPipelinesBasedOnMavenDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamJobs({0}, {1})", new Object[]{jobFullName, buildNumber});
         String generatedArtifactsSql = "SELECT DISTINCT GENERATED_MAVEN_ARTIFACT.ARTIFACT_ID " +
                 " FROM GENERATED_MAVEN_ARTIFACT " +
@@ -435,6 +462,48 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
             throw new RuntimeSqlException(e);
         }
         LOGGER.log(Level.FINE, "listDownstreamJobs({0}, {1}): {2}", new Object[]{jobFullName, buildNumber, downstreamJobsFullNames});
+
+        return downstreamJobsFullNames;
+    }
+
+    protected List<String> listDownstreamPipelinesBasedOnParentProjectDependencies(@Nonnull String jobFullName, int buildNumber) {
+        LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
+        String generatedArtifactsSql = "SELECT DISTINCT GENERATED_MAVEN_ARTIFACT.ARTIFACT_ID " +
+                " FROM GENERATED_MAVEN_ARTIFACT " +
+                " INNER JOIN JENKINS_BUILD AS UPSTREAM_BUILD ON GENERATED_MAVEN_ARTIFACT.BUILD_ID = UPSTREAM_BUILD.ID " +
+                " INNER JOIN JENKINS_JOB AS UPSTREAM_JOB ON UPSTREAM_BUILD.JOB_ID = UPSTREAM_JOB.ID " +
+                " WHERE " +
+                "   UPSTREAM_JOB.FULL_NAME = ? AND" +
+                "   UPSTREAM_BUILD.NUMBER = ? AND " +
+                "   GENERATED_MAVEN_ARTIFACT.SKIP_DOWNSTREAM_TRIGGERS = FALSE";
+
+        String sql = "SELECT DISTINCT DOWNSTREAM_JOB.FULL_NAME " +
+                " FROM JENKINS_JOB AS DOWNSTREAM_JOB" +
+                " INNER JOIN JENKINS_BUILD AS DOWNSTREAM_BUILD ON DOWNSTREAM_JOB.ID = DOWNSTREAM_BUILD.JOB_ID " +
+                " INNER JOIN MAVEN_PARENT_PROJECT ON DOWNSTREAM_BUILD.ID = MAVEN_PARENT_PROJECT.BUILD_ID" +
+                " WHERE " +
+                "   MAVEN_PARENT_PROJECT.ARTIFACT_ID IN (" + generatedArtifactsSql + ") AND " +
+                "   MAVEN_PARENT_PROJECT.IGNORE_UPSTREAM_TRIGGERS = FALSE AND " +
+                "   DOWNSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE DOWNSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID)" +
+                " ORDER BY DOWNSTREAM_JOB.FULL_NAME";
+
+        List<String> downstreamJobsFullNames = new ArrayList<>();
+        LOGGER.log(Level.FINER, "sql: {0}, jobFullName:{1}, buildNumber: {2}", new Object[]{sql, jobFullName, buildNumber});
+
+        try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            try (PreparedStatement stmt = cnn.prepareStatement(sql)) {
+                stmt.setString(1, jobFullName);
+                stmt.setInt(2, buildNumber);
+                try (ResultSet rst = stmt.executeQuery()) {
+                    while (rst.next()) {
+                        downstreamJobsFullNames.add(rst.getString(1));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeSqlException(e);
+        }
+        LOGGER.log(Level.FINE, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1}): {2}", new Object[]{jobFullName, buildNumber, downstreamJobsFullNames});
 
         return downstreamJobsFullNames;
     }
@@ -490,7 +559,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         List<String> prettyStrings = new ArrayList<>();
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             prettyStrings.add("jdbc.url: " + cnn.getMetaData().getURL());
-            List<String> tables = Arrays.asList("MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT");
+            List<String> tables = Arrays.asList("MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT", "MAVEN_PARENT_PROJECT");
             for (String table : tables) {
                 try (Statement stmt = cnn.createStatement()) {
                     try (ResultSet rst = stmt.executeQuery("SELECT count(*) FROM " + table)) {
