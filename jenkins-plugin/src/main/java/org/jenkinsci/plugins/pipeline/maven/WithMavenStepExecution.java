@@ -162,6 +162,7 @@ class WithMavenStepExecution extends StepExecution {
             LOGGER.log(Level.FINE, "Global settings FilePath: {0}", step.getGlobalMavenSettingsFilePath());
             LOGGER.log(Level.FINE, "Options: {0}", step.getOptions());
             LOGGER.log(Level.FINE, "env.PATH: {0}", env.get("PATH")); // JENKINS-40484
+            LOGGER.log(Level.FINE, "ws: {0}", ws.getRemote()); // JENKINS-47804
         }
 
         listener.getLogger().println("[withMaven] Options: " + step.getOptions());
@@ -566,15 +567,18 @@ class WithMavenStepExecution extends StepExecution {
      */
     @Nullable
     private String setupMavenLocalRepo() throws IOException, InterruptedException {
+        String expandedMavenLocalRepo;
         if (StringUtils.isEmpty(step.getMavenLocalRepo())) {
-            return null;
+            expandedMavenLocalRepo = null;
         } else {
             // resolve relative/absolute with workspace as base
             String expandedPath = envOverride.expand(env.expand(step.getMavenLocalRepo()));
             FilePath repoPath = new FilePath(ws, expandedPath);
             repoPath.mkdirs();
-            return repoPath.getRemote();
+            expandedMavenLocalRepo = repoPath.getRemote();
         }
+        LOGGER.log(Level.FINEST, "setupMavenLocalRepo({0}): {1}", new Object[]{step.getMavenLocalRepo(), expandedMavenLocalRepo});
+        return expandedMavenLocalRepo;
     }
 
     /**
