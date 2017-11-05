@@ -174,11 +174,14 @@ class WithMavenStepExecution extends StepExecution {
         withContainer = detectWithContainer();
 
         if (withContainer) {
-            listener.getLogger().print("WARNING: \"withMaven(){...}\" step running within \"docker.image('image').inside {...}\"." +
-                    " Since the Docker Pipeline Plugin version 1.14, you MUST prepend the 'PATH' environment variable" +
-                    " by the 'MVN_CMD' environment variable in every 'sh' step that invokes 'mvn'. See ");
-            listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/Pipeline+Maven+Plugin?", "Pipeline Maven Plugin FAQ");
-            listener.getLogger().println();
+            listener.getLogger().print("[withMaven] WARNING: \"withMaven(){...}\" step running within \"docker.image('image').inside {...}\"." +
+                    " Since the Docker Pipeline Plugin version 1.14, you MUST prepend the 'MVN_CMD' environment variable" +
+                    " to the 'PATH' environment variable in every 'sh' step that invokes 'mvn'. ");
+            listener.getLogger().print("See ");
+            listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/Pipeline+Maven+Plugin#PipelineMavenPlugin-HowtousethePipelineMavenPluginwithDocker", "Pipeline Maven Plugin FAQ");
+            listener.getLogger().println(".");
+            listener.getLogger().println("[withMaven] Sample:");
+            listener.getLogger().println("[withMaven]    sh \"export PATH=$MVN_CMD:$PATH && mvn ...\"");
         }
 
         setupJDK();
