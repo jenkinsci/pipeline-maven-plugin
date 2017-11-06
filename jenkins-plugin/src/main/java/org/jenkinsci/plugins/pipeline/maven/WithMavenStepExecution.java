@@ -276,17 +276,13 @@ class WithMavenStepExecution extends StepExecution {
 
     /**
      * @param credentials list of credentials injected by withMaven. They will be tracked and masked in the logs.
-     * @throws AbortException
      * @throws IOException
      * @throws InterruptedException
      */
-    private void setupMaven(@Nonnull Collection<Credentials> credentials) throws AbortException, IOException, InterruptedException {
+    private void setupMaven(@Nonnull Collection<Credentials> credentials) throws IOException, InterruptedException {
         // Temp dir with the wrapper that will be prepended to the path and the temporary files used by withMazven (settings files...)
         tempBinDir = tempDir(ws).child("withMaven" + Util.getDigestOf(UUID.randomUUID().toString()).substring(0, 8));
         tempBinDir.mkdirs();
-        // set the path to our script
-        envOverride.put("PATH+MAVEN", tempBinDir.getRemote());
-
 
         // SETTINGS FILES
         String settingsFilePath = setupSettingFile(credentials);
@@ -312,17 +308,17 @@ class WithMavenStepExecution extends StepExecution {
         //
         // MAVEN_CONFIG
         StringBuilder mavenConfig = new StringBuilder();
+        mavenConfig.append("--batch-mode ");
+        mavenConfig.append("--show-version ");
         if (StringUtils.isNotEmpty(settingsFilePath)) {
-            mavenConfig.append(" --settings " + settingsFilePath);
+            mavenConfig.append("--settings " + settingsFilePath + " ");
         }
         if (StringUtils.isNotEmpty(globalSettingsFilePath)) {
-            mavenConfig.append(" --global-settings " + globalSettingsFilePath);
+            mavenConfig.append("--global-settings " + globalSettingsFilePath + " ");
         }
         if (StringUtils.isNotEmpty(mavenLocalRepo)) {
-            mavenConfig.append(" -Dmaven.repo.local=" + mavenLocalRepo);
+            mavenConfig.append("-Dmaven.repo.local=" + mavenLocalRepo + " ");
         }
-        mavenConfig.append(" --batch-mode");
-        mavenConfig.append(" --show-version");
 
         envOverride.put("MAVEN_CONFIG", mavenConfig.toString());
 
@@ -349,6 +345,10 @@ class WithMavenStepExecution extends StepExecution {
 
         FilePath mvnExec = new FilePath(ws.getChannel(), mvnExecPath);
         String content = generateMavenWrapperScriptContent(mvnExec);
+
+        // ADD MAVEN WRAPPER SCRIPT PARENT DIRECTORY TO PATH
+        // WARNING MUST BE INVOKED AFTER obtainMavenExec(), THERE SEEM TO BE A BUG IN ENVIRONMENT VARIABLE HANDLING IN obtainMavenExec()
+        envOverride.put("PATH+MAVEN", tempBinDir.getRemote());
 
         createWrapperScript(tempBinDir, mvnExec.getName(), content);
 

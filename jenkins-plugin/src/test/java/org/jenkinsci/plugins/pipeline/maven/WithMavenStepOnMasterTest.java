@@ -599,7 +599,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "</project>'''\n" +
                 "\n" +
                 "    withMaven(maven: 'apache-maven-3.5.0', mavenSettingsFilePath: 'maven-settings.xml') {\n" +
-                "        sh 'mvn help:effective-settings'\n" +
+                "        sh 'env && mvn help:effective-settings'\n" +
                 "    }\n" +
                 "}\n";
 
