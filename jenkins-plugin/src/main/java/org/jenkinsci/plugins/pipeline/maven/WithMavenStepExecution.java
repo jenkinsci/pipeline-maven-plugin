@@ -109,7 +109,14 @@ class WithMavenStepExecution extends StepExecution {
     private static final String M2_HOME = "M2_HOME";
     private static final String MAVEN_HOME = "MAVEN_HOME";
     private static final String MAVEN_OPTS = "MAVEN_OPTS";
+    /**
+     * Environment variable of the path to the wrapped "mvn" command, you can just invoke "$MVN_CMD clean package"
+     */
     private static final String MVN_CMD = "MVN_CMD";
+    /**
+     * Environment variable of the path to the parent folder of the wrapper of the "mvn" command, you can add it to the "PATH" with "export PATH=$MVN_CMD_DIR:$PATH"
+     */
+    private static final String MVN_CMD_DIR = "MVN_CMD_DIR";
 
     private static final Logger LOGGER = Logger.getLogger(WithMavenStepExecution.class.getName());
 
@@ -175,13 +182,13 @@ class WithMavenStepExecution extends StepExecution {
 
         if (withContainer) {
             listener.getLogger().print("[withMaven] WARNING: \"withMaven(){...}\" step running within \"docker.image('image').inside {...}\"." +
-                    " Since the Docker Pipeline Plugin version 1.14, you MUST prepend the 'MVN_CMD' environment variable" +
+                    " Since the Docker Pipeline Plugin version 1.14, you MUST prepend the 'MVN_CMD_DIR' environment variable" +
                     " to the 'PATH' environment variable in every 'sh' step that invokes 'mvn'. ");
             listener.getLogger().print("See ");
             listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/Pipeline+Maven+Plugin#PipelineMavenPlugin-HowtousethePipelineMavenPluginwithDocker", "Pipeline Maven Plugin FAQ");
             listener.getLogger().println(".");
             listener.getLogger().println("[withMaven] Sample:");
-            listener.getLogger().println("[withMaven]    sh \"export PATH=$MVN_CMD:$PATH && mvn ...\"");
+            listener.getLogger().println("[withMaven]    sh \"export PATH=$MVN_CMD_DIR:$PATH && mvn ...\"");
         }
 
         setupJDK();
@@ -280,9 +287,10 @@ class WithMavenStepExecution extends StepExecution {
      * @throws InterruptedException
      */
     private void setupMaven(@Nonnull Collection<Credentials> credentials) throws IOException, InterruptedException {
-        // Temp dir with the wrapper that will be prepended to the path and the temporary files used by withMazven (settings files...)
+        // Temp dir with the wrapper that will be prepended to the path and the temporary files used by withMaven (settings files...)
         tempBinDir = tempDir(ws).child("withMaven" + Util.getDigestOf(UUID.randomUUID().toString()).substring(0, 8));
         tempBinDir.mkdirs();
+        envOverride.put("MVN_CMD_DIR", tempBinDir.getRemote());
 
         // SETTINGS FILES
         String settingsFilePath = setupSettingFile(credentials);
