@@ -29,6 +29,7 @@ import hudson.model.Run;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -108,6 +109,31 @@ public interface PipelineMavenPluginDao {
      */
     @Nonnull
     List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber);
+    
+    /**
+     * List the upstream jobs who generate an artifact that the given build depends on
+     * (build identified by the given {@code jobFullName}, {@code buildNumber})
+     *
+     * @param jobFullName see {@link Item#getFullName()}
+     * @param buildNumber see {@link Run#getNumber()}
+     * @return list of job full names (see {@link Item#getFullName()})
+     * @see Item#getFullName()
+     */
+    @Nonnull
+    Map<String, Integer> listUpstreamJobs(@Nonnull String jobFullName, int buildNumber);
+    
+    /**
+	 * List the upstream jobs who generate an artifact that the given build depends
+	 * on, including transitive dependencies (build identified by the given
+	 * {@code jobFullName}, {@code buildNumber})
+     *
+     * @param jobFullName see {@link Item#getFullName()}
+     * @param buildNumber see {@link Run#getNumber()}
+     * @return list of job full names (see {@link Item#getFullName()})
+     * @see Item#getFullName()
+     */
+    @Nonnull
+    Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber);
 
     /**
      * Routine task to cleanup the database and reclaim disk space (if possible in the underlying database).

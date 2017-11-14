@@ -26,6 +26,7 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -63,6 +64,18 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
         return Collections.emptyList();
     }
+    
+    @Nonnull
+	@Override
+	public Map<String, Integer> listUpstreamJobs(String jobFullName, int buildNumber) {
+		return Collections.emptyMap();
+	}
+    
+    @Nonnull
+	@Override
+	public Map<String, Integer> listTransitiveUpstreamJobs(String jobFullName, int buildNumber) {
+		return Collections.emptyMap();
+	}
 
     @Override
     public void cleanup() {

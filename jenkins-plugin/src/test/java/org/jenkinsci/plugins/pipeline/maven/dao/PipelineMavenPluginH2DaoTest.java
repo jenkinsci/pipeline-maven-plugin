@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -414,5 +415,31 @@ public class PipelineMavenPluginH2DaoTest {
 
         List<String> downstreamPipelinesForBuild2 = dao.listDownstreamJobs("my-upstream-pipeline-1", 2);
         assertThat(downstreamPipelinesForBuild2, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+    }
+    
+    @Test
+    public void list_upstream_jobs() {
+
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", false);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-2", 1, "com.mycompany", "service", "1.0-SNAPSHOT", "war", "1.0-SNAPSHOT", false);
+
+        dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false);
+
+
+        Map<String, Integer> upstreamPipelinesForBuild1 = dao.listUpstreamJobs("my-downstream-pipeline-1", 1);
+        assertThat(upstreamPipelinesForBuild1.keySet(), Matchers.containsInAnyOrder("my-upstream-pipeline-1"));
+    }
+    
+    @Test
+    public void list_transitive_upstream_jobs() {
+
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", false);
+        dao.recordGeneratedArtifact("my-downstream-pipeline-1", 1, "com.mycompany", "service", "1.0-SNAPSHOT", "war", "1.0-SNAPSHOT", false);
+        
+        dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false);
+        dao.recordDependency("my-downstream-downstream-pipeline-1", 1, "com.mycompany", "service", "1.0-SNAPSHOT", "war", "compile", false);
+
+        Map<String, Integer> upstreamPipelinesForBuild1 = dao.listTransitiveUpstreamJobs("my-downstream-downstream-pipeline-1", 1);
+        assertThat(upstreamPipelinesForBuild1.keySet(), Matchers.containsInAnyOrder("my-upstream-pipeline-1","my-downstream-pipeline-1"));
     }
 }
