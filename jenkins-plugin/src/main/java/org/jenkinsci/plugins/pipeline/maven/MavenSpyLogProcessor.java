@@ -282,6 +282,31 @@ public class MavenSpyLogProcessor implements Serializable {
         	
         	return result;
         }
+        
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(super.hashCode(), optional, scope);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (!super.equals(obj))
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			MavenDependency other = (MavenDependency) obj;
+			if (optional != other.optional)
+				return false;
+			if (scope == null) {
+				if (other.scope != null)
+					return false;
+			} else if (!scope.equals(other.scope))
+				return false;
+			return true;
+		}
     }
 
     /*
