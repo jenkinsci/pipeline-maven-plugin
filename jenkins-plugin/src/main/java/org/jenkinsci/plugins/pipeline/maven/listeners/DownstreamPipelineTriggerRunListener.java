@@ -58,6 +58,9 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         WorkflowJob upstreamPipeline = upstreamBuild.getParent();
         List<String> downstreamPipelines = GlobalPipelineMavenConfig.getDao().listDownstreamJobs(upstreamPipeline.getFullName(), upstreamBuild.getNumber());
 
+        // Don't trigger myself
+        downstreamPipelines.remove(upstreamPipeline.getFullName());
+        
         outer:
         for (String downstreamPipelineFullName : downstreamPipelines) {
             final WorkflowJob downstreamPipeline = Jenkins.getInstance().getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
@@ -65,10 +68,6 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 LOGGER.log(Level.FINE, "Downstream pipeline {0} not found from upstream build {1} with authentication {2}. Database synchronization issue?",
                         new Object[]{downstreamPipelineFullName, upstreamBuild.getFullDisplayName(), Jenkins.getAuthentication()});
                 // job not found, the database was probably out of sync
-                continue;
-            }
-            if (downstreamPipeline.equals(upstreamPipeline)) {
-                // don't trigger myself
                 continue;
             }
             
