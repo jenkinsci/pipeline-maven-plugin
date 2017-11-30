@@ -59,6 +59,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.ExtendedToolInstallations;
+import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.File;
@@ -164,6 +165,47 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         jenkinsRule.assertLogContains("[withMaven] openTasksPublisher - Scan Tasks for Maven artifact jenkins.mvn.test:mono-module-maven-app:0.1-SNAPSHOT", build);
         TasksResultAction tasksResultAction = build.getAction(TasksResultAction.class);
         assertThat(tasksResultAction.getProjectActions().size(), is(1));
+    }
+
+    @Issue("JENKINS-48264")
+    @Test
+    public void maven_build_jar_project_with_space_char_in_name() throws Exception {
+        loadMavenJarProjectInGitRepo(this.gitRepoRule);
+
+        String pipelineScript = "node('master') {\n" +
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven() {\n" +
+                "        sh 'mvn help:effective-settings'\n" +
+                "    }\n" +
+                "}";
+
+        String mavenSettings =                 "<?xml version='1.0' encoding='UTF-8'?>\n" +
+                "<settings \n" +
+                "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+                "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+                "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+                "    <servers>\n" +
+                "    	<server>\n" +
+                "	        <id>id-settings-test-through-config-file-provider</id>\n" +
+                "	    </server>\n" +
+                "    </servers>\n" +
+                "</settings>\n";
+        MavenSettingsConfig mavenSettingsConfig = new MavenSettingsConfig("maven-config-test", "maven-config-test", "", mavenSettings, false, null);
+
+        GlobalConfigFiles.get().save(mavenSettingsConfig);
+        GlobalMavenConfig.get().setSettingsProvider(new MvnSettingsProvider(mavenSettingsConfig.id));
+
+
+        try {
+            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build on master with spaces");
+            pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+            WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+            jenkinsRule.assertLogContains("[withMaven] use Maven settings provided by the Jenkins global configuration", build);
+            jenkinsRule.assertLogContains("<id>id-settings-test-through-config-file-provider</id>", build);
+        } finally {
+            GlobalMavenConfig.get().setSettingsProvider(null);
+        }
+
     }
 
     @Test
