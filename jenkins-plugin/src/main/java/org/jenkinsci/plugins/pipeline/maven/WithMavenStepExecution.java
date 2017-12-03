@@ -321,13 +321,13 @@ class WithMavenStepExecution extends StepExecution {
         mavenConfig.append("--batch-mode ");
         mavenConfig.append("--show-version ");
         if (StringUtils.isNotEmpty(settingsFilePath)) {
-            mavenConfig.append("--settings " + settingsFilePath + " ");
+            mavenConfig.append("--settings \"" + settingsFilePath + "\" ");
         }
         if (StringUtils.isNotEmpty(globalSettingsFilePath)) {
-            mavenConfig.append("--global-settings " + globalSettingsFilePath + " ");
+            mavenConfig.append("--global-settings \"" + globalSettingsFilePath + "\" ");
         }
         if (StringUtils.isNotEmpty(mavenLocalRepo)) {
-            mavenConfig.append("-Dmaven.repo.local=" + mavenLocalRepo + " ");
+            mavenConfig.append("-Dmaven.repo.local=\"" + mavenLocalRepo + "\" ");
         }
 
         envOverride.put("MAVEN_CONFIG", mavenConfig.toString());
@@ -354,7 +354,7 @@ class WithMavenStepExecution extends StepExecution {
         }
 
         FilePath mvnExec = new FilePath(ws.getChannel(), mvnExecPath);
-        String content = generateMavenWrapperScriptContent(mvnExec);
+        String content = generateMavenWrapperScriptContent(mvnExec, mavenConfig.toString());
 
         // ADD MAVEN WRAPPER SCRIPT PARENT DIRECTORY TO PATH
         // WARNING MUST BE INVOKED AFTER obtainMavenExec(), THERE SEEM TO BE A BUG IN ENVIRONMENT VARIABLE HANDLING IN obtainMavenExec()
@@ -545,10 +545,11 @@ class WithMavenStepExecution extends StepExecution {
      * Generates the content of the maven wrapper script
      *
      * @param mvnExec maven executable location
+     * @param mavenConfig config arguments added to the "mvn" command line
      * @return wrapper script content
      * @throws AbortException when problems creating content
      */
-    private String generateMavenWrapperScriptContent(FilePath mvnExec) throws AbortException {
+    private String generateMavenWrapperScriptContent(@Nonnull FilePath mvnExec, @Nonnull String mavenConfig) throws AbortException {
 
         boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
 
@@ -558,13 +559,13 @@ class WithMavenStepExecution extends StepExecution {
             String lineSep = "\n";
             script.append("#!/bin/sh -e").append(lineSep);
             script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
-            script.append(mvnExec.getRemote() + " $MAVEN_CONFIG \"$@\"").append(lineSep);
+            script.append(mvnExec.getRemote() + " " + mavenConfig + " \"$@\"").append(lineSep);
 
         } else { // Windows
             String lineSep = "\r\n";
             script.append("@echo off").append(lineSep);
             script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
-            script.append(mvnExec.getRemote() + " %MAVEN_CONFIG% %*").append(lineSep);
+            script.append(mvnExec.getRemote() + " " + mavenConfig + " %*").append(lineSep);
         }
 
         LOGGER.log(Level.FINER, "Generated Maven wrapper script: \n{0}", script);
