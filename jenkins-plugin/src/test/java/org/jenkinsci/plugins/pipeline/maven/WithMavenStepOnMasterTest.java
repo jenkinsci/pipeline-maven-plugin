@@ -169,7 +169,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
     @Issue("JENKINS-48264")
     @Test
-    public void maven_build_jar_project_with_space_char_in_name() throws Exception {
+    public void maven_build_jar_project_with_whitespace_char_in_name() throws Exception {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
         String pipelineScript = "node('master') {\n" +
