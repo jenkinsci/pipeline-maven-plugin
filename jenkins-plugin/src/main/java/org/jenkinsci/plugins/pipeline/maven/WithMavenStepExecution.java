@@ -559,13 +559,13 @@ class WithMavenStepExecution extends StepExecution {
             String lineSep = "\n";
             script.append("#!/bin/sh -e").append(lineSep);
             script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
-            script.append(mvnExec.getRemote() + " " + mavenConfig + " \"$@\"").append(lineSep);
+            script.append("\"" + mvnExec.getRemote() + "\" " + mavenConfig + " \"$@\"").append(lineSep);
 
         } else { // Windows
             String lineSep = "\r\n";
             script.append("@echo off").append(lineSep);
             script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
-            script.append(mvnExec.getRemote() + " " + mavenConfig + " %*").append(lineSep);
+            script.append("\"" + mvnExec.getRemote() + "\" " + mavenConfig + " %*").append(lineSep);
         }
 
         LOGGER.log(Level.FINER, "Generated Maven wrapper script: \n{0}", script);
