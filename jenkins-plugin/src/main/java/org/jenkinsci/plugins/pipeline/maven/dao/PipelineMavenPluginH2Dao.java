@@ -36,6 +36,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -66,8 +67,13 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
         File databaseFile = new File(rootDir, "jenkins-jobs");
         String jdbcUrl = "jdbc:h2:file:" + databaseFile.getAbsolutePath() + ";AUTO_SERVER=TRUE;MULTI_THREADED=1";
+        if(LOGGER.isLoggable(Level.FINEST)) {
+            jdbcUrl += ";TRACE_LEVEL_SYSTEM_OUT=3";
+        } else if (LOGGER.isLoggable(Level.FINE)) {
+            jdbcUrl += ";TRACE_LEVEL_SYSTEM_OUT=2";
+        }
+        LOGGER.log(Level.INFO, "Open database {0}", jdbcUrl);
         jdbcConnectionPool = JdbcConnectionPool.create(jdbcUrl, "sa", "sa");
-        LOGGER.log(Level.FINE, "Open database {0}", jdbcUrl);
 
         initializeDatabase();
         testDatabase();
@@ -344,7 +350,14 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
             }
             int newSchemaVersion = getSchemaVersion(cnn);
 
-            if (initialSchemaVersion != newSchemaVersion) {
+            if (newSchemaVersion == 0) {
+                // https://issues.jenkins-ci.org/browse/JENKINS-46577
+                throw new IllegalStateException("Failure to load database DDL files. " +
+                        "Files 'sql/h2/xxx_migration.sql' NOT found in the Thread Context Class Loader. " +
+                        " Pipeline Maven Plugin may be installed in an unsupported manner");
+            } else if (newSchemaVersion == initialSchemaVersion) {
+                // no migration was needed
+            } else {
                 LOGGER.log(Level.INFO, "Database successfully migrated from version {0} to version {1}", new Object[]{initialSchemaVersion, newSchemaVersion});
             }
         } catch (SQLException e) {
@@ -388,6 +401,8 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                             throw new IllegalStateException("Exception testing table '" + table + "'");
                         }
                     }
+                } catch (SQLException e) {
+                    throw new RuntimeSqlException("Exception testing table '" + table + "' on " + cnn.toString(), e);
                 }
             }
         } catch (SQLException e) {
