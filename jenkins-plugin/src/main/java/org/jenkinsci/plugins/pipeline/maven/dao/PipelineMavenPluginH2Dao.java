@@ -29,6 +29,7 @@ import hudson.model.Run;
 import org.apache.commons.io.IOUtils;
 import org.h2.api.ErrorCode;
 import org.h2.jdbcx.JdbcConnectionPool;
+import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 
@@ -36,7 +37,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -334,7 +334,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
             while (true) {
                 idx++;
                 String sqlScriptPath = "sql/h2/" + numberFormat.format(idx) + "_migration.sql";
-                InputStream sqlScriptInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(sqlScriptPath);
+                InputStream sqlScriptInputStream = ClassUtils.getResourceAsStream(sqlScriptPath);
                 if (sqlScriptInputStream == null) {
                     break;
                 } else {
@@ -354,7 +354,9 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 // https://issues.jenkins-ci.org/browse/JENKINS-46577
                 throw new IllegalStateException("Failure to load database DDL files. " +
                         "Files 'sql/h2/xxx_migration.sql' NOT found in the Thread Context Class Loader. " +
-                        " Pipeline Maven Plugin may be installed in an unsupported manner");
+                        " Pipeline Maven Plugin may be installed in an unsupported manner " +
+                        "(thread.contextClassLoader: " + Thread.currentThread().getContextClassLoader() + ", "
+                        + "classLoader: " + ClassUtils.class.getClassLoader() + ")");
             } else if (newSchemaVersion == initialSchemaVersion) {
                 // no migration was needed
             } else {
