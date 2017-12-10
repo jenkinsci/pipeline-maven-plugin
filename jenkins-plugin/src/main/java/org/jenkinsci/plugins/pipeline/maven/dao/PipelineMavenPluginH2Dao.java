@@ -340,7 +340,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 } else {
                     try (Statement stmt = cnn.createStatement()) {
                         String sqlScript = IOUtils.toString(sqlScriptInputStream);
-                        LOGGER.log(Level.INFO, "Execute database migration script {0}", sqlScriptPath);
+                        LOGGER.log(Level.FINE, "Execute database migration script {0}", sqlScriptPath);
                         stmt.execute(sqlScript);
                     } catch (IOException e) {
                         throw new RuntimeIoException("Exception reading " + sqlScriptPath, e);
