@@ -29,6 +29,8 @@ import static org.jenkinsci.plugins.pipeline.maven.eventspy.JenkinsMavenEventSpy
 import org.apache.maven.execution.ExecutionEvent;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,11 +44,13 @@ import javax.annotation.Nullable;
  * the environment.
  * <p>
  * Thus our spy will not run during Invoker integration tests, to avoid recording integration
- * tests artefacts and dependencies.
+ * tests artifacts and dependencies.
  * @author <a href="mailto:benoit.guerin1@free.fr">Benoit Guérin</a>
  *
  */
 public class InvokerStartExecutionHandler extends AbstractExecutionHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public InvokerStartExecutionHandler(final MavenEventReporter reporter) {
         super(reporter);
@@ -74,8 +78,7 @@ public class InvokerStartExecutionHandler extends AbstractExecutionHandler {
     public boolean _handle(final ExecutionEvent executionEvent) {
         final boolean result = super._handle(executionEvent);
 
-        //TODO move from "system.out.println" to a real logger
-        System.out.println("[jenkins-maven-event-spy] INFO start of goal " + getSupportedPluginGoal() + ", disabling spy in IT tests.");
+        logger.debug("[jenkins-event-spy] Start of goal " + getSupportedPluginGoal() + ", disabling spy in IT tests.");
 
         // First retrieve the "environmentVariables" configuration of the captured Mojo
         Xpp3Dom env = executionEvent.getMojoExecution().getConfiguration().getChild("environmentVariables");
