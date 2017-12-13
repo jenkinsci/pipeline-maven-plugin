@@ -31,6 +31,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.RuntimeIOException;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,6 +48,9 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<E> {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     protected final MavenEventReporter reporter;
 
     protected AbstractMavenEventHandler(MavenEventReporter reporter) {
@@ -121,8 +126,7 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
                 // TODO see if there is a better way to implement this "workaround"
                 absolutePath = absolutePath.replace(File.separator + ".flattened-pom.xml", File.separator + "pom.xml");
             } else {
-                System.out.println("[jenkins-maven-event-spy] WARNING: unexpected Maven project file name '"
-                        + projectFile.getName() + "', problems may occur");
+                logger.warn("[jenkins-event-spy] Unexpected Maven project file name '" + projectFile.getName() + "', problems may occur");
             }
             projectElt.setAttribute("file", absolutePath);
         }
