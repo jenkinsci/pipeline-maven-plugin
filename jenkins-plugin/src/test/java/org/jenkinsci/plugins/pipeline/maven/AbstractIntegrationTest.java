@@ -53,6 +53,14 @@ public abstract class AbstractIntegrationTest {
         loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_project/");
     }
 
+    protected void loadMavenPomProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
+        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_pom_project/");
+    }
+
+    protected void loadMavenJarWithParentPomProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
+        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_with_parent_pom_project/");
+    }
+
     protected void loadMavenWarProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
         loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_war_project/");
     }

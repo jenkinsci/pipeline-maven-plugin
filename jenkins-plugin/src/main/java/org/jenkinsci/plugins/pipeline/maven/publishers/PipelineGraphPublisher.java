@@ -1,7 +1,5 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
-import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
-
 import hudson.Extension;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -27,6 +25,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
+
+import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.*;
 
 /**
  * Fingerprint the dependencies of the maven project.
@@ -85,8 +85,55 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
         PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
 
+        recordParentProject(mavenSpyLogsElt, run,listener, dao);
         recordDependencies(mavenSpyLogsElt, run, listener, dao);
         recordGeneratedArtifacts(mavenSpyLogsElt, run, listener, dao);
+    }
+
+    protected void recordParentProject(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+        List<MavenSpyLogProcessor.MavenArtifact> parentProjects = listParentProjects(mavenSpyLogsElt, LOGGER);
+        recordParentProject(parentProjects, run, listener, dao);
+    }
+
+    protected void recordParentProject(List<MavenSpyLogProcessor.MavenArtifact> parentProjects, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+        if (LOGGER.isLoggable(Level.FINE)) {
+            listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordParentProject - filter: " +
+                    "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "]");
+        }
+
+        for (MavenSpyLogProcessor.MavenArtifact parentProject : parentProjects) {
+            if (parentProject.snapshot) {
+                if (!includeSnapshotVersions) {
+                    if (LOGGER.isLoggable(Level.FINER)) {
+                        listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording snapshot parent project: " + parentProject.getId());
+                    }
+                    continue;
+                }
+            } else {
+                if (!includeReleaseVersions) {
+                    if (LOGGER.isLoggable(Level.FINER)) {
+                        listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording release parent project: " + parentProject.getId());
+                    }
+                    continue;
+                }
+            }
+
+            try {
+                if (LOGGER.isLoggable(Level.FINE)) {
+                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record parent project: " + parentProject.getId() + ", ignoreUpstreamTriggers: " + ignoreUpstreamTriggers);
+                }
+
+                dao.recordParentProject(run.getParent().getFullName(), run.getNumber(),
+                        parentProject.groupId, parentProject.artifactId, parentProject.version,
+                        this.ignoreUpstreamTriggers);
+
+            } catch (RuntimeException e) {
+                listener.error("[withMaven] pipelineGraphPublisher - WARNING: Exception recording parent project " + parentProject.getId() + " on build, skip");
+                e.printStackTrace(listener.getLogger());
+                listener.getLogger().flush();
+            }
+        }
+
     }
 
     protected void recordDependencies(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
