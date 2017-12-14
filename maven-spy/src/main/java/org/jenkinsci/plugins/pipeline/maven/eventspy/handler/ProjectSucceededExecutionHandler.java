@@ -81,7 +81,6 @@ public class ProjectSucceededExecutionHandler extends AbstractExecutionHandler {
             }
             attachedArtifactsElt.addChild(artifactElt);
         }
-
     }
 
     @Override
