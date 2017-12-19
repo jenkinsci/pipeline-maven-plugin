@@ -29,6 +29,7 @@ import hudson.model.Run;
 import org.apache.commons.io.IOUtils;
 import org.h2.api.ErrorCode;
 import org.h2.jdbcx.JdbcConnectionPool;
+import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 
@@ -66,8 +67,13 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
         File databaseFile = new File(rootDir, "jenkins-jobs");
         String jdbcUrl = "jdbc:h2:file:" + databaseFile.getAbsolutePath() + ";AUTO_SERVER=TRUE;MULTI_THREADED=1";
+        if(LOGGER.isLoggable(Level.FINEST)) {
+            jdbcUrl += ";TRACE_LEVEL_SYSTEM_OUT=3";
+        } else if (LOGGER.isLoggable(Level.FINE)) {
+            jdbcUrl += ";TRACE_LEVEL_SYSTEM_OUT=2";
+        }
+        LOGGER.log(Level.INFO, "Open database {0}", jdbcUrl);
         jdbcConnectionPool = JdbcConnectionPool.create(jdbcUrl, "sa", "sa");
-        LOGGER.log(Level.FINE, "Open database {0}", jdbcUrl);
 
         initializeDatabase();
         testDatabase();
@@ -107,6 +113,27 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 stmt.setLong(2, buildPrimaryKey);
                 stmt.setString(3, scope);
                 stmt.setBoolean(4, ignoreUpstreamTriggers);
+                stmt.execute();
+            }
+            cnn.commit();
+        } catch (SQLException e) {
+            throw new RuntimeSqlException(e);
+        }
+    }
+
+    @Override
+    public void recordParentProject(@Nonnull String jobFullName, int buildNumber, @Nonnull String parentGroupId, @Nonnull String parentArtifactId, @Nonnull String parentVersion, boolean ignoreUpstreamTriggers) {
+        LOGGER.log(Level.FINE, "recordParentProject({0}#{1}, {2}:{3} ignoreUpstreamTriggers:{5}})",
+                new Object[]{jobFullName, buildNumber, parentGroupId, parentArtifactId, parentVersion, ignoreUpstreamTriggers});
+        long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
+        long parentArtifactPrimaryKey = getOrCreateArtifactPrimaryKey(parentGroupId, parentArtifactId, parentVersion, "pom");
+
+        try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            cnn.setAutoCommit(false);
+            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO MAVEN_PARENT_PROJECT(ARTIFACT_ID, BUILD_ID, IGNORE_UPSTREAM_TRIGGERS) VALUES (?, ?, ?)")) {
+                stmt.setLong(1, parentArtifactPrimaryKey);
+                stmt.setLong(2, buildPrimaryKey);
+                stmt.setBoolean(3, ignoreUpstreamTriggers);
                 stmt.execute();
             }
             cnn.commit();
@@ -328,13 +355,13 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
             while (true) {
                 idx++;
                 String sqlScriptPath = "sql/h2/" + numberFormat.format(idx) + "_migration.sql";
-                InputStream sqlScriptInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(sqlScriptPath);
+                InputStream sqlScriptInputStream = ClassUtils.getResourceAsStream(sqlScriptPath);
                 if (sqlScriptInputStream == null) {
                     break;
                 } else {
                     try (Statement stmt = cnn.createStatement()) {
                         String sqlScript = IOUtils.toString(sqlScriptInputStream);
-                        LOGGER.log(Level.INFO, "Execute database migration script {0}", sqlScriptPath);
+                        LOGGER.log(Level.FINE, "Execute database migration script {0}", sqlScriptPath);
                         stmt.execute(sqlScript);
                     } catch (IOException e) {
                         throw new RuntimeIoException("Exception reading " + sqlScriptPath, e);
@@ -344,7 +371,16 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
             }
             int newSchemaVersion = getSchemaVersion(cnn);
 
-            if (initialSchemaVersion != newSchemaVersion) {
+            if (newSchemaVersion == 0) {
+                // https://issues.jenkins-ci.org/browse/JENKINS-46577
+                throw new IllegalStateException("Failure to load database DDL files. " +
+                        "Files 'sql/h2/xxx_migration.sql' NOT found in the Thread Context Class Loader. " +
+                        " Pipeline Maven Plugin may be installed in an unsupported manner " +
+                        "(thread.contextClassLoader: " + Thread.currentThread().getContextClassLoader() + ", "
+                        + "classLoader: " + ClassUtils.class.getClassLoader() + ")");
+            } else if (newSchemaVersion == initialSchemaVersion) {
+                // no migration was needed
+            } else {
                 LOGGER.log(Level.INFO, "Database successfully migrated from version {0} to version {1}", new Object[]{initialSchemaVersion, newSchemaVersion});
             }
         } catch (SQLException e) {
@@ -377,7 +413,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
      */
     protected synchronized void testDatabase() throws RuntimeSqlException {
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
-            List<String> tables = Arrays.asList("MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT");
+            List<String> tables = Arrays.asList("MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT", "MAVEN_PARENT_PROJECT");
             for (String table : tables) {
                 try (Statement stmt = cnn.createStatement()) {
                     try (ResultSet rst = stmt.executeQuery("SELECT count(*) FROM " + table)) {
@@ -388,6 +424,8 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                             throw new IllegalStateException("Exception testing table '" + table + "'");
                         }
                     }
+                } catch (SQLException e) {
+                    throw new RuntimeSqlException("Exception testing table '" + table + "' on " + cnn.toString(), e);
                 }
             }
         } catch (SQLException e) {
@@ -398,6 +436,12 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     @Nonnull
     @Override
     public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+        List<String> downstreamJobs = listDownstreamPipelinesBasedOnMavenDependencies(jobFullName, buildNumber);
+        downstreamJobs.addAll(listDownstreamPipelinesBasedOnParentProjectDependencies(jobFullName, buildNumber));
+        return downstreamJobs;
+    }
+
+    protected List<String> listDownstreamPipelinesBasedOnMavenDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamJobs({0}, {1})", new Object[]{jobFullName, buildNumber});
         String generatedArtifactsSql = "SELECT DISTINCT GENERATED_MAVEN_ARTIFACT.ARTIFACT_ID " +
                 " FROM GENERATED_MAVEN_ARTIFACT " +
@@ -435,6 +479,48 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
             throw new RuntimeSqlException(e);
         }
         LOGGER.log(Level.FINE, "listDownstreamJobs({0}, {1}): {2}", new Object[]{jobFullName, buildNumber, downstreamJobsFullNames});
+
+        return downstreamJobsFullNames;
+    }
+
+    protected List<String> listDownstreamPipelinesBasedOnParentProjectDependencies(@Nonnull String jobFullName, int buildNumber) {
+        LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
+        String generatedArtifactsSql = "SELECT DISTINCT GENERATED_MAVEN_ARTIFACT.ARTIFACT_ID " +
+                " FROM GENERATED_MAVEN_ARTIFACT " +
+                " INNER JOIN JENKINS_BUILD AS UPSTREAM_BUILD ON GENERATED_MAVEN_ARTIFACT.BUILD_ID = UPSTREAM_BUILD.ID " +
+                " INNER JOIN JENKINS_JOB AS UPSTREAM_JOB ON UPSTREAM_BUILD.JOB_ID = UPSTREAM_JOB.ID " +
+                " WHERE " +
+                "   UPSTREAM_JOB.FULL_NAME = ? AND" +
+                "   UPSTREAM_BUILD.NUMBER = ? AND " +
+                "   GENERATED_MAVEN_ARTIFACT.SKIP_DOWNSTREAM_TRIGGERS = FALSE";
+
+        String sql = "SELECT DISTINCT DOWNSTREAM_JOB.FULL_NAME " +
+                " FROM JENKINS_JOB AS DOWNSTREAM_JOB" +
+                " INNER JOIN JENKINS_BUILD AS DOWNSTREAM_BUILD ON DOWNSTREAM_JOB.ID = DOWNSTREAM_BUILD.JOB_ID " +
+                " INNER JOIN MAVEN_PARENT_PROJECT ON DOWNSTREAM_BUILD.ID = MAVEN_PARENT_PROJECT.BUILD_ID" +
+                " WHERE " +
+                "   MAVEN_PARENT_PROJECT.ARTIFACT_ID IN (" + generatedArtifactsSql + ") AND " +
+                "   MAVEN_PARENT_PROJECT.IGNORE_UPSTREAM_TRIGGERS = FALSE AND " +
+                "   DOWNSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE DOWNSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID)" +
+                " ORDER BY DOWNSTREAM_JOB.FULL_NAME";
+
+        List<String> downstreamJobsFullNames = new ArrayList<>();
+        LOGGER.log(Level.FINER, "sql: {0}, jobFullName:{1}, buildNumber: {2}", new Object[]{sql, jobFullName, buildNumber});
+
+        try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            try (PreparedStatement stmt = cnn.prepareStatement(sql)) {
+                stmt.setString(1, jobFullName);
+                stmt.setInt(2, buildNumber);
+                try (ResultSet rst = stmt.executeQuery()) {
+                    while (rst.next()) {
+                        downstreamJobsFullNames.add(rst.getString(1));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeSqlException(e);
+        }
+        LOGGER.log(Level.FINE, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1}): {2}", new Object[]{jobFullName, buildNumber, downstreamJobsFullNames});
 
         return downstreamJobsFullNames;
     }
@@ -490,7 +576,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         List<String> prettyStrings = new ArrayList<>();
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             prettyStrings.add("jdbc.url: " + cnn.getMetaData().getURL());
-            List<String> tables = Arrays.asList("MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT");
+            List<String> tables = Arrays.asList("MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT", "MAVEN_PARENT_PROJECT");
             for (String table : tables) {
                 try (Statement stmt = cnn.createStatement()) {
                     try (ResultSet rst = stmt.executeQuery("SELECT count(*) FROM " + table)) {

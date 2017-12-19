@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
 public class DependencyGraphTest extends AbstractIntegrationTest {
 
     @Rule
-    public GitSampleRepoRule mavenWarRepoRule = new GitSampleRepoRule();
+    public GitSampleRepoRule downstreamArtifactRepoRule = new GitSampleRepoRule();
 
     /*
     Does not work
@@ -66,11 +66,11 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
      * The maven-war-app has a dependency on the maven-jar-app
      */
     @Test
-    public void verify_downstream__simple_pipeline_trigger() throws Exception {
+    public void verify_downstream_simple_pipeline_trigger() throws Exception {
         System.out.println("gitRepoRule: " + gitRepoRule);
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
-        System.out.println("mavenWarRepoRule: " + mavenWarRepoRule);
-        loadMavenWarProjectInGitRepo(this.mavenWarRepoRule);
+        System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
+        loadMavenWarProjectInGitRepo(this.downstreamArtifactRepoRule);
 
         String mavenJarPipelineScript = "node('master') {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
@@ -79,7 +79,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
                 "    }\n" +
                 "}";
         String mavenWarPipelineScript = "node('master') {\n" +
-                "    git($/" + mavenWarRepoRule.toString() + "/$)\n" +
+                "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn install'\n" +
                 "    }\n" +
@@ -112,8 +112,6 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         assertThat(mavenWarPipelineLastRun.getNumber(), is(mavenWarPipelineFirstRun.getNumber() + 1));
         Cause.UpstreamCause upstreamCause = mavenWarPipelineLastRun.getCause(Cause.UpstreamCause.class);
         assertThat(upstreamCause, notNullValue());
-
-
     }
 
     /**
@@ -123,8 +121,8 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
     public void verify_downstream_multi_branch_pipeline_trigger() throws Exception {
         System.out.println("gitRepoRule: " + gitRepoRule);
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
-        System.out.println("mavenWarRepoRule: " + mavenWarRepoRule);
-        loadMavenWarProjectInGitRepo(this.mavenWarRepoRule);
+        System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
+        loadMavenWarProjectInGitRepo(this.downstreamArtifactRepoRule);
 
         String script = "node('master') {\n" +
                 "    checkout scm\n" +
@@ -137,9 +135,9 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         gitRepoRule.git("commit", "--message=jenkinsfile");
 
 
-        mavenWarRepoRule.write("Jenkinsfile", script);
-        mavenWarRepoRule.git("add", "Jenkinsfile");
-        mavenWarRepoRule.git("commit", "--message=jenkinsfile");
+        downstreamArtifactRepoRule.write("Jenkinsfile", script);
+        downstreamArtifactRepoRule.git("add", "Jenkinsfile");
+        downstreamArtifactRepoRule.git("commit", "--message=jenkinsfile");
 
         // TRIGGER maven-jar#1 to record that "build-maven-jar" generates this jar and install this maven jar in the local maven repo
         WorkflowMultiBranchProject mavenJarPipeline = jenkinsRule.createProject(WorkflowMultiBranchProject.class, "build-maven-jar");
@@ -157,7 +155,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         // TRIGGER maven-war#1 to record that "build-maven-war" has a dependency on "build-maven-jar"
         WorkflowMultiBranchProject mavenWarPipeline = jenkinsRule.createProject(WorkflowMultiBranchProject.class, "build-maven-war");
         mavenWarPipeline.addTrigger(new WorkflowJobDependencyTrigger());
-        mavenWarPipeline.getSourcesList().add(new BranchSource(new GitSCMSource(null, mavenWarRepoRule.toString(), "", "*", "", false)));
+        mavenWarPipeline.getSourcesList().add(new BranchSource(new GitSCMSource(null, downstreamArtifactRepoRule.toString(), "", "*", "", false)));
         System.out.println("trigger maven-war#1...");
         WorkflowJob mavenWarPipelineMasterPipeline = WorkflowMultibranchProjectTestsUtils.scheduleAndFindBranchProject(mavenWarPipeline, "master");
         assertEquals(1, mavenWarPipeline.getItems().size());
@@ -237,5 +235,60 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
 
 
         assertThat(matchingArtifactTypes, Matchers.containsInAnyOrder("jar", "bundle", "pom"));
+    }
+
+
+    /**
+     * The maven-war-app has a dependency on the maven-jar-app
+     */
+    @Test
+    public void verify_downstream_pipeline_triggered_on_parent_pom_build() throws Exception {
+        System.out.println("gitRepoRule: " + gitRepoRule);
+        loadMavenJarProjectInGitRepo(this.gitRepoRule);
+        System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
+        loadMavenWarProjectInGitRepo(this.downstreamArtifactRepoRule);
+
+        String mavenJarPipelineScript = "node('master') {\n" +
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven() {\n" +
+                "        sh 'mvn install'\n" +
+                "    }\n" +
+                "}";
+        String mavenWarPipelineScript = "node('master') {\n" +
+                "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
+                "    withMaven() {\n" +
+                "        sh 'mvn install'\n" +
+                "    }\n" +
+                "}";
+
+
+        WorkflowJob mavenJarPipeline = jenkinsRule.createProject(WorkflowJob.class, "build-maven-jar");
+        mavenJarPipeline.setDefinition(new CpsFlowDefinition(mavenJarPipelineScript, true));
+        mavenJarPipeline.addTrigger(new WorkflowJobDependencyTrigger());
+
+        WorkflowRun mavenJarPipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenJarPipeline.scheduleBuild2(0));
+        // TODO check in DB that the generated artifact is recorded
+
+
+        WorkflowJob mavenWarPipeline = jenkinsRule.createProject(WorkflowJob.class, "build-maven-war");
+        mavenWarPipeline.setDefinition(new CpsFlowDefinition(mavenWarPipelineScript, true));
+        mavenWarPipeline.addTrigger(new WorkflowJobDependencyTrigger());
+        WorkflowRun mavenWarPipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenWarPipeline.scheduleBuild2(0));
+        // TODO check in DB that the dependency on the war project is recorded
+        System.out.println("mavenWarPipelineFirstRun: " + mavenWarPipelineFirstRun);
+
+        WorkflowRun mavenJarPipelineSecondRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenJarPipeline.scheduleBuild2(0));
+
+        jenkinsRule.waitUntilNoActivity();
+
+        WorkflowRun mavenWarPipelineLastRun = mavenWarPipeline.getLastBuild();
+
+        System.out.println("mavenWarPipelineLastBuild: " + mavenWarPipelineLastRun + " caused by " + mavenWarPipelineLastRun.getCauses());
+
+        assertThat(mavenWarPipelineLastRun.getNumber(), is(mavenWarPipelineFirstRun.getNumber() + 1));
+        Cause.UpstreamCause upstreamCause = mavenWarPipelineLastRun.getCause(Cause.UpstreamCause.class);
+        assertThat(upstreamCause, notNullValue());
+
+
     }
 }

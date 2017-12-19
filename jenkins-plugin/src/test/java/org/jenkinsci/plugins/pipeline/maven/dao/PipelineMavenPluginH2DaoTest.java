@@ -84,6 +84,26 @@ public class PipelineMavenPluginH2DaoTest {
                 is(1));
     }
 
+    @Test
+    public void record_one_parent_project() throws Exception {
+
+        dao.recordParentProject("my-pipeline", 1, "org.springframework.boot", "spring-boot-starter-parent", "1.5.4.RELEASE", false);
+
+        SqlTestsUtils.dump("select * from JENKINS_BUILD LEFT OUTER JOIN JENKINS_JOB ON JENKINS_BUILD.JOB_ID = JENKINS_JOB.ID", jdbcConnectionPool, System.out);
+        SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", jdbcConnectionPool, System.out);
+        SqlTestsUtils.dump("select * from MAVEN_PARENT_PROJECT", jdbcConnectionPool, System.out);
+
+        assertThat(
+                SqlTestsUtils.countRows("select * from JENKINS_BUILD", jdbcConnectionPool),
+                is(1));
+
+        assertThat(
+                SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", jdbcConnectionPool),
+                is(1));
+        assertThat(
+                SqlTestsUtils.countRows("select * from MAVEN_PARENT_PROJECT", jdbcConnectionPool),
+                is(1));
+    }
 
     @Test
     public void rename_job() throws Exception {
@@ -322,7 +342,7 @@ public class PipelineMavenPluginH2DaoTest {
     }
 
     @Test
-    public void list_downstream_jobs() {
+    public void listDownstreamJobs_upstream_jar_triggers_downstream_pipelines() {
 
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", false);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "service", "1.0-SNAPSHOT", "war", "1.0-SNAPSHOT", false);
@@ -343,6 +363,21 @@ public class PipelineMavenPluginH2DaoTest {
 
         List<String> downstreamPipelinesForBuild2 = dao.listDownstreamJobs("my-upstream-pipeline-1", 2);
         assertThat(downstreamPipelinesForBuild2, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+    }
+
+    @Test
+    public void listDownstreamJobs_upstream_pom_triggers_downstream_pipelines() {
+
+        dao.recordGeneratedArtifact("my-upstream-pom-pipeline-1", 1, "com.mycompany.pom", "parent-pom", "1.0-SNAPSHOT","pom", "1.0-SNAPSHOT", false);
+        dao.recordParentProject("my-downstream-pipeline-1", 2, "com.mycompany.pom", "parent-pom", "1.0-SNAPSHOT", false);
+
+        SqlTestsUtils.dump("select * from JENKINS_BUILD LEFT OUTER JOIN JENKINS_JOB ON JENKINS_BUILD.JOB_ID = JENKINS_JOB.ID", jdbcConnectionPool, System.out);
+        SqlTestsUtils.dump("select * from MAVEN_ARTIFACT INNER JOIN GENERATED_MAVEN_ARTIFACT ON MAVEN_ARTIFACT.ID = GENERATED_MAVEN_ARTIFACT.ARTIFACT_ID", jdbcConnectionPool, System.out);
+        SqlTestsUtils.dump("select * from MAVEN_ARTIFACT INNER JOIN MAVEN_PARENT_PROJECT ON MAVEN_ARTIFACT.ID = MAVEN_PARENT_PROJECT.ARTIFACT_ID", jdbcConnectionPool, System.out);
+
+        List<String> downstreamJobs = dao.listDownstreamJobs("my-upstream-pom-pipeline-1", 1);
+        assertThat(downstreamJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+        System.out.println(downstreamJobs);
     }
 
     @Test
