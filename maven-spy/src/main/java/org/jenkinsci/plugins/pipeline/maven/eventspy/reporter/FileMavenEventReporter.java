@@ -30,6 +30,8 @@ import org.codehaus.plexus.util.xml.XmlWriterUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomWriter;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.RuntimeIOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -48,6 +50,9 @@ import javax.annotation.concurrent.ThreadSafe;
  */
 @ThreadSafe
 public class FileMavenEventReporter implements MavenEventReporter {
+
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
+
     /**
      * report file gets initially created with a "maven-spy-*.log.tmp" file extension and gets renamed "maven-spy-*.log"
      * at the end of the execution
@@ -76,7 +81,7 @@ public class FileMavenEventReporter implements MavenEventReporter {
                 boolean created = reportsFolder.mkdirs();
                 if (!created) {
                     reportsFolder = new File(".");
-                    System.err.println("[jenkins-maven-event-spy] WARNING Failure to create folder '" + reportsFolder.getAbsolutePath() +
+                    logger.warn("[jenkins-event-spy] Failure to create folder '" + reportsFolder.getAbsolutePath() +
                             "', generate report in '" + reportsFolder.getAbsolutePath() + "'");
                 }
             }
@@ -91,7 +96,7 @@ public class FileMavenEventReporter implements MavenEventReporter {
         xmlWriter.addAttribute("_time", new Timestamp(System.currentTimeMillis()).toString());
 
         try {
-            System.out.println("[jenkins-maven-event-spy] INFO generate " + outFile.getCanonicalPath() + " ...");
+            logger.info("[jenkins-event-spy] Generate " + outFile.getCanonicalPath() + " ...");
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
@@ -125,12 +130,12 @@ public class FileMavenEventReporter implements MavenEventReporter {
 
             boolean result = outFile.renameTo(finalFile);
             if (result == false) {
-                System.out.println("[jenkins-maven-event-spy] WARNING failure to rename " + outFile + " into " + finalFile);
+                logger.warn("[jenkins-event-spy] Failure to rename " + outFile + " into " + finalFile);
             } else {
                 outFile = finalFile;
             }
             try {
-                System.out.println("[jenkins-maven-event-spy] INFO generated " + outFile.getCanonicalPath());
+                logger.info("[jenkins-event-spy] Generated " + outFile.getCanonicalPath());
             } catch (IOException e) {
                 throw new RuntimeIOException(e);
             }

@@ -40,6 +40,11 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     }
 
     @Override
+    public void recordParentProject(@Nonnull String jobFullName, int buildNumber, @Nonnull String parentGroupId, @Nonnull String parentArtifactId, @Nonnull String parentVersion, boolean ignoreUpstreamTriggers) {
+
+    }
+
+    @Override
     public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion, boolean skipDownstreamTriggers) {
 
     }
