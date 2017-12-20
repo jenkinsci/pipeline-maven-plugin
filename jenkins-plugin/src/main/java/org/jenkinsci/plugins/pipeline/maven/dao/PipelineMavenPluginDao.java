@@ -136,9 +136,9 @@ public interface PipelineMavenPluginDao {
     Map<String, Integer> listUpstreamJobs(@Nonnull String jobFullName, int buildNumber);
     
     /**
-	 * List the upstream jobs who generate an artifact that the given build depends
-	 * on, including transitive dependencies (build identified by the given
-	 * {@code jobFullName}, {@code buildNumber})
+     * List the upstream jobs who generate an artifact that the given build depends
+     * on, including transitive dependencies (build identified by the given
+     * {@code jobFullName}, {@code buildNumber})
      *
      * @param jobFullName see {@link Item#getFullName()}
      * @param buildNumber see {@link Run#getNumber()}

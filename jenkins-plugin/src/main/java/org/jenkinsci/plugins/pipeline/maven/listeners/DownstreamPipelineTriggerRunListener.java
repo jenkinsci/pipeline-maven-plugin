@@ -74,24 +74,24 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             // Avoid excessive triggering
             // See #46313
             if(downstreamPipeline.getLastBuild() != null) {
-            	int downstreamBuildNumber = downstreamPipeline.getLastBuild().getNumber();
-            	Map<String, Integer> transitiveUpstreamPipelines = GlobalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber);
-            	for(String transitiveUpstream : transitiveUpstreamPipelines.keySet()) {
-            		// Skip if one of the downstream's upstream is already building or in queue
-            		// Then it will get triggered anyway by that upstream, we don't need to trigger it again
-            		WorkflowJob tup = Jenkins.getInstance().getItemByFullName(transitiveUpstream, WorkflowJob.class);
-            		if(tup != null && !tup.equals(upstreamPipeline) && (tup.isBuilding() || tup.isInQueue())) {
-            			listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " because it has a dependency " + ModelHyperlinkNote.encodeTo(tup) + " already building or in queue");
+                int downstreamBuildNumber = downstreamPipeline.getLastBuild().getNumber();
+                Map<String, Integer> transitiveUpstreamPipelines = GlobalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber);
+                for(String transitiveUpstream : transitiveUpstreamPipelines.keySet()) {
+                    // Skip if one of the downstream's upstream is already building or in queue
+                    // Then it will get triggered anyway by that upstream, we don't need to trigger it again
+                    WorkflowJob tup = Jenkins.getInstance().getItemByFullName(transitiveUpstream, WorkflowJob.class);
+                    if(tup != null && !tup.equals(upstreamPipeline) && (tup.isBuilding() || tup.isInQueue())) {
+                        listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " because it has a dependency " + ModelHyperlinkNote.encodeTo(tup) + " already building or in queue");
                         continue outer;
-            		}
-            		
-            		// Skip if this downstream pipeline will be triggered by another one of our downstream pipelines
+                    }
+                    
+                    // Skip if this downstream pipeline will be triggered by another one of our downstream pipelines
                     // That's the case when one of the downstream's transitive upstream is our own downstream
-            		if(downstreamPipelines.contains(transitiveUpstream)) {
-            			listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " because it has dependencies in the downstream project list");
-            			continue outer;
-            		}
-            	}
+                    if(downstreamPipelines.contains(transitiveUpstream)) {
+                        listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " because it has dependencies in the downstream project list");
+                        continue outer;
+                    }
+                }
             }
 
             if (!downstreamPipeline.isBuildable()) {

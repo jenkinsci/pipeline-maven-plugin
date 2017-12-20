@@ -71,16 +71,16 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     }
     
     @Nonnull
-	@Override
-	public Map<String, Integer> listUpstreamJobs(String jobFullName, int buildNumber) {
-		return Collections.emptyMap();
-	}
+    @Override
+    public Map<String, Integer> listUpstreamJobs(String jobFullName, int buildNumber) {
+        return Collections.emptyMap();
+    }
     
     @Nonnull
-	@Override
-	public Map<String, Integer> listTransitiveUpstreamJobs(String jobFullName, int buildNumber) {
-		return Collections.emptyMap();
-	}
+    @Override
+    public Map<String, Integer> listTransitiveUpstreamJobs(String jobFullName, int buildNumber) {
+        return Collections.emptyMap();
+    }
 
     @Override
     public void cleanup() {

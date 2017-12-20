@@ -541,30 +541,30 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     @Nonnull
     @Override
     public Map<String, Integer> listUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
-    	Map<String, Integer> upstreamJobs = listUpstreamPipelinesBasedOnMavenDependencies(jobFullName, buildNumber);
-    	upstreamJobs.putAll(listUpstreamPipelinesBasedOnParentProjectDependencies(jobFullName, buildNumber));
+        Map<String, Integer> upstreamJobs = listUpstreamPipelinesBasedOnMavenDependencies(jobFullName, buildNumber);
+        upstreamJobs.putAll(listUpstreamPipelinesBasedOnParentProjectDependencies(jobFullName, buildNumber));
         return upstreamJobs;
     }
     
     protected Map<String, Integer> listUpstreamPipelinesBasedOnMavenDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listUpstreamJobs({0}, {1})", new Object[]{jobFullName, buildNumber});
         String dependenciesSql = "SELECT DISTINCT MAVEN_DEPENDENCY.ARTIFACT_ID " + 
-        		" FROM MAVEN_DEPENDENCY " + 
-        		" INNER JOIN JENKINS_BUILD AS DOWNSTREAM_BUILD ON MAVEN_DEPENDENCY.BUILD_ID = DOWNSTREAM_BUILD.ID " + 
-        		" INNER JOIN JENKINS_JOB AS DOWNSTREAM_JOB ON DOWNSTREAM_BUILD.JOB_ID = DOWNSTREAM_JOB.ID " + 
-        		" WHERE " + 
-        		"   DOWNSTREAM_JOB.FULL_NAME = ? AND " + 
-        		"   DOWNSTREAM_BUILD.NUMBER = ?";
+        	    " FROM MAVEN_DEPENDENCY " + 
+        	    " INNER JOIN JENKINS_BUILD AS DOWNSTREAM_BUILD ON MAVEN_DEPENDENCY.BUILD_ID = DOWNSTREAM_BUILD.ID " + 
+        	    " INNER JOIN JENKINS_JOB AS DOWNSTREAM_JOB ON DOWNSTREAM_BUILD.JOB_ID = DOWNSTREAM_JOB.ID " + 
+        	    " WHERE " + 
+        	    "   DOWNSTREAM_JOB.FULL_NAME = ? AND " + 
+        	    "   DOWNSTREAM_BUILD.NUMBER = ?";
 
         String sql = "SELECT DISTINCT UPSTREAM_JOB.FULL_NAME, UPSTREAM_BUILD.NUMBER " + 
-        		" FROM JENKINS_JOB AS UPSTREAM_JOB" + 
-        		" INNER JOIN JENKINS_BUILD AS UPSTREAM_BUILD ON UPSTREAM_JOB.ID = UPSTREAM_BUILD.JOB_ID " + 
-        		" INNER JOIN GENERATED_MAVEN_ARTIFACT ON UPSTREAM_BUILD.ID = GENERATED_MAVEN_ARTIFACT.BUILD_ID" + 
-        		" WHERE " + 
-        		"   GENERATED_MAVEN_ARTIFACT.ARTIFACT_ID IN (" + dependenciesSql + ") AND " + 
-				"   GENERATED_MAVEN_ARTIFACT.SKIP_DOWNSTREAM_TRIGGERS = FALSE AND " + 
-				"   UPSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE UPSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID)" + 
-				" ORDER BY UPSTREAM_JOB.FULL_NAME";
+        	    " FROM JENKINS_JOB AS UPSTREAM_JOB" + 
+        	    " INNER JOIN JENKINS_BUILD AS UPSTREAM_BUILD ON UPSTREAM_JOB.ID = UPSTREAM_BUILD.JOB_ID " + 
+        	    " INNER JOIN GENERATED_MAVEN_ARTIFACT ON UPSTREAM_BUILD.ID = GENERATED_MAVEN_ARTIFACT.BUILD_ID" + 
+        	    " WHERE " + 
+        	    "   GENERATED_MAVEN_ARTIFACT.ARTIFACT_ID IN (" + dependenciesSql + ") AND " + 
+        	    "   GENERATED_MAVEN_ARTIFACT.SKIP_DOWNSTREAM_TRIGGERS = FALSE AND " + 
+        	    "   UPSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE UPSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID)" + 
+        	    " ORDER BY UPSTREAM_JOB.FULL_NAME";
 
         Map<String, Integer> upstreamJobsFullNames = new HashMap<>();
         LOGGER.log(Level.FINER, "sql: {0}, jobFullName:{1}, buildNumber: {2}", new Object[]{sql, jobFullName, buildNumber});
@@ -590,21 +590,21 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     protected Map<String, Integer> listUpstreamPipelinesBasedOnParentProjectDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listUpstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
         String dependenciesSql = "SELECT DISTINCT MAVEN_DEPENDENCY.ARTIFACT_ID " + 
-        		" FROM MAVEN_DEPENDENCY " + 
-        		" INNER JOIN JENKINS_BUILD AS DOWNSTREAM_BUILD ON MAVEN_DEPENDENCY.BUILD_ID = DOWNSTREAM_BUILD.ID " + 
-        		" INNER JOIN JENKINS_JOB AS DOWNSTREAM_JOB ON DOWNSTREAM_BUILD.JOB_ID = DOWNSTREAM_JOB.ID " + 
-        		" WHERE " + 
-        		"   DOWNSTREAM_JOB.FULL_NAME = ? AND " + 
-        		"   DOWNSTREAM_BUILD.NUMBER = ?";
+        	    " FROM MAVEN_DEPENDENCY " + 
+        	    " INNER JOIN JENKINS_BUILD AS DOWNSTREAM_BUILD ON MAVEN_DEPENDENCY.BUILD_ID = DOWNSTREAM_BUILD.ID " + 
+        	    " INNER JOIN JENKINS_JOB AS DOWNSTREAM_JOB ON DOWNSTREAM_BUILD.JOB_ID = DOWNSTREAM_JOB.ID " + 
+        	    " WHERE " + 
+        	    "   DOWNSTREAM_JOB.FULL_NAME = ? AND " + 
+        	    "   DOWNSTREAM_BUILD.NUMBER = ?";
 
         String sql = "SELECT DISTINCT UPSTREAM_JOB.FULL_NAME, UPSTREAM_BUILD.NUMBER " + 
-        		" FROM JENKINS_JOB AS UPSTREAM_JOB" + 
-        		" INNER JOIN JENKINS_BUILD AS UPSTREAM_BUILD ON UPSTREAM_JOB.ID = UPSTREAM_BUILD.JOB_ID " + 
-        		" INNER JOIN MAVEN_PARENT_PROJECT ON UPSTREAM_BUILD.ID = MAVEN_PARENT_PROJECT.BUILD_ID" + 
-        		" WHERE " + 
-        		"   MAVEN_PARENT_PROJECT.ARTIFACT_ID IN (" + dependenciesSql + ") AND " + 
-				"   UPSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE UPSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID)" + 
-				" ORDER BY UPSTREAM_JOB.FULL_NAME";
+        	    " FROM JENKINS_JOB AS UPSTREAM_JOB" + 
+        	    " INNER JOIN JENKINS_BUILD AS UPSTREAM_BUILD ON UPSTREAM_JOB.ID = UPSTREAM_BUILD.JOB_ID " + 
+        	    " INNER JOIN MAVEN_PARENT_PROJECT ON UPSTREAM_BUILD.ID = MAVEN_PARENT_PROJECT.BUILD_ID" + 
+        	    " WHERE " + 
+        	    "   MAVEN_PARENT_PROJECT.ARTIFACT_ID IN (" + dependenciesSql + ") AND " + 
+        	    "   UPSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE UPSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID)" + 
+        	    " ORDER BY UPSTREAM_JOB.FULL_NAME";
 
         Map<String, Integer> upstreamJobsFullNames = new HashMap<>();
         LOGGER.log(Level.FINER, "sql: {0}, jobFullName:{1}, buildNumber: {2}", new Object[]{sql, jobFullName, buildNumber});
@@ -629,19 +629,19 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     
     @Nonnull
     public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
-    	return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<String, Integer>());
+        return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<String, Integer>());
     }
     
     private Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, Map<String, Integer> result) {
-    	for(Entry<String, Integer> entry : listUpstreamJobs(jobFullName, buildNumber).entrySet()) {
-    		String upstreamJobName = entry.getKey();
-    		Integer upstreamJobBuildNumber = entry.getValue();
-    		if(!result.containsKey(upstreamJobName)) {
-    			result.put(upstreamJobName, upstreamJobBuildNumber);
-    			listTransitiveUpstreamJobs(upstreamJobName, upstreamJobBuildNumber, result);
-    		}
-    	}
-    	return result;
+        for(Entry<String, Integer> entry : listUpstreamJobs(jobFullName, buildNumber).entrySet()) {
+            String upstreamJobName = entry.getKey();
+            Integer upstreamJobBuildNumber = entry.getValue();
+            if(!result.containsKey(upstreamJobName)) {
+                result.put(upstreamJobName, upstreamJobBuildNumber);
+                listTransitiveUpstreamJobs(upstreamJobName, upstreamJobBuildNumber, result);
+            }
+        }
+        return result;
     }
     
     /**
