@@ -98,9 +98,13 @@ public class MavenSpyLogProcessor implements Serializable {
                 for (MavenPublisher mavenPublisher : mavenPublishers) {
                     String skipFileName = mavenPublisher.getDescriptor().getSkipFileName();
                     if (Boolean.TRUE.equals(mavenPublisher.isDisabled())) {
-                        listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by configuration");
+                        if (LOGGER.isLoggable(Level.FINE)) {
+                            listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by configuration");
+                        }
                     } else if (StringUtils.isNotEmpty(skipFileName) && workspace.child(skipFileName).exists()) {
-                        listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by marker file '" + skipFileName + "'");
+                        if (LOGGER.isLoggable(Level.FINE)) {
+                            listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by marker file '" + skipFileName + "'");
+                        }
                     } else {
                         if (LOGGER.isLoggable(Level.FINE)) {
                             listener.getLogger().println("[withMaven] Run '" + mavenPublisher.getDescriptor().getDisplayName() + "'...");
