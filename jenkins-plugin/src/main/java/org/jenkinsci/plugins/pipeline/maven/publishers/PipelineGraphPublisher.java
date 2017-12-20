@@ -85,27 +85,31 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
         PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
 
+        List<MavenSpyLogProcessor.MavenArtifact> parentProjects = listParentProjects(mavenSpyLogsElt, LOGGER);
         List<MavenSpyLogProcessor.MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
         List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts = listArtifacts(mavenSpyLogsElt);
         List<String> executedLifecyclePhases = XmlUtils.getExecutedLifecyclePhases(mavenSpyLogsElt);
         
-        recordParentProject(mavenSpyLogsElt, run,listener, dao);
+        recordParentProject(parentProjects, generatedArtifacts, run,listener, dao);
         recordDependencies(dependencies, generatedArtifacts, run, listener, dao);
         recordGeneratedArtifacts(generatedArtifacts, executedLifecyclePhases, run, listener, dao);
     }
 
-    protected void recordParentProject(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
-        List<MavenSpyLogProcessor.MavenArtifact> parentProjects = listParentProjects(mavenSpyLogsElt, LOGGER);
-        recordParentProject(parentProjects, run, listener, dao);
-    }
-
-    protected void recordParentProject(List<MavenSpyLogProcessor.MavenArtifact> parentProjects, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+    protected void recordParentProject(List<MavenSpyLogProcessor.MavenArtifact> parentProjects, List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts,
+    		@Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordParentProject - filter: " +
                     "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "]");
         }
 
         for (MavenSpyLogProcessor.MavenArtifact parentProject : parentProjects) {
+        	// Exclude self-generated artifacts (#47996)
+        	if(generatedArtifacts.contains(parentProject)) {
+        		if (LOGGER.isLoggable(Level.FINER)) {
+                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording parent project to generated artifact: " + parentProject.getId());
+        		}
+                continue;
+        	}
             if (parentProject.snapshot) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
