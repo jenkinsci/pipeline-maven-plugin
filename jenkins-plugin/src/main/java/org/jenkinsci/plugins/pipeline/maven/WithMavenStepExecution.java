@@ -43,8 +43,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
+import com.cloudbees.hudson.plugins.folder.AbstractFolder;
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.IdCredentials;
@@ -68,7 +70,10 @@ import hudson.Util;
 import hudson.console.ConsoleLogFilter;
 import hudson.model.BuildListener;
 import hudson.model.Computer;
+import hudson.model.Describable;
+import hudson.model.ItemGroup;
 import hudson.model.JDK;
+import hudson.model.Job;
 import hudson.model.Node;
 import hudson.model.Run;
 import hudson.model.TaskListener;
@@ -130,7 +135,7 @@ class WithMavenStepExecution extends StepExecution {
      * in "envOverride" will override the environment variables defined in "env"
      */
     private transient EnvVars envOverride;
-    private final transient Run<?, ?> build;
+    private final transient Run<? extends Job<?, ?>, ? extends Run<?, ?>> build;
 
     private transient Computer computer;
     private transient FilePath tempBinDir;
@@ -654,11 +659,22 @@ class WithMavenStepExecution extends StepExecution {
             return settingsDest.getRemote();
         }
 
-        // Settings provided by the global maven configuration
-        SettingsProvider settingsProvider = GlobalMavenConfig.get().getSettingsProvider();
+        SettingsProvider settingsProvider;
+
+        MavenConfigFolderOverrideProperty overrideProperty = getMavenConfigOverrideProperty();
+        if (overrideProperty != null) {
+            // Settings overriden by a folder property
+            console.format("[withMaven] using overriden Maven settings by folder '%s'%n", overrideProperty.getOwner().getDisplayName());
+            settingsProvider = overrideProperty.getSettings();
+        } else {
+            console.format("[withMaven] using Maven settings provided by the Jenkins global configuration%n");
+            // Settings provided by the global maven configuration
+            settingsProvider = GlobalMavenConfig.get().getSettingsProvider();
+        }
+
         if (settingsProvider instanceof MvnSettingsProvider) {
             MvnSettingsProvider mvnSettingsProvider = (MvnSettingsProvider) settingsProvider;
-            console.format("[withMaven] use Maven settings provided by the Jenkins global configuration '%s' %n", mvnSettingsProvider.getSettingsConfigId());
+            console.format("[withMaven] use Config File Provide maven settings file '%s' %n", mvnSettingsProvider.getSettingsConfigId());
             settingsFromConfig(mvnSettingsProvider.getSettingsConfigId(), settingsDest, credentials);
             envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
@@ -668,7 +684,7 @@ class WithMavenStepExecution extends StepExecution {
             FilePath settings;
             if ((settings = ws.child(settingsPath)).exists()) {
                 // Settings file residing on the agent
-                console.format("[withMaven] use Maven settings provided by the Jenkins global configuration on the build agent '%s' %n", settingsPath);
+                console.format("[withMaven] use Maven settings on the build agent '%s' %n", settingsPath);
                 settings.copyTo(settingsDest);
             } else {
                 throw new AbortException("Could not find file provided by the Jenkins global configuration '" + settings + "' on the build agent");
@@ -684,6 +700,21 @@ class WithMavenStepExecution extends StepExecution {
             console.println("[withMaven] Ignore unsupported Maven SettingsProvider " + settingsProvider);
         }
 
+        return null;
+    }
+
+    @CheckForNull
+    private MavenConfigFolderOverrideProperty getMavenConfigOverrideProperty() {
+        Job<?, ?> job = build.getParent();
+        ItemGroup<?> group = job.getParent();
+        while (group != null && !(group instanceof Jenkins) && group instanceof AbstractFolder) {
+            AbstractFolder<?> folder = (AbstractFolder<?>) group;
+            MavenConfigFolderOverrideProperty mavenConfigProperty = folder.getProperties().get(MavenConfigFolderOverrideProperty.class);
+            if (mavenConfigProperty != null && mavenConfigProperty.isOverride()) {
+                return mavenConfigProperty;
+            }
+            group = folder.getParent();
+        }
         return null;
     }
 
@@ -726,10 +757,22 @@ class WithMavenStepExecution extends StepExecution {
         }
 
         // Settings provided by the global maven configuration
-        GlobalSettingsProvider globalSettingsProvider = GlobalMavenConfig.get().getGlobalSettingsProvider();
+        GlobalSettingsProvider globalSettingsProvider;
+
+        MavenConfigFolderOverrideProperty overrideProperty = getMavenConfigOverrideProperty();
+        if (overrideProperty != null) {
+            // Settings overriden by a folder property
+            console.format("[withMaven] using overriden Maven global settings by folder '%s'%n", overrideProperty.getOwner().getDisplayName());
+            globalSettingsProvider = overrideProperty.getGlobalSettings();
+        } else {
+            console.format("[withMaven] using Maven global settings provided by the Jenkins global configuration%n");
+            // Settings provided by the global maven configuration
+            globalSettingsProvider = GlobalMavenConfig.get().getGlobalSettingsProvider();
+        }
+
         if (globalSettingsProvider instanceof MvnGlobalSettingsProvider) {
             MvnGlobalSettingsProvider mvnGlobalSettingsProvider = (MvnGlobalSettingsProvider) globalSettingsProvider;
-            console.format("[withMaven] use Maven global settings provided by the Jenkins global configuration '%s' %n", mvnGlobalSettingsProvider.getSettingsConfigId());
+            console.format("[withMaven] use Config File Provide maven global settings file '%s' %n", mvnGlobalSettingsProvider.getSettingsConfigId());
             globalSettingsFromConfig(mvnGlobalSettingsProvider.getSettingsConfigId(), settingsDest, credentials);
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             return settingsDest.getRemote();
@@ -739,7 +782,7 @@ class WithMavenStepExecution extends StepExecution {
             FilePath settings;
             if ((settings = ws.child(settingsPath)).exists()) {
                 // Global settings file residing on the agent
-                console.format("[withMaven] use Maven global settings provided by the Jenkins global configuration on the build agent '%s' %n", settingsPath);
+                console.format("[withMaven] use Maven global settings on the build agent '%s' %n", settingsPath);
                 settings.copyTo(settingsDest);
             } else {
                 throw new AbortException("Could not find file provided by the Jenkins global configuration '" + settings + "' on the build agent");
