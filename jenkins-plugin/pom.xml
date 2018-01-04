@@ -76,7 +76,7 @@
     <jenkins.version>2.46.3</jenkins.version>
     <scm-api-plugin.version>2.1.1</scm-api-plugin.version>
     <git-plugin.version>3.3.0</git-plugin.version>
-    <junit-plugin.version>1.22-20170815.171655-1</junit-plugin.version><!-- TODO: Switch to release once https://github.com/jenkinsci/junit-plugin/pull/76 is merged and released -->
+    <junit-plugin.version>1.23</junit-plugin.version>
   </properties>
   <dependencies>
     <dependency>

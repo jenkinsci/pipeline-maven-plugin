@@ -34,6 +34,8 @@ import hudson.model.TaskListener;
 import hudson.tasks.junit.JUnitResultArchiver;
 import hudson.tasks.junit.TestDataPublisher;
 import hudson.tasks.junit.TestResultAction;
+import hudson.tasks.junit.pipeline.JUnitResultsStepExecution;
+import hudson.tasks.test.PipelineTestDetails;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
@@ -274,7 +276,13 @@ public class JunitTestsPublisher extends MavenPublisher {
             }
 
             try {
-                TestResultAction testResultAction = JUnitResultArchiver.parseAndAttach(archiver, nodeId, getEnclosingStagesAndParallels(node),
+                List<FlowNode> enclosingBlocks = JUnitResultsStepExecution.getEnclosingStagesAndParallels(node);
+                PipelineTestDetails pipelineTestDetails = new PipelineTestDetails();
+                pipelineTestDetails.setNodeId(nodeId);
+                pipelineTestDetails.setEnclosingBlocks(JUnitResultsStepExecution.getEnclosingBlockIds(enclosingBlocks));
+                pipelineTestDetails.setEnclosingBlockNames(JUnitResultsStepExecution.getEnclosingBlockNames(enclosingBlocks));
+
+                TestResultAction testResultAction = JUnitResultArchiver.parseAndAttach(archiver, pipelineTestDetails,
                         run, workspace, launcher, listener);
 
                 if (testResultAction != null) {
