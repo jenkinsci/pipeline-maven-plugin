@@ -667,7 +667,7 @@ class WithMavenStepExecution extends StepExecution {
         MavenConfigFolderOverrideProperty overrideProperty = getMavenConfigOverrideProperty();
         StringBuilder mavenSettingsLog=new StringBuilder();
 
-        if (overrideProperty != null) {
+        if (overrideProperty != null && overrideProperty.getSettings() != null) {
             // Settings overriden by a folder property
             if(LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("[withMaven] using overriden Maven settings by folder '").append(overrideProperty.getOwner().getDisplayName()).append("'. ");
@@ -789,7 +789,7 @@ class WithMavenStepExecution extends StepExecution {
         MavenConfigFolderOverrideProperty overrideProperty = getMavenConfigOverrideProperty();
 
         StringBuilder mavenSettingsLog = new StringBuilder();
-        if (overrideProperty != null) {
+        if (overrideProperty != null && overrideProperty.getGlobalSettings() != null) {
             // Settings overriden by a folder property
             if (LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("[withMaven] using overriden Maven global settings by folder '").append(overrideProperty.getOwner().getDisplayName()).append("'. ");
