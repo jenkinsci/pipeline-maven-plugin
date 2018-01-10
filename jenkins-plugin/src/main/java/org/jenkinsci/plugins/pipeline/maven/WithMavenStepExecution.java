@@ -70,7 +70,6 @@ import hudson.Util;
 import hudson.console.ConsoleLogFilter;
 import hudson.model.BuildListener;
 import hudson.model.Computer;
-import hudson.model.Describable;
 import hudson.model.ItemGroup;
 import hudson.model.JDK;
 import hudson.model.Job;

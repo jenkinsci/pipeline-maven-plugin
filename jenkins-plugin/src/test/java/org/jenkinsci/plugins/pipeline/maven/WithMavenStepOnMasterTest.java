@@ -23,22 +23,18 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
-import static org.junit.Assert.*;
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
-import hudson.model.Fingerprint;
-import hudson.model.Result;
-import hudson.plugins.tasks.TasksResultAction;
-import hudson.tasks.Fingerprinter;
-import hudson.tasks.Maven;
-import hudson.tasks.junit.TestResultAction;
-import jenkins.mvn.DefaultGlobalSettingsProvider;
-import jenkins.mvn.DefaultSettingsProvider;
-import jenkins.mvn.FilePathGlobalSettingsProvider;
-import jenkins.mvn.FilePathSettingsProvider;
-import jenkins.mvn.GlobalMavenConfig;
-import jenkins.plugins.git.GitSampleRepoRule;
-import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
+import java.io.File;
+import java.util.Collection;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.apache.commons.io.FileUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.configfiles.GlobalConfigFiles;
@@ -53,26 +49,40 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.BuildWatcher;
-import org.jvnet.hudson.test.ExtendedToolInstallations;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.JenkinsRule;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collection;
-import java.util.Map;
+import hudson.model.Fingerprint;
+import hudson.model.Result;
+import hudson.plugins.tasks.TasksResultAction;
+import hudson.tasks.Fingerprinter;
+import hudson.tasks.junit.TestResultAction;
+import jenkins.mvn.FilePathGlobalSettingsProvider;
+import jenkins.mvn.FilePathSettingsProvider;
+import jenkins.mvn.GlobalMavenConfig;
 
 /**
  * TODO migrate to {@link WithMavenStepTest} once we have implemented a GitRepoRule that can be used on remote agents
  */
 public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
+
+    Logger logger;
+    Level savedLevel;
+
+    @Before
+    public void before() {
+        // Many log messages checked here are not logged if we are not in FINE level.
+        logger = Logger.getLogger(WithMavenStepExecution.class.getName());
+        savedLevel = logger.getLevel();
+        logger.setLevel(Level.FINE);
+    }
+
+    @After
+    public void after() {
+        logger.setLevel(savedLevel);
+    }
 
     @Test
     public void maven_build_on_master_with_specified_maven_installation_succeeds() throws Exception {
