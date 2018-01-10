@@ -65,6 +65,7 @@ import jenkins.mvn.FilePathGlobalSettingsProvider;
 import jenkins.mvn.FilePathSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 
+
 /**
  * TODO migrate to {@link WithMavenStepTest} once we have implemented a GitRepoRule that can be used on remote agents
  */
@@ -263,30 +264,37 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
     private void maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(MavenPublisher.DescriptorImpl descriptor, String symbol, boolean disabled) throws Exception {
 
-        String displayName = descriptor.getDisplayName();
+        Logger logger = Logger.getLogger(MavenSpyLogProcessor.class.getName());
+        Level level = logger.getLevel();
+        logger.setLevel(Level.FINE);
+        try {
+            String displayName = descriptor.getDisplayName();
 
-        Symbol symbolAnnotation = descriptor.getClass().getAnnotation(Symbol.class);
-        String[] symbols = symbolAnnotation.value();
-        assertThat(new String[]{symbol},  is(symbols));
+            Symbol symbolAnnotation = descriptor.getClass().getAnnotation(Symbol.class);
+            String[] symbols = symbolAnnotation.value();
+            assertThat(new String[]{symbol}, is(symbols));
 
-        loadMavenJarProjectInGitRepo(this.gitRepoRule);
+            loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-        String pipelineScript = "node('master') {\n" +
-                "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                "    withMaven(options:[" + symbol + "(disabled:" + disabled + ")]) {\n" +
-                "        sh 'mvn package verify'\n" +
-                "    }\n" +
-                "}";
+            String pipelineScript = "node('master') {\n" +
+                    "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                    "    withMaven(options:[" + symbol + "(disabled:" + disabled + ")]) {\n" +
+                    "        sh 'mvn package verify'\n" +
+                    "    }\n" +
+                    "}";
 
-        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-" + symbol + "-publisher-disabled-" + disabled);
-        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-" + symbol + "-publisher-disabled-" + disabled);
+            pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+            WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
-        String message = "[withMaven] Skip '" + displayName + "' disabled by configuration";
-        if (disabled) {
-            jenkinsRule.assertLogContains(message, build);
-        } else {
-            jenkinsRule.assertLogNotContains(message, build);
+            String message = "[withMaven] Skip '" + displayName + "' disabled by configuration";
+            if (disabled) {
+                jenkinsRule.assertLogContains(message, build);
+            } else {
+                jenkinsRule.assertLogNotContains(message, build);
+            }
+        } finally {
+            logger.setLevel(level);
         }
     }
 

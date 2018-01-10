@@ -85,23 +85,31 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
         PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
 
-        recordParentProject(mavenSpyLogsElt, run,listener, dao);
-        recordDependencies(mavenSpyLogsElt, run, listener, dao);
-        recordGeneratedArtifacts(mavenSpyLogsElt, run, listener, dao);
-    }
-
-    protected void recordParentProject(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         List<MavenSpyLogProcessor.MavenArtifact> parentProjects = listParentProjects(mavenSpyLogsElt, LOGGER);
-        recordParentProject(parentProjects, run, listener, dao);
+        List<MavenSpyLogProcessor.MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
+        List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts = listArtifacts(mavenSpyLogsElt);
+        List<String> executedLifecyclePhases = XmlUtils.getExecutedLifecyclePhases(mavenSpyLogsElt);
+        
+        recordParentProject(parentProjects, generatedArtifacts, run,listener, dao);
+        recordDependencies(dependencies, generatedArtifacts, run, listener, dao);
+        recordGeneratedArtifacts(generatedArtifacts, executedLifecyclePhases, run, listener, dao);
     }
 
-    protected void recordParentProject(List<MavenSpyLogProcessor.MavenArtifact> parentProjects, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+    protected void recordParentProject(List<MavenSpyLogProcessor.MavenArtifact> parentProjects, List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts,
+    	    @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordParentProject - filter: " +
                     "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "]");
         }
 
         for (MavenSpyLogProcessor.MavenArtifact parentProject : parentProjects) {
+            // Exclude self-generated artifacts (#47996)
+            if(generatedArtifacts.contains(parentProject)) {
+                if (LOGGER.isLoggable(Level.FINER)) {
+                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording parent project to generated artifact: " + parentProject.getId());
+                }
+                continue;
+            }
             if (parentProject.snapshot) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
@@ -136,12 +144,8 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
     }
 
-    protected void recordDependencies(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
-        List<MavenSpyLogProcessor.MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
-        recordDependencies(dependencies, run, listener, dao);
-    }
-
-    protected void recordDependencies(List<MavenSpyLogProcessor.MavenDependency> dependencies, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+    protected void recordDependencies(List<MavenSpyLogProcessor.MavenDependency> dependencies, List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts,
+    	    @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordDependencies - filter: " +
                     "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "], " +
@@ -149,6 +153,13 @@ public class PipelineGraphPublisher extends MavenPublisher {
         }
 
         for (MavenSpyLogProcessor.MavenDependency dependency : dependencies) {
+            // Exclude self-generated artifacts (#47996)
+            if(generatedArtifacts.contains(dependency.asMavenArtifact())) {
+                if (LOGGER.isLoggable(Level.FINER)) {
+                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording dependency to generated artifact: " + dependency.getId());
+                }
+                continue;
+            }
             if (dependency.snapshot) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
@@ -186,13 +197,6 @@ public class PipelineGraphPublisher extends MavenPublisher {
                 listener.getLogger().flush();
             }
         }
-    }
-
-    protected void recordGeneratedArtifacts(@Nonnull Element mavenSpyLogsElt, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
-        List<MavenSpyLogProcessor.MavenArtifact> generatedArtifacts = listArtifacts(mavenSpyLogsElt);
-
-        List<String> executedLifecyclePhases = XmlUtils.getExecutedLifecyclePhases(mavenSpyLogsElt);
-        recordGeneratedArtifacts(generatedArtifacts, executedLifecyclePhases, run, listener, dao);
     }
 
     /**

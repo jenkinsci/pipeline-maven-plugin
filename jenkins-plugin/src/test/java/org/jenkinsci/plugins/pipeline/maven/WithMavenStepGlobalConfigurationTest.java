@@ -24,12 +24,6 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import hudson.model.Result;
-import hudson.tasks.Maven;
-import jenkins.mvn.DefaultGlobalSettingsProvider;
-import jenkins.mvn.DefaultSettingsProvider;
-import jenkins.mvn.GlobalMavenConfig;
-import jenkins.plugins.git.GitSampleRepoRule;
-import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
@@ -38,19 +32,12 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.BuildWatcher;
-import org.jvnet.hudson.test.ExtendedToolInstallations;
-import org.jvnet.hudson.test.JenkinsRule;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * TODO migrate to {@link WithMavenStepTest} once we have implemented a GitRepoRule that can be used on remote agents
@@ -85,6 +72,9 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
         GlobalPipelineMavenConfig globalPipelineMavenConfig = GlobalPipelineMavenConfig.get();
 
         globalPipelineMavenConfig.setPublisherOptions(Collections.singletonList(publisher));
+        Logger logger = Logger.getLogger(MavenSpyLogProcessor.class.getName());
+        Level level = logger.getLevel();
+        logger.setLevel(Level.FINE);
         try {
 
 
@@ -108,6 +98,7 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
             String message = "[withMaven] Skip '" + displayName + "' disabled by configuration";
             jenkinsRule.assertLogContains(message, build);
         } finally {
+            logger.setLevel(level);
             globalPipelineMavenConfig.setPublisherOptions((List<MavenPublisher>) null);
         }
     }
@@ -141,6 +132,9 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
         GlobalPipelineMavenConfig globalPipelineMavenConfig = GlobalPipelineMavenConfig.get();
 
         globalPipelineMavenConfig.setPublisherOptions(Collections.singletonList(publisher));
+        Logger logger = Logger.getLogger(MavenSpyLogProcessor.class.getName());
+        Level level = logger.getLevel();
+        logger.setLevel(Level.FINE);
         try {
 
 
@@ -165,6 +159,7 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
                     "Use pipeline level configuration for '" + displayName +                     "'", build);
             jenkinsRule.assertLogContains("[withMaven] Skip '" + displayName + "' disabled by configuration", build);
         } finally {
+            logger.setLevel(level);
             globalPipelineMavenConfig.setPublisherOptions((List<MavenPublisher>) null);
         }
     }

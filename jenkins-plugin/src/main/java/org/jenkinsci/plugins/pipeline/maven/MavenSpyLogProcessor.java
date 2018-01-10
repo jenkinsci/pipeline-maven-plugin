@@ -41,6 +41,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -98,9 +99,13 @@ public class MavenSpyLogProcessor implements Serializable {
                 for (MavenPublisher mavenPublisher : mavenPublishers) {
                     String skipFileName = mavenPublisher.getDescriptor().getSkipFileName();
                     if (Boolean.TRUE.equals(mavenPublisher.isDisabled())) {
-                        listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by configuration");
+                        if (LOGGER.isLoggable(Level.FINE)) {
+                            listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by configuration");
+                        }
                     } else if (StringUtils.isNotEmpty(skipFileName) && workspace.child(skipFileName).exists()) {
-                        listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by marker file '" + skipFileName + "'");
+                        if (LOGGER.isLoggable(Level.FINE)) {
+                            listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by marker file '" + skipFileName + "'");
+                        }
                     } else {
                         if (LOGGER.isLoggable(Level.FINE)) {
                             listener.getLogger().println("[withMaven] Run '" + mavenPublisher.getDescriptor().getDisplayName() + "'...");
@@ -201,6 +206,38 @@ public class MavenSpyLogProcessor implements Serializable {
                     (file == null ? "" : " " + file) +
                     '}';
         }
+        
+        @Override
+        public int hashCode() {
+            return Objects.hash(groupId, artifactId, baseVersion);
+        }
+        
+        @Override
+		public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+			if (getClass() != obj.getClass())
+			    return false;
+		    MavenArtifact other = (MavenArtifact) obj;
+		    if (groupId == null) {
+		        if (other.groupId != null)
+		            return false;
+		        } else if (!groupId.equals(other.groupId))
+		            return false;
+		    if (artifactId == null) {
+		        if (other.artifactId != null)
+		            return false;
+		        } else if (!artifactId.equals(other.artifactId))
+		            return false;
+		    if (baseVersion == null) {
+		        if (other.baseVersion != null)
+		            return false;
+		        } else if (!baseVersion.equals(other.baseVersion))
+		            return false;
+		    return true;
+		}
     }
 
     public static class MavenDependency extends MavenArtifact {
@@ -232,6 +269,47 @@ public class MavenSpyLogProcessor implements Serializable {
                     (file == null ? "" : " " + file) +
                     '}';
         }
+        
+        public MavenArtifact asMavenArtifact() {
+            MavenArtifact result = new MavenArtifact();
+            
+            result.groupId = groupId;
+            result.artifactId = artifactId;
+            result.version = version;
+            result.baseVersion = baseVersion;
+            result.type = type;
+            result.classifier = classifier;
+            result.extension = extension;
+            result.file = file;
+            result.snapshot = snapshot;
+            
+            return result;
+        }
+        
+
+		@Override
+		public int hashCode() {
+		    return Objects.hash(super.hashCode(), optional, scope);
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+		    if (this == obj)
+		        return true;
+		    if (!super.equals(obj))
+		        return false;
+		    if (getClass() != obj.getClass())
+		        return false;
+		    MavenDependency other = (MavenDependency) obj;
+		    if (optional != other.optional)
+		        return false;
+		    if (scope == null) {
+		        if (other.scope != null)
+		            return false;
+		        } else if (!scope.equals(other.scope))
+		            return false;
+		    return true;
+		}
     }
 
     /*
