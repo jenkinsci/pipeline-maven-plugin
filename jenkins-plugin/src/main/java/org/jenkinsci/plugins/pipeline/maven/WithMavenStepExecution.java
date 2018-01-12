@@ -70,6 +70,7 @@ import hudson.Util;
 import hudson.console.ConsoleLogFilter;
 import hudson.model.BuildListener;
 import hudson.model.Computer;
+import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.JDK;
 import hudson.model.Job;
@@ -729,15 +730,17 @@ class WithMavenStepExecution extends StepExecution {
 
     @CheckForNull
     private MavenConfigFolderOverrideProperty getMavenConfigOverrideProperty() {
-        Job<?, ?> job = build.getParent();
-        ItemGroup<?> group = job.getParent();
-        while (group != null && !(group instanceof Jenkins) && group instanceof AbstractFolder) {
-            AbstractFolder<?> folder = (AbstractFolder<?>) group;
-            MavenConfigFolderOverrideProperty mavenConfigProperty = folder.getProperties().get(MavenConfigFolderOverrideProperty.class);
-            if (mavenConfigProperty != null && mavenConfigProperty.isOverride()) {
-                return mavenConfigProperty;
+        Job<?, ?> job = build.getParent(); // Get the job
+
+        // Iterate until we find an override or until we reach the top. We need it to be an item to be able to do
+        // getParent, AbstractFolder which has the properties is also an Item
+        for (ItemGroup<?> group = job.getParent(); group != null && group instanceof Item && !(group instanceof Jenkins); group = ((Item) group).getParent()) {
+            if (group instanceof AbstractFolder) {
+                MavenConfigFolderOverrideProperty mavenConfigProperty = ((AbstractFolder<?>) group).getProperties().get(MavenConfigFolderOverrideProperty.class);
+                if (mavenConfigProperty != null && mavenConfigProperty.isOverride()) {
+                    return mavenConfigProperty;
+                }
             }
-            group = folder.getParent();
         }
         return null;
     }
