@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -125,6 +126,13 @@ public class TasksScannerPublisher extends MavenPublisher {
 
             String sourceDirectory = buildElement.getAttribute("sourceDirectory");
 
+            // JENKINS-44359
+            if (Objects.equals(sourceDirectory, "${project.basedir}/src/main/java")) {
+                if (LOGGER.isLoggable(Level.FINE))
+                    LOGGER.log(Level.FINE, "Skip task scanning for " + XmlUtils.toString(executionEvent));
+                continue;
+            }
+
             String sourceDirectoryRelativePath = XmlUtils.getPathInWorkspace(sourceDirectory, workspace);
 
             if (workspace.child(sourceDirectoryRelativePath).exists()) {
@@ -133,6 +141,13 @@ public class TasksScannerPublisher extends MavenPublisher {
             } else {
                 LOGGER.log(Level.FINE, "Skip task scanning for {0}, folder {1} does not exist", new Object[]{mavenArtifact, sourceDirectoryRelativePath});
             }
+        }
+
+        if (sourceDirectoriesPatterns.isEmpty()) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                listener.getLogger().println("[withMaven] openTasksPublisher - no folder to scan");
+            }
+            return;
         }
 
         TasksPublisher tasksPublisher = new TasksPublisher();
