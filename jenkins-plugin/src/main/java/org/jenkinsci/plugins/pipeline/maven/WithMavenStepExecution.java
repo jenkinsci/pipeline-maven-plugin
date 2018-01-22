@@ -260,7 +260,7 @@ class WithMavenStepExecution extends StepExecution {
     private void setupJDK() throws AbortException, IOException, InterruptedException {
         String jdkInstallationName = step.getJdk();
         if (StringUtils.isEmpty(jdkInstallationName)) {
-            console.println("[withMaven] use JDK installation provided by the build agent");
+            console.println("[withMaven] using JDK installation provided by the build agent");
             return;
         }
 
@@ -273,9 +273,9 @@ class WithMavenStepExecution extends StepExecution {
             return;
         }
 
-        console.println("[withMaven] use JDK installation " + jdkInstallationName);
+        console.println("[withMaven] using JDK installation " + jdkInstallationName);
 
-        JDK jdk = Jenkins.getActiveInstance().getJDK(jdkInstallationName);
+        JDK jdk = Jenkins.getInstance().getJDK(jdkInstallationName);
         if (jdk == null) {
             throw new AbortException("Could not find the JDK installation: " + jdkInstallationName + ". Make sure it is configured on the Global Tool Configuration page");
         }
@@ -413,7 +413,7 @@ class WithMavenStepExecution extends StepExecution {
         MavenInstallation mavenInstallation;
         if (StringUtils.isEmpty(mavenInstallationName)) {
             // no maven installation name is passed, we will search for the Maven installation on the agent
-            consoleMessage.append(" use Maven installation provided by the build agent");
+            consoleMessage.append(" using Maven installation provided by the build agent");
             mavenInstallation = null;
         } else if (withContainer) {
             console.println(
@@ -426,7 +426,7 @@ class WithMavenStepExecution extends StepExecution {
             for (MavenInstallation i : getMavenInstallations()) {
                 if (mavenInstallationName.equals(i.getName())) {
                     mavenInstallation = i;
-                    consoleMessage.append(" use Maven installation '" + mavenInstallation.getName() + "'");
+                    consoleMessage.append(" using Maven installation '" + mavenInstallation.getName() + "'");
                     LOGGER.log(Level.FINE, "Found maven installation {0} with installation home {1}", new Object[]{mavenInstallation.getName(), mavenInstallation.getHome()});
                     break;
                 }
@@ -792,18 +792,18 @@ class WithMavenStepExecution extends StepExecution {
         MavenConfigFolderOverrideProperty overrideProperty = getMavenConfigOverrideProperty();
 
         StringBuilder mavenSettingsLog = new StringBuilder();
-        if (overrideProperty != null && overrideProperty.getGlobalSettings() != null) {
-            // Settings overriden by a folder property
-            if (LOGGER.isLoggable(Level.FINE)) {
-                mavenSettingsLog.append("[withMaven] using overriden Maven global settings by folder '").append(overrideProperty.getOwner().getDisplayName()).append("'. ");
-            }
-            globalSettingsProvider = overrideProperty.getGlobalSettings();
-        } else {
+        if (overrideProperty == null || overrideProperty.getGlobalSettings() == null) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("[withMaven] using Maven global settings provided by the Jenkins global configuration. ");
             }
             // Settings provided by the global maven configuration
             globalSettingsProvider = GlobalMavenConfig.get().getGlobalSettingsProvider();
+        } else {
+            // Settings overriden by a folder property
+            if (LOGGER.isLoggable(Level.FINE)) {
+                mavenSettingsLog.append("[withMaven] using overriden Maven global settings by folder '").append(overrideProperty.getOwner().getDisplayName()).append("'. ");
+            }
+            globalSettingsProvider = overrideProperty.getGlobalSettings();
         }
 
         if (globalSettingsProvider instanceof MvnGlobalSettingsProvider) {
@@ -1036,7 +1036,7 @@ class WithMavenStepExecution extends StepExecution {
      * @return maven installations on this instance
      */
     private static MavenInstallation[] getMavenInstallations() {
-        return Jenkins.getActiveInstance().getDescriptorByType(Maven.DescriptorImpl.class).getInstallations();
+        return Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class).getInstallations();
     }
 
     @Override
@@ -1059,7 +1059,7 @@ class WithMavenStepExecution extends StepExecution {
         }
 
         String node = null;
-        Jenkins j = Jenkins.getActiveInstance();
+        Jenkins j = Jenkins.getInstance();
 
         for (Computer c : j.getComputers()) {
             if (c.getChannel() == launcher.getChannel()) {
