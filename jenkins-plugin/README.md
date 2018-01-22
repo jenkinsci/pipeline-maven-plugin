@@ -4,10 +4,10 @@
 The `withMaven` pipeline step will capture in the logs of the build all the details of the execution:
 
 * Version of the JVM
-   * Plugin initialization: `[withMaven] use JDK installation JDK8`
+   * Plugin initialization: `[withMaven] using JDK installation JDK8`
    * `mvn` executable invocation: `Java version: 1.8.0_102, vendor: Oracle Corporation`
 * Version of Maven
-   * Plugin initialization: `[withMaven] use Maven installation 'M3'`
+   * Plugin initialization: `[withMaven] using Maven installation 'M3'`
    * `mvn` executable invocation: `Apache Maven 3.3.9 (bb52d8502b132ec0a5a3f4c09453c07478323dc5; 2015-11-10T16:41:47+00:00)`
 * Name or path of the Maven settings.xml and Maven global settings.xml file.
    * Plugin initialization: `[withMaven] use Maven settings provided by the Jenkins Managed Configuration File 'maven-settings-for-supply-chain-build-job' 
@@ -19,10 +19,10 @@ details of the Jenkins credentials injected in the MAven build.
 Sample:
 
 ```
-[withMaven] use JDK installation JDK8
-[withMaven] use Maven installation 'M3'
-[withMaven] use Maven settings provided by the Jenkins Managed Configuration File 'maven-settings-for-supply-chain-build-job' 
-[withMaven] use Maven settings.xml 'maven-settings-for-supply-chain-build-job' with Maven servers credentials provided by Jenkins (replaceAll: true): 
+[withMaven] using JDK installation JDK8
+[withMaven] using Maven installation 'M3'
+[withMaven] using Maven settings provided by the Jenkins Managed Configuration File 'maven-settings-for-supply-chain-build-job' 
+[withMaven] using Maven settings.xml 'maven-settings-for-supply-chain-build-job' with Maven servers credentials provided by Jenkins (replaceAll: true): 
      [mavenServerId: 'nexus.beescloud.com', jenkinsCredentials: 'beescloud-nexus-deployment-credentials', username: 'deployment', type: 'UsernamePasswordCredentialsImpl'], 
      [mavenServerId: 'github.beescloud.com', jenkinsCredentials: 'github-enterprise-api-token', username: 'dev1', type: 'UsernamePasswordCredentialsImpl']
 ...

@@ -103,7 +103,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
         // verify provided Maven is used
-        jenkinsRule.assertLogContains("use Maven installation 'apache-maven-3.5.0'", build);
+        jenkinsRule.assertLogContains("using Maven installation 'apache-maven-3.5.0'", build);
 
         // verify .pom is archived and fingerprinted
         // "[withMaven] Archive ... under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.pom"
@@ -147,7 +147,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         // verify Maven installation provided by the build agent is used
         // can be either "by the build agent with executable..." or "by the build agent with the environment variable MAVEN_HOME=..."
-        jenkinsRule.assertLogContains("[withMaven] use Maven installation provided by the build agent with", build);
+        jenkinsRule.assertLogContains("[withMaven] using Maven installation provided by the build agent with", build);
 
         // verify .pom is archived and fingerprinted
         // "[withMaven] Archive ... under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.pom"
@@ -349,7 +349,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         // verify Maven installation provided by the build agent is used
         // can be either "by the build agent with executable..." or "by the build agent with the environment variable MAVEN_HOME=..."
-        jenkinsRule.assertLogContains("[withMaven] use Maven installation provided by the build agent with", build);
+        jenkinsRule.assertLogContains("[withMaven] using Maven installation provided by the build agent with", build);
 
         // verify .pom is archived and fingerprinted
         jenkinsRule.assertLogContains("under jenkins/mvn/test/maven-jar-with-flattened-pom/0.1-SNAPSHOT/maven-jar-with-flattened-pom-0.1-SNAPSHOT.pom", build);
@@ -388,7 +388,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         // verify Maven installation provided by the build agent is used
         // can be either "by the build agent with executable..." or "by the build agent with the environment variable MAVEN_HOME=..."
-        jenkinsRule.assertLogContains("[withMaven] use Maven installation provided by the build agent with", build);
+        jenkinsRule.assertLogContains("[withMaven] using Maven installation provided by the build agent with", build);
 
         // verify .pom is archived and fingerprinted
         jenkinsRule.assertLogContains("under jenkins/mvn/test/test-jenkins-hpi/0.1-SNAPSHOT/test-jenkins-hpi-0.1-SNAPSHOT.pom", build);
@@ -428,7 +428,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         // verify Maven installation provided by the build agent is used
         // can be either "by the build agent with executable..." or "by the build agent with the environment variable MAVEN_HOME=..."
-        jenkinsRule.assertLogContains("[withMaven] use Maven installation provided by the build agent with", build);
+        jenkinsRule.assertLogContains("[withMaven] using Maven installation provided by the build agent with", build);
 
         // verify .pom is archived and fingerprinted
         jenkinsRule.assertLogContains("under jenkins/mvn/test/maven-test-plugin/1.0-SNAPSHOT/maven-test-plugin-1.0-SNAPSHOT.pom", build);
