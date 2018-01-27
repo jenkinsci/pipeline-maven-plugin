@@ -11,6 +11,7 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublish
 import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.junit.Assert;
@@ -37,7 +38,7 @@ public class MavenPublisherTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         List<MavenPublisher> mavenPublishers = MavenPublisher.buildPublishersList(Collections.<MavenPublisher>emptyList(), new StreamTaskListener(baos));
-        Assert.assertThat(mavenPublishers.size(), CoreMatchers.is(9));
+        Assert.assertThat(mavenPublishers.size(), CoreMatchers.is(10));
 
         Map<String, MavenPublisher> reportersByDescriptorId = new HashMap<>();
         for(MavenPublisher mavenPublisher : mavenPublishers) {
@@ -51,5 +52,6 @@ public class MavenPublisherTest {
         assertThat(reportersByDescriptorId.containsKey(new InvokerRunsPublisher.DescriptorImpl().getId()), is(true));
         assertThat(reportersByDescriptorId.containsKey(new ConcordionTestsPublisher.DescriptorImpl().getId()), is(true));
         assertThat(reportersByDescriptorId.containsKey(new JGivenTestsPublisher.DescriptorImpl().getId()), is(true));
+        assertThat(reportersByDescriptorId.containsKey(new MavenLinkerPublisher.DescriptorImpl().getId()), is(true));
     }
 }

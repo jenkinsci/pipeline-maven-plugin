@@ -27,6 +27,7 @@ package org.jenkinsci.plugins.pipeline.maven.eventspy;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.eventspy.EventSpy;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.ArtifactDeployedEventHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.CatchAllExecutionHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.DefaultSettingsBuildingRequestHandler;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.handler.DependencyResolutionRequestHandler;
@@ -88,7 +89,7 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
 
     private Set<Class> blackList = new HashSet();
     private Set<String> ignoredList = new HashSet(Arrays.asList(
-            "org.eclipse.aether.RepositoryEvent",
+            /*"org.eclipse.aether.RepositoryEvent",*/
             "org.apache.maven.settings.building.DefaultSettingsBuildingResult"/*,
             "org.apache.maven.execution.DefaultMavenExecutionResult"*/));
 
@@ -132,6 +133,7 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
         handlers.add(new MavenExecutionResultHandler(reporter));
         handlers.add(new SessionEndedHandler(reporter));
         handlers.add(new DeployDeployExecutionHandler(reporter));
+        handlers.add(new ArtifactDeployedEventHandler(reporter));
 
         handlers.add(new CatchAllExecutionHandler(reporter));
 
