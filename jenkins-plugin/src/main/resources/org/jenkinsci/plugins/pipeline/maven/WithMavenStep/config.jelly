@@ -54,6 +54,10 @@ THE SOFTWARE.
         <f:textbox/>
     </f:entry>
 
+    <f:entry title="${%Publisher Strategy}" field="publisherStrategy">
+        <f:select/>
+    </f:entry>
+
     <f:entry title="${%Options}">
         <f:repeatableHeteroProperty field="options" targetType="org.jenkinsci.plugins.pipeline.maven.MavenPublisher"
                                     addCaption="${%Add Option}" hasHeader="true" oneEach="true"/>
