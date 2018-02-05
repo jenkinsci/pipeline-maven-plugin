@@ -80,7 +80,6 @@ public class MavenLinkerPublisher extends MavenPublisher implements LastBuildAct
         String version = null;
         String classifier = null;
         String type = null;
-        String url = null;
 
         NodeList nodes = repositoryEvent.getChildNodes();
 
@@ -97,8 +96,8 @@ public class MavenLinkerPublisher extends MavenPublisher implements LastBuildAct
                     type = element.getAttribute("type");
                 }
                 if (StringUtils.equals(element.getNodeName(), "repository")) {
-                    url = element.getAttribute("url");
-                    url += "/" + groupId.replace('.', '/') + "/" + artifactId + "/" + baseVersion + "/" + artifactId
+                    String repositoryUrl = element.getAttribute("url");
+                    String url = repositoryUrl + "/" + groupId.replace('.', '/') + "/" + artifactId + "/" + baseVersion + "/" + artifactId
                             + "-" + version;
                     if (!StringUtils.isBlank(classifier)) {
                         url += "-" + classifier;
