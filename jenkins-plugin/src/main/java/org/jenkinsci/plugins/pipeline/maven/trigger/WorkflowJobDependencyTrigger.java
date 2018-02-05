@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.pipeline.maven.trigger;
 
 import hudson.Extension;
 import hudson.model.Item;
-import hudson.model.Job;
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import jenkins.branch.MultiBranchProject;
@@ -15,7 +14,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class WorkflowJobDependencyTrigger extends Trigger<Job<?, ?>> {
+public class WorkflowJobDependencyTrigger extends Trigger<Item> {
 
     @DataBoundConstructor
     public WorkflowJobDependencyTrigger(){
