@@ -12,6 +12,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
+import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Attr;
@@ -71,48 +72,38 @@ public class MavenLinkerPublisher extends MavenPublisher implements LastBuildAct
         return elements;
     }
 
+    /*
+
+    <RepositoryEvent type="ARTIFACT_DEPLOYED" class="org.eclipse.aether.RepositoryEvent" _time="2018-02-07 23:12:00.936">
+    <artifact extension="pom" file="/home/ubuntu/jenkins-aws-home/workspace/plugins/pipeline-maven-plugin/my-jar/pom.xml" baseVersion="0.5-SNAPSHOT" groupId="com.example" classifier="" artifactId="my-jar" id="com.example:my-jar:pom:0.5-20180207.231200-16" version="0.5-20180207.231200-16" snapshot="true"/>
+    <repository layout="default" id="nexus.beescloud.com" url="https://nexus.beescloud.com/content/repositories/snapshots/"/>
+  </RepositoryEvent>
+     */
+    @Nonnull
     static Artifact getArtifact(@Nonnull Element repositoryEvent) {
 
-        Artifact artifact = null;
-        String groupId = null;
-        String artifactId = null;
-        String baseVersion = null;
-        String version = null;
-        String classifier = null;
-        String type = null;
+        Element artifactElement = XmlUtils.getUniqueChildElement(repositoryEvent, "artifact");
 
-        NodeList nodes = repositoryEvent.getChildNodes();
+        String groupId = artifactElement.getAttribute("groupId");
+        String artifactId = artifactElement.getAttribute("artifactId");
+        String baseVersion = artifactElement.getAttribute("baseVersion");
+        String version = artifactElement.getAttribute("version");
+        String classifier = artifactElement.getAttribute("classifier");
+        String extension = artifactElement.getAttribute("extension");
 
-        for (int i = 0; i < nodes.getLength(); i++) {
-            Node node = nodes.item(i);
-            if (node instanceof Element) {
-                Element element = (Element) node;
-                if (StringUtils.equals(element.getNodeName(), "artifact")) {
-                    groupId = element.getAttribute("groupId");
-                    artifactId = element.getAttribute("artifactId");
-                    baseVersion = element.getAttribute("baseVersion");
-                    version = element.getAttribute("version");
-                    classifier = element.getAttribute("classifier");
-                    type = element.getAttribute("type");
-                }
-                if (StringUtils.equals(element.getNodeName(), "repository")) {
-                    String repositoryUrl = element.getAttribute("url");
-                    String url = repositoryUrl + "/" + groupId.replace('.', '/') + "/" + artifactId + "/" + baseVersion + "/" + artifactId
-                            + "-" + version;
-                    if (!StringUtils.isBlank(classifier)) {
-                        url += "-" + classifier;
-                    }
-                    url += "." + type;
-                    artifact = new Artifact(getNameFromUrl(url), url);
-                }
-            }
+        Element repositoryElement = XmlUtils.getUniqueChildElement(repositoryEvent, "repository");
+        String repositoryUrl = repositoryElement.getAttribute("url");
+
+        String fileName = artifactId + "-" + version;
+        if (!StringUtils.isBlank(classifier)) {
+            fileName += "-" + classifier;
         }
+        fileName += "." + extension;
 
-        return artifact;
-    }
+        String url = repositoryUrl + "/" + groupId.replace('.', '/') + "/" + artifactId + "/" + baseVersion + "/" + fileName;
 
-    static String getNameFromUrl(@Nonnull String url) {
-        return url.substring(url.lastIndexOf('/') + 1, url.length());
+
+        return new Artifact(fileName, url);
     }
 
     public List<Artifact> getArtifacts() {
