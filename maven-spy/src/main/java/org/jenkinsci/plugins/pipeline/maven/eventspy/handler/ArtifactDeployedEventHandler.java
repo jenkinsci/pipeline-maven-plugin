@@ -70,9 +70,10 @@ public class ArtifactDeployedEventHandler implements MavenEventHandler {
         element.setAttribute("baseVersion", artifact.getBaseVersion());
         element.setAttribute("version", artifact.getVersion());
         element.setAttribute("classifier", artifact.getClassifier());
-        element.setAttribute("type", artifact.getExtension());
         element.setAttribute("snapshot", String.valueOf(artifact.isSnapshot()));
         element.setAttribute("file", artifact.getFile().getAbsolutePath());
+        element.setAttribute("extension", artifact.getExtension());
+
 
         return element;
     }
