@@ -1,5 +1,6 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:if test="${!empty it.artifacts}">
   <t:summary icon="package.gif"><b>Deployed Artifacts:</b>
     <ul>
       <j:forEach var="artifact" items="${it.artifacts}">
@@ -7,4 +8,5 @@
     </j:forEach>
     </ul>
   </t:summary>
+</j:if>
 </j:jelly>
