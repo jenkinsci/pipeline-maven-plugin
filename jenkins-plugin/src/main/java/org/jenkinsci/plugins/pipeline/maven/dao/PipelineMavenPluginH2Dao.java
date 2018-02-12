@@ -24,7 +24,6 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import hudson.model.Item;
 import hudson.model.Run;
 import org.apache.commons.io.IOUtils;
@@ -42,13 +41,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLType;
 import java.sql.Statement;
-import java.sql.Types;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
