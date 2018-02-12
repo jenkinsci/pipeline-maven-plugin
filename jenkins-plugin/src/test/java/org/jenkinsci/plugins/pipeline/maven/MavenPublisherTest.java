@@ -11,7 +11,7 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublish
 import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.junit.Assert;
@@ -52,6 +52,6 @@ public class MavenPublisherTest {
         assertThat(reportersByDescriptorId.containsKey(new InvokerRunsPublisher.DescriptorImpl().getId()), is(true));
         assertThat(reportersByDescriptorId.containsKey(new ConcordionTestsPublisher.DescriptorImpl().getId()), is(true));
         assertThat(reportersByDescriptorId.containsKey(new JGivenTestsPublisher.DescriptorImpl().getId()), is(true));
-        assertThat(reportersByDescriptorId.containsKey(new MavenLinkerPublisher.DescriptorImpl().getId()), is(true));
+        assertThat(reportersByDescriptorId.containsKey(new MavenLinkerPublisher2.DescriptorImpl().getId()), is(true));
     }
 }

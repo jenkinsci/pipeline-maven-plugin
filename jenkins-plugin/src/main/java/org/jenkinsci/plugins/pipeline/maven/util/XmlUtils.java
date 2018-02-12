@@ -27,7 +27,9 @@ package org.jenkinsci.plugins.pipeline.maven.util;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.FilePath;
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -59,8 +61,8 @@ import javax.xml.transform.stream.StreamResult;
 public class XmlUtils {
     private static final Logger LOGGER = Logger.getLogger(XmlUtils.class.getName());
 
-    public static MavenSpyLogProcessor.MavenArtifact newMavenArtifact(Element artifactElt) {
-        MavenSpyLogProcessor.MavenArtifact mavenArtifact = new MavenSpyLogProcessor.MavenArtifact();
+    public static MavenArtifact newMavenArtifact(Element artifactElt) {
+        MavenArtifact mavenArtifact = new MavenArtifact();
         loadMavenArtifact(artifactElt, mavenArtifact);
 
         return mavenArtifact;
@@ -75,7 +77,7 @@ public class XmlUtils {
         return dependency;
     }
 
-    private static void loadMavenArtifact(Element artifactElt, MavenSpyLogProcessor.MavenArtifact mavenArtifact) {
+    private static void loadMavenArtifact(Element artifactElt, MavenArtifact mavenArtifact) {
         mavenArtifact.groupId = artifactElt.getAttribute("groupId");
         mavenArtifact.artifactId = artifactElt.getAttribute("artifactId");
         mavenArtifact.version = artifactElt.getAttribute("version");
@@ -170,6 +172,81 @@ public class XmlUtils {
     }
 
     /*
+    <RepositoryEvent type="ARTIFACT_DEPLOYED" class="org.eclipse.aether.RepositoryEvent" _time="2018-02-11 16:18:26.505">
+        <artifact extension="jar" file="/path/to/my-project-workspace/target/my-jar-0.5-SNAPSHOT.jar" baseVersion="0.5-SNAPSHOT" groupId="com.example" classifier="" artifactId="my-jar" id="com.example:my-jar:jar:0.5-20180211.151825-18" version="0.5-20180211.151825-18" snapshot="true"/>
+        <repository layout="default" id="nexus.beescloud.com" url="https://nexus.beescloud.com/content/repositories/snapshots/"/>
+    </RepositoryEvent>
+    <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 16:18:30.971">
+        <project baseDir="/path/to/my-project-workspace" file="/path/to/my-project-workspace/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
+          <build sourceDirectory="/path/to/my-project-workspace/src/main/java" directory="/path/to/my-project-workspace/target"/>
+        </project>
+        <no-execution-found/>
+        <artifact extension="jar" baseVersion="0.5-SNAPSHOT" groupId="com.example" artifactId="my-jar" id="com.example:my-jar:jar:0.5-SNAPSHOT" type="jar" version="0.5-20180211.151825-18" snapshot="true">
+          <file>/path/to/my-project-workspace/target/my-jar-0.5-SNAPSHOT.jar</file>
+        </artifact>
+        <attachedArtifacts/>
+    </ExecutionEvent>
+     */
+    @Nonnull
+    public static List<Element> getArtifactDeployedEvents(@Nonnull Element mavenSpyLogs) {
+        List<Element> elements = new ArrayList<>();
+
+        NodeList nodes = mavenSpyLogs.getChildNodes();
+
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            if (node instanceof Element) {
+                Element element = (Element) node;
+                if (StringUtils.equals(element.getNodeName(), "RepositoryEvent")) {
+                    Attr type = element.getAttributeNode("type");
+                    if (null != type && StringUtils.equals(type.getValue(), "ARTIFACT_DEPLOYED")) {
+                        elements.add(element);
+                    }
+                }
+            }
+        }
+        return elements;
+    }
+
+    /*
+    <RepositoryEvent type="ARTIFACT_DEPLOYED" class="org.eclipse.aether.RepositoryEvent" _time="2018-02-11 16:18:26.505">
+        <artifact extension="jar" file="/path/to/my-project-workspace/target/my-jar-0.5-SNAPSHOT.jar" baseVersion="0.5-SNAPSHOT" groupId="com.example" classifier="" artifactId="my-jar" id="com.example:my-jar:jar:0.5-20180211.151825-18" version="0.5-20180211.151825-18" snapshot="true"/>
+        <repository layout="default" id="nexus.beescloud.com" url="https://nexus.beescloud.com/content/repositories/snapshots/"/>
+    </RepositoryEvent>
+    <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 16:18:30.971">
+        <project baseDir="/path/to/my-project-workspace" file="/path/to/my-project-workspace/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
+          <build sourceDirectory="/path/to/my-project-workspace/src/main/java" directory="/path/to/my-project-workspace/target"/>
+        </project>
+        <no-execution-found/>
+        <artifact extension="jar" baseVersion="0.5-SNAPSHOT" groupId="com.example" artifactId="my-jar" id="com.example:my-jar:jar:0.5-SNAPSHOT" type="jar" version="0.5-20180211.151825-18" snapshot="true">
+          <file>/path/to/my-project-workspace/target/my-jar-0.5-SNAPSHOT.jar</file>
+        </artifact>
+        <attachedArtifacts/>
+    </ExecutionEvent>
+     */
+
+    /**
+     *
+     * @param artifactDeployedEvents list of "RepositoryEvent" of type "ARTIFACT_DEPLOYED"
+     * @param filePath file path of the artifact we search for
+     * @return The "RepositoryEvent" of type "ARTIFACT_DEPLOYED" or {@code null} if non found
+     */
+    @Nullable
+    public static Element getArtifactDeployedEvent(@Nonnull List<Element> artifactDeployedEvents, @Nonnull String filePath) {
+        for (Element artifactDeployedEvent: artifactDeployedEvents) {
+            if (!"RepositoryEvent".equals(artifactDeployedEvent.getNodeName()) || !"ARTIFACT_DEPLOYED".equals(artifactDeployedEvent.getAttribute("type"))) {
+                // skip unexpected element
+                continue;
+            }
+            String deployedArtifactFilePath = getUniqueChildElement(artifactDeployedEvent, "artifact").getAttribute("file");
+            if (Objects.equals(filePath, deployedArtifactFilePath)) {
+                return artifactDeployedEvent;
+            }
+        }
+        return null;
+    }
+
+    /*
    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-02 23:03:17.06">
       <project artifactIdId="supplychain-portal" groupId="com.acmewidgets.supplychain" name="supplychain-portal" version="0.0.7" />
       <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.18.1">
@@ -244,8 +321,8 @@ public class XmlUtils {
 
     /*
     <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-26 23:55:44.188">
-    <project baseDir="/Users/cyrilleleclerc/git/cyrille-leclerc/my-jar" file="/Users/cyrilleleclerc/git/cyrille-leclerc/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
-      <build sourceDirectory="/Users/cyrilleleclerc/git/cyrille-leclerc/my-jar/src/main/java" directory="/Users/cyrilleleclerc/git/cyrille-leclerc/my-jar/target"/>
+    <project baseDir="/path/to/my-project-workspace" file="/path/to/my-project-workspace/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+      <build sourceDirectory="/path/to/my-project-workspace/src/main/java" directory="/path/to/my-project-workspace/target"/>
     </project>
     <plugin executionId="default-jar" goal="jar" lifecyclePhase="package" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="2.4">
       <finalName>${jar.finalName}</finalName>

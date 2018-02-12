@@ -1,0 +1,18 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
+         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <j:if test="${!empty it.deployedArtifacts}">
+        <table style="margin-top: 1em; margin-left:1em;">
+            <t:summary icon="/plugin/pipeline-maven/images/48x48/maven-repository.png">
+                Last Deployed Artifacts
+                <ul>
+                    <j:forEach var="artifact" items="${it.deployedArtifacts}">
+                        <li>
+                            <a href="${artifact.url}">${artifact.fileName}</a>
+                        </li>
+                    </j:forEach>
+                </ul>
+            </t:summary>
+        </table>
+    </j:if>
+</j:jelly>
