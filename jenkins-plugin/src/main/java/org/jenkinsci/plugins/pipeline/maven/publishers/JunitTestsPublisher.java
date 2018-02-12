@@ -33,6 +33,7 @@ import hudson.model.TaskListener;
 import hudson.tasks.junit.JUnitResultArchiver;
 import hudson.tasks.junit.TestDataPublisher;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
@@ -204,7 +205,7 @@ public class JunitTestsPublisher extends MavenPublisher {
             Element pluginElt = XmlUtils.getUniqueChildElement(testEvent, "plugin");
             Element reportsDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "reportsDirectory");
             Element projectElt = XmlUtils.getUniqueChildElement(testEvent, "project");
-            MavenSpyLogProcessor.MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
+            MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
 
             MavenSpyLogProcessor.PluginInvocation pluginInvocation = XmlUtils.newPluginInvocation(pluginElt);
 

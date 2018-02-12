@@ -31,6 +31,7 @@ import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.maveninvoker.MavenInvokerRecorder;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
@@ -119,7 +120,7 @@ public class InvokerRunsPublisher extends MavenPublisher {
             Element reportsDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "reportsDirectory");
             Element cloneProjectsToElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "cloneProjectsTo");
             Element projectsDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "projectsDirectory");
-            MavenSpyLogProcessor.MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
+            MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
             MavenSpyLogProcessor.PluginInvocation pluginInvocation = XmlUtils.newPluginInvocation(pluginElt);
 
             String reportsDirectory = expandAndRelativize(reportsDirectoryElt, "reportsDirectory", testEvent, projectElt, workspace,listener);

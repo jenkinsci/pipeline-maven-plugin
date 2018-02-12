@@ -9,8 +9,8 @@ import hudson.model.TaskListener;
 import hudson.plugins.tasks.TasksPublisher;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
-import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -122,7 +122,7 @@ public class TasksScannerPublisher extends MavenPublisher {
                 continue;
             }
             Element projectElt = XmlUtils.getUniqueChildElement(executionEvent, "project");
-            MavenSpyLogProcessor.MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
+            MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
 
             String sourceDirectory = buildElement.getAttribute("sourceDirectory");
 

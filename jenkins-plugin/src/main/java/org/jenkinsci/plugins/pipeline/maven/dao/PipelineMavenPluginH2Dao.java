@@ -24,11 +24,13 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
+import edu.emory.mathcs.backport.java.util.Collections;
 import hudson.model.Item;
 import hudson.model.Run;
 import org.apache.commons.io.IOUtils;
 import org.h2.api.ErrorCode;
 import org.h2.jdbcx.JdbcConnectionPool;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
@@ -40,30 +42,22 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLType;
 import java.sql.Statement;
+import java.sql.Types;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
-
-import org.apache.commons.io.IOUtils;
-import org.h2.api.ErrorCode;
-import org.h2.jdbcx.JdbcConnectionPool;
-import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
-import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
-
-import hudson.model.Item;
-import hudson.model.Run;
+import javax.annotation.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -112,11 +106,11 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     }
 
     @Override
-    public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope, boolean ignoreUpstreamTriggers) {
+    public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope, boolean ignoreUpstreamTriggers, String classifier) {
         LOGGER.log(Level.FINE, "recordDependency({0}#{1}, {2}:{3}:{4}:{5}, {6}, ignoreUpstreamTriggers:{7}})",
                 new Object[]{jobFullName, buildNumber, groupId, artifactId, version, type, scope, ignoreUpstreamTriggers});
         long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
-        long artifactPrimaryKey = getOrCreateArtifactPrimaryKey(groupId, artifactId, version, type);
+        long artifactPrimaryKey = getOrCreateArtifactPrimaryKey(groupId, artifactId, version, type, classifier);
 
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             cnn.setAutoCommit(false);
@@ -138,7 +132,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         LOGGER.log(Level.FINE, "recordParentProject({0}#{1}, {2}:{3} ignoreUpstreamTriggers:{5}})",
                 new Object[]{jobFullName, buildNumber, parentGroupId, parentArtifactId, parentVersion, ignoreUpstreamTriggers});
         long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
-        long parentArtifactPrimaryKey = getOrCreateArtifactPrimaryKey(parentGroupId, parentArtifactId, parentVersion, "pom");
+        long parentArtifactPrimaryKey = getOrCreateArtifactPrimaryKey(parentGroupId, parentArtifactId, parentVersion, "pom", null);
 
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             cnn.setAutoCommit(false);
@@ -155,19 +149,21 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     }
 
     @Override
-    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion, boolean skipDownstreamTriggers) {
-        LOGGER.log(Level.FINE, "recordGeneratedArtifact({0}#{1}, {2}:{3}:{4}:{5}, version:{6}, skipDownstreamTriggers:{7})",
-                new Object[]{jobFullName, buildNumber, groupId, artifactId, baseVersion, type, version, skipDownstreamTriggers});
+    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion, String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier) {
+        LOGGER.log(Level.FINE, "recordGeneratedArtifact({0}#{1}, {2}:{3}:{4}:{5}, version:{6}, repositoryUrl:{7}, skipDownstreamTriggers:{8})",
+                new Object[]{jobFullName, buildNumber, groupId, artifactId, baseVersion, type, version, repositoryUrl, skipDownstreamTriggers});
         long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
-        long artifactPrimaryKey = getOrCreateArtifactPrimaryKey(groupId, artifactId, baseVersion, type);
+        long artifactPrimaryKey = getOrCreateArtifactPrimaryKey(groupId, artifactId, baseVersion, type, classifier);
 
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             cnn.setAutoCommit(false);
-            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO GENERATED_MAVEN_ARTIFACT(ARTIFACT_ID, BUILD_ID, VERSION, SKIP_DOWNSTREAM_TRIGGERS) VALUES (?, ?, ?, ?)")) {
+            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO GENERATED_MAVEN_ARTIFACT(ARTIFACT_ID, BUILD_ID, VERSION, REPOSITORY_URL, EXTENSION, SKIP_DOWNSTREAM_TRIGGERS) VALUES (?, ?, ?, ?, ?, ?)")) {
                 stmt.setLong(1, artifactPrimaryKey);
                 stmt.setLong(2, buildPrimaryKey);
                 stmt.setString(3, version);
-                stmt.setBoolean(4, skipDownstreamTriggers);
+                stmt.setString(4, repositoryUrl);
+                stmt.setString(5, extension);
+                stmt.setBoolean(6, skipDownstreamTriggers);
                 stmt.execute();
             }
             cnn.commit();
@@ -315,29 +311,49 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         }
     }
 
-    protected long getOrCreateArtifactPrimaryKey(String groupId, String artifactId, String version, String type) {
+    protected long getOrCreateArtifactPrimaryKey(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull  String version, @Nonnull String type, @Nullable String classifier) {
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             cnn.setAutoCommit(false);
             // get or create build record
             Long artifactPrimaryKey = null;
-            try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM MAVEN_ARTIFACT WHERE GROUP_ID = ? AND ARTIFACT_ID = ? AND VERSION = ? AND TYPE = ?")) {
-                stmt.setString(1, groupId);
-                stmt.setString(2, artifactId);
-                stmt.setString(3, version);
-                stmt.setString(4, type);
-
-                try (ResultSet rst = stmt.executeQuery()) {
-                    if (rst.next()) {
-                        artifactPrimaryKey = rst.getLong(1);
-                    }
-                }
-            }
-            if (artifactPrimaryKey == null) {
-                try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO MAVEN_ARTIFACT(GROUP_ID, ARTIFACT_ID, VERSION, TYPE) VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            if (classifier == null) {
+                // For an unknown reason, "where classifier = null" does not work as expected when "where classifier is null" does
+                try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM MAVEN_ARTIFACT WHERE GROUP_ID = ? AND ARTIFACT_ID = ? AND VERSION = ? AND TYPE = ? AND CLASSIFIER is NULL")) {
                     stmt.setString(1, groupId);
                     stmt.setString(2, artifactId);
                     stmt.setString(3, version);
                     stmt.setString(4, type);
+
+                    try (ResultSet rst = stmt.executeQuery()) {
+                        if (rst.next()) {
+                            artifactPrimaryKey = rst.getLong(1);
+                        }
+                    }
+                }
+            } else {
+                try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM MAVEN_ARTIFACT WHERE GROUP_ID = ? AND ARTIFACT_ID = ? AND VERSION = ? AND TYPE = ? AND CLASSIFIER = ?")) {
+                    stmt.setString(1, groupId);
+                    stmt.setString(2, artifactId);
+                    stmt.setString(3, version);
+                    stmt.setString(4, type);
+                    stmt.setString(5, classifier);
+
+                    try (ResultSet rst = stmt.executeQuery()) {
+                        if (rst.next()) {
+                            artifactPrimaryKey = rst.getLong(1);
+                        }
+                    }
+                }
+            }
+
+            if (artifactPrimaryKey == null) {
+                try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO MAVEN_ARTIFACT(GROUP_ID, ARTIFACT_ID, VERSION, TYPE, CLASSIFIER) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+                    stmt.setString(1, groupId);
+                    stmt.setString(2, artifactId);
+                    stmt.setString(3, version);
+                    stmt.setString(4, type);
+                    stmt.setString(5, classifier);
+
                     stmt.execute();
                     try (ResultSet rst = stmt.getGeneratedKeys()) {
                         if (rst.next()) {
@@ -652,7 +668,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
      * @return list of artifact details stored as maps ("gav", "type", "skip_downstream_triggers")
      */
     @Nonnull
-    public List<Map<String, String>> getGeneratedArtifacts(@Nonnull String jobFullName, @Nonnull int buildNumber) {
+    public List<MavenArtifact> getGeneratedArtifacts(@Nonnull String jobFullName, @Nonnull int buildNumber) {
         LOGGER.log(Level.FINER, "getGeneratedArtifacts({0}, {1})", new Object[]{jobFullName, buildNumber});
         String generatedArtifactsSql = "SELECT DISTINCT MAVEN_ARTIFACT.*,  GENERATED_MAVEN_ARTIFACT.* " +
                 " FROM MAVEN_ARTIFACT " +
@@ -663,22 +679,27 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 "   UPSTREAM_JOB.FULL_NAME = ? AND" +
                 "   UPSTREAM_BUILD.NUMBER = ? ";
 
-        List<Map<String, String>> results = new ArrayList<>();
+        List<MavenArtifact> results = new ArrayList<>();
         try (Connection cnn = this.jdbcConnectionPool.getConnection()) {
             try (PreparedStatement stmt = cnn.prepareStatement(generatedArtifactsSql)) {
                 stmt.setString(1, jobFullName);
                 stmt.setInt(2, buildNumber);
                 try (ResultSet rst = stmt.executeQuery()) {
                     while (rst.next()) {
-                        Map<String, String> artifact = new HashMap<>();
+                        MavenArtifact artifact = new MavenArtifact();
 
-                        String gav =
-                                rst.getString("maven_artifact.group_id") + ":" +
-                                        rst.getString("maven_artifact.artifact_id") + ":" +
-                                        rst.getString("maven_artifact.version");
-                        artifact.put("gav", gav);
-                        artifact.put("type", rst.getString("maven_artifact.type"));
-                        artifact.put("skip_downstream_triggers", rst.getString("generated_maven_artifact.skip_downstream_triggers"));
+                        artifact.groupId = rst.getString("maven_artifact.group_id");
+                        artifact.artifactId = rst.getString("maven_artifact.artifact_id");
+                        artifact.version = rst.getString("maven_artifact.version");
+                        artifact.type = rst.getString("maven_artifact.type");
+                        artifact.classifier = rst.getString("maven_artifact.classifier");
+
+                        artifact.baseVersion = rst.getString("generated_maven_artifact.version");
+                        artifact.repositoryUrl = rst.getString("generated_maven_artifact.repository_url");
+                        artifact.extension = rst.getString("generated_maven_artifact.extension");
+                        artifact.snapshot = artifact.version.endsWith("-SNAPSHOT");
+
+                        // artifact.put("skip_downstream_triggers", rst.getString("generated_maven_artifact.skip_downstream_triggers"));
                         results.add(artifact);
                     }
                 }
@@ -687,6 +708,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
             throw new RuntimeSqlException(e);
         }
 
+        Collections.sort(results);
         return results;
     }
 

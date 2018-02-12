@@ -1,46 +1,43 @@
-<mavenExecution _time="2017-09-27 13:49:38.561">
-    <context _time="2017-09-27 13:49:38.572">
+<mavenExecution _time="2018-02-11 17:13:17.65">
+    <context _time="2018-02-11 17:13:17.658">
         <systemProperties/>
         <versionProperties/>
         <workingDirectory/>
         <userProperties/>
         <plexus/>
     </context>
-    <!-- 2017-09-27 13:49:38.575 - new File(.):                                 -->
-    <!-- /path/to/my-jar                       -->
-
-    <DefaultSettingsBuildingRequest class="org.apache.maven.settings.building.DefaultSettingsBuildingRequest" _time="2017-09-27 13:49:38.902">
+    <DefaultSettingsBuildingRequest class="org.apache.maven.settings.building.DefaultSettingsBuildingRequest" _time="2018-02-11 17:13:17.841">
         <userSettingsFile>/path/to/.m2/settings.xml</userSettingsFile>
-        <globalSettings>/usr/local/Cellar/maven/3.5.0/libexec/conf/settings.xml</globalSettings>
+        <globalSettings>/path/to/maven/conf/settings.xml</globalSettings>
     </DefaultSettingsBuildingRequest>
-    <MavenExecutionRequest class="org.apache.maven.execution.DefaultMavenExecutionRequest" _time="2017-09-27 13:49:39.057">
+    <MavenExecutionRequest class="org.apache.maven.execution.DefaultMavenExecutionRequest" _time="2018-02-11 17:13:17.892">
         <pom>/path/to/my-jar/pom.xml</pom>
-        <globalSettingsFile>/usr/local/Cellar/maven/3.5.0/libexec/conf/settings.xml</globalSettingsFile>
+        <globalSettingsFile>/path/to/maven/conf/settings.xml</globalSettingsFile>
         <userSettingsFile>/path/to/.m2/settings.xml</userSettingsFile>
         <baseDirectory>/path/to/my-jar</baseDirectory>
     </MavenExecutionRequest>
-    <ExecutionEvent type="ProjectDiscoveryStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:39.681">
+    <ExecutionEvent type="ProjectDiscoveryStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:18.191">
         <project/>
         <no-execution-found/>
     </ExecutionEvent>
-    <ExecutionEvent type="SessionStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:40.015">
+    <ExecutionEvent type="SessionStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:18.257">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <no-execution-found/>
     </ExecutionEvent>
-    <ExecutionEvent type="ProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:40.038">
+    <ExecutionEvent type="ProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:18.263">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <no-execution-found/>
     </ExecutionEvent>
-    <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest" _time="2017-09-27 13:49:40.435">
+    <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest" _time="2018-02-11 17:13:18.423">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
     </DependencyResolutionRequest>
-    <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult" _time="2017-09-27 13:49:40.527">
+    <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult" _time="2018-02-11 17:13:18.448">
         <resolvedDependencies>
             <dependency extension="jar" baseVersion="4.12" groupId="junit" scope="test" name="junit-4.12.jar" classifier="" artifactId="junit" optional="false" id="junit" type="jar" version="4.12" snapshot="false">
                 <file>/path/to/.m2/repository/junit/junit/4.12/junit-4.12.jar</file>
@@ -50,7 +47,7 @@
             </dependency>
         </resolvedDependencies>
     </DependencyResolutionResult>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:40.528">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:18.449">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -70,7 +67,7 @@
             <useDefaultDelimiters>true</useDefaultDelimiters>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:41.078">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:18.678">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -90,7 +87,7 @@
             <useDefaultDelimiters>true</useDefaultDelimiters>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:41.08">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:18.679">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -129,7 +126,7 @@
             <session>${session}</session>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:41.815">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:19.502">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -168,7 +165,7 @@
             <session>${session}</session>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:41.816">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:19.503">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -189,7 +186,7 @@
             <useDefaultDelimiters>true</useDefaultDelimiters>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:41.819">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:19.507">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -210,7 +207,7 @@
             <useDefaultDelimiters>true</useDefaultDelimiters>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:41.819">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:19.508">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -250,7 +247,7 @@
             <session>${session}</session>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:41.826">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:19.558">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -290,7 +287,7 @@
             <session>${session}</session>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:41.827">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:19.558">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -344,7 +341,7 @@
             <session>${session}</session>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:42.992">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:20.185">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -352,7 +349,7 @@
             <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:42.993">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:20.186">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -368,7 +365,7 @@
             <useDefaultManifestFile>${jar.useDefaultManifestFile}</useDefaultManifestFile>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:43.312">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:20.409">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -377,7 +374,7 @@
             <outputDirectory>${project.build.directory}</outputDirectory>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:43.313">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:20.409">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -392,7 +389,7 @@
             <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:43.393">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:20.492">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -407,7 +404,7 @@
             <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:43.394">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:20.492">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -429,7 +426,15 @@
             <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:44.325">
+    <RepositoryEvent type="ARTIFACT_DEPLOYED" class="org.eclipse.aether.RepositoryEvent" _time="2018-02-11 17:13:22.61">
+        <artifact extension="jar" file="/path/to/my-jar/target/my-jar-0.3-SNAPSHOT.jar" baseVersion="0.3-SNAPSHOT" groupId="com.example" classifier="" artifactId="my-jar" id="com.example:my-jar:jar:0.3-20180211.161321-20" version="0.3-20180211.161321-20" snapshot="true"/>
+        <repository layout="default" id="nexus.beescloud.com" url="https://nexus.beescloud.com/content/repositories/snapshots/"/>
+    </RepositoryEvent>
+    <RepositoryEvent type="ARTIFACT_DEPLOYED" class="org.eclipse.aether.RepositoryEvent" _time="2018-02-11 17:13:24.021">
+        <artifact extension="pom" file="/path/to/my-jar/pom.xml" baseVersion="0.3-SNAPSHOT" groupId="com.example" classifier="" artifactId="my-jar" id="com.example:my-jar:pom:0.3-20180211.161321-20" version="0.3-20180211.161321-20" snapshot="true"/>
+        <repository layout="default" id="nexus.beescloud.com" url="https://nexus.beescloud.com/content/repositories/snapshots/"/>
+    </RepositoryEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:27.218">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
@@ -451,28 +456,27 @@
             <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
         </plugin>
         <artifactRepository>
-            <id>nexus.local</id>
-            <url>http://localhost:8081/nexus/content/repositories/snapshots/</url>
+            <id>nexus.beescloud.com</id>
+            <url>https://nexus.beescloud.com/content/repositories/snapshots/</url>
         </artifactRepository>
     </ExecutionEvent>
-    <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-27 13:49:44.326">
+    <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:27.219">
         <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <no-execution-found/>
-        <artifact extension="jar" baseVersion="0.3-SNAPSHOT" groupId="com.example" artifactId="my-jar" id="com.example:my-jar:jar:0.3-SNAPSHOT" type="jar" version="0.3-20170927.114943-11" snapshot="true">
+        <artifact extension="jar" baseVersion="0.3-SNAPSHOT" groupId="com.example" artifactId="my-jar" id="com.example:my-jar:jar:0.3-SNAPSHOT" type="jar" version="0.3-20180211.161321-20" snapshot="true">
             <file>/path/to/my-jar/target/my-jar-0.3-SNAPSHOT.jar</file>
         </artifact>
         <attachedArtifacts/>
     </ExecutionEvent>
-    <MavenExecutionResult class="org.apache.maven.execution.DefaultMavenExecutionResult" _time="2017-09-27 13:49:44.528">
-        <buildSummary baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" time="4290" version="0.3-SNAPSHOT" class="org.apache.maven.execution.BuildSuccess">
+    <MavenExecutionResult class="org.apache.maven.execution.DefaultMavenExecutionResult" _time="2018-02-11 17:13:27.385">
+        <buildSummary baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" time="8955" version="0.3-SNAPSHOT" class="org.apache.maven.execution.BuildSuccess">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </buildSummary>
     </MavenExecutionResult>
-    <!-- 2017-09-27 13:49:44.529 - close:                                       -->
-    <!-- ignored:[org.eclipse.aether.RepositoryEvent,                           -->
-    <!-- org.apache.maven.settings.building.DefaultSettingsBuildingResult],     -->
+    <!-- 2018-02-11 17:13:27.385 - close:                                       -->
+    <!-- ignored:[org.apache.maven.settings.building.DefaultSettingsBuildingResult], -->
     <!-- blackListed: []                                                        -->
 
 </mavenExecution>

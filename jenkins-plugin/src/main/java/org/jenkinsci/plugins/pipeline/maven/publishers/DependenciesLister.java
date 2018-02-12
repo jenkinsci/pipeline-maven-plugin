@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.w3c.dom.Element;
@@ -21,7 +22,7 @@ public class DependenciesLister {
 
     /**
      * @param mavenSpyLogs Root XML element
-     * @return list of {@link MavenSpyLogProcessor.MavenArtifact}
+     * @return list of {@link MavenArtifact}
      */
     @Nonnull
     public static List<MavenSpyLogProcessor.MavenDependency> listDependencies(final Element mavenSpyLogs,
@@ -61,13 +62,13 @@ public class DependenciesLister {
 
     /**
      * @param mavenSpyLogs Root XML element
-     * @return list of {@link MavenSpyLogProcessor.MavenArtifact}
+     * @return list of {@link MavenArtifact}
      */
     @Nonnull
-    public static List<MavenSpyLogProcessor.MavenArtifact> listParentProjects(final Element mavenSpyLogs,
-                                                                              final Logger logger) {
+    public static List<MavenArtifact> listParentProjects(final Element mavenSpyLogs,
+                                                         final Logger logger) {
 
-        final List<MavenSpyLogProcessor.MavenArtifact> result = new ArrayList<>();
+        final List<MavenArtifact> result = new ArrayList<>();
 
         for (final Element dependencyResolutionResult : XmlUtils.getExecutionEvents(mavenSpyLogs,
                 "ProjectStarted")) {
@@ -77,7 +78,7 @@ public class DependenciesLister {
             if (parentProjectElt == null) {
                 continue;
             }
-            final MavenSpyLogProcessor.MavenArtifact parentProject = new MavenSpyLogProcessor.MavenArtifact();
+            final MavenArtifact parentProject = new MavenArtifact();
 
             parentProject.groupId = parentProjectElt.getAttribute("groupId");
             parentProject.artifactId = parentProjectElt.getAttribute("artifactId");

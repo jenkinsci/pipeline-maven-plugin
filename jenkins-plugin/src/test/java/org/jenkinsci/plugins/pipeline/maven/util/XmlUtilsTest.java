@@ -260,4 +260,18 @@ public class XmlUtilsTest {
         System.out.println(executedLifecyclePhases);
         Assert.assertThat(executedLifecyclePhases, Matchers.contains("process-resources", "compile", "process-test-resources", "test-compile", "test", "package"));
     }
+
+
+    @Test
+    public void test_getArtifactDeployedEvent() throws Exception {
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
+        in.getClass(); // check non null
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+        List<Element> artifactDeployedEvents = XmlUtils.getArtifactDeployedEvents(mavenSpyLogs);
+        Assert.assertThat(artifactDeployedEvents.size(), Matchers.is(2));
+
+        Element artifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, "/path/to/my-jar/target/my-jar-0.3-SNAPSHOT.jar");
+        String repositoryUrl = XmlUtils.getUniqueChildElement(artifactDeployedEvent, "repository").getAttribute("url");
+        Assert.assertThat(repositoryUrl, Matchers.is("https://nexus.beescloud.com/content/repositories/snapshots/"));
+    }
 }
