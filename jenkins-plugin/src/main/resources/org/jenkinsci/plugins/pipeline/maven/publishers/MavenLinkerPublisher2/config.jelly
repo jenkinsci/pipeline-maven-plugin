@@ -26,6 +26,9 @@ THE SOFTWARE.
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
          xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 
+    <f:entry title="Note" >
+        Don't forget to enable the "Downstream Pipeline Triggers" publisher to enable the "Maven Linker" publisher.
+    </f:entry>
     <st:include page="maven-publisher" class="${descriptor.clazz}"/>
 
 </j:jelly>
