@@ -38,7 +38,12 @@ public class MavenLinkerPublisher2 extends MavenPublisher {
     @Override
     public void process(StepContext context, Element mavenSpyLogsElt) throws IOException, InterruptedException {
         Run<?, ?> run = context.get(Run.class);
-        run.addAction(new MavenReport(run));
+        MavenReport mavenReport = run.getAction(MavenReport.class);
+        if (mavenReport == null) {
+            run.addAction(new MavenReport(run));
+        } else {
+            // nothing to do, MavenReport action is already registered
+        }
     }
 
     @Extension
