@@ -32,6 +32,7 @@ import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.plugins.findbugs.FindBugsPublisher;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
@@ -198,7 +199,7 @@ public class FindbugsAnalysisPublisher extends MavenPublisher {
             Element pluginElt = XmlUtils.getUniqueChildElement(findBugsTestEvent, "plugin");
             Element xmlOutputDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "xmlOutputDirectory");
             Element projectElt = XmlUtils.getUniqueChildElement(findBugsTestEvent, "project");
-            MavenSpyLogProcessor.MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
+            MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
             MavenSpyLogProcessor.PluginInvocation pluginInvocation = XmlUtils.newPluginInvocation(pluginElt);
 
             if (xmlOutputDirectoryElt == null) {

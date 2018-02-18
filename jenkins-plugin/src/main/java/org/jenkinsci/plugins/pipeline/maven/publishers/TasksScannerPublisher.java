@@ -9,8 +9,8 @@ import hudson.model.TaskListener;
 import hudson.plugins.tasks.TasksPublisher;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
-import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -121,9 +122,16 @@ public class TasksScannerPublisher extends MavenPublisher {
                 continue;
             }
             Element projectElt = XmlUtils.getUniqueChildElement(executionEvent, "project");
-            MavenSpyLogProcessor.MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
+            MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
 
             String sourceDirectory = buildElement.getAttribute("sourceDirectory");
+
+            // JENKINS-44359
+            if (Objects.equals(sourceDirectory, "${project.basedir}/src/main/java")) {
+                if (LOGGER.isLoggable(Level.FINE))
+                    LOGGER.log(Level.FINE, "Skip task scanning for " + XmlUtils.toString(executionEvent));
+                continue;
+            }
 
             String sourceDirectoryRelativePath = XmlUtils.getPathInWorkspace(sourceDirectory, workspace);
 
@@ -133,6 +141,13 @@ public class TasksScannerPublisher extends MavenPublisher {
             } else {
                 LOGGER.log(Level.FINE, "Skip task scanning for {0}, folder {1} does not exist", new Object[]{mavenArtifact, sourceDirectoryRelativePath});
             }
+        }
+
+        if (sourceDirectoriesPatterns.isEmpty()) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                listener.getLogger().println("[withMaven] openTasksPublisher - no folder to scan");
+            }
+            return;
         }
 
         TasksPublisher tasksPublisher = new TasksPublisher();

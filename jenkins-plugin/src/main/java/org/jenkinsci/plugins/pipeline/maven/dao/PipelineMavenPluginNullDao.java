@@ -24,6 +24,8 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +37,7 @@ import javax.annotation.Nonnull;
  */
 public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     @Override
-    public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope, boolean ignoreUpstreamTriggers) {
+    public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope, boolean ignoreUpstreamTriggers, String classifier) {
 
     }
 
@@ -45,7 +47,7 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     }
 
     @Override
-    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion, boolean skipDownstreamTriggers) {
+    public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion, String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier) {
 
     }
 
@@ -85,6 +87,12 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     @Override
     public void cleanup() {
 
+    }
+
+    @Nonnull
+    @Override
+    public List<MavenArtifact> getGeneratedArtifacts(@Nonnull String jobFullName, int buildNumber) {
+        return Collections.emptyList();
     }
 
     @Override
