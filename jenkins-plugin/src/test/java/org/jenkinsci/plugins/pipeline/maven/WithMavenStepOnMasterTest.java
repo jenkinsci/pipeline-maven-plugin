@@ -42,7 +42,6 @@ import hudson.model.Fingerprint;
 import hudson.model.Result;
 import hudson.plugins.tasks.TasksResultAction;
 import hudson.tasks.Fingerprinter;
-import hudson.tasks.junit.pipeline.JUnitResultsStepTest;
 import hudson.tasks.junit.TestResultAction;
 import jenkins.mvn.FilePathGlobalSettingsProvider;
 import jenkins.mvn.FilePathSettingsProvider;
@@ -965,10 +964,13 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         assertThat(testResultAction.getTotalCount(), is(6));
         assertThat(testResultAction.getFailCount(), is(0));
 
+        /*
+        TODO enable test below when we can bump the junit-plugin to version 1.23+
         JUnitResultsStepTest.assertStageResults(build, 4, 6, "first");
 
         JUnitResultsStepTest.assertBranchResults(build, 2, 3, "a", "first");
         JUnitResultsStepTest.assertBranchResults(build, 2, 3, "b", "first");
+        */
     }
 
 }

@@ -76,7 +76,10 @@
     <jenkins.version>2.46.3</jenkins.version>
     <scm-api-plugin.version>2.1.1</scm-api-plugin.version>
     <git-plugin.version>3.3.0</git-plugin.version>
-    <junit-plugin.version>1.23</junit-plugin.version>
+    <!--
+    stick to junit 1.20 clarifying the impact of the introduction of the dependencies
+    workflow-step-api or workflow-api-->
+    <junit-plugin.version>1.20</junit-plugin.version>
     <java.level>7</java.level>
   </properties>
   <dependencies>
@@ -150,6 +153,7 @@
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
+    <!--
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>junit</artifactId>
@@ -157,6 +161,7 @@
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
+    -->
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>junit-attachments</artifactId>
