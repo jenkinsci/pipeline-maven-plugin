@@ -23,6 +23,8 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
+import hudson.model.Fingerprint;
+import hudson.model.FingerprintMap;
 import hudson.model.Node;
 import hudson.model.Result;
 import hudson.plugins.sshslaves.SSHLauncher;
@@ -51,6 +53,11 @@ import org.jvnet.hudson.test.JenkinsRule;
 
 import java.io.File;
 import java.util.Collections;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 public class WithMavenStepTest extends AbstractIntegrationTest {
 
@@ -81,5 +88,26 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun b = jenkinsRule.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
         jenkinsRule.assertLogNotContains(secret, b);
+    }
+
+    @Test
+    public void disable_all_publishers() throws Exception
+    {
+
+        loadMonoDependencyMavenProjectInGitRepo( this.gitRepoRule );
+
+        String pipelineScript = "node('master') {\n" + "    git($/" + gitRepoRule.toString() + "/$)\n"
+            + "    withMaven(disableAllPublishers:true) {\n"
+            + "        sh 'mvn package'\n" + "    }\n" + "}";
+
+        String commonsLang3version35Md5 = "780b5a8b72eebe6d0dbff1c11b5658fa";
+        WorkflowJob firstPipeline = jenkinsRule.createProject(WorkflowJob.class, "disable-all-publishers");
+        firstPipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, firstPipeline.scheduleBuild2(0));
+        FingerprintMap fingerprintMap = jenkinsRule.jenkins.getFingerprintMap();
+        Fingerprint fingerprint = fingerprintMap.get(commonsLang3version35Md5);
+        assertThat( fingerprint, nullValue() );
+
+
     }
 }

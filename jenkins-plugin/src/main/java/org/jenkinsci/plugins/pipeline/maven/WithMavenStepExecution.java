@@ -221,7 +221,9 @@ class WithMavenStepExecution extends StepExecution {
 
         LOGGER.log(Level.FINEST, "envOverride: {0}", envOverride); // JENKINS-40484
 
-        body = getContext().newBodyInvoker().withContexts(envEx, newFilter).withCallback(new WorkspaceCleanupCallback(tempBinDir, step.getOptions())).start();
+        body = getContext().newBodyInvoker().withContexts(envEx, newFilter) //
+            .withCallback(new WorkspaceCleanupCallback(tempBinDir, step.getOptions(), step.isDisableAllPublishers())) //
+            .start();
 
         return false;
     }
@@ -1005,14 +1007,21 @@ class WithMavenStepExecution extends StepExecution {
 
         private final MavenSpyLogProcessor mavenSpyLogProcessor = new MavenSpyLogProcessor();
 
-        public WorkspaceCleanupCallback(@Nonnull FilePath tempBinDir, @Nonnull List<MavenPublisher> options) {
+        private final boolean disableAllPublishers;
+
+        public WorkspaceCleanupCallback(@Nonnull FilePath tempBinDir, @Nonnull List<MavenPublisher> options, boolean disableAllPublishers) {
             this.tempBinDir = tempBinDir;
             this.options = options;
+            this.disableAllPublishers = disableAllPublishers;
         }
 
         @Override
         protected void finished(StepContext context) throws Exception {
-            mavenSpyLogProcessor.processMavenSpyLogs(context, tempBinDir, options);
+            mavenSpyLogProcessor.processMavenSpyLogs( new MavenSpyLogProcessor.Request() //
+                                                          .context(context) //
+                                                          .mavenSpyLogFolder(tempBinDir) //
+                                                          .options(options) //
+                                                          .disableAllPublishers(disableAllPublishers));
 
             try {
                 tempBinDir.deleteRecursive();
