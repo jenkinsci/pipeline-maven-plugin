@@ -252,6 +252,10 @@ public class MavenSpyLogProcessor implements Serializable {
         }
     }
 
+    /**
+     * convenient class to pass all parameters 
+     * @since 3.3.3
+     */
     public static class Request {
         public StepContext context;
         public FilePath mavenSpyLogFolder;

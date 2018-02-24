@@ -75,6 +75,10 @@ public class WithMavenStep extends Step {
     private String jdk;
     private String mavenLocalRepo = "";
     private List<MavenPublisher> options = new ArrayList<>();
+
+    /**
+     * @since 3.3.3
+     */
     private boolean disableAllPublishers = false;
 
     @DataBoundConstructor
