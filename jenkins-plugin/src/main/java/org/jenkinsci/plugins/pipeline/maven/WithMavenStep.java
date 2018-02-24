@@ -76,6 +76,11 @@ public class WithMavenStep extends Step {
     private String mavenLocalRepo = "";
     private List<MavenPublisher> options = new ArrayList<>();
 
+    /**
+     * @since 3.3.3
+     */
+    private boolean disableAllPublishers = false;
+
     @DataBoundConstructor
     public WithMavenStep() {
     }
@@ -172,6 +177,15 @@ public class WithMavenStep extends Step {
     @DataBoundSetter
     public void setOptions(List<MavenPublisher> options) {
         this.options = options;
+    }
+
+    public boolean isDisableAllPublishers() {
+        return disableAllPublishers;
+    }
+
+    @DataBoundSetter
+    public void setDisableAllPublishers( boolean disableAllPublishers ) {
+        this.disableAllPublishers = disableAllPublishers;
     }
 
     @Override
