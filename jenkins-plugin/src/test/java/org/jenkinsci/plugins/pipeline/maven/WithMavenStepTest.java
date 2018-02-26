@@ -23,6 +23,8 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
+import hudson.model.Fingerprint;
+import hudson.model.FingerprintMap;
 import hudson.model.Node;
 import hudson.model.Result;
 import hudson.plugins.sshslaves.SSHLauncher;
@@ -35,11 +37,13 @@ import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.plugins.git.GitSampleRepoRule;
 import org.apache.commons.io.FileUtils;
+import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.docker.JavaGitContainer;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.test.acceptance.docker.DockerRule;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -81,5 +85,25 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun b = jenkinsRule.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
         jenkinsRule.assertLogNotContains(secret, b);
+    }
+
+    @Test
+    public void disable_all_publishers() throws Exception {
+
+        loadMonoDependencyMavenProjectInGitRepo( this.gitRepoRule );
+
+        String pipelineScript = "node('master') {\n" + "    git($/" + gitRepoRule.toString() + "/$)\n"
+                + "    withMaven(publisherStrategy: 'EXPLICIT') {\n"
+                + "        sh 'mvn package'\n"
+                + "    }\n"
+                + "}";
+
+        String commonsLang3version35Md5 = "780b5a8b72eebe6d0dbff1c11b5658fa";
+        WorkflowJob firstPipeline = jenkinsRule.createProject(WorkflowJob.class, "disable-all-publishers");
+        firstPipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        jenkinsRule.assertBuildStatus(Result.SUCCESS, firstPipeline.scheduleBuild2(0));
+        FingerprintMap fingerprintMap = jenkinsRule.jenkins.getFingerprintMap();
+        Fingerprint fingerprint = fingerprintMap.get(commonsLang3version35Md5);
+        Assert.assertThat( fingerprint, Matchers.nullValue() );
     }
 }

@@ -28,7 +28,7 @@ import java.util.Map;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class MavenPublisherTest {
+public class MavenPublisherStrategyTest {
 
     @Rule
     public JenkinsRule jenkinsRule = new JenkinsRule();
@@ -37,7 +37,7 @@ public class MavenPublisherTest {
     public void listMavenPublishers() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        List<MavenPublisher> mavenPublishers = MavenPublisher.buildPublishersList(Collections.<MavenPublisher>emptyList(), new StreamTaskListener(baos));
+        List<MavenPublisher> mavenPublishers = MavenPublisherStrategy.IMPLICIT.buildPublishersList(Collections.<MavenPublisher>emptyList(), new StreamTaskListener(baos));
         Assert.assertThat(mavenPublishers.size(), CoreMatchers.is(10));
 
         Map<String, MavenPublisher> reportersByDescriptorId = new HashMap<>();

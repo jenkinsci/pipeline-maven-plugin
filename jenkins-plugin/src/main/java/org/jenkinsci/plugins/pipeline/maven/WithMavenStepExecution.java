@@ -221,7 +221,7 @@ class WithMavenStepExecution extends StepExecution {
 
         LOGGER.log(Level.FINEST, "envOverride: {0}", envOverride); // JENKINS-40484
 
-        body = getContext().newBodyInvoker().withContexts(envEx, newFilter).withCallback(new WorkspaceCleanupCallback(tempBinDir, step.getOptions())).start();
+        body = getContext().newBodyInvoker().withContexts(envEx, newFilter).withCallback(new WithMavenStepExecutionCallBack(tempBinDir, step.getOptions(), step.getPublisherStrategy())).start();
 
         return false;
     }
@@ -998,21 +998,25 @@ class WithMavenStepExecution extends StepExecution {
     /**
      * Callback to cleanup tmp script after finishing the job
      */
-    private static class WorkspaceCleanupCallback extends BodyExecutionCallback.TailCall {
+    private static class WithMavenStepExecutionCallBack extends BodyExecutionCallback.TailCall {
         private final FilePath tempBinDir;
+
+        private final MavenPublisherStrategy mavenPublisherStrategy;
 
         private final List<MavenPublisher> options;
 
         private final MavenSpyLogProcessor mavenSpyLogProcessor = new MavenSpyLogProcessor();
 
-        public WorkspaceCleanupCallback(@Nonnull FilePath tempBinDir, @Nonnull List<MavenPublisher> options) {
+        public WithMavenStepExecutionCallBack(@Nonnull FilePath tempBinDir, @Nonnull List<MavenPublisher> options,
+                                              @Nonnull MavenPublisherStrategy mavenPublisherStrategy) {
             this.tempBinDir = tempBinDir;
             this.options = options;
+            this.mavenPublisherStrategy = mavenPublisherStrategy;
         }
 
         @Override
         protected void finished(StepContext context) throws Exception {
-            mavenSpyLogProcessor.processMavenSpyLogs(context, tempBinDir, options);
+            mavenSpyLogProcessor.processMavenSpyLogs(context, tempBinDir, options, mavenPublisherStrategy);
 
             try {
                 tempBinDir.deleteRecursive();

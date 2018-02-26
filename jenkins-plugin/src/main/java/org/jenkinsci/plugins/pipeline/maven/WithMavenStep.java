@@ -75,6 +75,7 @@ public class WithMavenStep extends Step {
     private String jdk;
     private String mavenLocalRepo = "";
     private List<MavenPublisher> options = new ArrayList<>();
+    private MavenPublisherStrategy publisherStrategy = MavenPublisherStrategy.IMPLICIT;
 
     @DataBoundConstructor
     public WithMavenStep() {
@@ -151,6 +152,15 @@ public class WithMavenStep extends Step {
     @DataBoundSetter
     public void setMavenLocalRepo(String mavenLocalRepo) {
         this.mavenLocalRepo = mavenLocalRepo;
+    }
+
+    public MavenPublisherStrategy getPublisherStrategy() {
+        return publisherStrategy;
+    }
+
+    @DataBoundSetter
+    public void setPublisherStrategy(MavenPublisherStrategy publisherStrategy) {
+        this.publisherStrategy = publisherStrategy;
     }
 
     public List<MavenPublisher> getOptions() {
@@ -251,6 +261,15 @@ public class WithMavenStep extends Step {
             r.add("--- Use system default settings or file path ---",null);
             for (Config config : ConfigFiles.getConfigsInContext(context, GlobalMavenSettingsConfigProvider.class)) {
                 r.add(config.name, config.id);
+            }
+            return r;
+        }
+
+        @Restricted(NoExternalUse.class) // Only for UI calls
+        public ListBoxModel doFillPublisherStrategyItems(@AncestorInPath ItemGroup context) {
+            ListBoxModel r = new ListBoxModel();
+            for(MavenPublisherStrategy publisherStrategy: MavenPublisherStrategy.values()) {
+                r.add(publisherStrategy.getDescription(), publisherStrategy.name());
             }
             return r;
         }

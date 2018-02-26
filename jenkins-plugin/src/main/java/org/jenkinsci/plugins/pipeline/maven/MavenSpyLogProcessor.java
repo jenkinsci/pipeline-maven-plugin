@@ -59,7 +59,8 @@ public class MavenSpyLogProcessor implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(MavenSpyLogProcessor.class.getName());
 
-    public void processMavenSpyLogs(StepContext context, FilePath mavenSpyLogFolder, List<MavenPublisher> options) throws IOException, InterruptedException {
+    public void processMavenSpyLogs(@Nonnull StepContext context, @Nonnull FilePath mavenSpyLogFolder, @Nonnull List<MavenPublisher> options,
+                                    @Nonnull MavenPublisherStrategy publisherStrategy) throws IOException, InterruptedException {
         FilePath[] mavenSpyLogsList = mavenSpyLogFolder.list("maven-spy-*.log");
         LOGGER.log(Level.FINE, "Found {0} maven execution reports in {1}", new Object[]{mavenSpyLogsList.length, mavenSpyLogFolder});
 
@@ -80,7 +81,7 @@ public class MavenSpyLogProcessor implements Serializable {
         for (FilePath mavenSpyLogs : mavenSpyLogsList) {
             try {
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    listener.getLogger().println("[withMaven]  Evaluate Maven Spy logs: " + mavenSpyLogs.getRemote());
+                    listener.getLogger().println("[withMaven] Evaluate Maven Spy logs: " + mavenSpyLogs.getRemote());
                 }
                 InputStream mavenSpyLogsInputStream = mavenSpyLogs.read();
                 if (mavenSpyLogsInputStream == null) {
@@ -95,7 +96,10 @@ public class MavenSpyLogProcessor implements Serializable {
 
                 Element mavenSpyLogsElt = documentBuilder.parse(mavenSpyLogsInputStream).getDocumentElement();
 
-                List<MavenPublisher> mavenPublishers = MavenPublisher.buildPublishersList(options, listener);
+                if (LOGGER.isLoggable(Level.FINE)){
+                    listener.getLogger().println("[withMaven] Maven Publisher Strategy: " + publisherStrategy.getDescription());
+                }
+                List<MavenPublisher> mavenPublishers = publisherStrategy.buildPublishersList(options, listener);
                 for (MavenPublisher mavenPublisher : mavenPublishers) {
                     String skipFileName = mavenPublisher.getDescriptor().getSkipFileName();
                     if (Boolean.TRUE.equals(mavenPublisher.isDisabled())) {
