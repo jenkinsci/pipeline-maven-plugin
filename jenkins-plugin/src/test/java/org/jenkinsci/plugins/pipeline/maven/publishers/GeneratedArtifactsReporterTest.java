@@ -50,7 +50,7 @@ public class GeneratedArtifactsReporterTest {
 
     @Test
     public void testListArtifactsMacOSX() throws Exception {
-        List<MavenArtifact> mavenArtifacts = generatedArtifactsReporter.listArtifacts(this.mavenSpyLogsOnMacOSX.getDocumentElement());
+        List<MavenArtifact> mavenArtifacts = XmlUtils.listGeneratedArtifacts(this.mavenSpyLogsOnMacOSX.getDocumentElement(), false);
         System.out.println(mavenArtifacts);
         Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
 
@@ -74,7 +74,7 @@ public class GeneratedArtifactsReporterTest {
 
     @Test
     public void testListArtifactsWindows() throws Exception {
-        List<MavenArtifact> mavenArtifacts = generatedArtifactsReporter.listArtifacts(this.mavenSpyLogsOnWindows.getDocumentElement());
+        List<MavenArtifact> mavenArtifacts = XmlUtils.listGeneratedArtifacts(this.mavenSpyLogsOnWindows.getDocumentElement(), false);
         System.out.println(mavenArtifacts);
         Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
 
@@ -99,9 +99,9 @@ public class GeneratedArtifactsReporterTest {
 
     @Test
     public void testListAttachedArtifactsMacOSX() throws Exception {
-        List<MavenArtifact> mavenArtifacts = generatedArtifactsReporter.listAttachedArtifacts(this.mavenSpyLogsOnMacOSX.getDocumentElement());
-        Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(1));
-        MavenArtifact mavenArtifact = mavenArtifacts.get(0);
+        List<MavenArtifact> mavenArtifacts = XmlUtils.listGeneratedArtifacts(this.mavenSpyLogsOnMacOSX.getDocumentElement(), true);
+        Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(3));
+        MavenArtifact mavenArtifact = mavenArtifacts.get(2); // 1st is pom, 2nd is jar, 3rd is sources
         System.out.println(mavenArtifacts);
         Assert.assertThat(mavenArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
         Assert.assertThat(mavenArtifact.classifier, CoreMatchers.is("sources"));
@@ -110,9 +110,9 @@ public class GeneratedArtifactsReporterTest {
 
     @Test
     public void testListAttachedArtifactsWindows() throws Exception {
-        List<MavenArtifact> mavenArtifacts = generatedArtifactsReporter.listAttachedArtifacts(this.mavenSpyLogsOnWindows.getDocumentElement());
-        Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(1));
-        MavenArtifact mavenArtifact = mavenArtifacts.get(0);
+        List<MavenArtifact> mavenArtifacts = XmlUtils.listGeneratedArtifacts(this.mavenSpyLogsOnWindows.getDocumentElement(), true);
+        Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(3));
+        MavenArtifact mavenArtifact = mavenArtifacts.get(2); // 1st is pom, 2nd is jar, 3rd is sources
         System.out.println(mavenArtifacts);
         Assert.assertThat(mavenArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
         Assert.assertThat(mavenArtifact.classifier, CoreMatchers.is("sources"));

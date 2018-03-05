@@ -1,8 +1,10 @@
 package org.jenkinsci.plugins.pipeline.maven.util;
 
 import hudson.FilePath;
+import junit.framework.AssertionFailedError;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -268,10 +270,60 @@ public class XmlUtilsTest {
         in.getClass(); // check non null
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
         List<Element> artifactDeployedEvents = XmlUtils.getArtifactDeployedEvents(mavenSpyLogs);
-        Assert.assertThat(artifactDeployedEvents.size(), Matchers.is(2));
+        Assert.assertThat(artifactDeployedEvents.size(), Matchers.is(3));
 
-        Element artifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, "/path/to/my-jar/target/my-jar-0.3-SNAPSHOT.jar");
+        Element artifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, "/path/to/my-jar/target/my-jar-0.5-SNAPSHOT.jar");
         String repositoryUrl = XmlUtils.getUniqueChildElement(artifactDeployedEvent, "repository").getAttribute("url");
         Assert.assertThat(repositoryUrl, Matchers.is("https://nexus.beescloud.com/content/repositories/snapshots/"));
+    }
+
+    @Test
+    public void test_listGeneratedArtifacts() throws Exception {
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
+        in.getClass(); // check non null
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+        List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, false);
+        System.out.println(generatedArtifacts);
+        Assert.assertThat(generatedArtifacts.size(), Matchers.is(2)); // a jar file and a pom file are generated
+
+        for (MavenArtifact mavenArtifact:generatedArtifacts) {
+            Assert.assertThat(mavenArtifact.groupId, Matchers.is("com.example"));
+            Assert.assertThat(mavenArtifact.artifactId, Matchers.is("my-jar"));
+            if("pom".equals(mavenArtifact.type)) {
+                Assert.assertThat(mavenArtifact.extension, Matchers.is("pom"));
+                Assert.assertThat(mavenArtifact.classifier, Matchers.isEmptyOrNullString());
+            } else if ("jar".equals(mavenArtifact.type)) {
+                Assert.assertThat(mavenArtifact.extension, Matchers.is("jar"));
+                Assert.assertThat(mavenArtifact.classifier, Matchers.isEmptyOrNullString());
+            } else {
+                throw new AssertionFailedError("Unsupported type for " + mavenArtifact);
+            }
+        }
+    }
+    @Test
+    public void test_listGeneratedArtifacts_including_generated_artifacts() throws Exception {
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
+        in.getClass(); // check non null
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+        List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, true);
+        System.out.println(generatedArtifacts);
+        Assert.assertThat(generatedArtifacts.size(), Matchers.is(3)); // a jar file and a pom file are generated
+
+        for (MavenArtifact mavenArtifact:generatedArtifacts) {
+            Assert.assertThat(mavenArtifact.groupId, Matchers.is("com.example"));
+            Assert.assertThat(mavenArtifact.artifactId, Matchers.is("my-jar"));
+            if("pom".equals(mavenArtifact.type)) {
+                Assert.assertThat(mavenArtifact.extension, Matchers.is("pom"));
+                Assert.assertThat(mavenArtifact.classifier, Matchers.isEmptyOrNullString());
+            } else if ("jar".equals(mavenArtifact.type)) {
+                Assert.assertThat(mavenArtifact.extension, Matchers.is("jar"));
+                Assert.assertThat(mavenArtifact.classifier, Matchers.isEmptyOrNullString());
+            } else if ("java-source".equals(mavenArtifact.type)) {
+                Assert.assertThat(mavenArtifact.extension, Matchers.is("jar"));
+                Assert.assertThat(mavenArtifact.classifier, Matchers.is("sources"));
+            } else {
+                throw new AssertionFailedError("Unsupported type for " + mavenArtifact);
+            }
+        }
     }
 }

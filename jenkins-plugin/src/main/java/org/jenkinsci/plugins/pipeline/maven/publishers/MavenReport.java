@@ -58,16 +58,16 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
         if (generatedArtifacts == null) {
             List<MavenArtifact> generatedArtifacts = GlobalPipelineMavenConfig.getDao().getGeneratedArtifacts(run.getParent().getFullName(), run.getNumber());
             if (run.getResult() == null) {
-                LOGGER.log(Level.FINE, "Load generated artifacts for build {0}#{1} but don't cache them as the build is not finished", new Object[]{run.getParent().getName(), run.getNumber()});
+                LOGGER.log(Level.FINE, "Load generated artifacts for build {0}#{1} but don't cache them as the build is not finished: {2} entries", new Object[]{run.getParent().getName(), run.getNumber(), generatedArtifacts.size()});
             } else {
-                LOGGER.log(Level.FINE, "Load generated artifacts for build {0}#{1} and cache them", new Object[]{run.getParent().getName(), run.getNumber()});
+                LOGGER.log(Level.FINE, "Load generated artifacts for build {0}#{1} and cache them: {2} entries", new Object[]{run.getParent().getName(), run.getNumber(), generatedArtifacts.size()});
 
                 // build is finished, we can cache the result
                 this.generatedArtifacts = generatedArtifacts;
             }
             return generatedArtifacts;
         } else {
-            LOGGER.log(Level.FINE, "Use cached generated artifacts for build {0}#{1}", new Object[]{run.getParent().getName(), run.getNumber()});
+            LOGGER.log(Level.FINE, "Use cached generated artifacts for build {0}#{1}: {2} entries", new Object[]{run.getParent().getName(), run.getNumber(), generatedArtifacts.size()});
             return generatedArtifacts;
         }
     }

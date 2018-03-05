@@ -1,43 +1,85 @@
-<mavenExecution _time="2018-02-11 17:13:17.65">
-    <context _time="2018-02-11 17:13:17.658">
+<mavenExecution _time="2018-03-04 19:48:25.091">
+    <context _time="2018-03-04 19:48:25.103">
         <systemProperties/>
         <versionProperties/>
         <workingDirectory/>
         <userProperties/>
         <plexus/>
     </context>
-    <DefaultSettingsBuildingRequest class="org.apache.maven.settings.building.DefaultSettingsBuildingRequest" _time="2018-02-11 17:13:17.841">
+    <DefaultSettingsBuildingRequest class="org.apache.maven.settings.building.DefaultSettingsBuildingRequest" _time="2018-03-04 19:48:25.258">
         <userSettingsFile>/path/to/.m2/settings.xml</userSettingsFile>
         <globalSettings>/path/to/maven/conf/settings.xml</globalSettings>
     </DefaultSettingsBuildingRequest>
-    <MavenExecutionRequest class="org.apache.maven.execution.DefaultMavenExecutionRequest" _time="2018-02-11 17:13:17.892">
+    <MavenExecutionRequest class="org.apache.maven.execution.DefaultMavenExecutionRequest" _time="2018-03-04 19:48:25.291">
         <pom>/path/to/my-jar/pom.xml</pom>
         <globalSettingsFile>/path/to/maven/conf/settings.xml</globalSettingsFile>
         <userSettingsFile>/path/to/.m2/settings.xml</userSettingsFile>
         <baseDirectory>/path/to/my-jar</baseDirectory>
     </MavenExecutionRequest>
-    <ExecutionEvent type="ProjectDiscoveryStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:18.191">
+    <ExecutionEvent type="ProjectDiscoveryStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:25.646">
         <project/>
         <no-execution-found/>
     </ExecutionEvent>
-    <ExecutionEvent type="SessionStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:18.257">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="SessionStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:25.724">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <no-execution-found/>
     </ExecutionEvent>
-    <ExecutionEvent type="ProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:18.263">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="ProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:26.145">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <no-execution-found/>
     </ExecutionEvent>
-    <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest" _time="2018-02-11 17:13:18.423">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="ForkStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:26.178">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
+            <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
+        </project>
+        <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin" version="3.0.1">
+            <attach>${maven.source.attach}</attach>
+            <classifier>${maven.source.classifier}</classifier>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <excludeResources>${maven.source.excludeResources}</excludeResources>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${maven.source.forceCreation}</forceCreation>
+            <includePom>${maven.source.includePom}</includePom>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <session>${session}</session>
+            <skipSource>${maven.source.skip}</skipSource>
+            <useDefaultExcludes>${maven.source.useDefaultExcludes}</useDefaultExcludes>
+            <useDefaultManifestFile>${maven.source.useDefaultManifestFile}</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:26.182">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
+            <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
+        </project>
+        <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin" version="3.0.1">
+            <attach>${maven.source.attach}</attach>
+            <classifier>${maven.source.classifier}</classifier>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <excludeResources>${maven.source.excludeResources}</excludeResources>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${maven.source.forceCreation}</forceCreation>
+            <includePom>${maven.source.includePom}</includePom>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <session>${session}</session>
+            <skipSource>${maven.source.skip}</skipSource>
+            <useDefaultExcludes>${maven.source.useDefaultExcludes}</useDefaultExcludes>
+            <useDefaultManifestFile>${maven.source.useDefaultManifestFile}</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest" _time="2018-03-04 19:48:26.192">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
     </DependencyResolutionRequest>
-    <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult" _time="2018-02-11 17:13:18.448">
+    <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult" _time="2018-03-04 19:48:26.24">
         <resolvedDependencies>
             <dependency extension="jar" baseVersion="4.12" groupId="junit" scope="test" name="junit-4.12.jar" classifier="" artifactId="junit" optional="false" id="junit" type="jar" version="4.12" snapshot="false">
                 <file>/path/to/.m2/repository/junit/junit/4.12/junit-4.12.jar</file>
@@ -47,8 +89,458 @@
             </dependency>
         </resolvedDependencies>
     </DependencyResolutionResult>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:18.449">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:26.241">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
+            <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
+        </project>
+        <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin" version="3.0.1">
+            <attach>${maven.source.attach}</attach>
+            <classifier>${maven.source.classifier}</classifier>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <excludeResources>${maven.source.excludeResources}</excludeResources>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${maven.source.forceCreation}</forceCreation>
+            <includePom>${maven.source.includePom}</includePom>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <session>${session}</session>
+            <skipSource>${maven.source.skip}</skipSource>
+            <useDefaultExcludes>${maven.source.useDefaultExcludes}</useDefaultExcludes>
+            <useDefaultManifestFile>${maven.source.useDefaultManifestFile}</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:26.739">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
+            <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
+        </project>
+        <plugin executionId="default-cli" goal="jar" groupId="org.apache.maven.plugins" artifactId="maven-source-plugin" version="3.0.1">
+            <attach>${maven.source.attach}</attach>
+            <classifier>${maven.source.classifier}</classifier>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <excludeResources>${maven.source.excludeResources}</excludeResources>
+            <finalName>${project.build.finalName}</finalName>
+            <forceCreation>${maven.source.forceCreation}</forceCreation>
+            <includePom>${maven.source.includePom}</includePom>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <session>${session}</session>
+            <skipSource>${maven.source.skip}</skipSource>
+            <useDefaultExcludes>${maven.source.useDefaultExcludes}</useDefaultExcludes>
+            <useDefaultManifestFile>${maven.source.useDefaultManifestFile}</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:26.74">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
+            <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
+        </project>
+        <plugin executionId="default-cli" goal="javadoc" groupId="org.apache.maven.plugins" artifactId="maven-javadoc-plugin" version="3.0.0">
+            <additionalJOption>${additionalJOption}</additionalJOption>
+            <applyJavadocSecurityFix>${maven.javadoc.applyJavadocSecurityFix}</applyJavadocSecurityFix>
+            <author>${author}</author>
+            <bootclasspath>${bootclasspath}</bootclasspath>
+            <bootclasspathArtifacts>${bootclasspathArtifacts}</bootclasspathArtifacts>
+            <bottom>${bottom}</bottom>
+            <breakiterator>${breakiterator}</breakiterator>
+            <charset>${charset}</charset>
+            <debug>${debug}</debug>
+            <description>${description}</description>
+            <destDir>${destDir}</destDir>
+            <detectJavaApiLink>${detectJavaApiLink}</detectJavaApiLink>
+            <detectLinks>${detectLinks}</detectLinks>
+            <detectOfflineLinks>${detectOfflineLinks}</detectOfflineLinks>
+            <docencoding>${docencoding}</docencoding>
+            <docfilessubdirs>${docfilessubdirs}</docfilessubdirs>
+            <doclet>${doclet}</doclet>
+            <docletArtifact>${docletArtifact}</docletArtifact>
+            <docletArtifacts>${docletArtifacts}</docletArtifacts>
+            <docletPath>${docletPath}</docletPath>
+            <doclint>${doclint}</doclint>
+            <doctitle>${doctitle}</doctitle>
+            <encoding>${encoding}</encoding>
+            <excludePackageNames>${excludePackageNames}</excludePackageNames>
+            <excludedocfilessubdir>${excludedocfilessubdir}</excludedocfilessubdir>
+            <extdirs>${extdirs}</extdirs>
+            <failOnError>${maven.javadoc.failOnError}</failOnError>
+            <footer>${footer}</footer>
+            <groups>${groups}</groups>
+            <header>${header}</header>
+            <helpfile>${helpfile}</helpfile>
+            <includeDependencySources>false</includeDependencySources>
+            <includeTransitiveDependencySources>false</includeTransitiveDependencySources>
+            <isOffline>${settings.offline}</isOffline>
+            <javaApiLinks>${javaApiLinks}</javaApiLinks>
+            <javadocDirectory>${basedir}/src/main/javadoc</javadocDirectory>
+            <javadocExecutable>${javadocExecutable}</javadocExecutable>
+            <javadocOptionsDir>${project.build.directory}/javadoc-bundle-options</javadocOptionsDir>
+            <javadocVersion>${javadocVersion}</javadocVersion>
+            <keywords>${keywords}</keywords>
+            <links>${links}</links>
+            <linksource>${linksource}</linksource>
+            <localRepository>${localRepository}</localRepository>
+            <locale>${locale}</locale>
+            <maxmemory>${maxmemory}</maxmemory>
+            <minmemory>${minmemory}</minmemory>
+            <mojo>${mojoExecution}</mojo>
+            <name>${name}</name>
+            <nocomment>${nocomment}</nocomment>
+            <nodeprecated>${nodeprecated}</nodeprecated>
+            <nodeprecatedlist>${nodeprecatedlist}</nodeprecatedlist>
+            <nohelp>${nohelp}</nohelp>
+            <noindex>${noindex}</noindex>
+            <nonavbar>${nonavbar}</nonavbar>
+            <nooverview>${nooverview}</nooverview>
+            <noqualifier>${noqualifier}</noqualifier>
+            <nosince>${nosince}</nosince>
+            <notimestamp>${notimestamp}</notimestamp>
+            <notree>${notree}</notree>
+            <offlineLinks>${offlineLinks}</offlineLinks>
+            <old>${old}</old>
+            <outputDirectory>${destDir}</outputDirectory>
+            <overview>${overview}</overview>
+            <packagesheader>${packagesheader}</packagesheader>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <reportOutputDirectory>${reportOutputDirectory}</reportOutputDirectory>
+            <resourcesArtifacts>${resourcesArtifacts}</resourcesArtifacts>
+            <serialwarn>${serialwarn}</serialwarn>
+            <session>${session}</session>
+            <settings>${settings}</settings>
+            <show>${show}</show>
+            <skip>${maven.javadoc.skip}</skip>
+            <source>${source}</source>
+            <sourceDependencyCacheDir>${project.build.directory}/distro-javadoc-sources</sourceDependencyCacheDir>
+            <sourcepath>${sourcepath}</sourcepath>
+            <sourcetab>${sourcetab}</sourcetab>
+            <splitindex>${splitindex}</splitindex>
+            <stylesheet>${stylesheet}</stylesheet>
+            <stylesheetfile>${stylesheetfile}</stylesheetfile>
+            <subpackages>${subpackages}</subpackages>
+            <taglet>${taglet}</taglet>
+            <tagletArtifact>${tagletArtifact}</tagletArtifact>
+            <tagletArtifacts>${tagletArtifacts}</tagletArtifacts>
+            <tagletpath>${tagletpath}</tagletpath>
+            <taglets>${taglets}</taglets>
+            <tags>${tags}</tags>
+            <top>${top}</top>
+            <use>${use}</use>
+            <useStandardDocletOptions>${useStandardDocletOptions}</useStandardDocletOptions>
+            <validateLinks>${validateLinks}</validateLinks>
+            <verbose>${verbose}</verbose>
+            <version>${version}</version>
+            <windowtitle>${windowtitle}</windowtitle>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ForkSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:26.742">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
+            <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
+        </project>
+        <plugin executionId="default-cli" goal="javadoc" groupId="org.apache.maven.plugins" artifactId="maven-javadoc-plugin" version="3.0.0">
+            <additionalJOption>${additionalJOption}</additionalJOption>
+            <applyJavadocSecurityFix>${maven.javadoc.applyJavadocSecurityFix}</applyJavadocSecurityFix>
+            <author>${author}</author>
+            <bootclasspath>${bootclasspath}</bootclasspath>
+            <bootclasspathArtifacts>${bootclasspathArtifacts}</bootclasspathArtifacts>
+            <bottom>${bottom}</bottom>
+            <breakiterator>${breakiterator}</breakiterator>
+            <charset>${charset}</charset>
+            <debug>${debug}</debug>
+            <description>${description}</description>
+            <destDir>${destDir}</destDir>
+            <detectJavaApiLink>${detectJavaApiLink}</detectJavaApiLink>
+            <detectLinks>${detectLinks}</detectLinks>
+            <detectOfflineLinks>${detectOfflineLinks}</detectOfflineLinks>
+            <docencoding>${docencoding}</docencoding>
+            <docfilessubdirs>${docfilessubdirs}</docfilessubdirs>
+            <doclet>${doclet}</doclet>
+            <docletArtifact>${docletArtifact}</docletArtifact>
+            <docletArtifacts>${docletArtifacts}</docletArtifacts>
+            <docletPath>${docletPath}</docletPath>
+            <doclint>${doclint}</doclint>
+            <doctitle>${doctitle}</doctitle>
+            <encoding>${encoding}</encoding>
+            <excludePackageNames>${excludePackageNames}</excludePackageNames>
+            <excludedocfilessubdir>${excludedocfilessubdir}</excludedocfilessubdir>
+            <extdirs>${extdirs}</extdirs>
+            <failOnError>${maven.javadoc.failOnError}</failOnError>
+            <footer>${footer}</footer>
+            <groups>${groups}</groups>
+            <header>${header}</header>
+            <helpfile>${helpfile}</helpfile>
+            <includeDependencySources>false</includeDependencySources>
+            <includeTransitiveDependencySources>false</includeTransitiveDependencySources>
+            <isOffline>${settings.offline}</isOffline>
+            <javaApiLinks>${javaApiLinks}</javaApiLinks>
+            <javadocDirectory>${basedir}/src/main/javadoc</javadocDirectory>
+            <javadocExecutable>${javadocExecutable}</javadocExecutable>
+            <javadocOptionsDir>${project.build.directory}/javadoc-bundle-options</javadocOptionsDir>
+            <javadocVersion>${javadocVersion}</javadocVersion>
+            <keywords>${keywords}</keywords>
+            <links>${links}</links>
+            <linksource>${linksource}</linksource>
+            <localRepository>${localRepository}</localRepository>
+            <locale>${locale}</locale>
+            <maxmemory>${maxmemory}</maxmemory>
+            <minmemory>${minmemory}</minmemory>
+            <mojo>${mojoExecution}</mojo>
+            <name>${name}</name>
+            <nocomment>${nocomment}</nocomment>
+            <nodeprecated>${nodeprecated}</nodeprecated>
+            <nodeprecatedlist>${nodeprecatedlist}</nodeprecatedlist>
+            <nohelp>${nohelp}</nohelp>
+            <noindex>${noindex}</noindex>
+            <nonavbar>${nonavbar}</nonavbar>
+            <nooverview>${nooverview}</nooverview>
+            <noqualifier>${noqualifier}</noqualifier>
+            <nosince>${nosince}</nosince>
+            <notimestamp>${notimestamp}</notimestamp>
+            <notree>${notree}</notree>
+            <offlineLinks>${offlineLinks}</offlineLinks>
+            <old>${old}</old>
+            <outputDirectory>${destDir}</outputDirectory>
+            <overview>${overview}</overview>
+            <packagesheader>${packagesheader}</packagesheader>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <reportOutputDirectory>${reportOutputDirectory}</reportOutputDirectory>
+            <resourcesArtifacts>${resourcesArtifacts}</resourcesArtifacts>
+            <serialwarn>${serialwarn}</serialwarn>
+            <session>${session}</session>
+            <settings>${settings}</settings>
+            <show>${show}</show>
+            <skip>${maven.javadoc.skip}</skip>
+            <source>${source}</source>
+            <sourceDependencyCacheDir>${project.build.directory}/distro-javadoc-sources</sourceDependencyCacheDir>
+            <sourcepath>${sourcepath}</sourcepath>
+            <sourcetab>${sourcetab}</sourcetab>
+            <splitindex>${splitindex}</splitindex>
+            <stylesheet>${stylesheet}</stylesheet>
+            <stylesheetfile>${stylesheetfile}</stylesheetfile>
+            <subpackages>${subpackages}</subpackages>
+            <taglet>${taglet}</taglet>
+            <tagletArtifact>${tagletArtifact}</tagletArtifact>
+            <tagletArtifacts>${tagletArtifacts}</tagletArtifacts>
+            <tagletpath>${tagletpath}</tagletpath>
+            <taglets>${taglets}</taglets>
+            <tags>${tags}</tags>
+            <top>${top}</top>
+            <use>${use}</use>
+            <useStandardDocletOptions>${useStandardDocletOptions}</useStandardDocletOptions>
+            <validateLinks>${validateLinks}</validateLinks>
+            <verbose>${verbose}</verbose>
+            <version>${version}</version>
+            <windowtitle>${windowtitle}</windowtitle>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:26.745">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
+            <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
+        </project>
+        <plugin executionId="default-cli" goal="javadoc" groupId="org.apache.maven.plugins" artifactId="maven-javadoc-plugin" version="3.0.0">
+            <additionalJOption>${additionalJOption}</additionalJOption>
+            <applyJavadocSecurityFix>${maven.javadoc.applyJavadocSecurityFix}</applyJavadocSecurityFix>
+            <author>${author}</author>
+            <bootclasspath>${bootclasspath}</bootclasspath>
+            <bootclasspathArtifacts>${bootclasspathArtifacts}</bootclasspathArtifacts>
+            <bottom>${bottom}</bottom>
+            <breakiterator>${breakiterator}</breakiterator>
+            <charset>${charset}</charset>
+            <debug>${debug}</debug>
+            <description>${description}</description>
+            <destDir>${destDir}</destDir>
+            <detectJavaApiLink>${detectJavaApiLink}</detectJavaApiLink>
+            <detectLinks>${detectLinks}</detectLinks>
+            <detectOfflineLinks>${detectOfflineLinks}</detectOfflineLinks>
+            <docencoding>${docencoding}</docencoding>
+            <docfilessubdirs>${docfilessubdirs}</docfilessubdirs>
+            <doclet>${doclet}</doclet>
+            <docletArtifact>${docletArtifact}</docletArtifact>
+            <docletArtifacts>${docletArtifacts}</docletArtifacts>
+            <docletPath>${docletPath}</docletPath>
+            <doclint>${doclint}</doclint>
+            <doctitle>${doctitle}</doctitle>
+            <encoding>${encoding}</encoding>
+            <excludePackageNames>${excludePackageNames}</excludePackageNames>
+            <excludedocfilessubdir>${excludedocfilessubdir}</excludedocfilessubdir>
+            <extdirs>${extdirs}</extdirs>
+            <failOnError>${maven.javadoc.failOnError}</failOnError>
+            <footer>${footer}</footer>
+            <groups>${groups}</groups>
+            <header>${header}</header>
+            <helpfile>${helpfile}</helpfile>
+            <includeDependencySources>false</includeDependencySources>
+            <includeTransitiveDependencySources>false</includeTransitiveDependencySources>
+            <isOffline>${settings.offline}</isOffline>
+            <javaApiLinks>${javaApiLinks}</javaApiLinks>
+            <javadocDirectory>${basedir}/src/main/javadoc</javadocDirectory>
+            <javadocExecutable>${javadocExecutable}</javadocExecutable>
+            <javadocOptionsDir>${project.build.directory}/javadoc-bundle-options</javadocOptionsDir>
+            <javadocVersion>${javadocVersion}</javadocVersion>
+            <keywords>${keywords}</keywords>
+            <links>${links}</links>
+            <linksource>${linksource}</linksource>
+            <localRepository>${localRepository}</localRepository>
+            <locale>${locale}</locale>
+            <maxmemory>${maxmemory}</maxmemory>
+            <minmemory>${minmemory}</minmemory>
+            <mojo>${mojoExecution}</mojo>
+            <name>${name}</name>
+            <nocomment>${nocomment}</nocomment>
+            <nodeprecated>${nodeprecated}</nodeprecated>
+            <nodeprecatedlist>${nodeprecatedlist}</nodeprecatedlist>
+            <nohelp>${nohelp}</nohelp>
+            <noindex>${noindex}</noindex>
+            <nonavbar>${nonavbar}</nonavbar>
+            <nooverview>${nooverview}</nooverview>
+            <noqualifier>${noqualifier}</noqualifier>
+            <nosince>${nosince}</nosince>
+            <notimestamp>${notimestamp}</notimestamp>
+            <notree>${notree}</notree>
+            <offlineLinks>${offlineLinks}</offlineLinks>
+            <old>${old}</old>
+            <outputDirectory>${destDir}</outputDirectory>
+            <overview>${overview}</overview>
+            <packagesheader>${packagesheader}</packagesheader>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <reportOutputDirectory>${reportOutputDirectory}</reportOutputDirectory>
+            <resourcesArtifacts>${resourcesArtifacts}</resourcesArtifacts>
+            <serialwarn>${serialwarn}</serialwarn>
+            <session>${session}</session>
+            <settings>${settings}</settings>
+            <show>${show}</show>
+            <skip>${maven.javadoc.skip}</skip>
+            <source>${source}</source>
+            <sourceDependencyCacheDir>${project.build.directory}/distro-javadoc-sources</sourceDependencyCacheDir>
+            <sourcepath>${sourcepath}</sourcepath>
+            <sourcetab>${sourcetab}</sourcetab>
+            <splitindex>${splitindex}</splitindex>
+            <stylesheet>${stylesheet}</stylesheet>
+            <stylesheetfile>${stylesheetfile}</stylesheetfile>
+            <subpackages>${subpackages}</subpackages>
+            <taglet>${taglet}</taglet>
+            <tagletArtifact>${tagletArtifact}</tagletArtifact>
+            <tagletArtifacts>${tagletArtifacts}</tagletArtifacts>
+            <tagletpath>${tagletpath}</tagletpath>
+            <taglets>${taglets}</taglets>
+            <tags>${tags}</tags>
+            <top>${top}</top>
+            <use>${use}</use>
+            <useStandardDocletOptions>${useStandardDocletOptions}</useStandardDocletOptions>
+            <validateLinks>${validateLinks}</validateLinks>
+            <verbose>${verbose}</verbose>
+            <version>${version}</version>
+            <windowtitle>${windowtitle}</windowtitle>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:28.372">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
+            <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
+        </project>
+        <plugin executionId="default-cli" goal="javadoc" groupId="org.apache.maven.plugins" artifactId="maven-javadoc-plugin" version="3.0.0">
+            <additionalJOption>${additionalJOption}</additionalJOption>
+            <applyJavadocSecurityFix>${maven.javadoc.applyJavadocSecurityFix}</applyJavadocSecurityFix>
+            <author>${author}</author>
+            <bootclasspath>${bootclasspath}</bootclasspath>
+            <bootclasspathArtifacts>${bootclasspathArtifacts}</bootclasspathArtifacts>
+            <bottom>${bottom}</bottom>
+            <breakiterator>${breakiterator}</breakiterator>
+            <charset>${charset}</charset>
+            <debug>${debug}</debug>
+            <description>${description}</description>
+            <destDir>${destDir}</destDir>
+            <detectJavaApiLink>${detectJavaApiLink}</detectJavaApiLink>
+            <detectLinks>${detectLinks}</detectLinks>
+            <detectOfflineLinks>${detectOfflineLinks}</detectOfflineLinks>
+            <docencoding>${docencoding}</docencoding>
+            <docfilessubdirs>${docfilessubdirs}</docfilessubdirs>
+            <doclet>${doclet}</doclet>
+            <docletArtifact>${docletArtifact}</docletArtifact>
+            <docletArtifacts>${docletArtifacts}</docletArtifacts>
+            <docletPath>${docletPath}</docletPath>
+            <doclint>${doclint}</doclint>
+            <doctitle>${doctitle}</doctitle>
+            <encoding>${encoding}</encoding>
+            <excludePackageNames>${excludePackageNames}</excludePackageNames>
+            <excludedocfilessubdir>${excludedocfilessubdir}</excludedocfilessubdir>
+            <extdirs>${extdirs}</extdirs>
+            <failOnError>${maven.javadoc.failOnError}</failOnError>
+            <footer>${footer}</footer>
+            <groups>${groups}</groups>
+            <header>${header}</header>
+            <helpfile>${helpfile}</helpfile>
+            <includeDependencySources>false</includeDependencySources>
+            <includeTransitiveDependencySources>false</includeTransitiveDependencySources>
+            <isOffline>${settings.offline}</isOffline>
+            <javaApiLinks>${javaApiLinks}</javaApiLinks>
+            <javadocDirectory>${basedir}/src/main/javadoc</javadocDirectory>
+            <javadocExecutable>${javadocExecutable}</javadocExecutable>
+            <javadocOptionsDir>${project.build.directory}/javadoc-bundle-options</javadocOptionsDir>
+            <javadocVersion>${javadocVersion}</javadocVersion>
+            <keywords>${keywords}</keywords>
+            <links>${links}</links>
+            <linksource>${linksource}</linksource>
+            <localRepository>${localRepository}</localRepository>
+            <locale>${locale}</locale>
+            <maxmemory>${maxmemory}</maxmemory>
+            <minmemory>${minmemory}</minmemory>
+            <mojo>${mojoExecution}</mojo>
+            <name>${name}</name>
+            <nocomment>${nocomment}</nocomment>
+            <nodeprecated>${nodeprecated}</nodeprecated>
+            <nodeprecatedlist>${nodeprecatedlist}</nodeprecatedlist>
+            <nohelp>${nohelp}</nohelp>
+            <noindex>${noindex}</noindex>
+            <nonavbar>${nonavbar}</nonavbar>
+            <nooverview>${nooverview}</nooverview>
+            <noqualifier>${noqualifier}</noqualifier>
+            <nosince>${nosince}</nosince>
+            <notimestamp>${notimestamp}</notimestamp>
+            <notree>${notree}</notree>
+            <offlineLinks>${offlineLinks}</offlineLinks>
+            <old>${old}</old>
+            <outputDirectory>${destDir}</outputDirectory>
+            <overview>${overview}</overview>
+            <packagesheader>${packagesheader}</packagesheader>
+            <project>${project}</project>
+            <quiet>${quiet}</quiet>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <reportOutputDirectory>${reportOutputDirectory}</reportOutputDirectory>
+            <resourcesArtifacts>${resourcesArtifacts}</resourcesArtifacts>
+            <serialwarn>${serialwarn}</serialwarn>
+            <session>${session}</session>
+            <settings>${settings}</settings>
+            <show>${show}</show>
+            <skip>${maven.javadoc.skip}</skip>
+            <source>${source}</source>
+            <sourceDependencyCacheDir>${project.build.directory}/distro-javadoc-sources</sourceDependencyCacheDir>
+            <sourcepath>${sourcepath}</sourcepath>
+            <sourcetab>${sourcetab}</sourcetab>
+            <splitindex>${splitindex}</splitindex>
+            <stylesheet>${stylesheet}</stylesheet>
+            <stylesheetfile>${stylesheetfile}</stylesheetfile>
+            <subpackages>${subpackages}</subpackages>
+            <taglet>${taglet}</taglet>
+            <tagletArtifact>${tagletArtifact}</tagletArtifact>
+            <tagletArtifacts>${tagletArtifacts}</tagletArtifacts>
+            <tagletpath>${tagletpath}</tagletpath>
+            <taglets>${taglets}</taglets>
+            <tags>${tags}</tags>
+            <top>${top}</top>
+            <use>${use}</use>
+            <useStandardDocletOptions>${useStandardDocletOptions}</useStandardDocletOptions>
+            <validateLinks>${validateLinks}</validateLinks>
+            <verbose>${verbose}</verbose>
+            <version>${version}</version>
+            <windowtitle>${windowtitle}</windowtitle>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:28.373">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-resources" goal="resources" lifecyclePhase="process-resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
@@ -67,8 +559,8 @@
             <useDefaultDelimiters>true</useDefaultDelimiters>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:18.678">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:28.488">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-resources" goal="resources" lifecyclePhase="process-resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
@@ -87,8 +579,8 @@
             <useDefaultDelimiters>true</useDefaultDelimiters>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:18.679">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:28.488">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-compile" goal="compile" lifecyclePhase="compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
@@ -126,8 +618,8 @@
             <session>${session}</session>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:19.502">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:28.693">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-compile" goal="compile" lifecyclePhase="compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
@@ -165,8 +657,8 @@
             <session>${session}</session>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:19.503">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:28.693">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-testResources" goal="testResources" lifecyclePhase="process-test-resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
@@ -186,8 +678,8 @@
             <useDefaultDelimiters>true</useDefaultDelimiters>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:19.507">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:28.697">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-testResources" goal="testResources" lifecyclePhase="process-test-resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
@@ -207,8 +699,8 @@
             <useDefaultDelimiters>true</useDefaultDelimiters>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:19.508">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:28.697">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-testCompile" goal="testCompile" lifecyclePhase="test-compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
@@ -247,8 +739,8 @@
             <session>${session}</session>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:19.558">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:28.717">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-testCompile" goal="testCompile" lifecyclePhase="test-compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.1">
@@ -287,8 +779,8 @@
             <session>${session}</session>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:19.558">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:28.718">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-test" goal="test" lifecyclePhase="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.12.4">
@@ -341,16 +833,16 @@
             <session>${session}</session>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:20.185">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:29.474">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-test" goal="test" lifecyclePhase="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.12.4">
             <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:20.186">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:29.475">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-jar" goal="jar" lifecyclePhase="package" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="2.4">
@@ -365,8 +857,8 @@
             <useDefaultManifestFile>${jar.useDefaultManifestFile}</useDefaultManifestFile>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:20.409">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:29.645">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-jar" goal="jar" lifecyclePhase="package" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="2.4">
@@ -374,8 +866,8 @@
             <outputDirectory>${project.build.directory}</outputDirectory>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:20.409">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:29.645">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-install" goal="install" lifecyclePhase="install" groupId="org.apache.maven.plugins" artifactId="maven-install-plugin" version="2.4">
@@ -389,8 +881,8 @@
             <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:20.492">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:29.742">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-install" goal="install" lifecyclePhase="install" groupId="org.apache.maven.plugins" artifactId="maven-install-plugin" version="2.4">
@@ -404,8 +896,8 @@
             <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
         </plugin>
     </ExecutionEvent>
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:20.492">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:29.742">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-deploy" goal="deploy" lifecyclePhase="deploy" groupId="org.apache.maven.plugins" artifactId="maven-deploy-plugin" version="2.8.2">
@@ -426,16 +918,20 @@
             <updateReleaseInfo>${updateReleaseInfo}</updateReleaseInfo>
         </plugin>
     </ExecutionEvent>
-    <RepositoryEvent type="ARTIFACT_DEPLOYED" class="org.eclipse.aether.RepositoryEvent" _time="2018-02-11 17:13:22.61">
-        <artifact extension="jar" file="/path/to/my-jar/target/my-jar-0.3-SNAPSHOT.jar" baseVersion="0.3-SNAPSHOT" groupId="com.example" classifier="" artifactId="my-jar" id="com.example:my-jar:jar:0.3-20180211.161321-20" version="0.3-20180211.161321-20" snapshot="true"/>
+    <RepositoryEvent type="ARTIFACT_DEPLOYED" class="org.eclipse.aether.RepositoryEvent" _time="2018-03-04 19:48:31.861">
+        <artifact extension="jar" file="/path/to/my-jar/target/my-jar-0.5-SNAPSHOT.jar" baseVersion="0.5-SNAPSHOT" groupId="com.example" classifier="" artifactId="my-jar" id="com.example:my-jar:jar:0.5-20180304.184830-1" version="0.5-20180304.184830-1" snapshot="true"/>
         <repository layout="default" id="nexus.beescloud.com" url="https://nexus.beescloud.com/content/repositories/snapshots/"/>
     </RepositoryEvent>
-    <RepositoryEvent type="ARTIFACT_DEPLOYED" class="org.eclipse.aether.RepositoryEvent" _time="2018-02-11 17:13:24.021">
-        <artifact extension="pom" file="/path/to/my-jar/pom.xml" baseVersion="0.3-SNAPSHOT" groupId="com.example" classifier="" artifactId="my-jar" id="com.example:my-jar:pom:0.3-20180211.161321-20" version="0.3-20180211.161321-20" snapshot="true"/>
+    <RepositoryEvent type="ARTIFACT_DEPLOYED" class="org.eclipse.aether.RepositoryEvent" _time="2018-03-04 19:48:33.293">
+        <artifact extension="pom" file="/path/to/my-jar/pom.xml" baseVersion="0.5-SNAPSHOT" groupId="com.example" classifier="" artifactId="my-jar" id="com.example:my-jar:pom:0.5-20180304.184830-1" version="0.5-20180304.184830-1" snapshot="true"/>
         <repository layout="default" id="nexus.beescloud.com" url="https://nexus.beescloud.com/content/repositories/snapshots/"/>
     </RepositoryEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:27.218">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <RepositoryEvent type="ARTIFACT_DEPLOYED" class="org.eclipse.aether.RepositoryEvent" _time="2018-03-04 19:48:38.039">
+        <artifact extension="jar" file="/path/to/my-jar/target/my-jar-0.5-SNAPSHOT-sources.jar" baseVersion="0.5-SNAPSHOT" groupId="com.example" classifier="sources" artifactId="my-jar" id="com.example:my-jar:jar:sources:0.5-20180304.184830-1" version="0.5-20180304.184830-1" snapshot="true"/>
+        <repository layout="default" id="nexus.beescloud.com" url="https://nexus.beescloud.com/content/repositories/snapshots/"/>
+    </RepositoryEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:39.387">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <plugin executionId="default-deploy" goal="deploy" lifecyclePhase="deploy" groupId="org.apache.maven.plugins" artifactId="maven-deploy-plugin" version="2.8.2">
@@ -460,22 +956,26 @@
             <url>https://nexus.beescloud.com/content/repositories/snapshots/</url>
         </artifactRepository>
     </ExecutionEvent>
-    <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-02-11 17:13:27.219">
-        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+    <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-04 19:48:39.388">
+        <project baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.5-SNAPSHOT">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <no-execution-found/>
-        <artifact extension="jar" baseVersion="0.3-SNAPSHOT" groupId="com.example" artifactId="my-jar" id="com.example:my-jar:jar:0.3-SNAPSHOT" type="jar" version="0.3-20180211.161321-20" snapshot="true">
-            <file>/path/to/my-jar/target/my-jar-0.3-SNAPSHOT.jar</file>
+        <artifact extension="jar" baseVersion="0.5-SNAPSHOT" groupId="com.example" artifactId="my-jar" id="com.example:my-jar:jar:0.5-SNAPSHOT" type="jar" version="0.5-20180304.184830-1" snapshot="true">
+            <file>/path/to/my-jar/target/my-jar-0.5-SNAPSHOT.jar</file>
         </artifact>
-        <attachedArtifacts/>
+        <attachedArtifacts>
+            <artifact extension="jar" baseVersion="0.5-SNAPSHOT" groupId="com.example" classifier="sources" artifactId="my-jar" id="com.example:my-jar:java-source:sources:0.5-SNAPSHOT" type="java-source" version="0.5-20180304.184830-1" snapshot="true">
+                <file>/path/to/my-jar/target/my-jar-0.5-SNAPSHOT-sources.jar</file>
+            </artifact>
+        </attachedArtifacts>
     </ExecutionEvent>
-    <MavenExecutionResult class="org.apache.maven.execution.DefaultMavenExecutionResult" _time="2018-02-11 17:13:27.385">
-        <buildSummary baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" time="8955" version="0.3-SNAPSHOT" class="org.apache.maven.execution.BuildSuccess">
+    <MavenExecutionResult class="org.apache.maven.execution.DefaultMavenExecutionResult" _time="2018-03-04 19:48:39.555">
+        <buildSummary baseDir="/path/to/my-jar" file="/path/to/my-jar/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" time="13242" version="0.5-SNAPSHOT" class="org.apache.maven.execution.BuildSuccess">
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </buildSummary>
     </MavenExecutionResult>
-    <!-- 2018-02-11 17:13:27.385 - close:                                       -->
+    <!-- 2018-03-04 19:48:39.555 - close:                                       -->
     <!-- ignored:[org.apache.maven.settings.building.DefaultSettingsBuildingResult], -->
     <!-- blackListed: []                                                        -->
 
