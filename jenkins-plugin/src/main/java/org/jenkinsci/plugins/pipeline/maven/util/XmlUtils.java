@@ -358,7 +358,7 @@ public class XmlUtils {
      */
     @Nonnull
     public static String getPathInWorkspace(@Nonnull final String absoluteFilePath, @Nonnull FilePath workspace) {
-        boolean windows = isWindows(workspace);
+        boolean windows = FileUtils.isWindows(workspace);
 
         final String workspaceRemote = workspace.getRemote();
 
@@ -406,26 +406,12 @@ public class XmlUtils {
         return relativePath;
     }
 
+    /**
+     * @deprecated  use {@link FileUtils#isWindows(FilePath)}
+     */
+    @Deprecated
     public static boolean isWindows(@Nonnull FilePath path) {
-        String remote = path.getRemote();
-        if (remote.length() > 3 && remote.charAt(1) == ':' && remote.charAt(2) == '\\') {
-            // windows path such as "C:\path\to\..."
-            return true;
-        } else if (remote.length() > 3 && remote.charAt(1) == ':' && remote.charAt(2) == '/') {
-            // nasty windows path such as "C:/path/to/...". See JENKINS-44088
-            return true;
-        }
-        int indexOfSlash = path.getRemote().indexOf('/');
-        int indexOfBackSlash = path.getRemote().indexOf('\\');
-        if (indexOfSlash == -1) {
-            return true;
-        } else if (indexOfBackSlash == -1) {
-            return false;
-        } else if (indexOfSlash < indexOfBackSlash) {
-            return false;
-        } else {
-            return true;
-        }
+        return FileUtils.isWindows(path);
     }
 
     /**
