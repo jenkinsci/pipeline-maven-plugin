@@ -1,0 +1,624 @@
+<mavenExecution _time="2018-03-06 23:48:58.164">
+    <!--
+    mvn -Prun-its integration-test
+    https://github.com/cyrille-leclerc/maui/blob/maven-invoker-3/src/main/resources/mp-it-1/pom.xml
+    -->
+    <context _time="2018-03-06 23:48:58.176">
+        <systemProperties/>
+        <versionProperties/>
+        <workingDirectory/>
+        <userProperties/>
+        <plexus/>
+    </context>
+    <DefaultSettingsBuildingRequest class="org.apache.maven.settings.building.DefaultSettingsBuildingRequest" _time="2018-03-06 23:48:58.335">
+        <userSettingsFile>/path/to/.m2/settings.xml</userSettingsFile>
+        <globalSettings>/path/to/maven/conf/settings.xml</globalSettings>
+    </DefaultSettingsBuildingRequest>
+    <MavenExecutionRequest class="org.apache.maven.execution.DefaultMavenExecutionRequest" _time="2018-03-06 23:48:58.382">
+        <pom>/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml</pom>
+        <globalSettingsFile>/path/to/maven/conf/settings.xml</globalSettingsFile>
+        <userSettingsFile>/path/to/.m2/settings.xml</userSettingsFile>
+        <baseDirectory>/path/to/khmarbaise/maui/src/main/resources/mp-it-1</baseDirectory>
+    </MavenExecutionRequest>
+    <ExecutionEvent type="ProjectDiscoveryStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:48:58.767">
+        <project/>
+        <no-execution-found/>
+    </ExecutionEvent>
+    <ExecutionEvent type="SessionStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:48:58.848">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <no-execution-found/>
+    </ExecutionEvent>
+    <ExecutionEvent type="ProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:48:58.857">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <no-execution-found/>
+    </ExecutionEvent>
+    <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest" _time="2018-03-06 23:49:01.773">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+    </DependencyResolutionRequest>
+    <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult" _time="2018-03-06 23:49:04.986">
+        <resolvedDependencies>
+            <dependency extension="jar" baseVersion="3.5.2" groupId="org.apache.maven" scope="compile" name="maven-plugin-api-3.5.2.jar" classifier="" artifactId="maven-plugin-api" optional="false" id="maven-plugin-api" type="jar" version="3.5.2" snapshot="false">
+                <file>/path/to/.m2/repository/org/apache/maven/maven-plugin-api/3.5.2/maven-plugin-api-3.5.2.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.5.2" groupId="org.apache.maven" scope="compile" name="maven-model-3.5.2.jar" classifier="" artifactId="maven-model" optional="false" id="maven-model" type="jar" version="3.5.2" snapshot="false">
+                <file>/path/to/.m2/repository/org/apache/maven/maven-model/3.5.2/maven-model-3.5.2.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.5" groupId="org.apache.commons" scope="compile" name="commons-lang3-3.5.jar" classifier="" artifactId="commons-lang3" optional="false" id="commons-lang3" type="jar" version="3.5" snapshot="false">
+                <file>/path/to/.m2/repository/org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.5.2" groupId="org.apache.maven" scope="compile" name="maven-artifact-3.5.2.jar" classifier="" artifactId="maven-artifact" optional="false" id="maven-artifact" type="jar" version="3.5.2" snapshot="false">
+                <file>/path/to/.m2/repository/org/apache/maven/maven-artifact/3.5.2/maven-artifact-3.5.2.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="0.3.3" groupId="org.eclipse.sisu" scope="compile" name="org.eclipse.sisu.plexus-0.3.3.jar" classifier="" artifactId="org.eclipse.sisu.plexus" optional="false" id="org.eclipse.sisu.plexus" type="jar" version="0.3.3" snapshot="false">
+                <file>/path/to/.m2/repository/org/eclipse/sisu/org.eclipse.sisu.plexus/0.3.3/org.eclipse.sisu.plexus-0.3.3.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.0" groupId="javax.enterprise" scope="compile" name="cdi-api-1.0.jar" classifier="" artifactId="cdi-api" optional="false" id="cdi-api" type="jar" version="1.0" snapshot="false">
+                <file>/path/to/.m2/repository/javax/enterprise/cdi-api/1.0/cdi-api-1.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.0" groupId="javax.annotation" scope="compile" name="jsr250-api-1.0.jar" classifier="" artifactId="jsr250-api" optional="false" id="jsr250-api" type="jar" version="1.0" snapshot="false">
+                <file>/path/to/.m2/repository/javax/annotation/jsr250-api/1.0/jsr250-api-1.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1" groupId="javax.inject" scope="compile" name="javax.inject-1.jar" classifier="" artifactId="javax.inject" optional="false" id="javax.inject" type="jar" version="1" snapshot="false">
+                <file>/path/to/.m2/repository/javax/inject/javax.inject/1/javax.inject-1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="0.3.3" groupId="org.eclipse.sisu" scope="compile" name="org.eclipse.sisu.inject-0.3.3.jar" classifier="" artifactId="org.eclipse.sisu.inject" optional="false" id="org.eclipse.sisu.inject" type="jar" version="0.3.3" snapshot="false">
+                <file>/path/to/.m2/repository/org/eclipse/sisu/org.eclipse.sisu.inject/0.3.3/org.eclipse.sisu.inject-0.3.3.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.5.5" groupId="org.codehaus.plexus" scope="compile" name="plexus-component-annotations-1.5.5.jar" classifier="" artifactId="plexus-component-annotations" optional="false" id="plexus-component-annotations" type="jar" version="1.5.5" snapshot="false">
+                <file>/path/to/.m2/repository/org/codehaus/plexus/plexus-component-annotations/1.5.5/plexus-component-annotations-1.5.5.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.1.0" groupId="org.codehaus.plexus" scope="compile" name="plexus-utils-3.1.0.jar" classifier="" artifactId="plexus-utils" optional="false" id="plexus-utils" type="jar" version="3.1.0" snapshot="false">
+                <file>/path/to/.m2/repository/org/codehaus/plexus/plexus-utils/3.1.0/plexus-utils-3.1.0.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.5.2" groupId="org.codehaus.plexus" scope="compile" name="plexus-classworlds-2.5.2.jar" classifier="" artifactId="plexus-classworlds" optional="false" id="plexus-classworlds" type="jar" version="2.5.2" snapshot="false">
+                <file>/path/to/.m2/repository/org/codehaus/plexus/plexus-classworlds/2.5.2/plexus-classworlds-2.5.2.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.2.1" groupId="org.apache.maven" scope="compile" name="maven-project-2.2.1.jar" classifier="" artifactId="maven-project" optional="false" id="maven-project" type="jar" version="2.2.1" snapshot="false">
+                <file>/path/to/.m2/repository/org/apache/maven/maven-project/2.2.1/maven-project-2.2.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.2.1" groupId="org.apache.maven" scope="compile" name="maven-profile-2.2.1.jar" classifier="" artifactId="maven-profile" optional="false" id="maven-profile" type="jar" version="2.2.1" snapshot="false">
+                <file>/path/to/.m2/repository/org/apache/maven/maven-profile/2.2.1/maven-profile-2.2.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.2.1" groupId="org.apache.maven" scope="compile" name="maven-artifact-manager-2.2.1.jar" classifier="" artifactId="maven-artifact-manager" optional="false" id="maven-artifact-manager" type="jar" version="2.2.1" snapshot="false">
+                <file>/path/to/.m2/repository/org/apache/maven/maven-artifact-manager/2.2.1/maven-artifact-manager-2.2.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.2.1" groupId="org.apache.maven" scope="compile" name="maven-repository-metadata-2.2.1.jar" classifier="" artifactId="maven-repository-metadata" optional="false" id="maven-repository-metadata" type="jar" version="2.2.1" snapshot="false">
+                <file>/path/to/.m2/repository/org/apache/maven/maven-repository-metadata/2.2.1/maven-repository-metadata-2.2.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.0-beta-6" groupId="org.apache.maven.wagon" scope="compile" name="wagon-provider-api-1.0-beta-6.jar" classifier="" artifactId="wagon-provider-api" optional="false" id="wagon-provider-api" type="jar" version="1.0-beta-6" snapshot="false">
+                <file>/path/to/.m2/repository/org/apache/maven/wagon/wagon-provider-api/1.0-beta-6/wagon-provider-api-1.0-beta-6.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.1" groupId="backport-util-concurrent" scope="compile" name="backport-util-concurrent-3.1.jar" classifier="" artifactId="backport-util-concurrent" optional="false" id="backport-util-concurrent" type="jar" version="3.1" snapshot="false">
+                <file>/path/to/.m2/repository/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="2.2.1" groupId="org.apache.maven" scope="compile" name="maven-plugin-registry-2.2.1.jar" classifier="" artifactId="maven-plugin-registry" optional="false" id="maven-plugin-registry" type="jar" version="2.2.1" snapshot="false">
+                <file>/path/to/.m2/repository/org/apache/maven/maven-plugin-registry/2.2.1/maven-plugin-registry-2.2.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.11" groupId="org.codehaus.plexus" scope="compile" name="plexus-interpolation-1.11.jar" classifier="" artifactId="plexus-interpolation" optional="false" id="plexus-interpolation" type="jar" version="1.11" snapshot="false">
+                <file>/path/to/.m2/repository/org/codehaus/plexus/plexus-interpolation/1.11/plexus-interpolation-1.11.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.0-alpha-9-stable-1" groupId="org.codehaus.plexus" scope="compile" name="plexus-container-default-1.0-alpha-9-stable-1.jar" classifier="" artifactId="plexus-container-default" optional="false" id="plexus-container-default" type="jar" version="1.0-alpha-9-stable-1" snapshot="false">
+                <file>/path/to/.m2/repository/org/codehaus/plexus/plexus-container-default/1.0-alpha-9-stable-1/plexus-container-default-1.0-alpha-9-stable-1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.8.1" groupId="junit" scope="compile" name="junit-3.8.1.jar" classifier="" artifactId="junit" optional="false" id="junit" type="jar" version="3.8.1" snapshot="false">
+                <file>/path/to/.m2/repository/junit/junit/3.8.1/junit-3.8.1.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.1-alpha-2" groupId="classworlds" scope="compile" name="classworlds-1.1-alpha-2.jar" classifier="" artifactId="classworlds" optional="false" id="classworlds" type="jar" version="1.1-alpha-2" snapshot="false">
+                <file>/path/to/.m2/repository/classworlds/classworlds/1.1-alpha-2/classworlds-1.1-alpha-2.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="3.5.2" groupId="org.apache.maven" scope="compile" name="maven-settings-3.5.2.jar" classifier="" artifactId="maven-settings" optional="false" id="maven-settings" type="jar" version="3.5.2" snapshot="false">
+                <file>/path/to/.m2/repository/org/apache/maven/maven-settings/3.5.2/maven-settings-3.5.2.jar</file>
+            </dependency>
+        </resolvedDependencies>
+    </DependencyResolutionResult>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:04.995">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="generated-helpmojo" goal="helpmojo" lifecyclePhase="generate-sources" groupId="org.apache.maven.plugins" artifactId="maven-plugin-plugin" version="3.5.1">
+            <dependencies>${project.artifacts}</dependencies>
+            <encoding>${encoding}</encoding>
+            <local>${localRepository}</local>
+            <outputDirectory>${project.build.directory}/generated-sources/plugin</outputDirectory>
+            <project>${project}</project>
+            <remoteRepos>${project.remoteArtifactRepositories}</remoteRepos>
+            <skip>${maven.plugin.skip}</skip>
+            <skipErrorNoDescriptorsFound>${maven.plugin.skipErrorNoDescriptorsFound}</skipErrorNoDescriptorsFound>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:08.704">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="generated-helpmojo" goal="helpmojo" lifecyclePhase="generate-sources" groupId="org.apache.maven.plugins" artifactId="maven-plugin-plugin" version="3.5.1">
+            <dependencies>${project.artifacts}</dependencies>
+            <encoding>${encoding}</encoding>
+            <local>${localRepository}</local>
+            <outputDirectory>${project.build.directory}/generated-sources/plugin</outputDirectory>
+            <project>${project}</project>
+            <remoteRepos>${project.remoteArtifactRepositories}</remoteRepos>
+            <skip>${maven.plugin.skip}</skip>
+            <skipErrorNoDescriptorsFound>${maven.plugin.skipErrorNoDescriptorsFound}</skipErrorNoDescriptorsFound>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:08.704">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-resources" goal="resources" lifecyclePhase="process-resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.resources}</resources>
+            <session>${session}</session>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>true</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:08.817">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-resources" goal="resources" lifecyclePhase="process-resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.resources}</resources>
+            <session>${session}</session>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>true</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:08.817">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-compile" goal="compile" lifecyclePhase="compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.7.0">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <compilePath>${project.compileClasspathElements}</compilePath>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <failOnWarning>${maven.compiler.failOnWarning}</failOnWarning>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <parameters>${maven.compiler.parameters}</parameters>
+            <project>${project}</project>
+            <projectArtifact>${project.artifact}</projectArtifact>
+            <release>${maven.compiler.release}</release>
+            <session>${session}</session>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skipMain>${maven.main.skip}</skipMain>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>1.8</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>1.8</target>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:09.784">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-compile" goal="compile" lifecyclePhase="compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.7.0">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <compilePath>${project.compileClasspathElements}</compilePath>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <failOnWarning>${maven.compiler.failOnWarning}</failOnWarning>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedSourcesDirectory>${project.build.directory}/generated-sources/annotations</generatedSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+            <parameters>${maven.compiler.parameters}</parameters>
+            <project>${project}</project>
+            <projectArtifact>${project.artifact}</projectArtifact>
+            <release>${maven.compiler.release}</release>
+            <session>${session}</session>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skipMain>${maven.main.skip}</skipMain>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>1.8</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>1.8</target>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:09.785">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-descriptor" goal="descriptor" lifecyclePhase="process-classes" groupId="org.apache.maven.plugins" artifactId="maven-plugin-plugin" version="3.5.1">
+            <dependencies>${project.artifacts}</dependencies>
+            <encoding>${encoding}</encoding>
+            <local>${localRepository}</local>
+            <outputDirectory>${project.build.outputDirectory}/META-INF/maven</outputDirectory>
+            <project>${project}</project>
+            <remoteRepos>${project.remoteArtifactRepositories}</remoteRepos>
+            <skip>${maven.plugin.skip}</skip>
+            <skipDescriptor>false</skipDescriptor>
+            <skipErrorNoDescriptorsFound>${maven.plugin.skipErrorNoDescriptorsFound}</skipErrorNoDescriptorsFound>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:10.466">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-descriptor" goal="descriptor" lifecyclePhase="process-classes" groupId="org.apache.maven.plugins" artifactId="maven-plugin-plugin" version="3.5.1">
+            <dependencies>${project.artifacts}</dependencies>
+            <encoding>${encoding}</encoding>
+            <local>${localRepository}</local>
+            <outputDirectory>${project.build.outputDirectory}/META-INF/maven</outputDirectory>
+            <project>${project}</project>
+            <remoteRepos>${project.remoteArtifactRepositories}</remoteRepos>
+            <skip>${maven.plugin.skip}</skip>
+            <skipDescriptor>false</skipDescriptor>
+            <skipErrorNoDescriptorsFound>${maven.plugin.skipErrorNoDescriptorsFound}</skipErrorNoDescriptorsFound>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:10.467">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-testResources" goal="testResources" lifecyclePhase="process-test-resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.testResources}</resources>
+            <session>${session}</session>
+            <skip>${maven.test.skip}</skip>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>true</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:10.47">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-testResources" goal="testResources" lifecyclePhase="process-test-resources" groupId="org.apache.maven.plugins" artifactId="maven-resources-plugin" version="2.6">
+            <buildFilters>${project.build.filters}</buildFilters>
+            <encoding>${encoding}</encoding>
+            <escapeString>${maven.resources.escapeString}</escapeString>
+            <escapeWindowsPaths>${maven.resources.escapeWindowsPaths}</escapeWindowsPaths>
+            <includeEmptyDirs>${maven.resources.includeEmptyDirs}</includeEmptyDirs>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <overwrite>${maven.resources.overwrite}</overwrite>
+            <project>${project}</project>
+            <resources>${project.testResources}</resources>
+            <session>${session}</session>
+            <skip>${maven.test.skip}</skip>
+            <supportMultiLineFiltering>${maven.resources.supportMultiLineFiltering}</supportMultiLineFiltering>
+            <useBuildFilters>true</useBuildFilters>
+            <useDefaultDelimiters>true</useDefaultDelimiters>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:10.47">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-testCompile" goal="testCompile" lifecyclePhase="test-compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.7.0">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <compilePath>${project.compileClasspathElements}</compilePath>
+            <compileSourceRoots>${project.testCompileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <failOnWarning>${maven.compiler.failOnWarning}</failOnWarning>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/test-annotations</generatedTestSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <parameters>${maven.compiler.parameters}</parameters>
+            <project>${project}</project>
+            <release>${maven.compiler.release}</release>
+            <session>${session}</session>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skip>${maven.test.skip}</skip>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>1.8</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>1.8</target>
+            <testPath>${project.testClasspathElements}</testPath>
+            <testRelease>${maven.compiler.testRelease}</testRelease>
+            <testSource>${maven.compiler.testSource}</testSource>
+            <testTarget>${maven.compiler.testTarget}</testTarget>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:10.474">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-testCompile" goal="testCompile" lifecyclePhase="test-compile" groupId="org.apache.maven.plugins" artifactId="maven-compiler-plugin" version="3.7.0">
+            <basedir>${basedir}</basedir>
+            <buildDirectory>${project.build.directory}</buildDirectory>
+            <compilePath>${project.compileClasspathElements}</compilePath>
+            <compileSourceRoots>${project.testCompileSourceRoots}</compileSourceRoots>
+            <compilerId>${maven.compiler.compilerId}</compilerId>
+            <compilerReuseStrategy>${maven.compiler.compilerReuseStrategy}</compilerReuseStrategy>
+            <compilerVersion>${maven.compiler.compilerVersion}</compilerVersion>
+            <debug>${maven.compiler.debug}</debug>
+            <debuglevel>${maven.compiler.debuglevel}</debuglevel>
+            <encoding>${encoding}</encoding>
+            <executable>${maven.compiler.executable}</executable>
+            <failOnError>${maven.compiler.failOnError}</failOnError>
+            <failOnWarning>${maven.compiler.failOnWarning}</failOnWarning>
+            <forceJavacCompilerUse>${maven.compiler.forceJavacCompilerUse}</forceJavacCompilerUse>
+            <fork>${maven.compiler.fork}</fork>
+            <generatedTestSourcesDirectory>${project.build.directory}/generated-test-sources/test-annotations</generatedTestSourcesDirectory>
+            <maxmem>${maven.compiler.maxmem}</maxmem>
+            <meminitial>${maven.compiler.meminitial}</meminitial>
+            <mojoExecution>${mojoExecution}</mojoExecution>
+            <optimize>${maven.compiler.optimize}</optimize>
+            <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+            <parameters>${maven.compiler.parameters}</parameters>
+            <project>${project}</project>
+            <release>${maven.compiler.release}</release>
+            <session>${session}</session>
+            <showDeprecation>${maven.compiler.showDeprecation}</showDeprecation>
+            <showWarnings>${maven.compiler.showWarnings}</showWarnings>
+            <skip>${maven.test.skip}</skip>
+            <skipMultiThreadWarning>${maven.compiler.skipMultiThreadWarning}</skipMultiThreadWarning>
+            <source>1.8</source>
+            <staleMillis>${lastModGranularityMs}</staleMillis>
+            <target>1.8</target>
+            <testPath>${project.testClasspathElements}</testPath>
+            <testRelease>${maven.compiler.testRelease}</testRelease>
+            <testSource>${maven.compiler.testSource}</testSource>
+            <testTarget>${maven.compiler.testTarget}</testTarget>
+            <useIncrementalCompilation>${maven.compiler.useIncrementalCompilation}</useIncrementalCompilation>
+            <verbose>${maven.compiler.verbose}</verbose>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:10.474">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-test" goal="test" lifecyclePhase="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.21.0">
+            <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
+            <argLine>${argLine}</argLine>
+            <basedir>${basedir}</basedir>
+            <childDelegation>${childDelegation}</childDelegation>
+            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+            <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
+            <debugForkedProcess>${maven.surefire.debug}</debugForkedProcess>
+            <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
+            <disableXmlReport>${disableXmlReport}</disableXmlReport>
+            <enableAssertions>${enableAssertions}</enableAssertions>
+            <excludedGroups>${excludedGroups}</excludedGroups>
+            <excludesFile>${surefire.excludesFile}</excludesFile>
+            <failIfNoSpecifiedTests>${surefire.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
+            <failIfNoTests>${failIfNoTests}</failIfNoTests>
+            <forkCount>${forkCount}</forkCount>
+            <forkMode>${forkMode}</forkMode>
+            <forkedProcessExitTimeoutInSeconds>${surefire.exitTimeout}</forkedProcessExitTimeoutInSeconds>
+            <forkedProcessTimeoutInSeconds>${surefire.timeout}</forkedProcessTimeoutInSeconds>
+            <groups>${groups}</groups>
+            <includesFile>${surefire.includesFile}</includesFile>
+            <junitArtifactName>${junitArtifactName}</junitArtifactName>
+            <jvm>${jvm}</jvm>
+            <localRepository>${localRepository}</localRepository>
+            <objectFactory>${objectFactory}</objectFactory>
+            <parallel>${parallel}</parallel>
+            <parallelMavenExecution>${session.parallel}</parallelMavenExecution>
+            <parallelOptimized>${parallelOptimized}</parallelOptimized>
+            <parallelTestsTimeoutForcedInSeconds>${surefire.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
+            <parallelTestsTimeoutInSeconds>${surefire.parallel.timeout}</parallelTestsTimeoutInSeconds>
+            <perCoreThreadCount>${perCoreThreadCount}</perCoreThreadCount>
+            <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
+            <pluginDescriptor>${plugin}</pluginDescriptor>
+            <printSummary>${surefire.printSummary}</printSummary>
+            <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
+            <projectBuildDirectory>${project.build.directory}</projectBuildDirectory>
+            <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+            <remoteRepositories>${project.pluginArtifactRepositories}</remoteRepositories>
+            <reportFormat>${surefire.reportFormat}</reportFormat>
+            <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
+            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+            <rerunFailingTestsCount>${surefire.rerunFailingTestsCount}</rerunFailingTestsCount>
+            <reuseForks>${reuseForks}</reuseForks>
+            <runOrder>${surefire.runOrder}</runOrder>
+            <shutdown>${surefire.shutdown}</shutdown>
+            <skip>${maven.test.skip}</skip>
+            <skipAfterFailureCount>${surefire.skipAfterFailureCount}</skipAfterFailureCount>
+            <skipExec>${maven.test.skip.exec}</skipExec>
+            <skipTests>${skipTests}</skipTests>
+            <suiteXmlFiles>${surefire.suiteXmlFiles}</suiteXmlFiles>
+            <tempDir>${tempDir}</tempDir>
+            <test>${test}</test>
+            <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
+            <testFailureIgnore>${maven.test.failure.ignore}</testFailureIgnore>
+            <testNGArtifactName>${testNGArtifactName}</testNGArtifactName>
+            <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+            <threadCount>${threadCount}</threadCount>
+            <threadCountClasses>${threadCountClasses}</threadCountClasses>
+            <threadCountMethods>${threadCountMethods}</threadCountMethods>
+            <threadCountSuites>${threadCountSuites}</threadCountSuites>
+            <trimStackTrace>${trimStackTrace}</trimStackTrace>
+            <useFile>${surefire.useFile}</useFile>
+            <useManifestOnlyJar>${surefire.useManifestOnlyJar}</useManifestOnlyJar>
+            <useSystemClassLoader>${surefire.useSystemClassLoader}</useSystemClassLoader>
+            <useUnlimitedThreads>${useUnlimitedThreads}</useUnlimitedThreads>
+            <workingDirectory>${basedir}</workingDirectory>
+            <project>${project}</project>
+            <session>${session}</session>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:14.863">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-test" goal="test" lifecyclePhase="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.21.0">
+            <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:14.864">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-jar" goal="jar" lifecyclePhase="package" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="2.4">
+            <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+            <defaultManifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</defaultManifestFile>
+            <finalName>${jar.finalName}</finalName>
+            <forceCreation>${jar.forceCreation}</forceCreation>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+            <project>${project}</project>
+            <session>${session}</session>
+            <skipIfEmpty>${jar.skipIfEmpty}</skipIfEmpty>
+            <useDefaultManifestFile>${jar.useDefaultManifestFile}</useDefaultManifestFile>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:15.123">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-jar" goal="jar" lifecyclePhase="package" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="2.4">
+            <finalName>${jar.finalName}</finalName>
+            <outputDirectory>${project.build.directory}</outputDirectory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:15.123">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-addPluginArtifactMetadata" goal="addPluginArtifactMetadata" lifecyclePhase="package" groupId="org.apache.maven.plugins" artifactId="maven-plugin-plugin" version="3.5.1">
+            <project>${project}</project>
+            <skip>${maven.plugin.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:15.128">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="default-addPluginArtifactMetadata" goal="addPluginArtifactMetadata" lifecyclePhase="package" groupId="org.apache.maven.plugins" artifactId="maven-plugin-plugin" version="3.5.1">
+            <project>${project}</project>
+            <skip>${maven.plugin.skip}</skip>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:15.129">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="integration-test" goal="install" lifecyclePhase="pre-integration-test" groupId="org.apache.maven.plugins" artifactId="maven-invoker-plugin" version="3.0.1">
+            <localRepository>${localRepository}</localRepository>
+            <localRepositoryPath>/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target/local-repo</localRepositoryPath>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <session>${session}</session>
+            <skipInstallation>${invoker.skip}</skipInstallation>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:23.971">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="integration-test" goal="install" lifecyclePhase="pre-integration-test" groupId="org.apache.maven.plugins" artifactId="maven-invoker-plugin" version="3.0.1">
+            <localRepository>${localRepository}</localRepository>
+            <localRepositoryPath>/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target/local-repo</localRepositoryPath>
+            <project>${project}</project>
+            <reactorProjects>${reactorProjects}</reactorProjects>
+            <session>${session}</session>
+            <skipInstallation>${invoker.skip}</skipInstallation>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:23.971">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="integration-test" goal="run" lifecyclePhase="integration-test" groupId="org.apache.maven.plugins" artifactId="maven-invoker-plugin" version="3.0.1"/>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:30.662">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <plugin executionId="integration-test" goal="run" lifecyclePhase="integration-test" groupId="org.apache.maven.plugins" artifactId="maven-invoker-plugin" version="3.0.1">
+            <projectsDirectory>src/it</projectsDirectory>
+            <cloneProjectsTo>/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target/it</cloneProjectsTo>
+            <reportsDirectory>${invoker.reportsDirectory}</reportsDirectory>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-03-06 23:49:30.664">
+        <project baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </project>
+        <no-execution-found/>
+        <artifact extension="jar" baseVersion="0.1-SNAPSHOT" groupId="com.soebes.maven.guide.mp.it" artifactId="mp-it-1" id="com.soebes.maven.guide.mp.it:mp-it-1:maven-plugin:0.1-SNAPSHOT" type="maven-plugin" version="0.1-SNAPSHOT" snapshot="true">
+            <file>/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target/mp-it-1-0.1-SNAPSHOT.jar</file>
+        </artifact>
+        <attachedArtifacts/>
+    </ExecutionEvent>
+    <MavenExecutionResult class="org.apache.maven.execution.DefaultMavenExecutionResult" _time="2018-03-06 23:49:30.883">
+        <buildSummary baseDir="/path/to/khmarbaise/maui/src/main/resources/mp-it-1" file="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/pom.xml" groupId="com.soebes.maven.guide.mp.it" name="Maven Plugin Integration Test" artifactId="mp-it-1" time="31807" version="0.1-SNAPSHOT" class="org.apache.maven.execution.BuildSuccess">
+            <build sourceDirectory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/src/main/java" directory="/path/to/khmarbaise/maui/src/main/resources/mp-it-1/target"/>
+        </buildSummary>
+    </MavenExecutionResult>
+    <!-- 2018-03-06 23:49:30.883 - close:                                       -->
+    <!-- ignored:[org.apache.maven.settings.building.DefaultSettingsBuildingResult], -->
+    <!-- blackListed: []                                                        -->
+
+</mavenExecution>
