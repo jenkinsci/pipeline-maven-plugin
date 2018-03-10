@@ -55,6 +55,7 @@ public class InvokerRunsPublisher extends MavenPublisher {
     protected static final String GROUP_ID = "org.apache.maven.plugins";
     protected static final String ARTIFACT_ID = "maven-invoker-plugin";
     protected static final String RUN_GOAL = "run";
+    protected static final String INTEGRATION_TEST_GOAL = "integration-test";
 
     private static final long serialVersionUID = 1L;
 
@@ -84,11 +85,14 @@ public class InvokerRunsPublisher extends MavenPublisher {
             listener = new StreamBuildListener((OutputStream) System.err);
         }
 
-        List<Element> invokerRunEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, RUN_GOAL);
+        List<Element> invokerRunRunEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, RUN_GOAL);
+        List<Element> invokerRunIntegrationTestEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, INTEGRATION_TEST_GOAL);
 
-        if (invokerRunEvents.isEmpty()) {
+        if (invokerRunRunEvents.isEmpty() && invokerRunIntegrationTestEvents.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println("[withMaven] invokerPublisher - No " + GROUP_ID + ":" + ARTIFACT_ID + ":" + RUN_GOAL + " execution found");
+                listener.getLogger().println("[withMaven] invokerPublisher - " +
+                        "No " + GROUP_ID + ":" + ARTIFACT_ID + ":" + RUN_GOAL +
+                        " or " + GROUP_ID + ":" + ARTIFACT_ID + ":" + INTEGRATION_TEST_GOAL + " execution found");
             }
             return;
         }
@@ -103,7 +107,8 @@ public class InvokerRunsPublisher extends MavenPublisher {
         }
 
 
-        executeReporter(context, listener, invokerRunEvents);
+        executeReporter(context, listener, invokerRunRunEvents);
+        executeReporter(context, listener, invokerRunIntegrationTestEvents);
     }
 
     private void executeReporter(StepContext context, TaskListener listener, List<Element> testEvents) throws IOException, InterruptedException {
