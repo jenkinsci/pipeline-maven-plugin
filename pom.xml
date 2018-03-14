@@ -46,14 +46,14 @@
 
     <developers>
         <developer>
-            <id>alvarolobato</id>
-            <name>Alvaro Lobato</name>
-            <email>alobato@cloudbees.com</email>
-        </developer>
-        <developer>
             <id>cleclerc</id>
             <name>Cyrille Le Clerc</name>
             <email>cleclerc@cloudbees.com</email>
+        </developer>
+        <developer>
+            <id>alvarolobato</id>
+            <name>Alvaro Lobato</name>
+            <email>alobato@cloudbees.com</email>
         </developer>
     </developers>
 
