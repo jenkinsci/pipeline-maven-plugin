@@ -355,17 +355,30 @@ class WithMavenStepExecution extends StepExecution {
         LOGGER.log(Level.FINE, "Using temp dir: {0}", tempBinDir.getRemote());
 
         if (mvnExecPath == null) {
-            throw new AbortException("Couldn\u2019t find any maven executable");
+            boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
+            String mvnwScript = isUnix ? "mvnw" : "mvnw.cmd";
+            boolean mvnwScriptExists = ws.child(mvnwScript).exists();
+            if (mvnwScriptExists) {
+                if (LOGGER.isLoggable(Level.FINE)) {
+                    listener.getLogger().println("[withMaven] 'mvn' executable not found in path but '" + mvnwScript +
+                            "' found in workspace " + ws.getRemote() + ".");
+                }
+            } else {
+                if (LOGGER.isLoggable(Level.FINE)) {
+                    listener.getLogger().println("[withMaven] 'mvn' executable not found in path and '" + mvnwScript +
+                            "' not found in workspace " + ws.getRemote() + ".");
+                }
+            }
+        } else {
+            FilePath mvnExec = new FilePath(ws.getChannel(), mvnExecPath);
+            String content = generateMavenWrapperScriptContent(mvnExec, mavenConfig.toString());
+
+            // ADD MAVEN WRAPPER SCRIPT PARENT DIRECTORY TO PATH
+            // WARNING MUST BE INVOKED AFTER obtainMavenExec(), THERE SEEM TO BE A BUG IN ENVIRONMENT VARIABLE HANDLING IN obtainMavenExec()
+            envOverride.put("PATH+MAVEN", tempBinDir.getRemote());
+
+            createWrapperScript(tempBinDir, mvnExec.getName(), content);
         }
-
-        FilePath mvnExec = new FilePath(ws.getChannel(), mvnExecPath);
-        String content = generateMavenWrapperScriptContent(mvnExec, mavenConfig.toString());
-
-        // ADD MAVEN WRAPPER SCRIPT PARENT DIRECTORY TO PATH
-        // WARNING MUST BE INVOKED AFTER obtainMavenExec(), THERE SEEM TO BE A BUG IN ENVIRONMENT VARIABLE HANDLING IN obtainMavenExec()
-        envOverride.put("PATH+MAVEN", tempBinDir.getRemote());
-
-        createWrapperScript(tempBinDir, mvnExec.getName(), content);
 
     }
 
@@ -404,6 +417,14 @@ class WithMavenStepExecution extends StepExecution {
         return mavenSpyJarFilePath;
     }
 
+    /**
+     * Find the "mvn" executable if exists, either specified by the "withMaven(){}" step or provided by the build agent.
+     *
+     * @return remote path to the Maven executable or {@code null} if none found
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    @Nullable
     private String obtainMavenExec() throws IOException, InterruptedException {
         String mavenInstallationName = step.getMaven();
         LOGGER.log(Level.FINE, "Setting up maven: {0}", mavenInstallationName);
@@ -432,7 +453,7 @@ class WithMavenStepExecution extends StepExecution {
                 }
             }
             if (mavenInstallation == null) {
-                throw new AbortException("Could not find Maven installation '" + mavenInstallationName + "'.");
+                throw new AbortException("Could not find specified Maven installation '" + mavenInstallationName + "'.");
             }
         }
 
@@ -500,7 +521,9 @@ class WithMavenStepExecution extends StepExecution {
 
         // if at this point mvnExecPath is still null try to use which/where command to find a maven executable
         if (mvnExecPath == null) {
-            LOGGER.fine("No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which/where command");
+            if (LOGGER.isLoggable(Level.FINE)) {
+                console.println("[withMaven] No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which/where command");
+            }
             if (Boolean.TRUE.equals(getComputer().isUnix())) {
                 mvnExecPath = readFromProcess("/bin/sh", "-c", "which mvn");
             } else {
@@ -511,11 +534,12 @@ class WithMavenStepExecution extends StepExecution {
             }
             consoleMessage.append(" with executable " + mvnExecPath);
         }
-        console.println(consoleMessage.toString());
 
         if (mvnExecPath == null) {
-            throw new AbortException("Could not find maven executable, please set up a Maven Installation or configure MAVEN_HOME or M2_HOME environment variable");
+            consoleMessage = new StringBuilder("[withMaven] Maven installation not specified in the 'withMaven()' step " +
+                    "and not found on the build agent");
         }
+        console.println(consoleMessage.toString());
 
         LOGGER.log(Level.FINE, "Found exec for maven on: {0}", mvnExecPath);
         return mvnExecPath;
@@ -526,7 +550,7 @@ class WithMavenStepExecution extends StepExecution {
      * launcher decorator is used ie. docker.image step
      *
      * @param args command arguments
-     * @return output from the command
+     * @return output from the command or {@code null} if the command returned a non zero code
      * @throws InterruptedException if interrupted
      */
     @Nullable
