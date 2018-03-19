@@ -50,12 +50,12 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
     }
 
     @Override
-    public void onAttached(Run<?, ?> run) {
+    public synchronized void onAttached(Run<?, ?> run) {
         this.run = run;
     }
 
     @Override
-    public void onLoad(Run<?, ?> run) {
+    public synchronized void onLoad(Run<?, ?> run) {
         this.run = run;
     }
 
@@ -150,7 +150,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
         });
     }
 
-    public Run getRun() {
+    public synchronized Run getRun() {
         return run;
     }
 
