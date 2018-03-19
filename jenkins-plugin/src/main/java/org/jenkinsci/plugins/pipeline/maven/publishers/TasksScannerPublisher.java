@@ -7,6 +7,8 @@ import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.plugins.tasks.TasksPublisher;
+import hudson.plugins.tasks.TasksResultAction;
+
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
@@ -148,6 +150,12 @@ public class TasksScannerPublisher extends MavenPublisher {
                 listener.getLogger().println("[withMaven] openTasksPublisher - no folder to scan");
             }
             return;
+        }
+
+        // To avoid duplicates
+        TasksResultAction tasksResult = run.getAction(TasksResultAction.class);
+        if (tasksResult != null) {
+            run.removeAction(tasksResult);
         }
 
         TasksPublisher tasksPublisher = new TasksPublisher();
