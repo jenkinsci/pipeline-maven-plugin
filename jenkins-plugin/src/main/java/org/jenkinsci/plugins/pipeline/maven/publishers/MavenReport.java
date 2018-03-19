@@ -60,7 +60,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
     }
 
     @Override
-    public Collection<? extends Action> getProjectActions() {
+    public synchronized Collection<? extends Action> getProjectActions() {
         return run.getParent().getLastSuccessfulBuild().getActions(MavenReport.class);
     }
 
@@ -141,7 +141,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
         }
     }
 
-    public Collection<MavenArtifact> getDeployedArtifacts() {
+    public synchronized Collection<MavenArtifact> getDeployedArtifacts() {
         return Collections2.filter(getGeneratedArtifacts(), new Predicate<MavenArtifact>() {
             @Override
             public boolean apply(@Nullable MavenArtifact mavenArtifact) {
