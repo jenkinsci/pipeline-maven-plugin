@@ -428,7 +428,7 @@ class WithMavenStepExecution extends StepExecution {
                             "Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. ");
             LOGGER.log(Level.FINE, "Running in docker-pipeline, ignore Maven Installation parameter: {0}", mavenInstallationName);
         } else {
-            return obtainMvnExecutableFromMavenInstallation(mavenInstallationName, consoleMessage);
+            return obtainMvnExecutableFromMavenInstallation(mavenInstallationName);
         }
 
 
@@ -517,12 +517,12 @@ class WithMavenStepExecution extends StepExecution {
         return mvnExecPath;
     }
 
-    private String obtainMvnExecutableFromMavenInstallation(String mavenInstallationName, StringBuilder consoleMessage) throws IOException, InterruptedException {
-        String mvnExecPath;MavenInstallation mavenInstallation = null;
+    private String obtainMvnExecutableFromMavenInstallation(String mavenInstallationName) throws IOException, InterruptedException {
+
+        MavenInstallation mavenInstallation = null;
         for (MavenInstallation i : getMavenInstallations()) {
             if (mavenInstallationName.equals(i.getName())) {
                 mavenInstallation = i;
-                consoleMessage.append(" using Maven installation '" + mavenInstallation.getName() + "'");
                 LOGGER.log(Level.FINE, "Found maven installation {0} with installation home {1}", new Object[]{mavenInstallation.getName(), mavenInstallation.getHome()});
                 break;
             }
@@ -536,7 +536,9 @@ class WithMavenStepExecution extends StepExecution {
         }
         mavenInstallation = mavenInstallation.forNode(node, listener).forEnvironment(env);
         mavenInstallation.buildEnvVars(envOverride);
-        mvnExecPath = mavenInstallation.getExecutable(launcher);
+        console.println("[withMaven] using Maven installation '" + mavenInstallation.getName() + "'");
+        String mvnExecPath = mavenInstallation.getExecutable(launcher);
+
         return mvnExecPath;
     }
 
