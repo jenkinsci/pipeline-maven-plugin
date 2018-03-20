@@ -355,17 +355,17 @@ class WithMavenStepExecution extends StepExecution {
         LOGGER.log(Level.FINE, "Using temp dir: {0}", tempBinDir.getRemote());
 
         if (mvnExecPath == null) {
-            throw new AbortException("Couldn\u2019t find any maven executable");
+            // 'mvn' execuable not found. Cannot create a script wrapper.
+        } else {
+            FilePath mvnExec = new FilePath(ws.getChannel(), mvnExecPath);
+            String content = generateMavenWrapperScriptContent(mvnExec, mavenConfig.toString());
+
+            // ADD MAVEN WRAPPER SCRIPT PARENT DIRECTORY TO PATH
+            // WARNING MUST BE INVOKED AFTER obtainMavenExec(), THERE SEEM TO BE A BUG IN ENVIRONMENT VARIABLE HANDLING IN obtainMavenExec()
+            envOverride.put("PATH+MAVEN", tempBinDir.getRemote());
+
+            createWrapperScript(tempBinDir, mvnExec.getName(), content);
         }
-
-        FilePath mvnExec = new FilePath(ws.getChannel(), mvnExecPath);
-        String content = generateMavenWrapperScriptContent(mvnExec, mavenConfig.toString());
-
-        // ADD MAVEN WRAPPER SCRIPT PARENT DIRECTORY TO PATH
-        // WARNING MUST BE INVOKED AFTER obtainMavenExec(), THERE SEEM TO BE A BUG IN ENVIRONMENT VARIABLE HANDLING IN obtainMavenExec()
-        envOverride.put("PATH+MAVEN", tempBinDir.getRemote());
-
-        createWrapperScript(tempBinDir, mvnExec.getName(), content);
 
     }
 
@@ -404,103 +404,89 @@ class WithMavenStepExecution extends StepExecution {
         return mavenSpyJarFilePath;
     }
 
+    /**
+     * Find the "mvn" executable if exists, either specified by the "withMaven(){}" step or provided by the build agent.
+     *
+     * @return remote path to the Maven executable or {@code null} if none found
+     * @throws IOException
+     * @throws InterruptedException
+     */
+    @Nullable
     private String obtainMavenExec() throws IOException, InterruptedException {
         String mavenInstallationName = step.getMaven();
         LOGGER.log(Level.FINE, "Setting up maven: {0}", mavenInstallationName);
 
         StringBuilder consoleMessage = new StringBuilder("[withMaven]");
+        String mvnExecPath;
 
-        MavenInstallation mavenInstallation;
         if (StringUtils.isEmpty(mavenInstallationName)) {
             // no maven installation name is passed, we will search for the Maven installation on the agent
             consoleMessage.append(" using Maven installation provided by the build agent");
-            mavenInstallation = null;
         } else if (withContainer) {
             console.println(
-                    "WARNING: Specified Maven '" + mavenInstallationName + "' cannot be installed, will be ignored." +
+                    "[withMaven] WARNING: Specified Maven '" + mavenInstallationName + "' cannot be installed, will be ignored." +
                             "Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. ");
-            LOGGER.log(Level.FINE, "Ignoring Maven Installation parameter: {0}", mavenInstallationName);
-            mavenInstallation = null;
+            LOGGER.log(Level.FINE, "Running in docker-pipeline, ignore Maven Installation parameter: {0}", mavenInstallationName);
         } else {
-            mavenInstallation = null;
-            for (MavenInstallation i : getMavenInstallations()) {
-                if (mavenInstallationName.equals(i.getName())) {
-                    mavenInstallation = i;
-                    consoleMessage.append(" using Maven installation '" + mavenInstallation.getName() + "'");
-                    LOGGER.log(Level.FINE, "Found maven installation {0} with installation home {1}", new Object[]{mavenInstallation.getName(), mavenInstallation.getHome()});
-                    break;
-                }
-            }
-            if (mavenInstallation == null) {
-                throw new AbortException("Could not find Maven installation '" + mavenInstallationName + "'.");
-            }
+            return obtainMvnExecutableFromMavenInstallation(mavenInstallationName);
         }
 
 
-        String mvnExecPath;
-        if (mavenInstallation == null) {
-            // in case there are no installations available we fallback to the OS maven installation
-            // first we try MAVEN_HOME and M2_HOME
-            LOGGER.fine("Searching for Maven through MAVEN_HOME and M2_HOME environment variables...");
+        // in case there are no installations available we fallback to the OS maven installation
+        // first we try MAVEN_HOME and M2_HOME
+        LOGGER.fine("Searching for Maven through MAVEN_HOME and M2_HOME environment variables...");
 
-            if (withContainer) {
-                // in case of docker.image we need to execute a command through the decorated launcher and get the output.
-                LOGGER.fine("Calling printenv on docker container...");
-                String mavenHome = readFromProcess("printenv", MAVEN_HOME);
-                if (mavenHome == null) {
-                    mavenHome = readFromProcess("printenv", M2_HOME);
-                    if (StringUtils.isNotEmpty(mavenHome)) {
-                        consoleMessage.append(" with the environment variable M2_HOME=" + mavenHome);
-                    }
-                } else {
-                    consoleMessage.append(" with the environment variable MAVEN_HOME=" + mavenHome);
-                }
-
-                if (mavenHome == null) {
-                    LOGGER.log(Level.FINE, "NO maven installation discovered on docker container through MAVEN_HOME and M2_HOME environment variables");
-                    mvnExecPath = null;
-                } else {
-                    LOGGER.log(Level.FINE, "Found maven installation on {0}", mavenHome);
-                    mvnExecPath = mavenHome + "/bin/mvn"; // we can safely assume *nix
+        if (withContainer) {
+            // in case of docker.image we need to execute a command through the decorated launcher and get the output.
+            LOGGER.fine("Calling printenv on docker container...");
+            String mavenHome = readFromProcess("printenv", MAVEN_HOME);
+            if (mavenHome == null) {
+                mavenHome = readFromProcess("printenv", M2_HOME);
+                if (StringUtils.isNotEmpty(mavenHome)) {
+                    consoleMessage.append(" with the environment variable M2_HOME=" + mavenHome);
                 }
             } else {
-                // if not on docker we can use the computer environment
-                LOGGER.fine("Using computer environment...");
-                EnvVars agentEnv = getComputer().getEnvironment();
-                LOGGER.log(Level.FINE, "Agent env: {0}", agentEnv);
-                String mavenHome = agentEnv.get(MAVEN_HOME);
-                if (mavenHome == null) {
-                    mavenHome = agentEnv.get(M2_HOME);
-                    if (StringUtils.isNotEmpty(mavenHome)) {
-                        consoleMessage.append(" with the environment variable M2_HOME=" + mavenHome);
-                    }
-                } else {
-                    consoleMessage.append(" with the environment variable MAVEN_HOME=" + mavenHome);
-                }
-                if (mavenHome == null) {
-                    LOGGER.log(Level.FINE, "NO maven installation discovered on build agent through MAVEN_HOME and M2_HOME environment variables");
-                    mvnExecPath = null;
-                } else {
-                    LOGGER.log(Level.FINE, "Found maven installation on {0}", mavenHome);
-                    // Resort to maven installation to get the executable and build environment
-                    mavenInstallation = new MavenInstallation("Maven Auto-discovered", mavenHome, null);
-                    mavenInstallation.buildEnvVars(envOverride);
-                    mvnExecPath = mavenInstallation.getExecutable(launcher);
-                }
+                consoleMessage.append(" with the environment variable MAVEN_HOME=" + mavenHome);
+            }
+
+            if (mavenHome == null) {
+                LOGGER.log(Level.FINE, "NO maven installation discovered on docker container through MAVEN_HOME and M2_HOME environment variables");
+                mvnExecPath = null;
+            } else {
+                LOGGER.log(Level.FINE, "Found maven installation on {0}", mavenHome);
+                mvnExecPath = mavenHome + "/bin/mvn"; // we can safely assume *nix
             }
         } else {
-            Node node = getComputer().getNode();
-            if (node == null) {
-                throw new AbortException("Could not obtain the Node for the computer: " + getComputer().getName());
+            // if not on docker we can use the computer environment
+            LOGGER.fine("Using computer environment...");
+            EnvVars agentEnv = getComputer().getEnvironment();
+            LOGGER.log(Level.FINE, "Agent env: {0}", agentEnv);
+            String mavenHome = agentEnv.get(MAVEN_HOME);
+            if (mavenHome == null) {
+                mavenHome = agentEnv.get(M2_HOME);
+                if (StringUtils.isNotEmpty(mavenHome)) {
+                    consoleMessage.append(" with the environment variable M2_HOME=" + mavenHome);
+                }
+            } else {
+                consoleMessage.append(" with the environment variable MAVEN_HOME=" + mavenHome);
             }
-            mavenInstallation = mavenInstallation.forNode(node, listener).forEnvironment(env);
-            mavenInstallation.buildEnvVars(envOverride);
-            mvnExecPath = mavenInstallation.getExecutable(launcher);
+            if (mavenHome == null) {
+                LOGGER.log(Level.FINE, "NO maven installation discovered on build agent through MAVEN_HOME and M2_HOME environment variables");
+                mvnExecPath = null;
+            } else {
+                LOGGER.log(Level.FINE, "Found maven installation on {0}", mavenHome);
+                // Resort to maven installation to get the executable and build environment
+                MavenInstallation mavenInstallation = new MavenInstallation("Maven Auto-discovered", mavenHome, null);
+                mavenInstallation.buildEnvVars(envOverride);
+                mvnExecPath = mavenInstallation.getExecutable(launcher);
+            }
         }
 
         // if at this point mvnExecPath is still null try to use which/where command to find a maven executable
         if (mvnExecPath == null) {
-            LOGGER.fine("No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which/where command");
+            if (LOGGER.isLoggable(Level.FINE)) {
+                console.println("[withMaven] No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which/where command");
+            }
             if (Boolean.TRUE.equals(getComputer().isUnix())) {
                 mvnExecPath = readFromProcess("/bin/sh", "-c", "which mvn");
             } else {
@@ -509,15 +495,50 @@ class WithMavenStepExecution extends StepExecution {
                     mvnExecPath = readFromProcess("where", "mvn.bat");
                 }
             }
-            consoleMessage.append(" with executable " + mvnExecPath);
+            if (mvnExecPath == null) {
+                boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
+                String mvnwScript = isUnix ? "mvnw" : "mvnw.cmd";
+                boolean mvnwScriptExists = ws.child(mvnwScript).exists();
+                if (mvnwScriptExists) {
+                    consoleMessage =  new StringBuilder("[withMaven] Maven installation not specified in the 'withMaven()' step " +
+                            "and not found on the build agent but '" + mvnwScript + "' script found in the workspace.");
+                } else {
+                    consoleMessage = new StringBuilder("[withMaven] Maven installation not specified in the 'withMaven()' step " +
+                            "and not found on the build agent");
+                }
+            } else {
+                consoleMessage.append(" with executable " + mvnExecPath);
+            }
         }
+
         console.println(consoleMessage.toString());
 
-        if (mvnExecPath == null) {
-            throw new AbortException("Could not find maven executable, please set up a Maven Installation or configure MAVEN_HOME or M2_HOME environment variable");
-        }
-
         LOGGER.log(Level.FINE, "Found exec for maven on: {0}", mvnExecPath);
+        return mvnExecPath;
+    }
+
+    private String obtainMvnExecutableFromMavenInstallation(String mavenInstallationName) throws IOException, InterruptedException {
+
+        MavenInstallation mavenInstallation = null;
+        for (MavenInstallation i : getMavenInstallations()) {
+            if (mavenInstallationName.equals(i.getName())) {
+                mavenInstallation = i;
+                LOGGER.log(Level.FINE, "Found maven installation {0} with installation home {1}", new Object[]{mavenInstallation.getName(), mavenInstallation.getHome()});
+                break;
+            }
+        }
+        if (mavenInstallation == null) {
+            throw new AbortException("Could not find specified Maven installation '" + mavenInstallationName + "'.");
+        }
+        Node node = getComputer().getNode();
+        if (node == null) {
+            throw new AbortException("Could not obtain the Node for the computer: " + getComputer().getName());
+        }
+        mavenInstallation = mavenInstallation.forNode(node, listener).forEnvironment(env);
+        mavenInstallation.buildEnvVars(envOverride);
+        console.println("[withMaven] using Maven installation '" + mavenInstallation.getName() + "'");
+        String mvnExecPath = mavenInstallation.getExecutable(launcher);
+
         return mvnExecPath;
     }
 
@@ -526,7 +547,7 @@ class WithMavenStepExecution extends StepExecution {
      * launcher decorator is used ie. docker.image step
      *
      * @param args command arguments
-     * @return output from the command
+     * @return output from the command or {@code null} if the command returned a non zero code
      * @throws InterruptedException if interrupted
      */
     @Nullable
