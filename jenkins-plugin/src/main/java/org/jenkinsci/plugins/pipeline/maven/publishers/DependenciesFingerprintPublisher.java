@@ -34,16 +34,14 @@ import hudson.tasks.Fingerprinter;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
-import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
-import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,7 +99,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
 
         FilePath workspace = context.get(FilePath.class);
 
-        List<MavenSpyLogProcessor.MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
+        List<MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
 
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] dependenciesFingerprintPublisher - filter: " +
@@ -110,7 +108,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
         }
 
         Map<String, String> artifactsToFingerPrint = new HashMap<>(); // artifactPathInFingerprintZone -> artifactMd5
-        for (MavenSpyLogProcessor.MavenDependency dependency : dependencies) {
+        for (MavenDependency dependency : dependencies) {
             if (dependency.snapshot) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {

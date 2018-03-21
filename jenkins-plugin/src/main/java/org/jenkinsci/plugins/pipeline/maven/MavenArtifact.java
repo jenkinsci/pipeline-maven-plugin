@@ -57,7 +57,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      * @see org.apache.maven.artifact.Artifact#getId()
      */
     public String getId() {
-        return groupId + ":" + artifactId + ":" + (baseVersion) + ((classifier == null || classifier.isEmpty()) ? "" : ":" + classifier);
+        return groupId + ":" + artifactId + ":" + (baseVersion == null ? version : baseVersion) + ((classifier == null || classifier.isEmpty()) ? "" : ":" + classifier);
     }
 
     /**
