@@ -142,7 +142,7 @@ class WithMavenStepExecution extends StepExecution {
     private transient BodyExecution body;
 
     /**
-     * Indicates if running on docker with <tt>docker.image()</tt>
+     * Indicates if running on docker with <tt>docker.image()</tt> or <tt>container()</tt>
      */
     private boolean withContainer;
 
@@ -186,10 +186,12 @@ class WithMavenStepExecution extends StepExecution {
         withContainer = detectWithContainer();
 
         if (withContainer) {
-            listener.getLogger().println("[withMaven] WARNING: \"withMaven(){...}\" step running within \"docker.image('image').inside {...}\"." +
+            listener.getLogger().println("[withMaven] WARNING: \"withMaven(){...}\" step running within a container." +
                     " Since the Docker Pipeline Plugin version 1.14, you MUST:");
             listener.getLogger().println("[withMaven] * Either prepend the 'MVN_CMD_DIR' environment variable" +
                     " to the 'PATH' environment variable in every 'sh' step that invokes 'mvn' (e.g. \"sh \'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy\' \"). ");
+            listener.getLogger().println("[withMaven] * Or use 'MVN_CMD' instead of invoking 'mvn'" +
+                    " (e.g. \"sh \'$MVN_CMD clean deploy\' \"). ");
             listener.getLogger().print("[withMaven] * Or use ");
             listener.hyperlink("https://github.com/takari/maven-wrapper", "Takari's Maven Wrapper");
             listener.getLogger().println(" (e.g. \"sh './mvnw clean deploy'\")");
@@ -227,7 +229,7 @@ class WithMavenStepExecution extends StepExecution {
     }
 
     /**
-     * Detects if this step is running inside <tt>docker.image()</tt>
+     * Detects if this step is running inside <tt>docker.image()</tt> or <tt>container()</tt>
      * <p>
      * This has the following implications:
      * <li>Tool intallers do no work, as they install in the host, see:
@@ -236,17 +238,25 @@ class WithMavenStepExecution extends StepExecution {
      * container running the <tt>sh</tt> command for maven This is due to the fact that <tt>docker.image()</tt> all it
      * does is decorate the launcher and excute the command with a <tt>docker run</tt> which means that the inherited
      * environment from the OS will be totally different eg: MAVEN_HOME, JAVA_HOME, PATH, etc.
+     * <li>Kubernetes' <tt>container()</tt> support is still in early stages, and environment variables might not be
+     * completely configured, depending on the version of the Jenkins Kubernetes plugin.
      *
-     * @return true if running inside docker container with <tt>docker.image()</tt>
+     * @return true if running inside a container with <tt>docker.image()</tt> or <tt>container()</tt>
      * @see <a href=
-     * "https://github.com/jenkinsci/docker-workflow-plugin/blob/master/src/main/java/org/jenkinsci/plugins/docker/workflow/WithContainerStep.java#L213">
-     * WithContainerStep</a>
+     * "https://github.com/jenkinsci/docker-workflow-plugin/blob/master/src/main/java/org/jenkinsci/plugins/docker/workflow/WithContainerStep.java">
+     * WithContainerStep</a> and <a href=
+     * "https://github.com/jenkinsci/kubernetes-plugin/blob/master/src/main/java/org/csanchez/jenkins/plugins/kubernetes/pipeline/ContainerStep.java">
+     * ContainerStep</a>
      */
     private boolean detectWithContainer() {
         Launcher launcher1 = launcher;
         while (launcher1 instanceof Launcher.DecoratedLauncher) {
-            if (launcher1.getClass().getName().contains("WithContainerStep")) {
+            String launcherClassName = launcher1.getClass().getName();
+            if (launcherClassName.contains("WithContainerStep")) {
                 LOGGER.fine("Step running within docker.image()");
+                return true;
+            } else if (launcherClassName.contains("ContainerExecDecorator")) {
+                LOGGER.fine("Step running within container()");
                 return true;
             }
             launcher1 = ((Launcher.DecoratedLauncher) launcher1).getInner();
@@ -267,7 +277,7 @@ class WithMavenStepExecution extends StepExecution {
         if (withContainer) {
             // see #detectWithContainer()
             LOGGER.log(Level.FINE, "Ignoring JDK installation parameter: {0}", jdkInstallationName);
-            console.println("WARNING: \"withMaven(){...}\" step running within \"docker.image().inside{...}\"," +
+            console.println("WARNING: \"withMaven(){...}\" step running within a container," +
                     " tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. " +
                     "You have specified a JDK installation \"" + jdkInstallationName + "\", which will be ignored.");
             return;
@@ -424,8 +434,8 @@ class WithMavenStepExecution extends StepExecution {
             consoleMessage.append(" using Maven installation provided by the build agent");
         } else if (withContainer) {
             console.println(
-                    "[withMaven] WARNING: Specified Maven '" + mavenInstallationName + "' cannot be installed, will be ignored." +
-                            "Step running within docker.image() tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. ");
+                    "[withMaven] WARNING: Specified Maven '" + mavenInstallationName + "' cannot be installed, will be ignored. " +
+                            "Step running within a container, tool installations are not available see https://issues.jenkins-ci.org/browse/JENKINS-36159. ");
             LOGGER.log(Level.FINE, "Running in docker-pipeline, ignore Maven Installation parameter: {0}", mavenInstallationName);
         } else {
             return obtainMvnExecutableFromMavenInstallation(mavenInstallationName);
