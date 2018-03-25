@@ -139,7 +139,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
         });
     }
 
-    public Collection<MavenDependency> getDependencies(){
+    public synchronized Collection<MavenDependency> getDependencies(){
         return GlobalPipelineMavenConfig.getDao().listDependencies(run.getParent().getFullName(), run.getNumber());
     }
 
