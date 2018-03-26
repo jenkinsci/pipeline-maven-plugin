@@ -2,7 +2,7 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
+import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.w3c.dom.Element;
 
@@ -25,10 +25,10 @@ public class DependenciesLister {
      * @return list of {@link MavenArtifact}
      */
     @Nonnull
-    public static List<MavenSpyLogProcessor.MavenDependency> listDependencies(final Element mavenSpyLogs,
-                                                                              final Logger logger) {
+    public static List<MavenDependency> listDependencies(final Element mavenSpyLogs,
+                                                         final Logger logger) {
 
-        final List<MavenSpyLogProcessor.MavenDependency> result = new ArrayList<>();
+        final List<MavenDependency> result = new ArrayList<>();
 
         for (final Element dependencyResolutionResult : XmlUtils.getChildrenElements(mavenSpyLogs,
                 "DependencyResolutionResult")) {
@@ -41,7 +41,7 @@ public class DependenciesLister {
 
             for (final Element dependencyElt : XmlUtils.getChildrenElements(resolvedDependenciesElt,
                     "dependency")) {
-                final MavenSpyLogProcessor.MavenDependency dependencyArtifact = XmlUtils.newMavenDependency(
+                final MavenDependency dependencyArtifact = XmlUtils.newMavenDependency(
                         dependencyElt);
 
                 final Element fileElt = XmlUtils.getUniqueChildElementOrNull(dependencyElt, "file");

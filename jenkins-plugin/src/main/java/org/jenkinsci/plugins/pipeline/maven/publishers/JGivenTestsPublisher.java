@@ -23,8 +23,8 @@ import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.jgiven.JgivenReportGenerator;
 import org.jenkinsci.plugins.jgiven.JgivenReportGenerator.ReportConfig;
+import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
-import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
@@ -76,8 +76,8 @@ public class JGivenTestsPublisher extends MavenPublisher {
         final Launcher launcher = context.get(Launcher.class);
 
         boolean foundJGivenDependency = false;
-        List<MavenSpyLogProcessor.MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
-        for (MavenSpyLogProcessor.MavenDependency dependency : dependencies) {
+        List<MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
+        for (MavenDependency dependency : dependencies) {
             if (dependency.artifactId.contains("jgiven")) {
                 foundJGivenDependency = true;
                 break;

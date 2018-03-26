@@ -28,6 +28,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.FilePath;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
@@ -68,8 +69,8 @@ public class XmlUtils {
         return mavenArtifact;
     }
 
-    public static MavenSpyLogProcessor.MavenDependency newMavenDependency(Element dependencyElt) {
-        MavenSpyLogProcessor.MavenDependency dependency = new MavenSpyLogProcessor.MavenDependency();
+    public static MavenDependency newMavenDependency(Element dependencyElt) {
+        MavenDependency dependency = new MavenDependency();
         loadMavenArtifact(dependencyElt, dependency);
         dependency.setScope(dependencyElt.getAttribute("scope"));
         dependency.optional = Boolean.valueOf(dependencyElt.getAttribute("optional"));

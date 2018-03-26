@@ -25,6 +25,7 @@
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 
 import java.util.Collections;
 import java.util.List;
@@ -39,6 +40,12 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     @Override
     public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope, boolean ignoreUpstreamTriggers, String classifier) {
 
+    }
+
+    @Nonnull
+    @Override
+    public List<MavenDependency> listDependencies(@Nonnull String jobFullName, int buildNumber) {
+        return Collections.emptyList();
     }
 
     @Override

@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.*;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.util.SqlTestsUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -85,7 +86,7 @@ public class PipelineMavenPluginH2DaoTest {
     @Test
     public void record_one_dependency() throws Exception {
 
-        dao.recordDependency("my-pipeline", 1, "com.h2database", "h2", "1.4.196", "jar", "compile", false, null);
+        dao.recordDependency("my-pipeline", 1, "com.h2.database", "h2", "1.4.196", "jar", "compile", false, null);
 
         SqlTestsUtils.dump("select * from JENKINS_BUILD LEFT OUTER JOIN JENKINS_JOB ON JENKINS_BUILD.JOB_ID = JENKINS_JOB.ID", jdbcConnectionPool, System.out);
         SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", jdbcConnectionPool, System.out);
@@ -101,6 +102,17 @@ public class PipelineMavenPluginH2DaoTest {
         assertThat(
                 SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", jdbcConnectionPool),
                 is(1));
+
+        List<MavenDependency> mavenDependencies = dao.listDependencies("my-pipeline", 1);
+        assertThat(mavenDependencies.size(), is(1));
+        MavenDependency dependency = mavenDependencies.get(0);
+
+        assertThat(dependency.groupId, is("com.h2.database"));
+        assertThat(dependency.artifactId, is("h2"));
+        assertThat(dependency.version, is("1.4.196"));
+        assertThat(dependency.type, is("jar"));
+        assertThat(dependency.getScope(), is("compile"));
+
     }
 
     @Test
