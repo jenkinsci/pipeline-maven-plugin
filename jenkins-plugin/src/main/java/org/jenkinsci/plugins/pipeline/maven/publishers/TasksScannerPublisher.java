@@ -31,7 +31,7 @@ import javax.annotation.Nonnull;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  * @see hudson.plugins.tasks.TasksPublisher
  */
-public class TasksScannerPublisher extends MavenPublisher {
+public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
     private static final Logger LOGGER = Logger.getLogger(TasksScannerPublisher.class.getName());
 
     private static final long serialVersionUID = 1L;
@@ -161,6 +161,8 @@ public class TasksScannerPublisher extends MavenPublisher {
         tasksPublisher.setIgnoreCase(this.ignoreCase);
         tasksPublisher.setAsRegexp(this.asRegexp);
 
+        setHealthAwarePublisherAttributes(tasksPublisher);
+
         try {
             tasksPublisher.perform(run, workspace, launcher, listener);
         } catch (Exception e) {
@@ -234,7 +236,7 @@ public class TasksScannerPublisher extends MavenPublisher {
 
     @Symbol("openTasksPublisher")
     @Extension
-    public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
+    public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
         @Nonnull
         @Override
         public String getDisplayName() {
