@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.Extension;
 import hudson.model.Run;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -46,6 +47,7 @@ public class MavenLinkerPublisher2 extends MavenPublisher {
         }
     }
 
+    @Symbol("mavenLinkerPublisher")
     @Extension
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
 
