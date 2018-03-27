@@ -55,4 +55,6 @@ THE SOFTWARE.
         </f:entry>
     </f:section>
 
+    <st:include page="health" class="${descriptor.clazz}" />
+
 </j:jelly>

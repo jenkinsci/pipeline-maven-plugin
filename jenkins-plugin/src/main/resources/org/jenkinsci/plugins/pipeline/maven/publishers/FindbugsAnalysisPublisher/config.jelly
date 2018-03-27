@@ -28,4 +28,5 @@ THE SOFTWARE.
 
     <st:include page="maven-publisher" class="${descriptor.clazz}"/>
 
+    <st:include page="health" class="${descriptor.clazz}" />
 </j:jelly>
