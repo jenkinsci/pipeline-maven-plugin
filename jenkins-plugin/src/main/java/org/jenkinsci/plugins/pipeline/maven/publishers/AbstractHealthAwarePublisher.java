@@ -63,10 +63,15 @@ public abstract class AbstractHealthAwarePublisher extends MavenPublisher {
         this.thresholdLimit = thresholdLimit;
     }
 
-    protected void setHealthAwarePublisherAttributes(HealthAwarePublisher healthAwarePublisher) {
-        healthAwarePublisher.setHealthy(this.healthy);
-        healthAwarePublisher.setUnHealthy(this.unHealthy);
-        healthAwarePublisher.setThresholdLimit(this.thresholdLimit);
+    /**
+     * WARNING due to <a href="https://issues.jenkins-ci.org/browse/JENKINS-50508">JENKINS-50508</a>, the MUST be NO reference to
+     * any class of the and of the <a href="https://wiki.jenkins.io/display/JENKINS/Static+Code+Analysis+Plug-ins">Static Code Analysis Plug-ins</a>
+     * and to its package "{@code hudson.plugins.analysis.core}".
+     *
+     * @param healthAwarePublisher typed as an @{code Object} instead of being typed as a {@code hudson.plugins.analysis.core.HealthAwarePublisher} due to JENKINS-50508
+     */
+    protected void setHealthAwarePublisherAttributes(Object healthAwarePublisher) {
+        Helper.setHealthAwarePublisherAttributes(healthAwarePublisher, this);
     }
 
     /**
@@ -77,4 +82,17 @@ public abstract class AbstractHealthAwarePublisher extends MavenPublisher {
     }
 
 
+    /**
+     * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
+     */
+    static class Helper {
+        protected static void setHealthAwarePublisherAttributes(Object healthAwarePublisherAsObject, AbstractHealthAwarePublisher abstractHealthAwarePublisher) {
+            if (healthAwarePublisherAsObject instanceof HealthAwarePublisher) {
+                HealthAwarePublisher healthAwarePublisher = (HealthAwarePublisher) healthAwarePublisherAsObject;
+                healthAwarePublisher.setHealthy(abstractHealthAwarePublisher.getHealthy());
+                healthAwarePublisher.setUnHealthy(abstractHealthAwarePublisher.getUnHealthy());
+                healthAwarePublisher.setThresholdLimit(abstractHealthAwarePublisher.getThresholdLimit());
+            }
+        }
+    }
 }

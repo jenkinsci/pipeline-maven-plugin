@@ -6,13 +6,9 @@ import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
-import hudson.plugins.tasks.TasksPublisher;
-import hudson.plugins.tasks.TasksResultAction;
-
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -41,32 +37,32 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
     /**
      * Coma separated high priority task identifiers
      *
-     * @see TasksPublisher#getHigh()
+     * @see hudson.plugins.tasks.TasksPublisher#getHigh()
      */
     private String highPriorityTaskIdentifiers = "";
     /**
-     * @see TasksPublisher#getNormal()
+     * @see hudson.plugins.tasks.TasksPublisher#getNormal()
      */
     private String normalPriorityTaskIdentifiers = "";
     /**
-     * @see TasksPublisher#getLow()
+     * @see hudson.plugins.tasks.TasksPublisher#getLow()
      */
     private String lowPriorityTaskIdentifiers = "";
     /**
-     * @see TasksPublisher#getIgnoreCase()
+     * @see hudson.plugins.tasks.TasksPublisher#getIgnoreCase()
      */
     private boolean ignoreCase = false;
     /**
-     * @see TasksPublisher#getPattern()
+     * @see hudson.plugins.tasks.TasksPublisher#getPattern()
      */
     private String pattern = "";
     /**
-     * @see TasksPublisher#getExcludePattern()
+     * @see hudson.plugins.tasks.TasksPublisher#getExcludePattern()
      */
     private String excludePattern = "";
 
     /**
-     * @see TasksPublisher#getAsRegexp()
+     * @see hudson.plugins.tasks.TasksPublisher#getAsRegexp()
      */
     private boolean asRegexp = false;
 
@@ -153,12 +149,12 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
         }
 
         // To avoid duplicates
-        TasksResultAction tasksResult = run.getAction(TasksResultAction.class);
+        hudson.plugins.tasks.TasksResultAction tasksResult = run.getAction(hudson.plugins.tasks.TasksResultAction.class);
         if (tasksResult != null) {
             run.removeAction(tasksResult);
         }
 
-        TasksPublisher tasksPublisher = new TasksPublisher();
+        hudson.plugins.tasks.TasksPublisher tasksPublisher = new hudson.plugins.tasks.TasksPublisher();
         String pattern = StringUtils.isEmpty(this.pattern)? XmlUtils.join(sourceDirectoriesPatterns, ",") : this.pattern;
         tasksPublisher.setPattern(pattern);
         tasksPublisher.setExcludePattern(StringUtils.trimToNull(this.excludePattern));
