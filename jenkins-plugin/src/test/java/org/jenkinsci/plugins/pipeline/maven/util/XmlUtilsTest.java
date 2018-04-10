@@ -326,4 +326,29 @@ public class XmlUtilsTest {
             }
         }
     }
+
+    @Test
+    public void test_listGeneratedArtifacts_includeAttachedArtifacts() throws Exception {
+        InputStream in = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-include-attached-artifacts.log");
+        in.getClass(); // check non null
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+        List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, true);
+        System.out.println(generatedArtifacts);
+        Assert.assertThat(generatedArtifacts.size(), Matchers.is(2)); // pom artifact plus 1 attachment
+
+        for (MavenArtifact mavenArtifact : generatedArtifacts) {
+            Assert.assertThat(mavenArtifact.groupId, Matchers.is("com.example"));
+            Assert.assertThat(mavenArtifact.artifactId, Matchers.is("my-jar"));
+            if ("pom".equals(mavenArtifact.type)) {
+                Assert.assertThat(mavenArtifact.extension, Matchers.is("pom"));
+                Assert.assertThat(mavenArtifact.classifier, Matchers.isEmptyOrNullString());
+            } else if ("ova".equals(mavenArtifact.type)) {
+                Assert.assertThat(mavenArtifact.extension, Matchers.is("ova"));
+                Assert.assertThat(mavenArtifact.classifier, Matchers.isEmptyOrNullString());
+            } else {
+                throw new AssertionFailedError("Unsupported type for " + mavenArtifact);
+            }
+        }
+    }
 }
