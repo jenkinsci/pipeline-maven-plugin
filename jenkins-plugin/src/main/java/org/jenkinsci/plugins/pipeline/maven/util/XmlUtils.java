@@ -492,7 +492,10 @@ public class XmlUtils {
 
             Element artifactElt = XmlUtils.getUniqueChildElement(projectSucceededElt, "artifact");
             MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(artifactElt);
-            if (!"pom".equals(mavenArtifact.type)) {
+            if ("pom".equals(mavenArtifact.type)) {
+                // No file is generated in a "pom" type project, don't add the pom file itself
+                // TODO: evaluate if we really want to skip this file - cyrille le clerc 2018-04-12
+            } else {
                 Element fileElt = XmlUtils.getUniqueChildElementOrNull(artifactElt, "file");
                 if (fileElt == null || fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
                     if (LOGGER.isLoggable(Level.FINER)) {
