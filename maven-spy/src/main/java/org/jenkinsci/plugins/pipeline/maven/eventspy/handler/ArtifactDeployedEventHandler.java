@@ -3,7 +3,6 @@ package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositoryEvent;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
@@ -53,7 +52,8 @@ public class ArtifactDeployedEventHandler implements MavenEventHandler {
 
         element.setAttribute("id", repository.getId());
         element.setAttribute("layout", repository.getContentType());
-        element.setAttribute("url", StringUtils.substringBetween(repository.toString(), "(", ","));
+        String repoString = repository.toString();
+        element.setAttribute("url", repoString.substring(repoString.indexOf("(") + 1, repoString.indexOf(",")));
 
         return element;
     }
