@@ -506,6 +506,9 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
         List<String> downstreamJobs = listDownstreamPipelinesBasedOnMavenDependencies(jobFullName, buildNumber);
         downstreamJobs.addAll(listDownstreamPipelinesBasedOnParentProjectDependencies(jobFullName, buildNumber));
+
+        // JENKINS-50507 Don't return the passed job in case of pipelines consuming the artifacts they produce
+        downstreamJobs.remove(jobFullName);
         return downstreamJobs;
     }
 
@@ -599,6 +602,10 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     public Map<String, Integer> listUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
         Map<String, Integer> upstreamJobs = listUpstreamPipelinesBasedOnMavenDependencies(jobFullName, buildNumber);
         upstreamJobs.putAll(listUpstreamPipelinesBasedOnParentProjectDependencies(jobFullName, buildNumber));
+
+        // JENKINS-50507 Don't return the passed job in case of pipelines consuming the artifacts they produce
+        upstreamJobs.remove(jobFullName);
+
         return upstreamJobs;
     }
     
