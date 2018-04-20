@@ -37,7 +37,6 @@ import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
-import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -68,8 +67,21 @@ public class JunitTestsPublisher extends MavenPublisher {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * If true, retain a suite's complete stdout/stderr even if this is huge and the suite passed.
+     *
+     * @see JUnitResultArchiver#keepLongStdio
+     */
+    private boolean keepLongStdio;
+
+    /**
+     * @see JUnitResultArchiver#keepLongStdio
+     */
     @CheckForNull
-    private Boolean ignoreAttachments;
+    private Double healthScaleFactor;
+
+
+    private boolean ignoreAttachments;
 
     @DataBoundConstructor
     public JunitTestsPublisher() {
@@ -247,6 +259,11 @@ public class JunitTestsPublisher extends MavenPublisher {
                 pluginInvocation.getId() + ": " + testResults);
             JUnitResultArchiver archiver = new JUnitResultArchiver(testResults);
 
+            if (healthScaleFactor != null) {
+                archiver.setHealthScaleFactor(this.healthScaleFactor);
+            }
+            archiver.setKeepLongStdio(this.keepLongStdio);
+
             // even if "org.apache.maven.plugins:maven-surefire-plugin@test" succeeds, it maybe with "-DskipTests" and thus not have any test results.
             archiver.setAllowEmptyResults(true);
 
@@ -310,6 +327,25 @@ public class JunitTestsPublisher extends MavenPublisher {
     @DataBoundSetter
     public void setIgnoreAttachments(@Nullable Boolean ignoreAttachments) {
         this.ignoreAttachments = ignoreAttachments;
+    }
+
+    public boolean isKeepLongStdio() {
+        return keepLongStdio;
+    }
+
+    @DataBoundSetter
+    public void setKeepLongStdio(boolean keepLongStdio) {
+        this.keepLongStdio = keepLongStdio;
+    }
+
+    @CheckForNull
+    public Double getHealthScaleFactor() {
+        return healthScaleFactor;
+    }
+
+    @DataBoundSetter
+    public void setHealthScaleFactor(@Nullable Double healthScaleFactor) {
+        this.healthScaleFactor = healthScaleFactor;
     }
 
     /**
