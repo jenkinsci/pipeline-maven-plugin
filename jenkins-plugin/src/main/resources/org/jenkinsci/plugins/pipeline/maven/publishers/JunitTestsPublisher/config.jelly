@@ -32,7 +32,7 @@ THE SOFTWARE.
         <f:checkbox/>
     </f:entry>
 
-    <f:entry field="healthScaleFactor" title="${%Health report amplification factor}" description="${%Between 0.0 and 10.0}">
+    <f:entry field="healthScaleFactor" title="${%Health report amplification factor}" description="${%Between 0.0 and 10.0.}">
         <f:number default="1.0" min="0" step="0.1" size="10" />
     </f:entry>
 

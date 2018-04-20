@@ -319,13 +319,12 @@ public class JunitTestsPublisher extends MavenPublisher {
         }
     }
 
-    @CheckForNull
-    public Boolean getIgnoreAttachments() {
+    public boolean getIgnoreAttachments() {
         return ignoreAttachments;
     }
 
     @DataBoundSetter
-    public void setIgnoreAttachments(@Nullable Boolean ignoreAttachments) {
+    public void setIgnoreAttachments(boolean ignoreAttachments) {
         this.ignoreAttachments = ignoreAttachments;
     }
 
