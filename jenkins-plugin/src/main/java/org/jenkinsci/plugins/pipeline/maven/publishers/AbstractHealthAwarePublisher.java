@@ -74,6 +74,16 @@ public abstract class AbstractHealthAwarePublisher extends MavenPublisher {
         Helper.setHealthAwarePublisherAttributes(healthAwarePublisher, this);
     }
 
+    @Override
+    public String toString() {
+        return  getClass().getName() + "[" +
+                "disabled='" + isDisabled() + '\'' +
+                ", healthy='" + healthy + '\'' +
+                ", unHealthy='" + unHealthy + '\'' +
+                ", thresholdLimit='" + thresholdLimit + '\'' +
+                ']';
+    }
+
     /**
      * Required by org/jenkinsci/plugins/pipeline/maven/publishers/AbstractHealthAwarePublisher/health.jelly
      */

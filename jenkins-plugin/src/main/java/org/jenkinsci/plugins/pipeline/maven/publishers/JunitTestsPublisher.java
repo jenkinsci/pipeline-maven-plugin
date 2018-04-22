@@ -347,6 +347,16 @@ public class JunitTestsPublisher extends MavenPublisher {
         this.healthScaleFactor = healthScaleFactor;
     }
 
+    @Override
+    public String toString() {
+        return "JunitTestsPublisher[" +
+                "disabled=" + isDisabled() + "," +
+                "healthScaleFactor=" + healthScaleFactor + "," +
+                "keepLongStdio=" + keepLongStdio + "," +
+                "ignoreAttachments=" + ignoreAttachments +
+                ']';
+    }
+
     /**
      * Don't use the symbol "junit", it would collide with hudson.tasks.junit.JUnitResultArchiver
      */
