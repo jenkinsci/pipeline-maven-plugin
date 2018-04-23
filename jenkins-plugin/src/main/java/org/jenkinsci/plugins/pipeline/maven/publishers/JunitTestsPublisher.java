@@ -47,6 +47,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -351,7 +352,7 @@ public class JunitTestsPublisher extends MavenPublisher {
     public String toString() {
         return "JunitTestsPublisher[" +
                 "disabled=" + isDisabled() + "," +
-                "healthScaleFactor=" + healthScaleFactor + "," +
+                "healthScaleFactor=" + (healthScaleFactor == null ? ""  : healthScaleFactor) + "," +
                 "keepLongStdio=" + keepLongStdio + "," +
                 "ignoreAttachments=" + ignoreAttachments +
                 ']';
