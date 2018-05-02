@@ -342,7 +342,7 @@ class WithMavenStepExecution extends StepExecution {
             mavenConfig.append("--global-settings \"" + globalSettingsFilePath + "\" ");
         }
         if (StringUtils.isNotEmpty(mavenLocalRepo)) {
-            mavenConfig.append("-Dmaven.repo.local=\"" + mavenLocalRepo + "\" ");
+            mavenConfig.append("\"-Dmaven.repo.local=" + mavenLocalRepo + "\" ");
         }
 
         envOverride.put("MAVEN_CONFIG", mavenConfig.toString());
