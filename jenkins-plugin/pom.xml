@@ -92,6 +92,13 @@
       Keep the dependency optional
       -->
       <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <!-- Require upper bound dependencies error for com.google.inject:guice:4.0-beta paths to dependency are:...-->
+          <groupId>com.google.inject</groupId>
+          <artifactId>guice</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
@@ -267,7 +274,7 @@
     <dependency>
       <groupId>org.jenkins-ci.test</groupId>
       <artifactId>docker-fixtures</artifactId>
-      <version>1.0</version>
+      <version>1.7</version>
       <scope>test</scope>
     </dependency>
     <dependency>
