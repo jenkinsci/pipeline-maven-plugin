@@ -11,7 +11,6 @@ import jenkins.plugins.git.GitSCMSource;
 import jenkins.plugins.git.GitSampleRepoRule;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
-import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.pipeline.maven.util.WorkflowMultibranchProjectTestsUtils;
@@ -201,11 +200,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, multiModuleBundleProjectPipeline.scheduleBuild2(0));
 
         PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
-        if (!(dao instanceof PipelineMavenPluginH2Dao))
-            throw new IllegalStateException();
-
-        PipelineMavenPluginH2Dao h2Dao = (PipelineMavenPluginH2Dao) dao;
-        List<MavenArtifact> generatedArtifacts = h2Dao.getGeneratedArtifacts(multiModuleBundleProjectPipeline.getFullName(), build.getNumber());
+        List<MavenArtifact> generatedArtifacts = dao.getGeneratedArtifacts(multiModuleBundleProjectPipeline.getFullName(), build.getNumber());
 
         /*
         [{skip_downstream_triggers=TRUE, type=pom, gav=jenkins.mvn.test.bundle:bundle-parent:0.0.1-SNAPSHOT},
