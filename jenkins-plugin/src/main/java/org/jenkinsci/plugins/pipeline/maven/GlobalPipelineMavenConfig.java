@@ -10,6 +10,7 @@ import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginMonitoringDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -36,7 +37,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
     private final static Logger LOGGER = Logger.getLogger(GlobalPipelineMavenConfig.class.getName());
 
-    private static PipelineMavenPluginDao DAO;
+    private PipelineMavenPluginDao dao;
 
     private boolean triggerDownstreamUponResultSuccess = true;
     private boolean triggerDownstreamUponResultUnstable;
@@ -120,31 +121,28 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         return true;
     }
 
-    /**
-     * TODO replace this static method by proper dependency injection
-     * This requires to understand better the lifecyle of components managed by Jenkins.
-     */
-    public static synchronized PipelineMavenPluginDao getDao() {
-        if (DAO == null) {
+    public synchronized PipelineMavenPluginDao getDao() {
+        if (dao == null) {
             try {
                 File jenkinsRootDir = Jenkins.getInstance().getRootDir();
                 File databaseRootDir = new File(jenkinsRootDir, "jenkins-jobs");
-                if (!databaseRootDir.exists()){
+                if (!databaseRootDir.exists()) {
                     boolean created = databaseRootDir.mkdirs();
                     if (!created) {
                         throw new IllegalStateException("Failure to create database root dir " + databaseRootDir);
                     }
                 }
-                DAO = new PipelineMavenPluginH2Dao(databaseRootDir);
+                dao = new PipelineMavenPluginMonitoringDao(new PipelineMavenPluginH2Dao(databaseRootDir));
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Exception creating database dao, skip", e);
-                DAO = new PipelineMavenPluginNullDao();
+                dao = new PipelineMavenPluginNullDao();
             }
         }
-        return DAO;
+        return dao;
     }
+
     @Nonnull
-    public Set<Result> getTriggerDownstreamBuildsResultsCriteria(){
+    public Set<Result> getTriggerDownstreamBuildsResultsCriteria() {
         Set<Result> result = new HashSet<>(5);
         if (this.triggerDownstreamUponResultSuccess)
             result.add(Result.SUCCESS);
@@ -158,20 +156,6 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
             result.add(Result.FAILURE);
 
         return result;
-    }
-
-    /**
-     * TODO replace this static method by org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig#getTriggerDownstreamBuildsResultsCriteria()
-     * This requires to understand better the lifecyle of components managed by Jenkins.
-     */
-    @Nonnull
-    public static Set<Result> getTriggerDownstreamBuildsCriteria(){
-        GlobalPipelineMavenConfig globalPipelineMavenConfig = GlobalPipelineMavenConfig.get();
-        if (globalPipelineMavenConfig == null) {
-            return Collections.singleton(Result.SUCCESS);
-        } else {
-            return globalPipelineMavenConfig.getTriggerDownstreamBuildsResultsCriteria();
-        }
     }
 
     @Nullable

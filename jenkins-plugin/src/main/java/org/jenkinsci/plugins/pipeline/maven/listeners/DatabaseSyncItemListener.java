@@ -8,6 +8,7 @@ import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
+import javax.inject.Inject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,6 +21,9 @@ import java.util.logging.Logger;
 public class DatabaseSyncItemListener extends ItemListener {
     private final static Logger LOGGER = Logger.getLogger(DatabaseSyncItemListener.class.getName());
 
+    @Inject
+    public GlobalPipelineMavenConfig globalPipelineMavenConfig;
+    
     @Override
     public void onDeleted(Item item) {
         if (item instanceof WorkflowJob) {
@@ -32,7 +36,7 @@ public class DatabaseSyncItemListener extends ItemListener {
 
     public void onDeleted(WorkflowJob pipeline) {
         LOGGER.log(Level.FINE, "onDeleted({0})", pipeline);
-        GlobalPipelineMavenConfig.getDao().deleteJob(pipeline.getFullName());
+        globalPipelineMavenConfig.getDao().deleteJob(pipeline.getFullName());
     }
 
     @Override
@@ -56,7 +60,7 @@ public class DatabaseSyncItemListener extends ItemListener {
             oldFullName = parent.getFullName() + "/" + oldName;
         }
         String newFullName = pipeline.getFullName();
-        GlobalPipelineMavenConfig.getDao().renameJob(oldFullName, newFullName);
+        globalPipelineMavenConfig.getDao().renameJob(oldFullName, newFullName);
     }
 
     @Override
@@ -71,6 +75,6 @@ public class DatabaseSyncItemListener extends ItemListener {
 
     public void onLocationChanged(WorkflowJob pipeline, String oldFullName, String newFullName) {
         LOGGER.log(Level.FINE, "onLocationChanged({0}, {1}, {2})", new Object[]{pipeline, oldFullName, newFullName});
-        GlobalPipelineMavenConfig.getDao().renameJob(oldFullName, newFullName);
+        globalPipelineMavenConfig.getDao().renameJob(oldFullName, newFullName);
     }
 }
