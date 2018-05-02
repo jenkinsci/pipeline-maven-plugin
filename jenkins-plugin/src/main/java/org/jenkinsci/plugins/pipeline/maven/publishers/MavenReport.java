@@ -5,8 +5,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import hudson.model.Action;
-import hudson.model.Build;
-import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
@@ -16,7 +14,6 @@ import org.acegisecurity.AccessDeniedException;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -65,7 +62,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
 
     public synchronized Collection<MavenArtifact> getGeneratedArtifacts() {
         if (generatedArtifacts == null) {
-            List<MavenArtifact> generatedArtifacts = GlobalPipelineMavenConfig.getDao().getGeneratedArtifacts(run.getParent().getFullName(), run.getNumber());
+            List<MavenArtifact> generatedArtifacts = GlobalPipelineMavenConfig.get().getDao().getGeneratedArtifacts(run.getParent().getFullName(), run.getNumber());
             if (run.getResult() == null) {
                 LOGGER.log(Level.FINE, "Load generated artifacts for build {0}#{1} but don't cache them as the build is not finished: {2} entries", new Object[]{run.getParent().getName(), run.getNumber(), generatedArtifacts.size()});
             } else {
@@ -82,7 +79,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
     }
 
     public synchronized Collection<Job> getDownstreamJobs() {
-        List<String> downstreamJobFullNames = GlobalPipelineMavenConfig.getDao().listDownstreamJobs(run.getParent().getFullName(), run.getNumber());
+        List<String> downstreamJobFullNames = GlobalPipelineMavenConfig.get().getDao().listDownstreamJobs(run.getParent().getFullName(), run.getNumber());
         Collection<Job> downstreamJobs = Collections2.transform(downstreamJobFullNames, new Function<String, Job>() {
             @Override
             public Job apply(@Nullable String jobFullName) {
@@ -104,7 +101,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
     }
 
     public synchronized Collection<Run> getUpstreamBuilds() {
-        Map<String, Integer> upstreamJobs = GlobalPipelineMavenConfig.getDao().listUpstreamJobs(run.getParent().getFullName(), run.getNumber());
+        Map<String, Integer> upstreamJobs = GlobalPipelineMavenConfig.get().getDao().listUpstreamJobs(run.getParent().getFullName(), run.getNumber());
         Collection<Run> upstreamBuilds = Collections2.transform(upstreamJobs.entrySet(), new Function<Map.Entry<String, Integer>, Run>() {
             @Override
             public Run apply(@Nullable Map.Entry<String, Integer> entry) {
@@ -140,7 +137,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
     }
 
     public synchronized Collection<MavenDependency> getDependencies(){
-        return GlobalPipelineMavenConfig.getDao().listDependencies(run.getParent().getFullName(), run.getNumber());
+        return GlobalPipelineMavenConfig.get().getDao().listDependencies(run.getParent().getFullName(), run.getNumber());
     }
 
     public synchronized Run getRun() {

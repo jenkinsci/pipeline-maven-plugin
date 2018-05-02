@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 
 /**
  * Trigger downstream pipelines.
@@ -40,6 +41,9 @@ import javax.annotation.Nullable;
 public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRun> {
 
     private final static Logger LOGGER = Logger.getLogger(DownstreamPipelineTriggerRunListener.class.getName());
+    
+    @Inject
+    public GlobalPipelineMavenConfig globalPipelineMavenConfig;
 
     @Override
     public void onCompleted(WorkflowRun upstreamBuild, @Nonnull TaskListener listener) {
@@ -48,7 +52,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - triggerDownstreamPipelines");
         }
 
-        if (!GlobalPipelineMavenConfig.getTriggerDownstreamBuildsCriteria().contains(upstreamBuild.getResult())) {
+        if (!globalPipelineMavenConfig.getTriggerDownstreamBuildsResultsCriteria().contains(upstreamBuild.getResult())) {
             if (LOGGER.isLoggable(Level.FINER)) {
                 listener.getLogger().println("[withMaven] Skip downstream job triggering for upstream build with ignored result status " + upstreamBuild + ": " + upstreamBuild.getResult());
             }
@@ -56,7 +60,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         }
 
         WorkflowJob upstreamPipeline = upstreamBuild.getParent();
-        List<String> downstreamPipelines = GlobalPipelineMavenConfig.getDao().listDownstreamJobs(upstreamPipeline.getFullName(), upstreamBuild.getNumber());
+        List<String> downstreamPipelines = globalPipelineMavenConfig.getDao().listDownstreamJobs(upstreamPipeline.getFullName(), upstreamBuild.getNumber());
 
         // Don't trigger myself
         downstreamPipelines.remove(upstreamPipeline.getFullName());
@@ -75,7 +79,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             // See #46313
             if(downstreamPipeline.getLastBuild() != null) {
                 int downstreamBuildNumber = downstreamPipeline.getLastBuild().getNumber();
-                Map<String, Integer> transitiveUpstreamPipelines = GlobalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber);
+                Map<String, Integer> transitiveUpstreamPipelines = globalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber);
                 for(String transitiveUpstream : transitiveUpstreamPipelines.keySet()) {
                     // Skip if one of the downstream's upstream is already building or in queue
                     // Then it will get triggered anyway by that upstream, we don't need to trigger it again

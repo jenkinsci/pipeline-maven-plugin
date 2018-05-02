@@ -9,7 +9,6 @@ import hudson.model.Result;
 import jenkins.branch.BranchSource;
 import jenkins.plugins.git.GitSCMSource;
 import jenkins.plugins.git.GitSampleRepoRule;
-import org.apache.maven.artifact.Artifact;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
@@ -26,7 +25,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Future;
 
 import javax.annotation.Nullable;
@@ -202,7 +200,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         multiModuleBundleProjectPipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, multiModuleBundleProjectPipeline.scheduleBuild2(0));
 
-        PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.getDao();
+        PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
         if (!(dao instanceof PipelineMavenPluginH2Dao))
             throw new IllegalStateException();
 
