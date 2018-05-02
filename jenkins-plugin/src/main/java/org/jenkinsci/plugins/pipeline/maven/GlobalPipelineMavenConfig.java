@@ -10,6 +10,7 @@ import net.sf.json.JSONObject;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginMonitoringDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -131,7 +132,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                         throw new IllegalStateException("Failure to create database root dir " + databaseRootDir);
                     }
                 }
-                dao = new PipelineMavenPluginH2Dao(databaseRootDir);
+                dao = new PipelineMavenPluginMonitoringDao(new PipelineMavenPluginH2Dao(databaseRootDir));
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Exception creating database dao, skip", e);
                 dao = new PipelineMavenPluginNullDao();
