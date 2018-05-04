@@ -28,5 +28,10 @@ THE SOFTWARE.
 
     <st:include page="maven-publisher" class="${descriptor.clazz}"/>
 
+    <f:entry title="${%Plugin Type}" field="pluginType">
+        <f:select/>
+    </f:entry>
+
     <st:include page="health" class="${descriptor.clazz}" />
+
 </j:jelly>
