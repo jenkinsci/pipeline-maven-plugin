@@ -31,6 +31,8 @@ import org.h2.api.ErrorCode;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
+import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
+import org.jenkinsci.plugins.pipeline.maven.db.migration.h2.MigrationStep8;
 import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
@@ -67,7 +69,9 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
     private transient JdbcConnectionPool jdbcConnectionPool;
 
-    public PipelineMavenPluginH2Dao(File rootDir) {
+    private transient Long jenkinsMasterPrimaryKey;
+
+    public PipelineMavenPluginH2Dao(@Nonnull File rootDir) {
         rootDir.getClass(); // check non null
 
         File databaseFile = new File(rootDir, "jenkins-jobs");
@@ -84,7 +88,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         testDatabase();
     }
 
-    public PipelineMavenPluginH2Dao(JdbcConnectionPool jdbcConnectionPool) {
+    public PipelineMavenPluginH2Dao(@Nonnull JdbcConnectionPool jdbcConnectionPool) {
         jdbcConnectionPool.getClass(); // check non null
 
         this.jdbcConnectionPool = jdbcConnectionPool;
@@ -217,9 +221,10 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         LOGGER.log(Level.FINER, "renameJob({0}, {1})", new Object[]{oldFullName, newFullName});
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             cnn.setAutoCommit(false);
-            try (PreparedStatement stmt = cnn.prepareStatement("UPDATE JENKINS_JOB SET FULL_NAME = ? WHERE FULL_NAME = ?")) {
+            try (PreparedStatement stmt = cnn.prepareStatement("UPDATE JENKINS_JOB SET FULL_NAME = ? WHERE FULL_NAME = ? AND JENKINS_MASTER_ID = ?")) {
                 stmt.setString(1, newFullName);
                 stmt.setString(2, oldFullName);
+                stmt.setLong(3, getJenkinsMasterPrimaryKey(cnn));
                 int count = stmt.executeUpdate();
                 LOGGER.log(Level.FINE, "renameJob({0}, {1}): {2}", new Object[]{oldFullName, newFullName, count});
             }
@@ -234,8 +239,9 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         LOGGER.log(Level.FINER, "deleteJob({0})", new Object[]{jobFullName});
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             cnn.setAutoCommit(false);
-            try (PreparedStatement stmt = cnn.prepareStatement("DELETE FROM JENKINS_JOB WHERE FULL_NAME = ?")) {
+            try (PreparedStatement stmt = cnn.prepareStatement("DELETE FROM JENKINS_JOB WHERE FULL_NAME = ? AND JENKINS_MASTER_ID = ?")) {
                 stmt.setString(1, jobFullName);
+                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
                 int count = stmt.executeUpdate();
                 LOGGER.log(Level.FINE, "deleteJob({0}): {1}", new Object[]{jobFullName, count});
             }
@@ -251,8 +257,9 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             cnn.setAutoCommit(false);
             Long jobPrimaryKey;
-            try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM JENKINS_JOB WHERE FULL_NAME = ?")) {
+            try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM JENKINS_JOB WHERE FULL_NAME = ? AND JENKINS_MASTER_ID = ?")) {
                 stmt.setString(1, jobFullName);
+                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
                 try (ResultSet rst = stmt.executeQuery()) {
                     if (rst.next()) {
                         jobPrimaryKey = rst.getLong(1);
@@ -298,8 +305,9 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
             cnn.setAutoCommit(false);
 
             Long jobPrimaryKey = null;
-            try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM JENKINS_JOB WHERE FULL_NAME=?")) {
+            try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM JENKINS_JOB WHERE FULL_NAME = ? AND JENKINS_MASTER_ID = ?")) {
                 stmt.setString(1, jobFullName);
+                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
                 try (ResultSet rst = stmt.executeQuery()) {
                     if (rst.next()) {
                         jobPrimaryKey = rst.getLong(1);
@@ -307,8 +315,9 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 }
             }
             if (jobPrimaryKey == null) {
-                try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO JENKINS_JOB(FULL_NAME) VALUES (?)", Statement.RETURN_GENERATED_KEYS)) {
+                try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO JENKINS_JOB(FULL_NAME, JENKINS_MASTER_ID) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                     stmt.setString(1, jobFullName);
+                    stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
                     stmt.execute();
                     try (ResultSet rst = stmt.getGeneratedKeys()) {
                         if (rst.next()) {
@@ -434,6 +443,19 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                     } catch (IOException e) {
                         throw new RuntimeIoException("Exception reading " + sqlScriptPath, e);
                     }
+
+                    try {
+                        String className = "org.jenkinsci.plugins.pipeline.maven.db.migration.h2.MigrationStep" + idx;
+                        MigrationStep migrationStep = (MigrationStep) Class.forName(className).newInstance();
+                        LOGGER.log(Level.FINE, "Execute database migration step {0}", migrationStep.getClass().getName());
+                        migrationStep.execute(cnn, getJenkinsDetails());
+                    } catch (ClassNotFoundException e) {
+                        // no migration class found, just a migration script
+                    } catch (Exception e) {
+                        cnn.rollback();
+                        throw new RuntimeException(e);
+                    }
+
                 }
                 cnn.commit();
             }
@@ -520,6 +542,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 " INNER JOIN JENKINS_JOB AS UPSTREAM_JOB ON UPSTREAM_BUILD.JOB_ID = UPSTREAM_JOB.ID " +
                 " WHERE " +
                 "   UPSTREAM_JOB.FULL_NAME = ? AND" +
+                "   UPSTREAM_JOB.JENKINS_MASTER_ID = ? AND" +
                 "   UPSTREAM_BUILD.NUMBER = ? AND " +
                 "   GENERATED_MAVEN_ARTIFACT.SKIP_DOWNSTREAM_TRIGGERS = FALSE";
 
@@ -530,7 +553,8 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 " WHERE " +
                 "   MAVEN_DEPENDENCY.ARTIFACT_ID IN (" + generatedArtifactsSql + ") AND " +
                 "   MAVEN_DEPENDENCY.IGNORE_UPSTREAM_TRIGGERS = FALSE AND " +
-                "   DOWNSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE DOWNSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID)" +
+                "   DOWNSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE DOWNSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID) AND" +
+                "   DOWNSTREAM_JOB.JENKINS_MASTER_ID = ?" +
                 " ORDER BY DOWNSTREAM_JOB.FULL_NAME";
 
         List<String> downstreamJobsFullNames = new ArrayList<>();
@@ -539,7 +563,9 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             try (PreparedStatement stmt = cnn.prepareStatement(sql)) {
                 stmt.setString(1, jobFullName);
-                stmt.setInt(2, buildNumber);
+                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
+                stmt.setInt(3, buildNumber);
+                stmt.setLong(4, getJenkinsMasterPrimaryKey(cnn));
                 try (ResultSet rst = stmt.executeQuery()) {
                     while (rst.next()) {
                         downstreamJobsFullNames.add(rst.getString(1));
@@ -562,6 +588,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 " INNER JOIN JENKINS_JOB AS UPSTREAM_JOB ON UPSTREAM_BUILD.JOB_ID = UPSTREAM_JOB.ID " +
                 " WHERE " +
                 "   UPSTREAM_JOB.FULL_NAME = ? AND" +
+                "   UPSTREAM_JOB.JENKINS_MASTER_ID = ? AND" +
                 "   UPSTREAM_BUILD.NUMBER = ? AND " +
                 "   GENERATED_MAVEN_ARTIFACT.SKIP_DOWNSTREAM_TRIGGERS = FALSE";
 
@@ -572,7 +599,8 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 " WHERE " +
                 "   MAVEN_PARENT_PROJECT.ARTIFACT_ID IN (" + generatedArtifactsSql + ") AND " +
                 "   MAVEN_PARENT_PROJECT.IGNORE_UPSTREAM_TRIGGERS = FALSE AND " +
-                "   DOWNSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE DOWNSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID)" +
+                "   DOWNSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE DOWNSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID) AND " +
+                "   DOWNSTREAM_JOB.JENKINS_MASTER_ID = ? " +
                 " ORDER BY DOWNSTREAM_JOB.FULL_NAME";
 
         List<String> downstreamJobsFullNames = new ArrayList<>();
@@ -581,7 +609,9 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             try (PreparedStatement stmt = cnn.prepareStatement(sql)) {
                 stmt.setString(1, jobFullName);
-                stmt.setInt(2, buildNumber);
+                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
+                stmt.setInt(3, buildNumber);
+                stmt.setLong(4, getJenkinsMasterPrimaryKey(cnn));
                 try (ResultSet rst = stmt.executeQuery()) {
                     while (rst.next()) {
                         downstreamJobsFullNames.add(rst.getString(1));
@@ -596,7 +626,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         return downstreamJobsFullNames;
     }
 
-    
+
     @Nonnull
     @Override
     public Map<String, Integer> listUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
@@ -608,25 +638,27 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
         return upstreamJobs;
     }
-    
+
     protected Map<String, Integer> listUpstreamPipelinesBasedOnMavenDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listUpstreamJobs({0}, {1})", new Object[]{jobFullName, buildNumber});
-        String dependenciesSql = "SELECT DISTINCT MAVEN_DEPENDENCY.ARTIFACT_ID " + 
-        	    " FROM MAVEN_DEPENDENCY " + 
-        	    " INNER JOIN JENKINS_BUILD AS DOWNSTREAM_BUILD ON MAVEN_DEPENDENCY.BUILD_ID = DOWNSTREAM_BUILD.ID " + 
-        	    " INNER JOIN JENKINS_JOB AS DOWNSTREAM_JOB ON DOWNSTREAM_BUILD.JOB_ID = DOWNSTREAM_JOB.ID " + 
-        	    " WHERE " + 
-        	    "   DOWNSTREAM_JOB.FULL_NAME = ? AND " + 
+        String dependenciesSql = "SELECT DISTINCT MAVEN_DEPENDENCY.ARTIFACT_ID " +
+        	    " FROM MAVEN_DEPENDENCY " +
+        	    " INNER JOIN JENKINS_BUILD AS DOWNSTREAM_BUILD ON MAVEN_DEPENDENCY.BUILD_ID = DOWNSTREAM_BUILD.ID " +
+        	    " INNER JOIN JENKINS_JOB AS DOWNSTREAM_JOB ON DOWNSTREAM_BUILD.JOB_ID = DOWNSTREAM_JOB.ID " +
+        	    " WHERE " +
+                "   DOWNSTREAM_JOB.FULL_NAME = ? AND " +
+                "   DOWNSTREAM_JOB.JENKINS_MASTER_ID = ? AND " +
         	    "   DOWNSTREAM_BUILD.NUMBER = ?";
 
-        String sql = "SELECT DISTINCT UPSTREAM_JOB.FULL_NAME, UPSTREAM_BUILD.NUMBER " + 
-        	    " FROM JENKINS_JOB AS UPSTREAM_JOB" + 
-        	    " INNER JOIN JENKINS_BUILD AS UPSTREAM_BUILD ON UPSTREAM_JOB.ID = UPSTREAM_BUILD.JOB_ID " + 
-        	    " INNER JOIN GENERATED_MAVEN_ARTIFACT ON UPSTREAM_BUILD.ID = GENERATED_MAVEN_ARTIFACT.BUILD_ID" + 
-        	    " WHERE " + 
-        	    "   GENERATED_MAVEN_ARTIFACT.ARTIFACT_ID IN (" + dependenciesSql + ") AND " + 
-        	    "   GENERATED_MAVEN_ARTIFACT.SKIP_DOWNSTREAM_TRIGGERS = FALSE AND " + 
-        	    "   UPSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE UPSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID)" + 
+        String sql = "SELECT DISTINCT UPSTREAM_JOB.FULL_NAME, UPSTREAM_BUILD.NUMBER " +
+        	    " FROM JENKINS_JOB AS UPSTREAM_JOB" +
+        	    " INNER JOIN JENKINS_BUILD AS UPSTREAM_BUILD ON UPSTREAM_JOB.ID = UPSTREAM_BUILD.JOB_ID " +
+        	    " INNER JOIN GENERATED_MAVEN_ARTIFACT ON UPSTREAM_BUILD.ID = GENERATED_MAVEN_ARTIFACT.BUILD_ID" +
+        	    " WHERE " +
+        	    "   GENERATED_MAVEN_ARTIFACT.ARTIFACT_ID IN (" + dependenciesSql + ") AND " +
+        	    "   GENERATED_MAVEN_ARTIFACT.SKIP_DOWNSTREAM_TRIGGERS = FALSE AND " +
+        	    "   UPSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE UPSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID) AND " +
+                "   UPSTREAM_JOB.JENKINS_MASTER_ID = ? " +
         	    " ORDER BY UPSTREAM_JOB.FULL_NAME";
 
         Map<String, Integer> upstreamJobsFullNames = new HashMap<>();
@@ -635,7 +667,9 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             try (PreparedStatement stmt = cnn.prepareStatement(sql)) {
                 stmt.setString(1, jobFullName);
-                stmt.setInt(2, buildNumber);
+                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
+                stmt.setInt(3, buildNumber);
+                stmt.setLong(4, getJenkinsMasterPrimaryKey(cnn));
                 try (ResultSet rst = stmt.executeQuery()) {
                     while (rst.next()) {
                         upstreamJobsFullNames.put(rst.getString(1), rst.getInt(2));
@@ -649,24 +683,26 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
         return upstreamJobsFullNames;
     }
-    
+
     protected Map<String, Integer> listUpstreamPipelinesBasedOnParentProjectDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listUpstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
-        String dependenciesSql = "SELECT DISTINCT MAVEN_DEPENDENCY.ARTIFACT_ID " + 
-        	    " FROM MAVEN_DEPENDENCY " + 
-        	    " INNER JOIN JENKINS_BUILD AS DOWNSTREAM_BUILD ON MAVEN_DEPENDENCY.BUILD_ID = DOWNSTREAM_BUILD.ID " + 
-        	    " INNER JOIN JENKINS_JOB AS DOWNSTREAM_JOB ON DOWNSTREAM_BUILD.JOB_ID = DOWNSTREAM_JOB.ID " + 
-        	    " WHERE " + 
-        	    "   DOWNSTREAM_JOB.FULL_NAME = ? AND " + 
+        String dependenciesSql = "SELECT DISTINCT MAVEN_DEPENDENCY.ARTIFACT_ID " +
+        	    " FROM MAVEN_DEPENDENCY " +
+        	    " INNER JOIN JENKINS_BUILD AS DOWNSTREAM_BUILD ON MAVEN_DEPENDENCY.BUILD_ID = DOWNSTREAM_BUILD.ID " +
+        	    " INNER JOIN JENKINS_JOB AS DOWNSTREAM_JOB ON DOWNSTREAM_BUILD.JOB_ID = DOWNSTREAM_JOB.ID " +
+        	    " WHERE " +
+                "   DOWNSTREAM_JOB.FULL_NAME = ? AND " +
+                "   DOWNSTREAM_JOB.JENKINS_MASTER_ID  = ? AND " +
         	    "   DOWNSTREAM_BUILD.NUMBER = ?";
 
-        String sql = "SELECT DISTINCT UPSTREAM_JOB.FULL_NAME, UPSTREAM_BUILD.NUMBER " + 
-        	    " FROM JENKINS_JOB AS UPSTREAM_JOB" + 
-        	    " INNER JOIN JENKINS_BUILD AS UPSTREAM_BUILD ON UPSTREAM_JOB.ID = UPSTREAM_BUILD.JOB_ID " + 
-        	    " INNER JOIN MAVEN_PARENT_PROJECT ON UPSTREAM_BUILD.ID = MAVEN_PARENT_PROJECT.BUILD_ID" + 
-        	    " WHERE " + 
-        	    "   MAVEN_PARENT_PROJECT.ARTIFACT_ID IN (" + dependenciesSql + ") AND " + 
-        	    "   UPSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE UPSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID)" + 
+        String sql = "SELECT DISTINCT UPSTREAM_JOB.FULL_NAME, UPSTREAM_BUILD.NUMBER " +
+        	    " FROM JENKINS_JOB AS UPSTREAM_JOB" +
+        	    " INNER JOIN JENKINS_BUILD AS UPSTREAM_BUILD ON UPSTREAM_JOB.ID = UPSTREAM_BUILD.JOB_ID " +
+        	    " INNER JOIN MAVEN_PARENT_PROJECT ON UPSTREAM_BUILD.ID = MAVEN_PARENT_PROJECT.BUILD_ID" +
+        	    " WHERE " +
+        	    "   MAVEN_PARENT_PROJECT.ARTIFACT_ID IN (" + dependenciesSql + ") AND " +
+        	    "   UPSTREAM_BUILD.NUMBER in (SELECT MAX(JENKINS_BUILD.NUMBER) FROM JENKINS_BUILD WHERE UPSTREAM_JOB.ID = JENKINS_BUILD.JOB_ID) AND" +
+                "   UPSTREAM_JOB.JENKINS_MASTER_ID = ? " +
         	    " ORDER BY UPSTREAM_JOB.FULL_NAME";
 
         Map<String, Integer> upstreamJobsFullNames = new HashMap<>();
@@ -675,7 +711,9 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             try (PreparedStatement stmt = cnn.prepareStatement(sql)) {
                 stmt.setString(1, jobFullName);
-                stmt.setInt(2, buildNumber);
+                stmt.setLong(2,getJenkinsMasterPrimaryKey(cnn));
+                stmt.setInt(3, buildNumber);
+                stmt.setLong(4, getJenkinsMasterPrimaryKey(cnn));
                 try (ResultSet rst = stmt.executeQuery()) {
                     while (rst.next()) {
                     	upstreamJobsFullNames.put(rst.getString(1), rst.getInt(2));
@@ -689,12 +727,12 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
         return upstreamJobsFullNames;
     }
-    
+
     @Nonnull
     public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
         return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<String, Integer>());
     }
-    
+
     private Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, Map<String, Integer> result) {
         for(Entry<String, Integer> entry : listUpstreamJobs(jobFullName, buildNumber).entrySet()) {
             String upstreamJobName = entry.getKey();
@@ -706,7 +744,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         }
         return result;
     }
-    
+
     /**
      * List the artifacts generated by the given build
      *
@@ -724,13 +762,15 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 " INNER JOIN JENKINS_JOB AS UPSTREAM_JOB ON UPSTREAM_BUILD.JOB_ID = UPSTREAM_JOB.ID " +
                 " WHERE " +
                 "   UPSTREAM_JOB.FULL_NAME = ? AND" +
+                "   UPSTREAM_JOB.JENKINS_MASTER_ID = ? AND" +
                 "   UPSTREAM_BUILD.NUMBER = ? ";
 
         List<MavenArtifact> results = new ArrayList<>();
         try (Connection cnn = this.jdbcConnectionPool.getConnection()) {
             try (PreparedStatement stmt = cnn.prepareStatement(generatedArtifactsSql)) {
                 stmt.setString(1, jobFullName);
-                stmt.setInt(2, buildNumber);
+                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
+                stmt.setInt(3, buildNumber);
                 try (ResultSet rst = stmt.executeQuery()) {
                     while (rst.next()) {
                         MavenArtifact artifact = new MavenArtifact();
@@ -759,12 +799,51 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         return results;
     }
 
+    @Nonnull
+    public synchronized Long getJenkinsMasterPrimaryKey(Connection cnn) throws SQLException {
+        if (this.jenkinsMasterPrimaryKey == null) {
+            String jenkinsMasterLegacyInstanceId = getJenkinsDetails().getMasterLegacyInstanceId();
+            String jenkinsMasterUrl = getJenkinsDetails().getMasterRootUrl();
+
+            try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM JENKINS_MASTER WHERE LEGACY_INSTANCE_ID=?")) {
+                stmt.setString(1, jenkinsMasterLegacyInstanceId);
+                try (ResultSet rst = stmt.executeQuery()) {
+                    if(rst.next()) {
+                        this.jenkinsMasterPrimaryKey = rst.getLong("ID");
+                    }
+                }
+            }
+            if(this.jenkinsMasterPrimaryKey == null) {
+                try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO JENKINS_MASTER(LEGACY_INSTANCE_ID, URL) values (?, ?)")) {
+                    stmt.setString(1, jenkinsMasterLegacyInstanceId);
+                    stmt.setString(2, jenkinsMasterUrl);
+                    stmt.execute();
+                    try (ResultSet rst = stmt.getGeneratedKeys()) {
+                        if (rst.next()) {
+                            this.jenkinsMasterPrimaryKey = rst.getLong(1);
+                        } else {
+                            throw new IllegalStateException();
+                        }
+                    }
+                }
+            }
+        }
+        return this.jenkinsMasterPrimaryKey;
+    }
+
+    /**
+     * for mocking
+     */
+    protected MigrationStep.JenkinsDetails getJenkinsDetails() {
+        return new MigrationStep.JenkinsDetails();
+    }
+
     @Override
     public String toPrettyString() {
         List<String> prettyStrings = new ArrayList<>();
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             prettyStrings.add("jdbc.url: " + cnn.getMetaData().getURL());
-            List<String> tables = Arrays.asList("MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT", "MAVEN_PARENT_PROJECT");
+            List<String> tables = Arrays.asList("JENKINS_MASTER", "MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT", "MAVEN_PARENT_PROJECT");
             for (String table : tables) {
                 try (Statement stmt = cnn.createStatement()) {
                     try (ResultSet rst = stmt.executeQuery("SELECT count(*) FROM " + table)) {

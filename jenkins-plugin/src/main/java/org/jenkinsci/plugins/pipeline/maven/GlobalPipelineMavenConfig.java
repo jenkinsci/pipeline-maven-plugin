@@ -1,12 +1,20 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
+import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import hudson.Extension;
 import hudson.model.Result;
+import hudson.security.ACL;
+import hudson.util.ListBoxModel;
+import hudson.util.Secret;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import jenkins.tools.ToolConfigurationCategory;
 import net.sf.json.JSONObject;
+import org.h2.jdbcx.JdbcConnectionPool;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
@@ -16,17 +24,16 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -37,13 +44,16 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
     private final static Logger LOGGER = Logger.getLogger(GlobalPipelineMavenConfig.class.getName());
 
-    private PipelineMavenPluginDao dao;
+    private transient PipelineMavenPluginDao dao;
 
     private boolean triggerDownstreamUponResultSuccess = true;
     private boolean triggerDownstreamUponResultUnstable;
     private boolean triggerDownstreamUponResultFailure;
     private boolean triggerDownstreamUponResultNotBuilt;
     private boolean triggerDownstreamUponResultAborted;
+
+    private String jdbcUrl;
+    private String jdbcCredentialsId;
 
     @DataBoundConstructor
     public GlobalPipelineMavenConfig() {
@@ -112,6 +122,30 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         this.triggerDownstreamUponResultAborted = triggerDownstreamUponResultAborted;
     }
 
+    public synchronized String getJdbcUrl() {
+        return jdbcUrl;
+    }
+
+    @DataBoundSetter
+    public synchronized void setJdbcUrl(String jdbcUrl) {
+        if (!Objects.equals(jdbcUrl, this.jdbcUrl)) {
+            this.dao = null;
+        }
+        this.jdbcUrl = jdbcUrl;
+    }
+
+    public synchronized String getJdbcCredentialsId() {
+        return jdbcCredentialsId;
+    }
+
+    @DataBoundSetter
+    public synchronized void setJdbcCredentialsId(String jdbcCredentialsId) {
+        if (!Objects.equals(jdbcCredentialsId, this.jdbcCredentialsId)) {
+            this.dao = null;
+        }
+        this.jdbcCredentialsId = jdbcCredentialsId;
+    }
+
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
         req.bindJSON(this, json);
@@ -121,18 +155,44 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         return true;
     }
 
+    @Nonnull
     public synchronized PipelineMavenPluginDao getDao() {
         if (dao == null) {
             try {
-                File jenkinsRootDir = Jenkins.getInstance().getRootDir();
-                File databaseRootDir = new File(jenkinsRootDir, "jenkins-jobs");
-                if (!databaseRootDir.exists()) {
-                    boolean created = databaseRootDir.mkdirs();
-                    if (!created) {
-                        throw new IllegalStateException("Failure to create database root dir " + databaseRootDir);
+                if (jdbcUrl == null || jdbcUrl.trim().isEmpty()) {
+                    File jenkinsRootDir = Jenkins.getInstance().getRootDir();
+                    File databaseRootDir = new File(jenkinsRootDir, "jenkins-jobs");
+                    if (!databaseRootDir.exists()) {
+                        boolean created = databaseRootDir.mkdirs();
+                        if (!created) {
+                            throw new IllegalStateException("Failure to create database root dir " + databaseRootDir);
+                        }
                     }
+                    dao = new PipelineMavenPluginMonitoringDao(new PipelineMavenPluginH2Dao(databaseRootDir));
+                } else if (jdbcUrl.startsWith("jdbc:h2:")) {
+                    UsernamePasswordCredentials credentials;
+                    if (jdbcCredentialsId == null || jdbcCredentialsId.isEmpty()) {
+                        throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
+                    } else {
+                        credentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
+                                CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.getInstance(),
+                                        ACL.SYSTEM, Collections.EMPTY_LIST),
+                                CredentialsMatchers.withId(this.jdbcCredentialsId));
+                        if (credentials == null) {
+                            throw new IllegalStateException("Credentials '" + jdbcCredentialsId + "' defined for JDBC URL '" + jdbcUrl + "' NOT found");
+                        }
+                    }
+
+                    JdbcConnectionPool jdbcConnectionPool = JdbcConnectionPool.create(this.jdbcUrl, credentials.getUsername(), Secret.toString(credentials.getPassword()));
+                    try (Connection cnn = jdbcConnectionPool.getConnection()) {
+                        dao = new PipelineMavenPluginMonitoringDao(new PipelineMavenPluginH2Dao(jdbcConnectionPool));
+                    } catch (Exception e) {
+                        throw new SQLException("Exception connecting to '" + this.jdbcUrl + "' with credentials '" + this.jdbcCredentialsId + "' - " + credentials, e);
+                    }
+                } else {
+                    LOGGER.warning("Unsupported jdbc URL '" + jdbcUrl + "'. JDBC URL must start with 'jdbc:h2:'");
+                    dao = new PipelineMavenPluginNullDao();
                 }
-                dao = new PipelineMavenPluginMonitoringDao(new PipelineMavenPluginH2Dao(databaseRootDir));
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Exception creating database dao, skip", e);
                 dao = new PipelineMavenPluginNullDao();
@@ -161,5 +221,18 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     @Nullable
     public static GlobalPipelineMavenConfig get() {
         return GlobalConfiguration.all().get(GlobalPipelineMavenConfig.class);
+    }
+
+    public ListBoxModel doFillJdbcCredentialsIdItems() {
+        // use deprecated "withMatching" because, even after 20 mins of research,
+        // I didn't understand how to use the new "recommended" API
+        return new StandardListBoxModel()
+                .includeEmptyValue()
+                .withMatching(
+                        CredentialsMatchers.always(),
+                        CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class,
+                                Jenkins.getInstance(),
+                                ACL.SYSTEM,
+                                Collections.EMPTY_LIST));
     }
 }

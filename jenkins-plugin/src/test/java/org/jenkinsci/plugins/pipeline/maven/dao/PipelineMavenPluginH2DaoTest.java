@@ -7,6 +7,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
+import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 import org.jenkinsci.plugins.pipeline.maven.util.SqlTestsUtils;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +29,22 @@ public class PipelineMavenPluginH2DaoTest {
     public void before() {
         jdbcConnectionPool = JdbcConnectionPool.create("jdbc:h2:mem:", "sa", "");
         SqlTestsUtils.silentlyDeleteTableRows(jdbcConnectionPool, "JENKINS_BUILD", "MAVEN_ARTIFACT", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT");
-        dao = new PipelineMavenPluginH2Dao(jdbcConnectionPool);
+        dao = new PipelineMavenPluginH2Dao(jdbcConnectionPool) {
+            @Override
+            protected MigrationStep.JenkinsDetails getJenkinsDetails() {
+                return new MigrationStep.JenkinsDetails() {
+                    @Override
+                    public String getMasterLegacyInstanceId() {
+                        return "123456";
+                    }
+
+                    @Override
+                    public String getMasterRootUrl() {
+                        return "https://jenkins.mycompany.com/";
+                    }
+                };
+            }
+        };
 
     }
 
