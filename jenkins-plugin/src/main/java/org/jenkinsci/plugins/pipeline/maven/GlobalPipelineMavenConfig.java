@@ -193,7 +193,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     LOGGER.warning("Unsupported jdbc URL '" + jdbcUrl + "'. JDBC URL must start with 'jdbc:h2:'");
                     dao = new PipelineMavenPluginNullDao();
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException | SQLException e) {
                 LOGGER.log(Level.WARNING, "Exception creating database dao, skip", e);
                 dao = new PipelineMavenPluginNullDao();
             }

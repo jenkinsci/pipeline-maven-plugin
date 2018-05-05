@@ -444,13 +444,14 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                         throw new RuntimeIoException("Exception reading " + sqlScriptPath, e);
                     }
 
+                    String className = "org.jenkinsci.plugins.pipeline.maven.db.migration.h2.MigrationStep" + idx;
                     try {
-                        String className = "org.jenkinsci.plugins.pipeline.maven.db.migration.h2.MigrationStep" + idx;
                         MigrationStep migrationStep = (MigrationStep) Class.forName(className).newInstance();
                         LOGGER.log(Level.FINE, "Execute database migration step {0}", migrationStep.getClass().getName());
                         migrationStep.execute(cnn, getJenkinsDetails());
                     } catch (ClassNotFoundException e) {
                         // no migration class found, just a migration script
+                        LOGGER.log(Level.FINER, "Migration step {0} not found", new Object[]{className});
                     } catch (Exception e) {
                         cnn.rollback();
                         throw new RuntimeException(e);
