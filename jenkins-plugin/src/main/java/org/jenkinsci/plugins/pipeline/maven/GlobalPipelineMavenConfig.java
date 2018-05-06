@@ -187,7 +187,9 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     try (Connection cnn = jdbcConnectionPool.getConnection()) {
                         dao = new PipelineMavenPluginMonitoringDao(new PipelineMavenPluginH2Dao(jdbcConnectionPool));
                     } catch (Exception e) {
-                        throw new SQLException("Exception connecting to '" + this.jdbcUrl + "' with credentials '" + this.jdbcCredentialsId + "' - " + credentials, e);
+                        throw new SQLException(
+                                "Exception connecting to '" + this.jdbcUrl + "' with credentials '" + this.jdbcCredentialsId + "' - " +
+                                        (credentials == null? null: credentials.getUsername() + "/***"), e);
                     }
                 } else {
                     LOGGER.warning("Unsupported jdbc URL '" + jdbcUrl + "'. JDBC URL must start with 'jdbc:h2:'");

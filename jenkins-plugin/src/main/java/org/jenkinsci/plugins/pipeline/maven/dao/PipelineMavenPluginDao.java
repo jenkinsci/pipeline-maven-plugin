@@ -187,4 +187,16 @@ public interface PipelineMavenPluginDao {
      * Human readable toString
      */
     String toPrettyString();
+
+
+    /**
+     * Update the database with build result details.
+     *
+     * @param jobFullName see {@link Item#getFullName()}
+     * @param buildNumber see {@link Run#getNumber()}
+     * @param buildResultOrdinal see {@link hudson.model.Result#ordinal}
+     * @param startTimeInMillis see {@link Run#getStartTimeInMillis()}
+     * @param durationInMillis see {@link Run#getDuration()}
+     */
+    void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis);
 }
