@@ -189,7 +189,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     } catch (Exception e) {
                         throw new SQLException(
                                 "Exception connecting to '" + this.jdbcUrl + "' with credentials '" + this.jdbcCredentialsId + "' - " +
-                                        (credentials == null? null: credentials.getUsername() + "/***"), e);
+                                        credentials.getUsername() + "/***", e);
                     }
                 } else {
                     LOGGER.warning("Unsupported jdbc URL '" + jdbcUrl + "'. JDBC URL must start with 'jdbc:h2:'");
