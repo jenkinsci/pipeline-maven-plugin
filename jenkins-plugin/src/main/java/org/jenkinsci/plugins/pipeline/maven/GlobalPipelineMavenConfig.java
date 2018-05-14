@@ -184,7 +184,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     }
 
                     JdbcConnectionPool jdbcConnectionPool = JdbcConnectionPool.create(this.jdbcUrl, credentials.getUsername(), Secret.toString(credentials.getPassword()));
-                    try (Connection cnn = jdbcConnectionPool.getConnection()) {
+                    try {
                         dao = new PipelineMavenPluginMonitoringDao(new PipelineMavenPluginH2Dao(jdbcConnectionPool));
                     } catch (Exception e) {
                         throw new SQLException(
