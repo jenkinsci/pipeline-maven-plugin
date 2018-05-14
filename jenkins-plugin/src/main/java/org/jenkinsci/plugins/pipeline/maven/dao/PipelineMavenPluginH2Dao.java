@@ -72,7 +72,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         rootDir.getClass(); // check non null
 
         File databaseFile = new File(rootDir, "jenkins-jobs");
-        String jdbcUrl = "jdbc:h2:file:" + databaseFile.getAbsolutePath() + ";AUTO_SERVER=TRUE;MULTI_THREADED=1";
+        String jdbcUrl = "jdbc:h2:file:" + databaseFile.getAbsolutePath() + ";AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
         if (LOGGER.isLoggable(Level.FINEST)) {
             jdbcUrl += ";TRACE_LEVEL_SYSTEM_OUT=3";
         } else if (LOGGER.isLoggable(Level.FINE)) {
