@@ -3,7 +3,7 @@
 #
 
 # cf. JavaContainer/Dockerfile
-FROM jenkins/java:b2ba021c5fa1
+FROM jenkins/java:d93654cc6239
 
 RUN apt-get update
 RUN apt-get install --no-install-recommends -y git
