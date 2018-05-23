@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
 import hudson.Extension;
+import hudson.model.Cause;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
@@ -22,6 +23,22 @@ public class DatabaseSyncRunListener extends RunListener<WorkflowRun> {
     @Override
     public void onDeleted(WorkflowRun run) {
         globalPipelineMavenConfig.getDao().deleteBuild(run.getParent().getFullName(), run.getNumber());
+    }
+
+    @Override
+    public void onInitialize(WorkflowRun run) {
+        super.onInitialize(run);
+
+        for (Cause cause: run.getCauses()) {
+            if (cause instanceof Cause.UpstreamCause) {
+                Cause.UpstreamCause upstreamCause = (Cause.UpstreamCause) cause;
+
+                String upstreamJobName = upstreamCause.getUpstreamProject();
+                int upstreamBuildNumber = upstreamCause.getUpstreamBuild();
+                globalPipelineMavenConfig.getDao().recordBuildUpstreamCause(upstreamJobName, upstreamBuildNumber, run.getParent().getFullName(), run.getNumber());
+            }
+        }
+
     }
 
     /*

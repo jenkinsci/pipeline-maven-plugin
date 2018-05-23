@@ -62,6 +62,18 @@ public class PipelineMavenPluginMonitoringDao implements PipelineMavenPluginDao 
     }
 
     @Override
+    public void recordBuildUpstreamCause(String upstreamJobName, int upstreamBuildNumber, String downstreamJobName, int downstreamBuildNumber) {
+        long nanosBefore = System.nanoTime();
+        try {
+            delegate.recordBuildUpstreamCause(upstreamJobName, upstreamBuildNumber, downstreamJobName, downstreamBuildNumber);
+        } finally {
+            long nanosAfter = System.nanoTime();
+            writeCount.incrementAndGet();
+            writeDurationInNanos.addAndGet(nanosAfter - nanosBefore);
+        }
+    }
+
+    @Override
     @Nonnull
     public List<MavenDependency> listDependencies(@Nonnull String jobFullName, int buildNumber) {
         long nanosBefore = System.nanoTime();

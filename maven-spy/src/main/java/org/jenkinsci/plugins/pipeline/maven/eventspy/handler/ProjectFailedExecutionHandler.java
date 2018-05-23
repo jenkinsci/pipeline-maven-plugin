@@ -24,13 +24,9 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
-import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.ExecutionEvent;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
-import java.io.File;
 import java.util.Collections;
 import java.util.List;
 

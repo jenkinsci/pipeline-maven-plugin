@@ -68,6 +68,12 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     }
 
     @Override
+    public void recordBuildUpstreamCause(String upstreamJobName, int upstreamBuildNumber, String downstreamJobName, int downstreamBuildNumber) {
+        LOGGER.log(Level.INFO, "recordBuildUpstreamCause(upstreamBuild: {0}#{1}, downstreamBuild: {2}#{3})",
+                new Object[]{upstreamJobName, upstreamBuildNumber, downstreamJobName, downstreamBuildNumber});
+    }
+
+    @Override
     public void renameJob(String oldFullName, String newFullName) {
         LOGGER.log(Level.INFO, "renameJob({0}, {1})", new Object[]{oldFullName, newFullName});
 
