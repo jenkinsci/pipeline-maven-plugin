@@ -5,15 +5,7 @@ import static org.hamcrest.CoreMatchers.*;
 
 import hudson.util.StreamTaskListener;
 import org.hamcrest.CoreMatchers;
-import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
-import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.*;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +30,7 @@ public class MavenPublisherStrategyTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         List<MavenPublisher> mavenPublishers = MavenPublisherStrategy.IMPLICIT.buildPublishersList(Collections.<MavenPublisher>emptyList(), new StreamTaskListener(baos));
-        Assert.assertThat(mavenPublishers.size(), CoreMatchers.is(10));
+        Assert.assertThat(mavenPublishers.size(), CoreMatchers.is(11));
 
         Map<String, MavenPublisher> reportersByDescriptorId = new HashMap<>();
         for(MavenPublisher mavenPublisher : mavenPublishers) {
@@ -46,6 +38,7 @@ public class MavenPublisherStrategyTest {
         }
         assertThat(reportersByDescriptorId.containsKey(new GeneratedArtifactsPublisher.DescriptorImpl().getId()), is(true));
         assertThat(reportersByDescriptorId.containsKey(new FindbugsAnalysisPublisher.DescriptorImpl().getId()), is(true));
+        assertThat(reportersByDescriptorId.containsKey(new SpotBugsAnalysisPublisher.DescriptorImpl().getId()), is(true));
         assertThat(reportersByDescriptorId.containsKey(new JunitTestsPublisher.DescriptorImpl().getId()), is(true));
         assertThat(reportersByDescriptorId.containsKey(new TasksScannerPublisher.DescriptorImpl().getId()), is(true));
         assertThat(reportersByDescriptorId.containsKey(new PipelineGraphPublisher.DescriptorImpl().getId()), is(true));
