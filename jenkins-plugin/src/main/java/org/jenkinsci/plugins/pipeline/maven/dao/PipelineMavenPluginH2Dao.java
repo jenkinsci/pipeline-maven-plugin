@@ -876,7 +876,8 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         List<String> prettyStrings = new ArrayList<>();
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             prettyStrings.add("jdbc.url: " + cnn.getMetaData().getURL());
-            List<String> tables = Arrays.asList("JENKINS_MASTER", "MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT", "MAVEN_PARENT_PROJECT");
+            List<String> tables = Arrays.asList("JENKINS_MASTER", "MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD",
+                    "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT", "MAVEN_PARENT_PROJECT", "JENKINS_BUILD_UPSTREAM_CAUSE");
             for (String table : tables) {
                 try (Statement stmt = cnn.createStatement()) {
                     try (ResultSet rst = stmt.executeQuery("SELECT count(*) FROM " + table)) {
