@@ -214,6 +214,34 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     }
 
     @Override
+    public void recordBuildUpstreamCause(String upstreamJobName, int upstreamBuildNumber, String downstreamJobName, int downstreamBuildNumber) {
+        LOGGER.log(Level.FINE, "recordBuildUpstreamCause(upstreamBuild: {0}#{1}, downstreamBuild: {2}#{3})",
+                new Object[]{upstreamJobName, upstreamBuildNumber, downstreamJobName, downstreamBuildNumber});
+        try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            cnn.setAutoCommit(false);
+            String sql = "insert into jenkins_build_upstream_cause (upstream_build_id, downstream_build_id) values (?, ?)";
+
+            long upstreamBuildPrimaryKey = getOrCreateBuildPrimaryKey(upstreamJobName, upstreamBuildNumber);
+            long downstreamBuildPrimaryKey = getOrCreateBuildPrimaryKey(downstreamJobName, downstreamBuildNumber);
+
+            try (PreparedStatement stmt = cnn.prepareStatement(sql)) {
+                stmt.setLong(1, upstreamBuildPrimaryKey);
+                stmt.setLong(2, downstreamBuildPrimaryKey);
+
+                int rowCount = stmt.executeUpdate();
+                if (rowCount != 1) {
+                    LOGGER.log(Level.INFO, "More/less ({0}) than 1 record inserted in jenkins_build_upstream_cause for upstreamBuild: {1}#{2}, downstreamBuild: {3}#{4}",
+                            new Object[]{rowCount, upstreamJobName, upstreamBuildNumber, downstreamJobName, downstreamBuildNumber});
+                }
+            }
+            cnn.commit();
+        } catch (SQLException e) {
+            throw new RuntimeSqlException(e);
+        }
+
+    }
+
+    @Override
     public void renameJob(String oldFullName, String newFullName) {
         LOGGER.log(Level.FINER, "renameJob({0}, {1})", new Object[]{oldFullName, newFullName});
         try (Connection cnn = jdbcConnectionPool.getConnection()) {

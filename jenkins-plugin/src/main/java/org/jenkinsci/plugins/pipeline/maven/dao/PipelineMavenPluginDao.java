@@ -91,6 +91,8 @@ public interface PipelineMavenPluginDao {
                                  @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nonnull String baseVersion,
                                  @Nullable String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier);
 
+    void recordBuildUpstreamCause(String upstreamJobName, int upstreamBuildNumber, String downstreamJobName, int downstreamBuildNumber);
+
     /**
      * Return the dependencies registered by the given build.
      *
