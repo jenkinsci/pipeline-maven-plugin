@@ -1,0 +1,169 @@
+<mavenExecution _time="2018-06-04 09:32:12.323">
+    <context _time="2018-06-04 09:32:12.338">
+        <systemProperties/>
+        <versionProperties/>
+        <workingDirectory/>
+        <userProperties/>
+        <plexus/>
+    </context>
+    <DefaultSettingsBuildingRequest class="org.apache.maven.settings.building.DefaultSettingsBuildingRequest" _time="2018-06-04 09:32:12.458">
+        <userSettingsFile>/path/to/.m2/settings.xml</userSettingsFile>
+        <globalSettings>/path/to/maven/conf/settings.xml</globalSettings>
+    </DefaultSettingsBuildingRequest>
+    <MavenExecutionRequest class="org.apache.maven.execution.DefaultMavenExecutionRequest" _time="2018-06-04 09:32:12.489">
+        <pom>/path/to/test-spotbugs/pom.xml</pom>
+        <globalSettingsFile>/path/to/maven/conf/settings.xml</globalSettingsFile>
+        <userSettingsFile>/path/to/.m2/settings.xml</userSettingsFile>
+        <baseDirectory>/path/to/test-spotbugs</baseDirectory>
+    </MavenExecutionRequest>
+    <ExecutionEvent type="ProjectDiscoveryStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-06-04 09:32:12.855">
+        <project/>
+        <no-execution-found/>
+    </ExecutionEvent>
+    <ExecutionEvent type="SessionStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-06-04 09:32:13.042">
+        <project baseDir="/path/to/test-spotbugs" file="/path/to/test-spotbugs/pom.xml" groupId="com.example.spotbugs" name="my-jar" artifactId="my-jar" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/test-spotbugs/src/main/java" directory="/path/to/test-spotbugs/target"/>
+        </project>
+        <no-execution-found/>
+    </ExecutionEvent>
+    <ExecutionEvent type="ProjectStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-06-04 09:32:13.152">
+        <project baseDir="/path/to/test-spotbugs" file="/path/to/test-spotbugs/pom.xml" groupId="com.example.spotbugs" name="my-jar" artifactId="my-jar" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/test-spotbugs/src/main/java" directory="/path/to/test-spotbugs/target"/>
+        </project>
+        <no-execution-found/>
+    </ExecutionEvent>
+    <DependencyResolutionRequest class="org.apache.maven.project.DefaultDependencyResolutionRequest" _time="2018-06-04 09:32:13.162">
+        <project baseDir="/path/to/test-spotbugs" file="/path/to/test-spotbugs/pom.xml" groupId="com.example.spotbugs" name="my-jar" artifactId="my-jar" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/test-spotbugs/src/main/java" directory="/path/to/test-spotbugs/target"/>
+        </project>
+    </DependencyResolutionRequest>
+    <DependencyResolutionResult class="org.apache.maven.project.DefaultDependencyResolutionResult" _time="2018-06-04 09:32:13.203">
+        <resolvedDependencies>
+            <dependency extension="jar" baseVersion="4.12" groupId="junit" scope="test" name="junit-4.12.jar" classifier="" artifactId="junit" optional="false" id="junit" type="jar" version="4.12" snapshot="false">
+                <file>/path/to/.m2/repository/junit/junit/4.12/junit-4.12.jar</file>
+            </dependency>
+            <dependency extension="jar" baseVersion="1.3" groupId="org.hamcrest" scope="test" name="hamcrest-core-1.3.jar" classifier="" artifactId="hamcrest-core" optional="false" id="hamcrest-core" type="jar" version="1.3" snapshot="false">
+                <file>/path/to/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar</file>
+            </dependency>
+        </resolvedDependencies>
+    </DependencyResolutionResult>
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-06-04 09:32:13.205">
+        <project baseDir="/path/to/test-spotbugs" file="/path/to/test-spotbugs/pom.xml" groupId="com.example.spotbugs" name="my-jar" artifactId="my-jar" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/test-spotbugs/src/main/java" directory="/path/to/test-spotbugs/target"/>
+        </project>
+        <plugin executionId="default-cli" goal="spotbugs" groupId="com.github.spotbugs" artifactId="spotbugs-maven-plugin" version="3.1.3">
+            <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <debug>${spotbugs.debug}</debug>
+            <effort>${spotbugs.effort}</effort>
+            <excludeBugsFile>${spotbugs.excludeBugsFile}</excludeBugsFile>
+            <excludeFilterFile>${spotbugs.excludeFilterFile}</excludeFilterFile>
+            <failOnError>${spotbugs.failOnError}</failOnError>
+            <fork>${spotbugs.fork}</fork>
+            <includeFilterFile>${spotbugs.includeFilterFile}</includeFilterFile>
+            <includeTests>${spotbugs.includeTests}</includeTests>
+            <inputEncoding>${encoding}</inputEncoding>
+            <jvmArgs>${spotbugs.jvmArgs}</jvmArgs>
+            <localRepository>${localRepository}</localRepository>
+            <maxHeap>${spotbugs.maxHeap}</maxHeap>
+            <maxRank>${spotbugs.maxRank}</maxRank>
+            <nested>${spotbugs.nested}</nested>
+            <omitVisitors>${spotbugs.omitVisitors}</omitVisitors>
+            <onlyAnalyze>${spotbugs.onlyAnalyze}</onlyAnalyze>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+            <outputEncoding>${outputEncoding}</outputEncoding>
+            <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
+            <pluginList>${spotbugs.pluginList}</pluginList>
+            <project>${project}</project>
+            <relaxed>${spotbugs.relaxed}</relaxed>
+            <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
+            <remoteRepositories>${project.remoteArtifactRepositories}</remoteRepositories>
+            <skip>${spotbugs.skip}</skip>
+            <skipEmptyReport>${spotbugs.skipEmptyReport}</skipEmptyReport>
+            <sourceEncoding>${encoding}</sourceEncoding>
+            <spotbugsXmlOutput>true</spotbugsXmlOutput>
+            <spotbugsXmlOutputDirectory>${project.build.directory}</spotbugsXmlOutputDirectory>
+            <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
+            <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
+            <threshold>${spotbugs.threshold}</threshold>
+            <timeout>${spotbugs.timeout}</timeout>
+            <trace>${spotbugs.trace}</trace>
+            <userPrefs>${spotbugs.userPrefs}</userPrefs>
+            <visitors>${spotbugs.visitors}</visitors>
+            <xmlEncoding>UTF-8</xmlEncoding>
+            <xmlOutput>${spotbugs.xmlOutput}</xmlOutput>
+            <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+            <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
+            <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-06-04 09:32:19.043">
+        <project baseDir="/path/to/test-spotbugs" file="/path/to/test-spotbugs/pom.xml" groupId="com.example.spotbugs" name="my-jar" artifactId="my-jar" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/test-spotbugs/src/main/java" directory="/path/to/test-spotbugs/target"/>
+        </project>
+        <plugin executionId="default-cli" goal="spotbugs" groupId="com.github.spotbugs" artifactId="spotbugs-maven-plugin" version="3.1.3">
+            <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
+            <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
+            <debug>${spotbugs.debug}</debug>
+            <effort>${spotbugs.effort}</effort>
+            <excludeBugsFile>${spotbugs.excludeBugsFile}</excludeBugsFile>
+            <excludeFilterFile>${spotbugs.excludeFilterFile}</excludeFilterFile>
+            <failOnError>${spotbugs.failOnError}</failOnError>
+            <fork>${spotbugs.fork}</fork>
+            <includeFilterFile>${spotbugs.includeFilterFile}</includeFilterFile>
+            <includeTests>${spotbugs.includeTests}</includeTests>
+            <inputEncoding>${encoding}</inputEncoding>
+            <jvmArgs>${spotbugs.jvmArgs}</jvmArgs>
+            <localRepository>${localRepository}</localRepository>
+            <maxHeap>${spotbugs.maxHeap}</maxHeap>
+            <maxRank>${spotbugs.maxRank}</maxRank>
+            <nested>${spotbugs.nested}</nested>
+            <omitVisitors>${spotbugs.omitVisitors}</omitVisitors>
+            <onlyAnalyze>${spotbugs.onlyAnalyze}</onlyAnalyze>
+            <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
+            <outputEncoding>${outputEncoding}</outputEncoding>
+            <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
+            <pluginList>${spotbugs.pluginList}</pluginList>
+            <project>${project}</project>
+            <relaxed>${spotbugs.relaxed}</relaxed>
+            <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
+            <remoteRepositories>${project.remoteArtifactRepositories}</remoteRepositories>
+            <skip>${spotbugs.skip}</skip>
+            <skipEmptyReport>${spotbugs.skipEmptyReport}</skipEmptyReport>
+            <sourceEncoding>${encoding}</sourceEncoding>
+            <spotbugsXmlOutput>true</spotbugsXmlOutput>
+            <spotbugsXmlOutputDirectory>${project.build.directory}</spotbugsXmlOutputDirectory>
+            <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
+            <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
+            <threshold>${spotbugs.threshold}</threshold>
+            <timeout>${spotbugs.timeout}</timeout>
+            <trace>${spotbugs.trace}</trace>
+            <userPrefs>${spotbugs.userPrefs}</userPrefs>
+            <visitors>${spotbugs.visitors}</visitors>
+            <xmlEncoding>UTF-8</xmlEncoding>
+            <xmlOutput>${spotbugs.xmlOutput}</xmlOutput>
+            <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
+            <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
+            <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
+        </plugin>
+    </ExecutionEvent>
+    <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-06-04 09:32:19.044">
+        <project baseDir="/path/to/test-spotbugs" file="/path/to/test-spotbugs/pom.xml" groupId="com.example.spotbugs" name="my-jar" artifactId="my-jar" version="0.1-SNAPSHOT">
+            <build sourceDirectory="/path/to/test-spotbugs/src/main/java" directory="/path/to/test-spotbugs/target"/>
+        </project>
+        <no-execution-found/>
+        <artifact extension="jar" baseVersion="0.1-SNAPSHOT" groupId="com.example.spotbugs" artifactId="my-jar" id="com.example.spotbugs:my-jar:jar:0.1-SNAPSHOT" type="jar" version="0.1-SNAPSHOT" snapshot="true">
+            <file/>
+        </artifact>
+        <attachedArtifacts/>
+    </ExecutionEvent>
+    <MavenExecutionResult class="org.apache.maven.execution.DefaultMavenExecutionResult" _time="2018-06-04 09:32:19.051">
+        <buildSummary baseDir="/path/to/test-spotbugs" file="/path/to/test-spotbugs/pom.xml" groupId="com.example.spotbugs" name="my-jar" artifactId="my-jar" time="5893" version="0.1-SNAPSHOT" class="org.apache.maven.execution.BuildSuccess">
+            <build sourceDirectory="/path/to/test-spotbugs/src/main/java" directory="/path/to/test-spotbugs/target"/>
+        </buildSummary>
+    </MavenExecutionResult>
+    <!-- 2018-06-04 09:32:19.051 - close:                                       -->
+    <!-- ignored:[org.apache.maven.settings.building.DefaultSettingsBuildingResult], -->
+    <!-- blackListed: []                                                        -->
+
+</mavenExecution>
