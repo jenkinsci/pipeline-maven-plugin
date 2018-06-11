@@ -1,13 +1,10 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
 import com.cloudbees.hudson.plugins.folder.computed.ComputedFolder;
+import edu.emory.mathcs.backport.java.util.Collections;
 import hudson.Extension;
 import hudson.console.ModelHyperlinkNote;
-import hudson.model.Cause;
-import hudson.model.CauseAction;
-import hudson.model.Item;
-import hudson.model.Queue;
-import hudson.model.TaskListener;
+import hudson.model.*;
 import hudson.model.listeners.RunListener;
 import hudson.model.queue.Tasks;
 import hudson.security.ACL;
@@ -23,8 +20,10 @@ import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,42 +58,58 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             return;
         }
 
-        WorkflowJob upstreamPipeline = upstreamBuild.getParent();
-        List<String> downstreamPipelines = globalPipelineMavenConfig.getDao().listDownstreamJobs(upstreamPipeline.getFullName(), upstreamBuild.getNumber());
+        try {
+            checkNoInfiniteLoopOfUpstreamCause(upstreamBuild);
+        } catch (IllegalStateException e) {
+            listener.getLogger().println("[withMaven] WARNING abort infinite build trigger loop. Please consider opening a Jira issue: " + e.getMessage());
+            return;
+        }
 
-        // Don't trigger myself
-        downstreamPipelines.remove(upstreamPipeline.getFullName());
-        
-        outer:
+        WorkflowJob upstreamPipeline = upstreamBuild.getParent();
+
+        String upstreamPipelineFullName = upstreamPipeline.getFullName();
+        int upstreamBuildNumber = upstreamBuild.getNumber();
+        List<String> downstreamPipelines = globalPipelineMavenConfig.getDao().listDownstreamJobs(upstreamPipelineFullName, upstreamBuildNumber);
+
+        downstreamPipelinesLoop:
         for (String downstreamPipelineFullName : downstreamPipelines) {
-            final WorkflowJob downstreamPipeline = Jenkins.getInstance().getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
-            if (downstreamPipeline == null) {
-                LOGGER.log(Level.FINE, "Downstream pipeline {0} not found from upstream build {1} with authentication {2}. Database synchronization issue?",
-                        new Object[]{downstreamPipelineFullName, upstreamBuild.getFullDisplayName(), Jenkins.getAuthentication()});
-                // job not found, the database was probably out of sync
+            if (Objects.equals(downstreamPipelineFullName, upstreamPipelineFullName)) {
+                // Don't trigger myself
                 continue;
             }
-            
+
+            final WorkflowJob downstreamPipeline = Jenkins.getInstance().getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
+            if (downstreamPipeline == null || downstreamPipeline.getLastBuild() == null) {
+                LOGGER.log(Level.FINE, "Downstream pipeline {0} or downstream pipeline last build not found from upstream build {1}. Database synchronization issue or security restriction?",
+                        new Object[]{downstreamPipelineFullName, upstreamBuild.getFullDisplayName(), Jenkins.getAuthentication()});
+                continue;
+            }
+
+            int downstreamBuildNumber = downstreamPipeline.getLastBuild().getNumber();
+
+            List<String> downstreamDownstreamPipelines = globalPipelineMavenConfig.getDao().listDownstreamJobs(downstreamPipelineFullName, downstreamBuildNumber);
+            if (downstreamDownstreamPipelines.contains(upstreamPipelineFullName)) {
+                // prevent infinite loop
+                continue;
+            }
+
             // Avoid excessive triggering
             // See #46313
-            if(downstreamPipeline.getLastBuild() != null) {
-                int downstreamBuildNumber = downstreamPipeline.getLastBuild().getNumber();
-                Map<String, Integer> transitiveUpstreamPipelines = globalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber);
-                for(String transitiveUpstream : transitiveUpstreamPipelines.keySet()) {
-                    // Skip if one of the downstream's upstream is already building or in queue
-                    // Then it will get triggered anyway by that upstream, we don't need to trigger it again
-                    WorkflowJob tup = Jenkins.getInstance().getItemByFullName(transitiveUpstream, WorkflowJob.class);
-                    if(tup != null && !tup.equals(upstreamPipeline) && (tup.isBuilding() || tup.isInQueue())) {
-                        listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " because it has a dependency " + ModelHyperlinkNote.encodeTo(tup) + " already building or in queue");
-                        continue outer;
-                    }
-                    
-                    // Skip if this downstream pipeline will be triggered by another one of our downstream pipelines
-                    // That's the case when one of the downstream's transitive upstream is our own downstream
-                    if(downstreamPipelines.contains(transitiveUpstream)) {
-                        listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " because it has dependencies in the downstream project list");
-                        continue outer;
-                    }
+            Map<String, Integer> transitiveUpstreamPipelines = globalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber);
+            for(String transitiveUpstream : transitiveUpstreamPipelines.keySet()) {
+                // Skip if one of the downstream's upstream is already building or in queue
+                // Then it will get triggered anyway by that upstream, we don't need to trigger it again
+                WorkflowJob tup = Jenkins.getInstance().getItemByFullName(transitiveUpstream, WorkflowJob.class);
+                if(tup != null && !tup.equals(upstreamPipeline) && (tup.isBuilding() || tup.isInQueue())) {
+                    listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " because it has a dependency " + ModelHyperlinkNote.encodeTo(tup) + " already building or in queue");
+                    continue downstreamPipelinesLoop;
+                }
+
+                // Skip if this downstream pipeline will be triggered by another one of our downstream pipelines
+                // That's the case when one of the downstream's transitive upstream is our own downstream
+                if(downstreamPipelines.contains(transitiveUpstream)) {
+                    listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " because it has dependencies in the downstream project list");
+                    continue downstreamPipelinesLoop;
                 }
             }
 
@@ -115,7 +130,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
 
             if (LOGGER.isLoggable(Level.FINER)) {
                 LOGGER.log(Level.FINER,
-                        "upstreamPipeline (" + upstreamPipeline.getFullName() + ", visibleByDownstreamBuildAuth: " + upstreamVisibleByDownstreamBuildAuth + "), " +
+                        "upstreamPipeline (" + upstreamPipelineFullName + ", visibleByDownstreamBuildAuth: " + upstreamVisibleByDownstreamBuildAuth + "), " +
                                 " downstreamPipeline (" + downstreamPipeline.getFullName() + ", visibleByUpstreamBuildAuth: " + downstreamVisibleByUpstreamBuildAuth + "), " +
                                 "upstreamBuildAuth: " + Jenkins.getAuthentication());
             }
@@ -133,6 +148,29 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             }
         }
 
+    }
+
+    /**
+     * Check NO infinite loop of job triggers caused by {@link hudson.model.Cause.UpstreamCause}.
+     *
+     * @param initialBuild
+     * @throws IllegalStateException if a loop is detected
+     */
+    protected void checkNoInfiniteLoopOfUpstreamCause(@Nonnull Run initialBuild) throws IllegalStateException {
+        java.util.Queue<Run> builds = new LinkedList<>(Collections.singleton(initialBuild));
+        Run currentBuild;
+        while ((currentBuild = builds.poll()) != null) {
+            for(Cause cause: ((List<Cause>) currentBuild.getCauses())) {
+                if (cause instanceof Cause.UpstreamCause) {
+                    Cause.UpstreamCause upstreamCause = (Cause.UpstreamCause) cause;
+                    if (Objects.equals(upstreamCause.getUpstreamRun().getParent().getFullName(), initialBuild.getParent().getFullName())) {
+                        throw new IllegalStateException("Infinite loop of job triggers ");
+                    } else {
+                        builds.add(upstreamCause.getUpstreamRun());
+                    }
+                }
+            }
+        }
     }
 
     @Nullable
