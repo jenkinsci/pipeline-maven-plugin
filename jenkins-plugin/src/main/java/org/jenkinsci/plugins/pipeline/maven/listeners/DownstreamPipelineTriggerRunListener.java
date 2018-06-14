@@ -16,6 +16,7 @@ import jenkins.model.ParameterizedJobMixIn;
 import jenkins.security.QueueItemAuthenticatorConfiguration;
 import org.acegisecurity.Authentication;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
+import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -73,6 +74,10 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
 
         downstreamPipelinesLoop:
         for (String downstreamPipelineFullName : downstreamPipelines) {
+            String groupId = "com.example";
+            String artifactId = "my-app";
+            String version = "1.2.3-SNAPSHOT";
+
             if (Objects.equals(downstreamPipelineFullName, upstreamPipelineFullName)) {
                 // Don't trigger myself
                 continue;
@@ -136,7 +141,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             }
             if (downstreamVisibleByUpstreamBuildAuth && upstreamVisibleByDownstreamBuildAuth) {
                 // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
-                Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(downstreamPipeline, -1, new CauseAction(new Cause.UpstreamCause(upstreamBuild)));
+                MavenDependencyUpstreamCause cause = new MavenDependencyUpstreamCause(upstreamBuild, groupId, artifactId, version);
+                Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(downstreamPipeline, -1, new CauseAction(cause));
                 if (queuedItem == null) {
                     listener.getLogger().println("[withMaven] Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + ", it is already in the queue.");
                 } else {
