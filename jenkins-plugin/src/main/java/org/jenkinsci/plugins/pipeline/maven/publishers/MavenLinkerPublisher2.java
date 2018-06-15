@@ -36,15 +36,14 @@ public class MavenLinkerPublisher2 extends MavenPublisher {
         // default DataBoundConstructor
     }
 
+    /**
+     * Synchronize because {@link Run#addOrReplaceAction(hudson.model.Action)} is not thread safe
+     */
     @Override
-    public void process(StepContext context, Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public synchronized void process(StepContext context, Element mavenSpyLogsElt) throws IOException, InterruptedException {
         Run<?, ?> run = context.get(Run.class);
-        MavenReport mavenReport = run.getAction(MavenReport.class);
-        if (mavenReport == null) {
-            run.addAction(new MavenReport(run));
-        } else {
-            // nothing to do, MavenReport action is already registered
-        }
+        // we replace instead of because we want to refresh the cache org.jenkinsci.plugins.pipeline.maven.publishers.MavenReport.getGeneratedArtifacts()
+        run.addOrReplaceAction(new MavenReport(run));
     }
 
     @Symbol("mavenLinkerPublisher")
