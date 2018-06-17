@@ -163,10 +163,14 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             for(Cause cause: ((List<Cause>) currentBuild.getCauses())) {
                 if (cause instanceof Cause.UpstreamCause) {
                     Cause.UpstreamCause upstreamCause = (Cause.UpstreamCause) cause;
-                    if (Objects.equals(upstreamCause.getUpstreamRun().getParent().getFullName(), initialBuild.getParent().getFullName())) {
+                    Run upstreamRun = upstreamCause.getUpstreamRun();
+                    if (upstreamRun == null) {
+                        // probably a security reason or the upstream run has been deleted.
+                        // do nothing
+                    } else if (Objects.equals(upstreamRun.getParent().getFullName(), initialBuild.getParent().getFullName())) {
                         throw new IllegalStateException("Infinite loop of job triggers ");
                     } else {
-                        builds.add(upstreamCause.getUpstreamRun());
+                        builds.add(upstreamRun);
                     }
                 }
             }
