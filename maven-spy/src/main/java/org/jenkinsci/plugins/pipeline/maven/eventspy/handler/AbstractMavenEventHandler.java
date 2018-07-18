@@ -115,16 +115,14 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
             } catch (IOException e) {
                 throw new RuntimeIOException(e);
             }
-            if (absolutePath.endsWith(File.separator + "pom.xml")) {
+
+            if (absolutePath.endsWith(File.separator + "pom.xml") || absolutePath.endsWith(File.separator + ".flattened-pom.xml")) {
+                // JENKINS-43616: flatten-maven-plugin replaces the original pom as artifact with a .flattened-pom.xml
                 // no tweak
             } else if (absolutePath.endsWith(File.separator + "dependency-reduced-pom.xml")) {
                 // JENKINS-42302: maven-shade-plugin creates a temporary project file dependency-reduced-pom.xml
                 // TODO see if there is a better way to implement this "workaround"
                 absolutePath = absolutePath.replace(File.separator + "dependency-reduced-pom.xml", File.separator + "pom.xml");
-            } else if (absolutePath.endsWith(File.separator + ".flattened-pom.xml")) {
-                // JENKINS-43616: flatten-maven-plugin creates an intermediate project file .flattened-pom.xml
-                // TODO see if there is a better way to implement this "workaround"
-                absolutePath = absolutePath.replace(File.separator + ".flattened-pom.xml", File.separator + "pom.xml");
             } else {
                 logger.warn("[jenkins-event-spy] Unexpected Maven project file name '" + projectFile.getName() + "', problems may occur");
             }
