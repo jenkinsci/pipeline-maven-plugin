@@ -154,7 +154,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
      * Check NO infinite loop of job triggers caused by {@link hudson.model.Cause.UpstreamCause}.
      *
      * @param initialBuild
-     * @throws IllegalStateException if a loop is detected
+     * @throws IllegalStateException if an infinite loop is detected
      */
     protected void checkNoInfiniteLoopOfUpstreamCause(@Nonnull Run initialBuild) throws IllegalStateException {
         java.util.Queue<Run> builds = new LinkedList<>(Collections.singleton(initialBuild));
