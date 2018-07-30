@@ -669,7 +669,6 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         return downstreamJobsFullNames;
     }
 
-
     @Nonnull
     @Override
     public Map<String, Integer> listUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
@@ -766,16 +765,19 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<String, Integer>());
     }
 
-    private Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, Map<String, Integer> result) {
-        for (Entry<String, Integer> entry : listUpstreamJobs(jobFullName, buildNumber).entrySet()) {
-            String upstreamJobName = entry.getKey();
-            Integer upstreamJobBuildNumber = entry.getValue();
-            if (!result.containsKey(upstreamJobName)) {
-                result.put(upstreamJobName, upstreamJobBuildNumber);
-                listTransitiveUpstreamJobs(upstreamJobName, upstreamJobBuildNumber, result);
+    private Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, Map<String, Integer> transitiveUpstreamBuilds) {
+        Map<String, Integer> upstreamBuilds = listUpstreamJobs(jobFullName, buildNumber);
+        for (Entry<String, Integer> upstreamBuild : upstreamBuilds.entrySet()) {
+            String upstreamJobFullName = upstreamBuild.getKey();
+            Integer upstreamBuildNumber = upstreamBuild.getValue();
+            if (transitiveUpstreamBuilds.containsKey(upstreamJobFullName)) {
+                // job has already been visited, skip
+            } else {
+                transitiveUpstreamBuilds.put(upstreamJobFullName, upstreamBuildNumber);
+                listTransitiveUpstreamJobs(upstreamJobFullName, upstreamBuildNumber, transitiveUpstreamBuilds);
             }
         }
-        return result;
+        return transitiveUpstreamBuilds;
     }
 
     /**

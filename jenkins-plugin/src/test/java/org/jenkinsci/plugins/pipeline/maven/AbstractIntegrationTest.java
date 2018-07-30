@@ -81,6 +81,10 @@ public abstract class AbstractIntegrationTest {
         loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_hpi_project/");
     }
 
+    protected void loadMultiModuleProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
+        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/multi_module_maven_project/");
+    }
+
     protected void loadNbmBaseMavenProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
         loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_nbm_base_project/");
     }
