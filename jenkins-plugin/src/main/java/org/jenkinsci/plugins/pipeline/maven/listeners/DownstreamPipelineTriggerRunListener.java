@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
 import com.cloudbees.hudson.plugins.folder.computed.ComputedFolder;
-import edu.emory.mathcs.backport.java.util.Collections;
 import hudson.Extension;
 import hudson.console.ModelHyperlinkNote;
 import hudson.model.*;
@@ -20,6 +19,7 @@ import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
