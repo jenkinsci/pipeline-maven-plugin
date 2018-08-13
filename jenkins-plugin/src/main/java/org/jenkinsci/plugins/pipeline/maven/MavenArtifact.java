@@ -88,6 +88,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
         return new CompareToBuilder().
                 append(this.groupId, o.groupId).
                 append(this.artifactId, o.artifactId).
+                append(this.baseVersion, o.baseVersion).
                 append(this.version, o.version).
                 append(this.type, o.type).
                 append(this.classifier, o.classifier).
@@ -104,7 +105,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupId, artifactId, baseVersion);
+        return Objects.hash(groupId, artifactId, baseVersion, version);
     }
 
     @Override
@@ -131,6 +132,22 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
                 return false;
         } else if (!baseVersion.equals(other.baseVersion))
             return false;
+        if (version == null) {
+            if (other.version != null)
+                return false;
+        } else if (!version.equals(other.version))
+            return false;
+        if (type == null) {
+            if (other.type != null)
+                return false;
+        } else if (!type.equals(other.type))
+            return false;
+        if (classifier == null) {
+            if (other.classifier != null)
+                return false;
+        } else if (!classifier.equals(other.classifier))
+            return false;
+
         return true;
     }
 }

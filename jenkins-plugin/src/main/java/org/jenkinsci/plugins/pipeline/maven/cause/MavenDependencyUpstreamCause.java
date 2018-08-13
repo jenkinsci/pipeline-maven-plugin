@@ -10,12 +10,14 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
     private final String groupId;
     private final String artifactId;
     private final String version;
+    private final String type;
 
-    public MavenDependencyUpstreamCause(Run<?, ?> up, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version) {
+    public MavenDependencyUpstreamCause(Run<?, ?> up, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type) {
         super(up);
         this.groupId = groupId;
         this.artifactId = artifactId;
         this.version = version;
+        this.type = type;
     }
 
     @Override
@@ -34,6 +36,11 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
     }
 
     @Override
+    public String getType() {
+        return type;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -41,12 +48,13 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
         MavenDependencyUpstreamCause that = (MavenDependencyUpstreamCause) o;
         return Objects.equals(groupId, that.groupId) &&
                 Objects.equals(artifactId, that.artifactId) &&
-                Objects.equals(version, that.version);
+                Objects.equals(version, that.version) &&
+                Objects.equals(type, that.type);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), groupId, artifactId, version);
+        return Objects.hash(super.hashCode(), groupId, artifactId, version, type);
     }
 }

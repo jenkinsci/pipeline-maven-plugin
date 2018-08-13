@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -141,6 +142,19 @@ public class PipelineMavenPluginMonitoringDao implements PipelineMavenPluginDao 
         long nanosBefore = System.nanoTime();
         try {
             return delegate.listDownstreamJobs(jobFullName, buildNumber);
+        } finally {
+            long nanosAfter = System.nanoTime();
+            findCount.incrementAndGet();
+            findDurationInNanos.addAndGet(nanosAfter - nanosBefore);
+        }
+    }
+
+    @Nonnull
+    @Override
+    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@Nonnull String jobFullName, int buildNumber) {
+        long nanosBefore = System.nanoTime();
+        try {
+            return delegate.listDownstreamJobsByArtifact(jobFullName, buildNumber);
         } finally {
             long nanosAfter = System.nanoTime();
             findCount.incrementAndGet();

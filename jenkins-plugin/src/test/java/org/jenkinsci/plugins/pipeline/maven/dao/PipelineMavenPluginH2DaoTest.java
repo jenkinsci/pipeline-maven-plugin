@@ -16,6 +16,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -465,6 +466,7 @@ public class PipelineMavenPluginH2DaoTest {
 
     }
 
+    @Deprecated
     @Test
     public void listDownstreamJobs_upstream_jar_triggers_downstream_pipelines() {
 
@@ -502,6 +504,66 @@ public class PipelineMavenPluginH2DaoTest {
     }
 
     @Test
+    public void listDownstreamJobsByArtifact_upstream_jar_triggers_downstream_pipelines() {
+
+        dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "service", "1.0-SNAPSHOT", "war", "1.0-SNAPSHOT", null, false, "war", null);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
+        dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 1);
+        dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+
+        {
+            MavenArtifact expectedMavenArtifact = new MavenArtifact();
+            expectedMavenArtifact.groupId = "com.mycompany";
+            expectedMavenArtifact.artifactId = "core";
+            expectedMavenArtifact.version = "1.0-SNAPSHOT";
+            expectedMavenArtifact.type = "jar";
+
+            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 1);
+
+            SortedSet<String> actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
+            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1", "my-downstream-pipeline-2"));
+
+            assertThat(downstreamJobsByArtifactForBuild1.size(), is(1));
+        }
+
+        dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 2);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "core", "1.1-SNAPSHOT", "jar", "1.1-SNAPSHOT", null, false, "jar", null);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "service", "1.1-SNAPSHOT", "war", "1.1-SNAPSHOT", null, false, "war", null);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+        dao.recordDependency("my-downstream-pipeline-1", 2, "com.mycompany", "core", "1.1-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+        dao.recordDependency("my-downstream-pipeline-2", 2, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+        {
+            MavenArtifact expectedMavenArtifact = new MavenArtifact();
+            expectedMavenArtifact.groupId = "com.mycompany";
+            expectedMavenArtifact.artifactId = "core";
+            expectedMavenArtifact.version = "1.1-SNAPSHOT";
+            expectedMavenArtifact.type = "jar";
+
+            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 2);
+
+            SortedSet<String> actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
+            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+
+            assertThat(downstreamJobsByArtifactForBuild1.size(), is(1));
+        }
+    }
+
+    @Deprecated
+    @Test
     public void listDownstreamJobs_upstream_pom_triggers_downstream_pipelines() {
 
         dao.getOrCreateBuildPrimaryKey("my-upstream-pom-pipeline-1", 1);
@@ -521,6 +583,39 @@ public class PipelineMavenPluginH2DaoTest {
         System.out.println(downstreamJobs);
     }
 
+    @Test
+    public void listDownstreamJobsbyArtifact_upstream_pom_triggers_downstream_pipelines() {
+
+        dao.getOrCreateBuildPrimaryKey("my-upstream-pom-pipeline-1", 1);
+        dao.recordGeneratedArtifact("my-upstream-pom-pipeline-1", 1, "com.mycompany.pom", "parent-pom", "1.0-SNAPSHOT","pom", "1.0-SNAPSHOT", null, false, "pom", null);
+        dao.updateBuildOnCompletion("my-upstream-pom-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 2);
+        dao.recordParentProject("my-downstream-pipeline-1", 2, "com.mycompany.pom", "parent-pom", "1.0-SNAPSHOT", false);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 555, 5);
+
+        SqlTestsUtils.dump("select * from JENKINS_BUILD LEFT OUTER JOIN JENKINS_JOB ON JENKINS_BUILD.JOB_ID = JENKINS_JOB.ID", jdbcConnectionPool, System.out);
+        SqlTestsUtils.dump("select * from MAVEN_ARTIFACT INNER JOIN GENERATED_MAVEN_ARTIFACT ON MAVEN_ARTIFACT.ID = GENERATED_MAVEN_ARTIFACT.ARTIFACT_ID", jdbcConnectionPool, System.out);
+        SqlTestsUtils.dump("select * from MAVEN_ARTIFACT INNER JOIN MAVEN_PARENT_PROJECT ON MAVEN_ARTIFACT.ID = MAVEN_PARENT_PROJECT.ARTIFACT_ID", jdbcConnectionPool, System.out);
+
+        {
+            MavenArtifact expectedMavenArtifact = new MavenArtifact();
+            expectedMavenArtifact.groupId = "com.mycompany.pom";
+            expectedMavenArtifact.artifactId = "parent-pom";
+            expectedMavenArtifact.version = "1.0-SNAPSHOT";
+            expectedMavenArtifact.type = "pom";
+
+            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pom-pipeline-1", 1);
+
+            SortedSet<String> actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
+            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+
+            assertThat(actualJobs.size(), is(1));
+            assertThat(downstreamJobsByArtifactForBuild1.size(), is(1));
+        }
+    }
+
+    @Deprecated
     @Test
     public void list_downstream_jobs_with_ignoreUpstreamTriggers_activated() {
 
@@ -560,6 +655,69 @@ public class PipelineMavenPluginH2DaoTest {
     }
 
     @Test
+    public void list_downstream_jobs_by_artifact_with_ignoreUpstreamTriggers_activated() {
+
+        dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "service", "1.0-SNAPSHOT", "war", "1.0-SNAPSHOT", null, false, "war", null);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 111);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
+        dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", true, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 111, 11);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 1);
+        dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 111, 11);
+
+        {
+            MavenArtifact expectedMavenArtifact = new MavenArtifact();
+            expectedMavenArtifact.groupId = "com.mycompany";
+            expectedMavenArtifact.artifactId = "core";
+            expectedMavenArtifact.version = "1.0-SNAPSHOT";
+            expectedMavenArtifact.type = "jar";
+
+            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 1);
+
+            SortedSet<String> actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
+            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-2"));
+
+            assertThat(actualJobs.size(), is(1));
+            assertThat(downstreamJobsByArtifactForBuild1.size(), is(1));
+        }
+
+        dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 2);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "core", "1.1-SNAPSHOT", "jar", "1.1-SNAPSHOT", null, false, "jar", null);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "service", "1.1-SNAPSHOT", "war", "1.1-SNAPSHOT", null, false, "war", null);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 11, 5);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 2);
+        dao.recordDependency("my-downstream-pipeline-1", 2, "com.mycompany", "core", "1.1-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 11, 5);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 2);
+        dao.recordDependency("my-downstream-pipeline-2", 2, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 11, 5);
+
+        {
+            MavenArtifact expectedMavenArtifact = new MavenArtifact();
+            expectedMavenArtifact.groupId = "com.mycompany";
+            expectedMavenArtifact.artifactId = "core";
+            expectedMavenArtifact.version = "1.1-SNAPSHOT";
+            expectedMavenArtifact.type = "jar";
+
+            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 2);
+
+            SortedSet<String> actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
+            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+
+            assertThat(actualJobs.size(), is(1));
+            assertThat(downstreamJobsByArtifactForBuild1.size(), is(1));
+        }
+    }
+
+    @Deprecated
+    @Test
     public void list_downstream_jobs_with_skippedDownstreamTriggersActivated() {
 
         dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
@@ -598,6 +756,64 @@ public class PipelineMavenPluginH2DaoTest {
     }
 
     @Test
+    public void list_downstream_jobs_by_artifact_with_skippedDownstreamTriggersActivated() {
+
+        dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "shared", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, true, "jar", null);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
+        dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "shared", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 555, 5);
+
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 1);
+        dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "shared", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 123, 5);
+
+        {
+            MavenArtifact expectedMavenArtifact = new MavenArtifact();
+            expectedMavenArtifact.groupId = "com.mycompany";
+            expectedMavenArtifact.artifactId = "core";
+            expectedMavenArtifact.version = "1.0-SNAPSHOT";
+            expectedMavenArtifact.type = "jar";
+
+            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 1);
+            assertThat(downstreamJobsByArtifactForBuild1.size(), is(0));
+        }
+
+        dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 2);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "core", "1.1-SNAPSHOT", "jar", "1.1-SNAPSHOT", null, false, "jar", null);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "service", "1.1-SNAPSHOT", "war", "1.1-SNAPSHOT", null, false, "war", null);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 11, 5);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 2);
+        dao.recordDependency("my-downstream-pipeline-1", 2, "com.mycompany", "core", "1.1-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 9, 5);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 2);
+        dao.recordDependency("my-downstream-pipeline-2", 2, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 9, 5);
+
+        {
+            MavenArtifact expectedMavenArtifact = new MavenArtifact();
+            expectedMavenArtifact.groupId = "com.mycompany";
+            expectedMavenArtifact.artifactId = "core";
+            expectedMavenArtifact.version = "1.1-SNAPSHOT";
+            expectedMavenArtifact.type = "jar";
+
+            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 2);
+
+            SortedSet<String> actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
+            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+
+            assertThat(downstreamJobsByArtifactForBuild1.size(), is(1));
+            assertThat(actualJobs.size(), is(1));
+        }
+    }
+
+    @Deprecated
+    @Test
     public void list_downstream_jobs_timestamped_snapshot_version() {
 
         dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
@@ -634,6 +850,67 @@ public class PipelineMavenPluginH2DaoTest {
 
         List<String> downstreamPipelinesForBuild2 = dao.listDownstreamJobs("my-upstream-pipeline-1", 2);
         assertThat(downstreamPipelinesForBuild2, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+    }
+
+    @Test
+    public void list_downstream_jobs_by_artifact_timestamped_snapshot_version() {
+
+        dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-20170808.155524-63", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "service", "1.0-20170808.155524-64", "war", "1.0-SNAPSHOT", null, false, "war", null);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
+        dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-70, 22);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 1);
+        dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-50, 22);
+
+        {
+            MavenArtifact expectedMavenArtifact = new MavenArtifact();
+            expectedMavenArtifact.groupId = "com.mycompany";
+            expectedMavenArtifact.artifactId = "core";
+            expectedMavenArtifact.version = "1.0-SNAPSHOT";
+            expectedMavenArtifact.type = "jar";
+
+            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 1);
+
+            SortedSet<String> actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
+            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1", "my-downstream-pipeline-2"));
+
+            assertThat(downstreamJobsByArtifactForBuild1.size(), is(1));
+        }
+
+        dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 2);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "core", "1.1-20170808.155524-65", "jar", "1.1-SNAPSHOT", null, false, "jar", null);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "service", "1.1-20170808.155524-66", "war", "1.1-SNAPSHOT", null, false, "war", null);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis()-20, 9);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 2);
+        dao.recordDependency("my-downstream-pipeline-1", 2, "com.mycompany", "core", "1.1-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis()-20, 9);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 2);
+        dao.recordDependency("my-downstream-pipeline-2", 2, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 2, Result.SUCCESS.ordinal, System.currentTimeMillis()-20, 9);
+
+        {
+            MavenArtifact expectedMavenArtifact = new MavenArtifact();
+            expectedMavenArtifact.groupId = "com.mycompany";
+            expectedMavenArtifact.artifactId = "core";
+            expectedMavenArtifact.version = "1.1-SNAPSHOT";
+            expectedMavenArtifact.type = "jar";
+
+            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 2);
+
+            SortedSet<String> actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
+            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+
+            assertThat(downstreamJobsByArtifactForBuild1.size(), is(1));
+            assertThat(actualJobs.size(), is(1));
+        }
     }
 
     @Test
@@ -704,6 +981,7 @@ public class PipelineMavenPluginH2DaoTest {
         assertThat(upstreamPipelinesForBuild1.keySet(), Matchers.containsInAnyOrder("pipeline-framework", "pipeline-core"));
     }
 
+    @Deprecated
     @Test
     public void list_downstream_jobs_with_failed_last_build() {
 
@@ -734,6 +1012,49 @@ public class PipelineMavenPluginH2DaoTest {
             List<String> downstreamJobs = dao.listDownstreamJobs("pipeline-framework", 1);
             assertThat(downstreamJobs, Matchers.containsInAnyOrder("pipeline-core"));
 
+        }
+    }
+    @Test
+    public void list_downstream_jobs_by_artifact_with_failed_last_build() {
+
+        dao.getOrCreateBuildPrimaryKey("pipeline-framework", 1);
+        dao.recordGeneratedArtifact("pipeline-framework", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
+        dao.recordGeneratedArtifact("pipeline-framework", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", "sources");
+        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+
+        dao.getOrCreateBuildPrimaryKey("pipeline-core", 1);
+        dao.recordDependency("pipeline-core", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.recordGeneratedArtifact("pipeline-core", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
+        dao.updateBuildOnCompletion("pipeline-core", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+
+        MavenArtifact expectedMavenArtifact = new MavenArtifact();
+        expectedMavenArtifact.groupId = "com.mycompany";
+        expectedMavenArtifact.artifactId = "framework";
+        expectedMavenArtifact.version = "1.0-SNAPSHOT";
+        expectedMavenArtifact.type = "jar";
+
+        {
+            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifact = dao.listDownstreamJobsByArtifact("pipeline-framework", 1);
+
+            SortedSet<String> actualJobs = downstreamJobsByArtifact.get(expectedMavenArtifact);
+            assertThat(actualJobs, Matchers.containsInAnyOrder("pipeline-core"));
+            assertThat(downstreamJobsByArtifact.size(), is(1));
+
+        }
+
+        // pipeline-core#2 fails before dependencies have been tracked
+        dao.getOrCreateBuildPrimaryKey("pipeline-core", 2);
+        dao.updateBuildOnCompletion("pipeline-core", 2, Result.FAILURE.ordinal, System.currentTimeMillis() - 100, 11);
+
+        SqlTestsUtils.dump("select * from jenkins_job", this.jdbcConnectionPool, System.out);
+        SqlTestsUtils.dump("select * from job_generated_artifacts", this.jdbcConnectionPool, System.out);
+        SqlTestsUtils.dump("select * from job_dependencies", this.jdbcConnectionPool, System.out);
+
+        {
+            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifact = dao.listDownstreamJobsByArtifact("pipeline-framework", 1);
+            SortedSet<String> actualJobs = downstreamJobsByArtifact.get(expectedMavenArtifact);
+            assertThat(actualJobs, Matchers.containsInAnyOrder("pipeline-core"));
+            assertThat(downstreamJobsByArtifact.size(), is(1));
         }
     }
 }

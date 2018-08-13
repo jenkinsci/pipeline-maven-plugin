@@ -19,6 +19,9 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -98,6 +101,36 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
 
         // filter null entries resulting from security/authorization filtering
         return Collections2.filter(downstreamJobs, Predicates.notNull());
+    }
+
+    public synchronized SortedMap<MavenArtifact, Collection<Job>> getDownstreamJobsByArtifact() {
+        Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifact = GlobalPipelineMavenConfig.get().getDao().listDownstreamJobsByArtifact(run.getParent().getFullName(), run.getNumber());
+        TreeMap<MavenArtifact, Collection<Job>> result = new TreeMap<>();
+
+        for(Map.Entry<MavenArtifact, SortedSet<String>> entry: downstreamJobsByArtifact.entrySet()) {
+            MavenArtifact mavenArtifact = entry.getKey();
+            SortedSet<String> downstreamJobFullNames = entry.getValue();
+
+            Collection<Job> downstreamJobs = Collections2.transform(downstreamJobFullNames, new Function<String, Job>() {
+                @Override
+                public Job apply(@Nullable String jobFullName) {
+                    if (jobFullName == null) {
+                        return null;
+                    }
+                    // security / authorization is checked by Jenkins#getItemByFullName
+                    try {
+                        return Jenkins.getInstance().getItemByFullName(jobFullName, Job.class);
+                    } catch (AccessDeniedException e) {
+                        return null;
+                    }
+
+                }
+            });
+            // filter null entries resulting from security/authorization filtering
+            result.put(mavenArtifact, Collections2.filter(downstreamJobs, Predicates.notNull()));
+        }
+
+        return result;
     }
 
     public synchronized Collection<Run> getUpstreamBuilds() {
