@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+OpenIDE-Module-Localizing-Bundle: com/netbeans/sample/maven_nbm_dependency_project/Bundle.properties
+
