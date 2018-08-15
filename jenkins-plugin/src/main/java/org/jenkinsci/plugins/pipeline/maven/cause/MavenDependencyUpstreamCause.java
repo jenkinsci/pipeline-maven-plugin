@@ -7,37 +7,49 @@ import javax.annotation.Nonnull;
 import java.util.Objects;
 
 public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements MavenDependencyCause {
-    private final String groupId;
-    private final String artifactId;
-    private final String version;
-    private final String type;
+    private final String mavenArtifactGroupId;
+    private final String mavenArtifactArtifactId;
+    private final String mavenArtifactVersion;
+    private final String mavenArtifactType;
 
-    public MavenDependencyUpstreamCause(Run<?, ?> up, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type) {
+    public MavenDependencyUpstreamCause(Run<?, ?> up, @Nonnull String mavenArtifactGroupId, @Nonnull String mavenArtifactArtifactId, @Nonnull String mavenArtifactVersion, @Nonnull String mavenArtifactType) {
         super(up);
-        this.groupId = groupId;
-        this.artifactId = artifactId;
-        this.version = version;
-        this.type = type;
+        this.mavenArtifactGroupId = mavenArtifactGroupId;
+        this.mavenArtifactArtifactId = mavenArtifactArtifactId;
+        this.mavenArtifactVersion = mavenArtifactVersion;
+        this.mavenArtifactType = mavenArtifactType;
     }
 
     @Override
-    public String getGroupId() {
-        return groupId;
+    public String getShortDescription() {
+        return "Started by upstream project \"" + getUpstreamProject() + "\" build number " + getUpstreamBuild() + " modifying Maven dependency " + getId();
     }
 
     @Override
-    public String getArtifactId() {
-        return artifactId;
+    public String getMavenArtifactGroupId() {
+        return mavenArtifactGroupId;
     }
 
     @Override
-    public String getVersion() {
-        return version;
+    public String getMavenArtifactArtifactId() {
+        return mavenArtifactArtifactId;
     }
 
     @Override
-    public String getType() {
-        return type;
+    public String getMavenArtifactVersion() {
+        return mavenArtifactVersion;
+    }
+
+    @Override
+    public String getMavenArtifactType() {
+        return mavenArtifactType;
+    }
+
+    /**
+     * @see org.apache.maven.artifact.Artifact#getId()
+     */
+    public String getId() {
+        return mavenArtifactGroupId + ":" + mavenArtifactArtifactId + ":" + mavenArtifactVersion + " - " + mavenArtifactType;
     }
 
     @Override
@@ -46,15 +58,15 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         MavenDependencyUpstreamCause that = (MavenDependencyUpstreamCause) o;
-        return Objects.equals(groupId, that.groupId) &&
-                Objects.equals(artifactId, that.artifactId) &&
-                Objects.equals(version, that.version) &&
-                Objects.equals(type, that.type);
+        return Objects.equals(mavenArtifactGroupId, that.mavenArtifactGroupId) &&
+                Objects.equals(mavenArtifactArtifactId, that.mavenArtifactArtifactId) &&
+                Objects.equals(mavenArtifactVersion, that.mavenArtifactVersion) &&
+                Objects.equals(mavenArtifactType, that.mavenArtifactType);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), groupId, artifactId, version, type);
+        return Objects.hash(super.hashCode(), mavenArtifactGroupId, mavenArtifactArtifactId, mavenArtifactVersion, mavenArtifactType);
     }
 }

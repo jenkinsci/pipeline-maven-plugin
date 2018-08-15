@@ -9,11 +9,11 @@ import javax.annotation.Nonnull;
  */
 public interface MavenDependencyCause {
     @Nonnull
-    String getGroupId();
+    String getMavenArtifactGroupId();
     @Nonnull
-    String getArtifactId();
+    String getMavenArtifactArtifactId();
     @Nonnull
-    String getVersion();
+    String getMavenArtifactVersion();
     @Nonnull
-    String getType();
+    String getMavenArtifactType();
 }
