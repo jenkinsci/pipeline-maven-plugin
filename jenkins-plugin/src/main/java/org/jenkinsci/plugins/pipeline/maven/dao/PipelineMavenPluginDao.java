@@ -92,6 +92,13 @@ public interface PipelineMavenPluginDao {
                                  @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nonnull String baseVersion,
                                  @Nullable String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier);
 
+    /**
+     * TODO add {@link MavenArtifact} as {@link org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause} gives these details
+     * @param upstreamJobName Job that triggered the build. See {@link Item#getFullName()}.
+     * @param upstreamBuildNumber Job that triggered the build. See {@link Run#getNumber()}.
+     * @param downstreamJobName Job that is triggered. See {@link Item#getFullName()}.
+     * @param downstreamBuildNumber Job that is triggered. See {@link Run#getNumber()}.
+     */
     void recordBuildUpstreamCause(String upstreamJobName, int upstreamBuildNumber, String downstreamJobName, int downstreamBuildNumber);
 
     /**

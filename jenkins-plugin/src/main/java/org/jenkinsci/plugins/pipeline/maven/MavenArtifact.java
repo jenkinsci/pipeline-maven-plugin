@@ -31,6 +31,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      */
     public String baseVersion;
     public String type, classifier, extension;
+    @Nullable
     public String file;
     public boolean snapshot;
     /**

@@ -138,6 +138,7 @@ public class PipelineMavenPluginMonitoringDao implements PipelineMavenPluginDao 
 
     @Override
     @Nonnull
+    @Deprecated
     public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
         long nanosBefore = System.nanoTime();
         try {

@@ -94,6 +94,7 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
 
     @Nonnull
     @Override
+    @Deprecated
     public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
         return Collections.emptyList();
     }

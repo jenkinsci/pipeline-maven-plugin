@@ -1,5 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven.cause;
 
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -9,11 +11,5 @@ import javax.annotation.Nonnull;
  */
 public interface MavenDependencyCause {
     @Nonnull
-    String getMavenArtifactGroupId();
-    @Nonnull
-    String getMavenArtifactArtifactId();
-    @Nonnull
-    String getMavenArtifactVersion();
-    @Nonnull
-    String getMavenArtifactType();
+    MavenArtifact getMavenArtifact();
 }

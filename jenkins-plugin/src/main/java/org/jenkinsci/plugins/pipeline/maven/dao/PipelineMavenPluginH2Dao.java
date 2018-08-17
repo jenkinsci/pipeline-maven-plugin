@@ -33,7 +33,6 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-import org.jenkinsci.plugins.pipeline.maven.db.migration.h2.MigrationStep8;
 import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
@@ -631,6 +630,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         return results;
     }
 
+    @Deprecated
     protected List<String> listDownstreamPipelinesBasedOnMavenDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamJobs({0}, {1})", new Object[]{jobFullName, buildNumber});
 
@@ -672,7 +672,8 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
 
         String sql = "select distinct downstream_job.full_name, \n " +
-                "   maven_artifact.group_id, maven_artifact.artifact_id, maven_artifact.version, maven_artifact.type, maven_artifact.classifier \n" +
+                "   maven_artifact.group_id, maven_artifact.artifact_id, maven_artifact.version, maven_artifact.type, maven_artifact.classifier, \n" +
+                "   generated_maven_artifact.version, generated_maven_artifact.extension \n" +
                 "from jenkins_job as upstream_job \n" +
                 "inner join jenkins_build as upstream_build on upstream_job.id = upstream_build.job_id \n" +
                 "inner join generated_maven_artifact on (upstream_build.id = generated_maven_artifact.build_id and generated_maven_artifact.skip_downstream_triggers = false) \n" +
@@ -696,9 +697,11 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                         MavenArtifact artifact = new MavenArtifact();
                         artifact.groupId = rst.getString("group_id");
                         artifact.artifactId = rst.getString("artifact_id");
-                        artifact.version = rst.getString("version");
+                        artifact.version = rst.getString("generated_maven_artifact.version");
+                        artifact.baseVersion = rst.getString("maven_artifact.version");
                         artifact.type = rst.getString("type");
                         artifact.classifier = rst.getString("classifier");
+                        artifact.extension = rst.getString("extension");
                         String downstreamJobFullName = rst.getString("full_name");
 
                         if(results.containsKey(artifact)) {
@@ -718,6 +721,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     }
 
 
+    @Deprecated
     protected List<String> listDownstreamPipelinesBasedOnParentProjectDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
         String sql = "select distinct downstream_job.full_name \n" +
@@ -757,7 +761,8 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
     protected Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifactBasedOnParentProjectDependencies(String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
         String sql = "select distinct downstream_job.full_name, \n" +
-                "   maven_artifact.group_id, maven_artifact.artifact_id, maven_artifact.version, maven_artifact.type, maven_artifact.classifier \n" +
+                "   maven_artifact.group_id, maven_artifact.artifact_id, maven_artifact.version, maven_artifact.type, maven_artifact.classifier, \n" +
+                "   generated_maven_artifact.version, generated_maven_artifact.extension \n" +
                 "from jenkins_job as upstream_job \n" +
                 "inner join jenkins_build as upstream_build on upstream_job.id = upstream_build.job_id \n" +
                 "inner join generated_maven_artifact on (upstream_build.id = generated_maven_artifact.build_id and generated_maven_artifact.skip_downstream_triggers = false) \n" +
@@ -782,9 +787,11 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                         MavenArtifact artifact = new MavenArtifact();
                         artifact.groupId = rst.getString("group_id");
                         artifact.artifactId = rst.getString("artifact_id");
-                        artifact.version = rst.getString("version");
+                        artifact.version = rst.getString("generated_maven_artifact.version");
+                        artifact.baseVersion = rst.getString("maven_artifact.version");
                         artifact.type = rst.getString("type");
                         artifact.classifier = rst.getString("classifier");
+                        artifact.extension = rst.getString("extension");
                         String downstreamJobFullName = rst.getString("full_name");
 
                         if(results.containsKey(artifact)) {
