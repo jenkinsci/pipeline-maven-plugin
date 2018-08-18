@@ -62,7 +62,7 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
 
         if (getUpstreamCauses() != null && !getUpstreamCauses().isEmpty()) {
             indent(listener, depth);
-            listener.getLogger().println(Messages.Cause_UpstreamCause_CausedBy());
+            listener.getLogger().println("originally caused by:");
             for (Cause cause : getUpstreamCauses()) {
                 if (cause instanceof MavenDependencyUpstreamCause) {
                     ((MavenDependencyUpstreamCause) cause).print(listener, depth + 1);
