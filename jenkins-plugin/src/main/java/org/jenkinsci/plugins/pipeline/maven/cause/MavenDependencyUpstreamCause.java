@@ -22,7 +22,7 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
 
     @Override
     public String getShortDescription() {
-        return "Started by upstream project \"" + getUpstreamProject() + "\" build number " + getUpstreamBuild() + " modifying Maven dependency " + mavenArtifact.getId();
+        return "Started by upstream project \"" + getUpstreamProject() + "\" build number " + getUpstreamBuild() + " generating Maven artifact " + mavenArtifact.getId();
     }
 
     /**
@@ -58,7 +58,7 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
         indent(listener, depth);
         listener.getLogger().println("Started by upstream project \"" + ModelHyperlinkNote.encodeTo('/' + getUpstreamUrl(), getUpstreamProject()) +
                 "\" build number " + ModelHyperlinkNote.encodeTo('/' + getUpstreamUrl() + getUpstreamBuild(), Integer.toString(getUpstreamBuild())) +
-                " modifying Maven dependency " + mavenArtifact.getId());
+                " generating Maven artifact " + mavenArtifact.getId());
 
         if (getUpstreamCauses() != null && !getUpstreamCauses().isEmpty()) {
             indent(listener, depth);
