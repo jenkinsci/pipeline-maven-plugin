@@ -76,7 +76,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
             return groupId + ":" + artifactId  + ":" +
                     type + ":" +
                     ((classifier == null || classifier.isEmpty()) ? "" :  classifier + ":")  +
-                    (baseVersion == null ? version : baseVersion + "(" + version + ")") ;
+                     baseVersion + "(" + version + ")";
         }
     }
 
