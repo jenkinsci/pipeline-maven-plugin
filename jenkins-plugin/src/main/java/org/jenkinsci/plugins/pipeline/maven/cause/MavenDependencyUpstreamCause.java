@@ -15,14 +15,14 @@ import java.util.Objects;
 public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements MavenDependencyCause {
     private final MavenArtifact mavenArtifact;
 
-    public MavenDependencyUpstreamCause(            Run<?, ?> up,            @Nonnull MavenArtifact mavenArtifact) {
+    public MavenDependencyUpstreamCause(Run<?, ?> up, @Nonnull MavenArtifact mavenArtifact) {
         super(up);
         this.mavenArtifact = mavenArtifact;
     }
 
     @Override
     public String getShortDescription() {
-        return "Started by upstream project \"" + getUpstreamProject() + "\" build number " + getUpstreamBuild() + " generating Maven artifact " + mavenArtifact.getId();
+        return "Started by upstream build \"" + getUpstreamProject() + "\" #" + getUpstreamBuild() + " generating Maven artifact " + mavenArtifact.getShortDescription();
     }
 
     /**
@@ -56,9 +56,16 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
      */
     private void print(TaskListener listener, int depth) {
         indent(listener, depth);
-        listener.getLogger().println("Started by upstream project \"" + ModelHyperlinkNote.encodeTo('/' + getUpstreamUrl(), getUpstreamProject()) +
-                "\" build number " + ModelHyperlinkNote.encodeTo('/' + getUpstreamUrl() + getUpstreamBuild(), Integer.toString(getUpstreamBuild())) +
-                " generating Maven artifact " + mavenArtifact.getId());
+        Run<?, ?> upstreamRun = getUpstreamRun();
+
+        if (upstreamRun == null) {
+            listener.getLogger().println("Started by upstream build " + ModelHyperlinkNote.encodeTo('/' + getUpstreamUrl(), getUpstreamProject()) +
+                    "\" #" + ModelHyperlinkNote.encodeTo('/' + getUpstreamUrl() + getUpstreamBuild(), Integer.toString(getUpstreamBuild())) +
+                    " generating Maven artifact " + mavenArtifact.getShortDescription());
+        } else {
+            listener.getLogger().println("Started by upstream build " +
+                    ModelHyperlinkNote.encodeTo('/' + upstreamRun.getUrl(), upstreamRun.getFullDisplayName()) + " generating Maven artifact " + mavenArtifact.getShortDescription());
+        }
 
         if (getUpstreamCauses() != null && !getUpstreamCauses().isEmpty()) {
             indent(listener, depth);

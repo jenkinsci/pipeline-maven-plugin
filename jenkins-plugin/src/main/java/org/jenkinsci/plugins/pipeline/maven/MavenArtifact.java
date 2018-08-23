@@ -5,6 +5,7 @@ import org.apache.commons.lang.builder.CompareToBuilder;
 import java.io.Serializable;
 import java.util.Objects;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -43,6 +44,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     /**
      * @see MavenArtifact#version
      */
+    @Nonnull
     public String getFileName() {
         return artifactId + "-" + version + ((classifier == null || classifier.isEmpty()) ? "" : "-" + classifier) + "." + extension;
     }
@@ -50,6 +52,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     /**
      * @see MavenArtifact#baseVersion
      */
+    @Nonnull
     public String getFileNameWithBaseVersion() {
         return artifactId + "-" + baseVersion + ((classifier == null || classifier.isEmpty()) ? "" : "-" + classifier) + "." + extension;
     }
@@ -57,9 +60,26 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     /**
      * @see org.apache.maven.artifact.Artifact#getId()
      */
+    @Nonnull
     public String getId() {
-        return groupId + ":" + artifactId + ":" + (baseVersion == null ? version : baseVersion) + ((classifier == null || classifier.isEmpty()) ? "" : ":" + classifier);
+        return groupId + ":" + artifactId  + ":" +
+                type + ":" +
+                ((classifier == null || classifier.isEmpty()) ? "" : classifier + ":") +
+                (baseVersion == null ? version : baseVersion) ;
     }
+
+    @Nonnull
+    public String getShortDescription() {
+        if (baseVersion == null) {
+            return getId();
+        } else {
+            return groupId + ":" + artifactId  + ":" +
+                    type + ":" +
+                    ((classifier == null || classifier.isEmpty()) ? "" :  classifier + ":")  +
+                    (baseVersion == null ? version : baseVersion + "(" + version + ")") ;
+        }
+    }
+
 
     /**
      * URL of the artifact on the maven repository on which it has been deployed if it has been deployed.
