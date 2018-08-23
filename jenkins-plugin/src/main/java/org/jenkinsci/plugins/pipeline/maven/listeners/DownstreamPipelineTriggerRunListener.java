@@ -102,7 +102,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                     if (downstreamDownstreamPipelines.contains(upstreamPipelineFullName)) {
                         if (LOGGER.isLoggable(Level.FINE)) {
                             listener.getLogger().println("[withMaven] Infinite loop detected: not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " " +
-                                    " (dependency: " + mavenArtifact + " because it is itself triggering this pipeline " +
+                                    " (dependency: " + mavenArtifact.getId() + " because it is itself triggering this pipeline " +
                                     ModelHyperlinkNote.encodeTo(upstreamPipeline) + " (dependency: " + entry2.getKey() + ")");
                         }
                         // prevent infinite loop
