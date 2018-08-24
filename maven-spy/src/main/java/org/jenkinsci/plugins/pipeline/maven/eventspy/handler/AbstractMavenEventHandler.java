@@ -98,6 +98,7 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         projectElt.setAttribute("groupId", project.getGroupId());
         projectElt.setAttribute("artifactId", project.getArtifactId());
         projectElt.setAttribute("version", project.getVersion());
+        projectElt.setAttribute("packaging", project.getPackaging());
 
         if (project.getBasedir() != null) {
             try {

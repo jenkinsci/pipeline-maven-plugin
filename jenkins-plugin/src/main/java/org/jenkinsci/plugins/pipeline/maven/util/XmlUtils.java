@@ -88,6 +88,11 @@ public class XmlUtils {
         }
         mavenArtifact.snapshot = Boolean.valueOf(artifactElt.getAttribute("snapshot"));
         mavenArtifact.type = artifactElt.getAttribute("type");
+        if (mavenArtifact.type == null || mavenArtifact.type.isEmpty()) {
+            // workaround: sometimes we use "XmlUtils.newMavenArtifact()" on "project" elements, in this case, "packaging" is defined but "type" is not defined
+            // we should  probably not use "MavenArtifact"
+            mavenArtifact.type = artifactElt.getAttribute("packaging");
+        }
         mavenArtifact.classifier = artifactElt.hasAttribute("classifier") ? artifactElt.getAttribute("classifier") : null;
         mavenArtifact.extension = artifactElt.getAttribute("extension");
     }
