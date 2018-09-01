@@ -100,11 +100,9 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 for (Map.Entry<MavenArtifact, SortedSet<String>> entry2 : downstreamDownstreamPipelinesByArtifact.entrySet()) {
                     SortedSet<String> downstreamDownstreamPipelines = entry2.getValue();
                     if (downstreamDownstreamPipelines.contains(upstreamPipelineFullName)) {
-                        if (LOGGER.isLoggable(Level.FINE)) {
                             listener.getLogger().println("[withMaven] Infinite loop detected: not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " " +
                                     " (dependency: " + mavenArtifact.getId() + " because it is itself triggering this pipeline " +
                                     ModelHyperlinkNote.encodeTo(upstreamPipeline) + " (dependency: " + entry2.getKey() + ")");
-                        }
                         // prevent infinite loop
                         continue downstreamPipelinesLoop;
                     }
@@ -114,19 +112,26 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 // Avoid excessive triggering
                 // See #46313
                 Map<String, Integer> transitiveUpstreamPipelines = globalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber);
-                for (String transitiveUpstream : transitiveUpstreamPipelines.keySet()) {
+                for (String transitiveUpstreamPipelineName : transitiveUpstreamPipelines.keySet()) {
                     // Skip if one of the downstream's upstream is already building or in queue
                     // Then it will get triggered anyway by that upstream, we don't need to trigger it again
-                    WorkflowJob tup = Jenkins.getInstance().getItemByFullName(transitiveUpstream, WorkflowJob.class);
-                    if (tup != null && !tup.equals(upstreamPipeline) && (tup.isBuilding() || tup.isInQueue())) {
-                        listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " because it has a dependency " + ModelHyperlinkNote.encodeTo(tup) + " already building or in queue");
+                    WorkflowJob transitiveUpstreamPipeline = Jenkins.getInstance().getItemByFullName(transitiveUpstreamPipelineName, WorkflowJob.class);
+
+                    if (transitiveUpstreamPipeline == null) {
+                        // security: not allowed to view this transitive upstream pipeline, skip
+                        continue;
+                    }
+                    if (!transitiveUpstreamPipeline.equals(upstreamPipeline) && (transitiveUpstreamPipeline.isBuilding() || transitiveUpstreamPipeline.isInQueue())) {
+                        listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                                " because it has a dependency already building or in queue: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
                         continue downstreamPipelinesLoop;
                     }
 
                     // Skip if this downstream pipeline will be triggered by another one of our downstream pipelines
                     // That's the case when one of the downstream's transitive upstream is our own downstream
-                    if (downstreamPipelines.contains(transitiveUpstream)) {
-                        listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " because it has dependencies in the downstream project list");
+                    if (downstreamPipelines.contains(transitiveUpstreamPipelineName)) {
+                        listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                                " because it has a dependency on a pipeline that will be triggered by this build: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
                         continue downstreamPipelinesLoop;
                     }
                 }
