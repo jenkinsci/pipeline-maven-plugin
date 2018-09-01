@@ -30,6 +30,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -93,10 +94,17 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
 
     @Nonnull
     @Override
+    @Deprecated
     public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
         return Collections.emptyList();
     }
-    
+
+    @Nonnull
+    @Override
+    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@Nonnull String jobFullName, int buildNumber) {
+        return Collections.emptyMap();
+    }
+
     @Nonnull
     @Override
     public Map<String, Integer> listUpstreamJobs(String jobFullName, int buildNumber) {

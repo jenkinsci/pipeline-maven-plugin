@@ -33,7 +33,6 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-import org.jenkinsci.plugins.pipeline.maven.db.migration.h2.MigrationStep8;
 import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
@@ -51,6 +50,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -589,6 +590,7 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
     @Nonnull
     @Override
+    @Deprecated
     public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
         List<String> downstreamJobs = listDownstreamPipelinesBasedOnMavenDependencies(jobFullName, buildNumber);
         downstreamJobs.addAll(listDownstreamPipelinesBasedOnParentProjectDependencies(jobFullName, buildNumber));
@@ -598,6 +600,37 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         return downstreamJobs;
     }
 
+    @Nonnull
+    @Override
+    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@Nonnull String jobFullName, int buildNumber) {
+        Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactBasedOnMavenDependencies = listDownstreamJobsByArtifactBasedOnMavenDependencies(jobFullName, buildNumber);
+        Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactBasedOnParentProjectDependencies = listDownstreamJobsByArtifactBasedOnParentProjectDependencies(jobFullName, buildNumber);
+
+
+        Map<MavenArtifact, SortedSet<String>> results = new HashMap<>();
+        results.putAll(downstreamJobsByArtifactBasedOnMavenDependencies);
+
+        for(Map.Entry<MavenArtifact, SortedSet<String>> entry: downstreamJobsByArtifactBasedOnParentProjectDependencies.entrySet()) {
+            MavenArtifact mavenArtifact = entry.getKey();
+            if (results.containsKey(mavenArtifact)) {
+                results.get(mavenArtifact).addAll(entry.getValue());
+            } else {
+                results.put(mavenArtifact, new TreeSet<>(entry.getValue()));
+            }
+        }
+        // JENKINS-50507 Don't return the passed job in case of pipelines consuming the artifacts they produce
+        for(Map.Entry<MavenArtifact, SortedSet<String>> entry:results.entrySet()) {
+            MavenArtifact mavenArtifact = entry.getKey();
+            SortedSet<String> jobs = entry.getValue();
+            boolean removed = jobs.remove(jobFullName);
+            if (removed) {
+                LOGGER.log(Level.FINER, "Remove {0} from downstreamJobs of artifact {1}", new Object[]{jobFullName, mavenArtifact});
+            }
+        }
+        return results;
+    }
+
+    @Deprecated
     protected List<String> listDownstreamPipelinesBasedOnMavenDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamJobs({0}, {1})", new Object[]{jobFullName, buildNumber});
 
@@ -634,6 +667,61 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         return downstreamJobsFullNames;
     }
 
+    protected Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifactBasedOnMavenDependencies(@Nonnull String jobFullName, int buildNumber) {
+        LOGGER.log(Level.FINER, "listDownstreamJobsByArtifactBasedOnMavenDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
+
+
+        String sql = "select distinct downstream_job.full_name, \n " +
+                "   maven_artifact.group_id, maven_artifact.artifact_id, maven_artifact.version, maven_artifact.type, maven_artifact.classifier, \n" +
+                "   generated_maven_artifact.version, generated_maven_artifact.extension \n" +
+                "from jenkins_job as upstream_job \n" +
+                "inner join jenkins_build as upstream_build on upstream_job.id = upstream_build.job_id \n" +
+                "inner join generated_maven_artifact on (upstream_build.id = generated_maven_artifact.build_id and generated_maven_artifact.skip_downstream_triggers = false) \n" +
+                "inner join maven_artifact on generated_maven_artifact.artifact_id = maven_artifact.id \n" +
+                "inner join maven_dependency on (maven_dependency.artifact_id = maven_artifact.id and maven_dependency.ignore_upstream_triggers = false) \n" +
+                "inner join jenkins_build as downstream_build on maven_dependency.build_id = downstream_build.id \n" +
+                "inner join jenkins_job as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
+                "where upstream_job.full_name = ? and upstream_job.jenkins_master_id = ? and upstream_build.number = ? and downstream_job.jenkins_master_id = ?";
+
+        LOGGER.log(Level.FINER, "sql: {0}, jobFullName:{1}, buildNumber: {2}", new Object[]{sql, jobFullName, buildNumber});
+        Map<MavenArtifact, SortedSet<String>> results = new HashMap<>();
+
+        try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            try (PreparedStatement stmt = cnn.prepareStatement(sql)) {
+                stmt.setString(1, jobFullName);
+                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
+                stmt.setInt(3, buildNumber);
+                stmt.setLong(4, getJenkinsMasterPrimaryKey(cnn));
+                try (ResultSet rst = stmt.executeQuery()) {
+                    while (rst.next()) {
+                        MavenArtifact artifact = new MavenArtifact();
+                        artifact.groupId = rst.getString("group_id");
+                        artifact.artifactId = rst.getString("artifact_id");
+                        artifact.version = rst.getString("generated_maven_artifact.version");
+                        artifact.baseVersion = rst.getString("maven_artifact.version");
+                        artifact.type = rst.getString("type");
+                        artifact.classifier = rst.getString("classifier");
+                        artifact.extension = rst.getString("extension");
+                        String downstreamJobFullName = rst.getString("full_name");
+
+                        if(results.containsKey(artifact)) {
+                            results.get(artifact).add(downstreamJobFullName);
+                        } else {
+                            results.put(artifact, new TreeSet<>(Collections.singleton(downstreamJobFullName)));
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeSqlException(e);
+        }
+        LOGGER.log(Level.FINE, "listDownstreamJobsByArtifactBasedOnMavenDependencies({0}, {1}): {2}", new Object[]{jobFullName, buildNumber, results});
+
+        return results;
+    }
+
+
+    @Deprecated
     protected List<String> listDownstreamPipelinesBasedOnParentProjectDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
         String sql = "select distinct downstream_job.full_name \n" +
@@ -667,6 +755,59 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         LOGGER.log(Level.FINE, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1}): {2}", new Object[]{jobFullName, buildNumber, downstreamJobsFullNames});
 
         return downstreamJobsFullNames;
+    }
+
+
+    protected Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifactBasedOnParentProjectDependencies(String jobFullName, int buildNumber) {
+        LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
+        String sql = "select distinct downstream_job.full_name, \n" +
+                "   maven_artifact.group_id, maven_artifact.artifact_id, maven_artifact.version, maven_artifact.type, maven_artifact.classifier, \n" +
+                "   generated_maven_artifact.version, generated_maven_artifact.extension \n" +
+                "from jenkins_job as upstream_job \n" +
+                "inner join jenkins_build as upstream_build on upstream_job.id = upstream_build.job_id \n" +
+                "inner join generated_maven_artifact on (upstream_build.id = generated_maven_artifact.build_id and generated_maven_artifact.skip_downstream_triggers = false) \n" +
+                "inner join maven_artifact on generated_maven_artifact.artifact_id = maven_artifact.id \n" +
+                "inner join maven_parent_project on (maven_parent_project.artifact_id = maven_artifact.id and maven_parent_project.ignore_upstream_triggers = false) \n" +
+                "inner join jenkins_build as downstream_build on maven_parent_project.build_id = downstream_build.id \n" +
+                "inner join jenkins_job as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
+                "where upstream_job.full_name = ? and upstream_job.jenkins_master_id = ? and upstream_build.number = ? and downstream_job.jenkins_master_id = ?";
+
+        LOGGER.log(Level.FINER, "sql: {0}, jobFullName:{1}, buildNumber: {2}", new Object[]{sql, jobFullName, buildNumber});
+
+        Map<MavenArtifact, SortedSet<String>> results = new HashMap<>();
+
+        try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            try (PreparedStatement stmt = cnn.prepareStatement(sql)) {
+                stmt.setString(1, jobFullName);
+                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
+                stmt.setInt(3, buildNumber);
+                stmt.setLong(4, getJenkinsMasterPrimaryKey(cnn));
+                try (ResultSet rst = stmt.executeQuery()) {
+                    while (rst.next()) {
+                        MavenArtifact artifact = new MavenArtifact();
+                        artifact.groupId = rst.getString("group_id");
+                        artifact.artifactId = rst.getString("artifact_id");
+                        artifact.version = rst.getString("generated_maven_artifact.version");
+                        artifact.baseVersion = rst.getString("maven_artifact.version");
+                        artifact.type = rst.getString("type");
+                        artifact.classifier = rst.getString("classifier");
+                        artifact.extension = rst.getString("extension");
+                        String downstreamJobFullName = rst.getString("full_name");
+
+                        if(results.containsKey(artifact)) {
+                            results.get(artifact).add(jobFullName);
+                        } else {
+                            results.put(artifact, new TreeSet<>(Collections.singleton(downstreamJobFullName)));
+                        }
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeSqlException(e);
+        }
+        LOGGER.log(Level.FINE, "listDownstreamJobsByArtifactBasedOnParentProjectDependencies({0}, {1}): {2}", new Object[]{jobFullName, buildNumber, results});
+
+        return results;
     }
 
     @Nonnull

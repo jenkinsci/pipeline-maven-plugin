@@ -49,10 +49,15 @@ Inspired by /hudson/tasks/Fingerprinter/FingerprintAction/index.jelly
                 </em>
             </f:section>
             <f:section title="Downstream Jobs">
+
                 <ul>
-                    <j:forEach var="job" items="${it.downstreamJobs}">
+                    <j:forEach var="jobsByArtifact" items="${it.downstreamJobsByArtifact.entrySet()}">
                         <li>
-                            <a href="${rootURL}/${job.url}">${job.fullDisplayName}</a>
+                            ${jobsByArtifact.key.id}:
+                            <j:forEach var="job" varStatus="varStatus" items="${jobsByArtifact.value}">
+                                <a href="${rootURL}/${job.url}">${job.fullDisplayName}</a>
+                                <j:if test="${!varStatus.last}">, </j:if>
+                            </j:forEach>
                         </li>
                     </j:forEach>
                 </ul>
