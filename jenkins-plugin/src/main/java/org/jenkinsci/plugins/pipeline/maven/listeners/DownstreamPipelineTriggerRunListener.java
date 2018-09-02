@@ -193,9 +193,6 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             for(MavenArtifact mavenArtifact : mavenArtifacts) {
                 MavenDependencyUpstreamCause cause = new MavenDependencyUpstreamCause(upstreamBuild, mavenArtifact);
                 causeActions.add( new CauseAction(cause));
-
-
-
             }
             // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
             Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(downstreamJob, -1, causeActions.toArray(new Action[0]));
