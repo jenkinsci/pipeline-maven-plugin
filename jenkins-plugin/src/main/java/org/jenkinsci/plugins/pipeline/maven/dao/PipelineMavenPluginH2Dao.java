@@ -47,6 +47,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -619,14 +620,19 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
             }
         }
         // JENKINS-50507 Don't return the passed job in case of pipelines consuming the artifacts they produce
-        for(Map.Entry<MavenArtifact, SortedSet<String>> entry:results.entrySet()) {
+        for (Iterator<Entry<MavenArtifact, SortedSet<String>>> it = results.entrySet().iterator(); it.hasNext();) {
+            Map.Entry<MavenArtifact, SortedSet<String>> entry = it.next();
             MavenArtifact mavenArtifact = entry.getKey();
             SortedSet<String> jobs = entry.getValue();
             boolean removed = jobs.remove(jobFullName);
             if (removed) {
                 LOGGER.log(Level.FINER, "Remove {0} from downstreamJobs of artifact {1}", new Object[]{jobFullName, mavenArtifact});
+                if (jobs.isEmpty()) {
+                    it.remove();
+                }
             }
         }
+
         return results;
     }
 

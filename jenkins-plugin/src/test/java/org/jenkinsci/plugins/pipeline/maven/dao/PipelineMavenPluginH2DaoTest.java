@@ -566,6 +566,40 @@ public class PipelineMavenPluginH2DaoTest {
         }
     }
 
+    @Test
+    public void listDownstreamJobsByArtifact_doesnt_return_artifacts_with_no_pipelines() {
+
+        dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "upstream-shared", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "upstream-1", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
+        dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "upstream-2", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
+        dao.recordDependency("my-upstream-pipeline-1", 1, "com.mycompany", "upstream-shared", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
+        dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "upstream-1", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+        {
+            MavenArtifact expectedMavenArtifact = new MavenArtifact();
+            expectedMavenArtifact.groupId = "com.mycompany";
+            expectedMavenArtifact.artifactId = "upstream-1";
+            expectedMavenArtifact.version = "1.0-SNAPSHOT";
+            expectedMavenArtifact.baseVersion = "1.0-SNAPSHOT";
+            expectedMavenArtifact.type = "jar";
+            expectedMavenArtifact.extension = "jar";
+
+            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 1);
+            System.out.println(downstreamJobsByArtifactForBuild1);
+
+            SortedSet<String> actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
+            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+
+            assertThat(downstreamJobsByArtifactForBuild1.size(), is(1));
+        }
+    }
+
+
     @Deprecated
     @Test
     public void listDownstreamJobs_upstream_pom_triggers_downstream_pipelines() {
