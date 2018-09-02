@@ -1,6 +1,9 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
 import com.cloudbees.hudson.plugins.folder.computed.ComputedFolder;
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import hudson.Extension;
 import hudson.console.ModelHyperlinkNote;
 import hudson.model.*;
@@ -21,12 +24,16 @@ import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -73,6 +80,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         String upstreamPipelineFullName = upstreamPipeline.getFullName();
         int upstreamBuildNumber = upstreamBuild.getNumber();
         Map<MavenArtifact, SortedSet<String>> downstreamPipelinesByArtifact = globalPipelineMavenConfig.getDao().listDownstreamJobsByArtifact(upstreamPipelineFullName, upstreamBuildNumber);
+
+        Map<String, Set<MavenArtifact>> jobsToTrigger = new TreeMap<>();
 
         for(Map.Entry<MavenArtifact, SortedSet<String>> entry: downstreamPipelinesByArtifact.entrySet()) {
 
@@ -158,15 +167,15 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                                     "upstreamBuildAuth: " + Jenkins.getAuthentication());
                 }
                 if (downstreamVisibleByUpstreamBuildAuth && upstreamVisibleByDownstreamBuildAuth) {
-                    // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
-                    MavenDependencyUpstreamCause cause = new MavenDependencyUpstreamCause(upstreamBuild, mavenArtifact);
-                    Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(downstreamPipeline, -1, new CauseAction(cause));
-                    if (queuedItem == null) {
-                        listener.getLogger().println("[withMaven] Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " due to dependency on " +
-                                mavenArtifact.getId() + ", it is already in the queue.");
+                    Set<MavenArtifact> mavenArtifacts = jobsToTrigger.get(upstreamPipelineFullName);
+                    if (mavenArtifacts == null) {
+                        mavenArtifacts = new TreeSet<>();
+                        jobsToTrigger.put(downstreamPipelineFullName, mavenArtifacts);
+                    }
+                    if(mavenArtifacts.contains(mavenArtifact)) {
+                        // TODO display warning
                     } else {
-                        listener.getLogger().println("[withMaven] Scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + "#" + downstreamPipeline.getNextBuildNumber() + " due to dependency on " +
-                                mavenArtifact.getId() + "...");
+                        mavenArtifacts.add(mavenArtifact);
                     }
                 } else {
                     LOGGER.log(Level.FINE, "Skip triggering of {0} by {1}: downstreamVisibleByUpstreamBuildAuth: {2}, upstreamVisibleByDownstreamBuildAuth: {3}",
@@ -175,6 +184,37 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             }
         }
 
+        for (Map.Entry<String, Set<MavenArtifact>> entry: jobsToTrigger.entrySet()) {
+            String downstreamJobFullName = entry.getKey();
+            Job downstreamJob = Jenkins.getInstance().getItemByFullName(downstreamJobFullName, Job.class);
+
+            List<Action> causeActions = new ArrayList<>();
+            Set<MavenArtifact> mavenArtifacts = entry.getValue();
+            for(MavenArtifact mavenArtifact : mavenArtifacts) {
+                MavenDependencyUpstreamCause cause = new MavenDependencyUpstreamCause(upstreamBuild, mavenArtifact);
+                causeActions.add( new CauseAction(cause));
+
+
+
+            }
+            // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
+            Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(downstreamJob, -1, causeActions.toArray(new Action[0]));
+
+            String dependenciesMessage = Joiner.on(",").join(Collections2.transform(mavenArtifacts, new Function<MavenArtifact, String>() {
+                @Override
+                public String apply(@Nullable MavenArtifact mavenArtifact) {
+                    return mavenArtifact == null ? "null" : mavenArtifact.getShortDescription();
+                }
+            }));
+            if (queuedItem == null) {
+                listener.getLogger().println("[withMaven] Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " due to dependencies on " +
+                        dependenciesMessage + ", it is already in the queue.");
+            } else {
+                listener.getLogger().println("[withMaven] Scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + "#" + downstreamJob.getNextBuildNumber() + " due to dependency on " +
+                        dependenciesMessage + " ...");
+            }
+
+        }
     }
 
     /**
