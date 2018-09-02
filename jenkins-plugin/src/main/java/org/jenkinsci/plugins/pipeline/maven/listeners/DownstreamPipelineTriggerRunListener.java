@@ -167,7 +167,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                                     "upstreamBuildAuth: " + Jenkins.getAuthentication());
                 }
                 if (downstreamVisibleByUpstreamBuildAuth && upstreamVisibleByDownstreamBuildAuth) {
-                    Set<MavenArtifact> mavenArtifacts = jobsToTrigger.get(upstreamPipelineFullName);
+                    Set<MavenArtifact> mavenArtifacts = jobsToTrigger.get(downstreamPipelineFullName);
                     if (mavenArtifacts == null) {
                         mavenArtifacts = new TreeSet<>();
                         jobsToTrigger.put(downstreamPipelineFullName, mavenArtifacts);
