@@ -93,6 +93,21 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             downstreamPipelinesLoop:
             for (String downstreamPipelineFullName : downstreamPipelines) {
 
+                if (jobsToTrigger.containsKey(downstreamPipelineFullName)) {
+                    // downstream pipeline has already been added to the list of pipelines to trigger,
+                    // it's meeting requirements (not an infinite loop, authorized by security, not excessive triggering, buildable...)
+                    if (LOGGER.isLoggable(Level.FINEST)) {
+                        listener.getLogger().println("[withMaven - DownstreamPipelineTriggerRunListener] Skip eligibility check of pipeline " + downstreamPipelineFullName + " for artifact " + mavenArtifact.getShortDescription() + ", eligibility already confirmed");
+                    }
+                    Set<MavenArtifact> mavenArtifacts = jobsToTrigger.get(downstreamPipelineFullName);
+                    if (mavenArtifacts == null) {
+                        listener.getLogger().println("[withMaven - DownstreamPipelineTriggerRunListener] Invalid state, no artifacts found for pipeline '" + downstreamPipelineFullName + "' while evaluating " + mavenArtifact.getShortDescription());
+                    } else {
+                        mavenArtifacts.add(mavenArtifact);
+                    }
+                    continue;
+                }
+
                 if (Objects.equals(downstreamPipelineFullName, upstreamPipelineFullName)) {
                     // Don't trigger myself
                     continue;
