@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -57,6 +58,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
     @Override
     public void onCompleted(WorkflowRun upstreamBuild, @Nonnull TaskListener listener) {
         LOGGER.log(Level.FINER, "onCompleted({0})", new Object[]{upstreamBuild});
+        long startTimeInNanos = System.nanoTime();
         if(LOGGER.isLoggable(Level.FINER)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - triggerDownstreamPipelines");
         }
@@ -110,12 +112,11 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                     SortedSet<String> downstreamDownstreamPipelines = entry2.getValue();
                     if (downstreamDownstreamPipelines.contains(upstreamPipelineFullName)) {
                             listener.getLogger().println("[withMaven] Infinite loop detected: not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " " +
-                                    " (dependency: " + mavenArtifact.getId() + " because it is itself triggering this pipeline " +
+                                    " (dependency: " + mavenArtifact.getId() + ") because it is itself triggering this pipeline " +
                                     ModelHyperlinkNote.encodeTo(upstreamPipeline) + " (dependency: " + entry2.getKey() + ")");
                         // prevent infinite loop
                         continue downstreamPipelinesLoop;
                     }
-
                 }
 
                 // Avoid excessive triggering
@@ -211,6 +212,10 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                         dependenciesMessage + " ...");
             }
 
+        }
+        long durationInMillis = TimeUnit.MILLISECONDS.convert(System.nanoTime() - startTimeInNanos, TimeUnit.NANOSECONDS);
+        if (durationInMillis > TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS) || LOGGER.isLoggable(Level.FINE)) {
+            listener.getLogger().println("[withMaven] triggerDownstreamPipelines completed in " + durationInMillis + " ms");
         }
     }
 
