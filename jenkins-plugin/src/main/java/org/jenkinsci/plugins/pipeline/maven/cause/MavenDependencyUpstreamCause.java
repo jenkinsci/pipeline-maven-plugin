@@ -1,28 +1,39 @@
 package org.jenkinsci.plugins.pipeline.maven.cause;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import hudson.console.ModelHyperlinkNote;
 import hudson.model.Cause;
-import hudson.model.Messages;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-import java.util.Objects;
-
 public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements MavenDependencyCause {
-    private final MavenArtifact mavenArtifact;
+    private final List<MavenArtifact> mavenArtifacts;
 
-    public MavenDependencyUpstreamCause(Run<?, ?> up, @Nonnull MavenArtifact mavenArtifact) {
+    public MavenDependencyUpstreamCause(Run<?, ?> up, @Nonnull MavenArtifact... mavenArtifact) {
         super(up);
-        this.mavenArtifact = mavenArtifact;
+        this.mavenArtifacts = Arrays.asList(mavenArtifact);
+    }
+
+    public MavenDependencyUpstreamCause(Run<?, ?> up, @Nonnull Collection<MavenArtifact> mavenArtifacts) {
+        super(up);
+        this.mavenArtifacts = new ArrayList<>(mavenArtifacts);
     }
 
     @Override
     public String getShortDescription() {
-        return "Started by upstream build \"" + getUpstreamProject() + "\" #" + getUpstreamBuild() + " generating Maven artifact " + mavenArtifact.getShortDescription();
+        return "Started by upstream build \"" + getUpstreamProject() + "\" #" + getUpstreamBuild() + " generating Maven artifacts: " + getMavenArtifactsDescription();
     }
 
     /**
@@ -50,8 +61,9 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
 
     /**
      * TODO create a PR on jenkins-core to make {@link hudson.model.Cause.UpstreamCause#print(TaskListener, int)} protected instead of private
-     *
+     * <p>
      * Mimic {@link hudson.model.Cause.UpstreamCause#print(TaskListener, int)} waiting for this method to become protected instead of private
+     *
      * @see UpstreamCause#print(TaskListener, int)
      */
     private void print(TaskListener listener, int depth) {
@@ -61,10 +73,10 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
         if (upstreamRun == null) {
             listener.getLogger().println("Started by upstream build " + ModelHyperlinkNote.encodeTo('/' + getUpstreamUrl(), getUpstreamProject()) +
                     "\" #" + ModelHyperlinkNote.encodeTo('/' + getUpstreamUrl() + getUpstreamBuild(), Integer.toString(getUpstreamBuild())) +
-                    " generating Maven artifact " + mavenArtifact.getShortDescription());
+                    " generating Maven artifact: " + getMavenArtifactsDescription());
         } else {
             listener.getLogger().println("Started by upstream build " +
-                    ModelHyperlinkNote.encodeTo('/' + upstreamRun.getUrl(), upstreamRun.getFullDisplayName()) + " generating Maven artifact " + mavenArtifact.getShortDescription());
+                    ModelHyperlinkNote.encodeTo('/' + upstreamRun.getUrl(), upstreamRun.getFullDisplayName()) + " generating Maven artifacts: " + getMavenArtifactsDescription());
         }
 
         if (getUpstreamCauses() != null && !getUpstreamCauses().isEmpty()) {
@@ -82,9 +94,19 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
     }
 
     @Nonnull
+    public String getMavenArtifactsDescription() {
+        return Joiner.on(",").join(Collections2.transform(mavenArtifacts, new Function<MavenArtifact, String>() {
+            @Override
+            public String apply(@Nullable MavenArtifact mavenArtifact) {
+                return mavenArtifact == null ? "null" : mavenArtifact.getShortDescription();
+            }
+        }));
+    }
+
+    @Nonnull
     @Override
-    public MavenArtifact getMavenArtifact() {
-        return mavenArtifact;
+    public List<MavenArtifact> getMavenArtifacts() {
+        return mavenArtifacts;
     }
 
     @Override
@@ -93,12 +115,12 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         MavenDependencyUpstreamCause that = (MavenDependencyUpstreamCause) o;
-        return Objects.equals(mavenArtifact, that.mavenArtifact);
+        return Objects.equals(mavenArtifacts, that.mavenArtifacts);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(super.hashCode(), mavenArtifact);
+        return Objects.hash(super.hashCode(), mavenArtifacts);
     }
 }

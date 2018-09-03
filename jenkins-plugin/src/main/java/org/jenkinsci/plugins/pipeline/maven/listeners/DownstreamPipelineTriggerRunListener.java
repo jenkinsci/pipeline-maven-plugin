@@ -188,25 +188,16 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         for (Map.Entry<String, Set<MavenArtifact>> entry: jobsToTrigger.entrySet()) {
             String downstreamJobFullName = entry.getKey();
             Job downstreamJob = Jenkins.getInstance().getItemByFullName(downstreamJobFullName, Job.class);
-
-            List<Action> causeActions = new ArrayList<>();
             Set<MavenArtifact> mavenArtifacts = entry.getValue();
-            for(MavenArtifact mavenArtifact : mavenArtifacts) {
-                MavenDependencyUpstreamCause cause = new MavenDependencyUpstreamCause(upstreamBuild, mavenArtifact);
-                causeActions.add( new CauseAction(cause));
-            }
-            // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
-            Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(downstreamJob, -1, causeActions.toArray(new Action[0]));
 
-            String dependenciesMessage = Joiner.on(",").join(Collections2.transform(mavenArtifacts, new Function<MavenArtifact, String>() {
-                @Override
-                public String apply(@Nullable MavenArtifact mavenArtifact) {
-                    return mavenArtifact == null ? "null" : mavenArtifact.getShortDescription();
-                }
-            }));
+            // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
+            MavenDependencyUpstreamCause cause = new MavenDependencyUpstreamCause(upstreamBuild, mavenArtifacts);
+            Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(downstreamJob, -1, new CauseAction(cause));
+
+            String dependenciesMessage = cause.getMavenArtifactsDescription();
             if (queuedItem == null) {
                 listener.getLogger().println("[withMaven] Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " due to dependencies on " +
-                        dependenciesMessage + ", it is already in the queue.");
+                        dependenciesMessage + ", invocation rejected.");
             } else {
                 listener.getLogger().println("[withMaven] Scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + "#" + downstreamJob.getNextBuildNumber() + " due to dependency on " +
                         dependenciesMessage + " ...");

@@ -32,10 +32,10 @@ Based on jenkins-core-2.46.3.jar!/hudson/model/Cause/UpstreamCause/description.j
             <j:when test="${it.upstreamUrl!=null and app.getItemByFullName(it.upstreamProject)!=null}">
                 <j:choose>
                     <j:when test="${app.getItemByFullName(it.upstreamProject).getBuildByNumber(it.upstreamBuild)!=null}">
-                        <j:out value="${%started_by_project(app.getItemByFullName(it.upstreamProject).fullDisplayName,it.upstreamBuild.toString(),it.upstreamUrl,rootURL,it.mavenArtifact.shortDescription)}"/>
+                        <j:out value="${%started_by_project(app.getItemByFullName(it.upstreamProject).fullDisplayName,it.upstreamBuild.toString(),it.upstreamUrl,rootURL,it.mavenArtifactsDescription)}"/>
                     </j:when>
                     <j:otherwise>
-                        <j:out value="${%started_by_project_with_deleted_build(app.getItemByFullName(it.upstreamProject).fullDisplayName,it.upstreamBuild.toString(),it.upstreamUrl,rootURL,it.mavenArtifact.shortDescription)}"/>
+                        <j:out value="${%started_by_project_with_deleted_build(app.getItemByFullName(it.upstreamProject).fullDisplayName,it.upstreamBuild.toString(),it.upstreamUrl,rootURL,it.mavenArtifactsDescription)}"/>
                     </j:otherwise>
                 </j:choose>
             </j:when>
