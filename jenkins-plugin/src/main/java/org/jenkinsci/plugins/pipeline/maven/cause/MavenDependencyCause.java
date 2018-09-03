@@ -2,6 +2,8 @@ package org.jenkinsci.plugins.pipeline.maven.cause;
 
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 /**
@@ -11,5 +13,5 @@ import javax.annotation.Nonnull;
  */
 public interface MavenDependencyCause {
     @Nonnull
-    MavenArtifact getMavenArtifact();
+    List<MavenArtifact> getMavenArtifacts();
 }
