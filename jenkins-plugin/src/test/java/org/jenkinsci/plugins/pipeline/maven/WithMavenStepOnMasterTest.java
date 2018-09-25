@@ -40,6 +40,7 @@ import java.util.Map;
 import com.cloudbees.hudson.plugins.folder.Folder;
 import hudson.model.Fingerprint;
 import hudson.model.Result;
+import hudson.plugins.jacoco.JacocoBuildAction;
 import hudson.plugins.tasks.TasksResultAction;
 import hudson.tasks.Fingerprinter;
 import hudson.tasks.junit.TestResultAction;
@@ -62,6 +63,7 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.Symbol;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
@@ -179,6 +181,37 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         jenkinsRule.assertLogContains("[withMaven] openTasksPublisher - Scan Tasks for Maven artifact jenkins.mvn.test:mono-module-maven-app:jar:0.1-SNAPSHOT", build);
         TasksResultAction tasksResultAction = build.getAction(TasksResultAction.class);
         assertThat(tasksResultAction.getProjectActions().size(), is(1));
+    }
+
+    @Ignore("disable while we can't use ASM 6.x due to jenkins enforcer preventing jars supporting java 11 https://gist.github.com/cyrille-leclerc/ac2ad901c27b3b96fd3efa6ed8062f7c")
+    @Test
+    public void maven_build_jar_with_jacoco_succeeds() throws Exception {
+        loadMavenJarWithJacocoInGitRepo(this.gitRepoRule);
+
+        String pipelineScript = "node('master') {\n" +
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven() {\n" +
+                "        sh 'mvn package verify'\n" +
+                "    }\n" +
+                "}";
+
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "jar-with-jacoco");
+        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+
+       Collection<String> artifactsFileNames = TestUtils.artifactsToArtifactsFileNames(build.getArtifacts());
+        assertThat(artifactsFileNames, hasItems("jar-with-jacoco-0.1-SNAPSHOT.pom", "jar-with-jacoco-0.1-SNAPSHOT.jar"));
+
+        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/jar-with-jacoco/0.1-SNAPSHOT/jar-with-jacoco-0.1-SNAPSHOT.jar");
+        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/jar-with-jacoco/0.1-SNAPSHOT/jar-with-jacoco-0.1-SNAPSHOT.pom");
+
+        TestResultAction testResultAction = build.getAction(TestResultAction.class);
+        assertThat(testResultAction.getTotalCount(), is(2));
+        assertThat(testResultAction.getFailCount(), is(0));
+
+        // verify Task Scanner is called for jenkins.mvn.test:mono-module-maven-app
+        JacocoBuildAction jacocoBuildAction = build.getAction(JacocoBuildAction.class);
+        assertThat(jacocoBuildAction.getProjectActions().size(), is(1));
     }
 
     @Issue("JENKINS-48264")
