@@ -599,6 +599,20 @@ public class PipelineMavenPluginH2DaoTest {
         }
     }
 
+    @Test
+    public void listDownstreamPipelinesBasedOnMavenDependencies_() {
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
+        dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 1);
+        dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 2222, 22);
+
+        SortedSet<String> downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar");
+        System.out.println(downstreamJobs);
+        assertThat(downstreamJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1", "my-downstream-pipeline-2"));
+    }
 
     @Deprecated
     @Test

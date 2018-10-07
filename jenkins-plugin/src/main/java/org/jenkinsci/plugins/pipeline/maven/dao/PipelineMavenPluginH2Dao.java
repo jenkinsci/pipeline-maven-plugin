@@ -636,7 +636,46 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
         return results;
     }
 
-    @Deprecated
+    @Nonnull
+    @Override
+    public SortedSet<String> listDownstreamJobs(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type) {
+        return listDownstreamPipelinesBasedOnMavenDependencies(groupId,artifactId,version,type);
+    }
+
+    protected SortedSet<String> listDownstreamPipelinesBasedOnMavenDependencies(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type) {
+        LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnMavenDependencies({0}:{1}:{2}:{3})", new Object[]{groupId, artifactId, version, type});
+
+        String sql = "select distinct downstream_job.full_name \n" +
+                "from maven_artifact  \n" +
+                "inner join maven_dependency on (maven_dependency.artifact_id = maven_artifact.id and maven_dependency.ignore_upstream_triggers = false) \n" +
+                "inner join jenkins_build as downstream_build on maven_dependency.build_id = downstream_build.id \n" +
+                "inner join jenkins_job as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
+                "where maven_artifact.group_id = ? and maven_artifact.artifact_id = ? and maven_artifact.version = ? and maven_artifact.type = ? and downstream_job.jenkins_master_id = ?";
+
+        SortedSet<String> downstreamJobsFullNames = new TreeSet<>();
+
+        try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            try (PreparedStatement stmt = cnn.prepareStatement(sql)) {
+                stmt.setString(1, groupId);
+                stmt.setString(2, artifactId);
+                stmt.setString(3, version);
+                stmt.setString(4, type);
+                stmt.setLong(5, getJenkinsMasterPrimaryKey(cnn));
+                try (ResultSet rst = stmt.executeQuery()) {
+                    while (rst.next()) {
+                        downstreamJobsFullNames.add(rst.getString(1));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeSqlException(e);
+        }
+        LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnMavenDependencies({0}:{1}:{2}:{3}): {4}", new Object[]{groupId, artifactId, version, type, downstreamJobsFullNames});
+
+        return downstreamJobsFullNames;
+    }
+
+        @Deprecated
     protected List<String> listDownstreamPipelinesBasedOnMavenDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamJobs({0}, {1})", new Object[]{jobFullName, buildNumber});
 
