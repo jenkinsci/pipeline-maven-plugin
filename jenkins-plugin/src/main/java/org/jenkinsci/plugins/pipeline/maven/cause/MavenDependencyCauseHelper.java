@@ -17,6 +17,12 @@ import javax.annotation.Nullable;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class MavenDependencyCauseHelper {
+
+    /**
+     * Return {@code true} if the given causes refer to at least one common Maven artifact.
+     *
+     * TODO add unit tests
+     */
     public static boolean isSameCause(MavenDependencyCause newMavenCause, Cause olderMavenCause) {
         if (!(olderMavenCause instanceof MavenDependencyCause)) {
             return false;
