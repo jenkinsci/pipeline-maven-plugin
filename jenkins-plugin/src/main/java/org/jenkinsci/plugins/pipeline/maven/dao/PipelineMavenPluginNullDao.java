@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -103,6 +104,12 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     @Override
     public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@Nonnull String jobFullName, int buildNumber) {
         return Collections.emptyMap();
+    }
+
+    @Nonnull
+    @Override
+    public SortedSet<String> listDownstreamJobs(String groupId, String artifactId, String version, String type) {
+        return new TreeSet<>();
     }
 
     @Nonnull

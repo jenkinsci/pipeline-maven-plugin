@@ -20,6 +20,7 @@ import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginMonitoringDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao;
+import org.jenkinsci.plugins.pipeline.maven.service.PipelineTriggerService;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.StaplerRequest;
@@ -28,8 +29,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Level;
@@ -45,6 +44,8 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     private final static Logger LOGGER = Logger.getLogger(GlobalPipelineMavenConfig.class.getName());
 
     private transient PipelineMavenPluginDao dao;
+
+    private transient PipelineTriggerService pipelineTriggerService;
 
     private boolean triggerDownstreamUponResultSuccess = true;
     private boolean triggerDownstreamUponResultUnstable;
@@ -201,6 +202,14 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
             }
         }
         return dao;
+    }
+
+    @Nonnull
+    public synchronized PipelineTriggerService getPipelineTriggerService() {
+        if (pipelineTriggerService == null) {
+            pipelineTriggerService = new PipelineTriggerService(this);
+        }
+        return pipelineTriggerService;
     }
 
     @Nonnull

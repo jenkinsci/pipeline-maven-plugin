@@ -1,22 +1,16 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
-import com.cloudbees.hudson.plugins.folder.computed.ComputedFolder;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 import hudson.Extension;
 import hudson.console.ModelHyperlinkNote;
-import hudson.model.*;
+import hudson.model.Cause;
+import hudson.model.CauseAction;
+import hudson.model.Job;
+import hudson.model.Queue;
+import hudson.model.Run;
+import hudson.model.TaskListener;
 import hudson.model.listeners.RunListener;
-import hudson.model.queue.Tasks;
-import hudson.security.ACL;
-import hudson.security.ACLContext;
-import hudson.triggers.Trigger;
-import hudson.triggers.TriggerDescriptor;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
-import jenkins.security.QueueItemAuthenticatorConfiguration;
-import org.acegisecurity.Authentication;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause;
@@ -24,9 +18,6 @@ import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -39,7 +30,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 /**
@@ -51,7 +41,7 @@ import javax.inject.Inject;
 public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRun> {
 
     private final static Logger LOGGER = Logger.getLogger(DownstreamPipelineTriggerRunListener.class.getName());
-    
+
     @Inject
     public GlobalPipelineMavenConfig globalPipelineMavenConfig;
 
@@ -71,7 +61,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         }
 
         try {
-            checkNoInfiniteLoopOfUpstreamCause(upstreamBuild);
+            this.globalPipelineMavenConfig.getPipelineTriggerService().checkNoInfiniteLoopOfUpstreamCause(upstreamBuild);
         } catch (IllegalStateException e) {
             listener.getLogger().println("[withMaven] WARNING abort infinite build trigger loop. Please consider opening a Jira issue: " + e.getMessage());
             return;
@@ -167,14 +157,14 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                     continue;
                 }
 
-                WorkflowJobDependencyTrigger downstreamPipelineTrigger = getWorkflowJobDependencyTrigger(downstreamPipeline);
+                WorkflowJobDependencyTrigger downstreamPipelineTrigger = this.globalPipelineMavenConfig.getPipelineTriggerService().getWorkflowJobDependencyTrigger(downstreamPipeline);
                 if (downstreamPipelineTrigger == null) {
                     LOGGER.log(Level.FINE, "Skip triggering of downstream pipeline {0} from upstream build {1}: dependency trigger not configured", new Object[]{downstreamPipeline.getFullName(), upstreamBuild.getFullDisplayName()});
                     continue;
                 }
 
-                boolean downstreamVisibleByUpstreamBuildAuth = isDownstreamVisibleByUpstreamBuildAuth(downstreamPipeline);
-                boolean upstreamVisibleByDownstreamBuildAuth = isUpstreamBuildVisibleByDownstreamBuildAuth(upstreamPipeline, downstreamPipeline);
+                boolean downstreamVisibleByUpstreamBuildAuth = this.globalPipelineMavenConfig.getPipelineTriggerService().isDownstreamVisibleByUpstreamBuildAuth(downstreamPipeline);
+                boolean upstreamVisibleByDownstreamBuildAuth = this.globalPipelineMavenConfig.getPipelineTriggerService().isUpstreamBuildVisibleByDownstreamBuildAuth(upstreamPipeline, downstreamPipeline);
 
                 if (LOGGER.isLoggable(Level.FINER)) {
                     LOGGER.log(Level.FINER,
@@ -203,10 +193,25 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         for (Map.Entry<String, Set<MavenArtifact>> entry: jobsToTrigger.entrySet()) {
             String downstreamJobFullName = entry.getKey();
             Job downstreamJob = Jenkins.getInstance().getItemByFullName(downstreamJobFullName, Job.class);
+            if (downstreamJob == null) {
+                listener.getLogger().println("[withMaven] Illegal state: " + downstreamJobFullName + " not resolved");
+                continue;
+            }
             Set<MavenArtifact> mavenArtifacts = entry.getValue();
 
             // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
             MavenDependencyUpstreamCause cause = new MavenDependencyUpstreamCause(upstreamBuild, mavenArtifacts);
+
+            Run downstreamJobLastBuild = downstreamJob.getLastBuild();
+            if (downstreamJobLastBuild == null) {
+                // should never happen, we need at least one build to know the dependencies
+            } else {
+                List<Cause> causes = downstreamJobLastBuild.getCauses();
+                for (Cause downstreamCause : causes) {
+                    // TODO check if it is the "same cause"
+                }
+            }
+
             Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(downstreamJob, -1, new CauseAction(cause));
 
             String dependenciesMessage = cause.getMavenArtifactsDescription();
@@ -225,90 +230,5 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         }
     }
 
-    /**
-     * Check NO infinite loop of job triggers caused by {@link hudson.model.Cause.UpstreamCause}.
-     *
-     * @param initialBuild
-     * @throws IllegalStateException if an infinite loop is detected
-     */
-    protected void checkNoInfiniteLoopOfUpstreamCause(@Nonnull Run initialBuild) throws IllegalStateException {
-        java.util.Queue<Run> builds = new LinkedList<>(Collections.singleton(initialBuild));
-        Run currentBuild;
-        while ((currentBuild = builds.poll()) != null) {
-            for(Cause cause: ((List<Cause>) currentBuild.getCauses())) {
-                if (cause instanceof Cause.UpstreamCause) {
-                    Cause.UpstreamCause upstreamCause = (Cause.UpstreamCause) cause;
-                    Run<?, ?> upstreamBuild = upstreamCause.getUpstreamRun();
-                    if (upstreamBuild == null) {
-                        // Can be Authorization, build deleted on the file system...
-                    } else if (Objects.equals(upstreamBuild.getParent().getFullName(), initialBuild.getParent().getFullName())) {
-                        throw new IllegalStateException("Infinite loop of job triggers ");
-                    } else {
-                        builds.add(upstreamBuild);
-                    }
-                }
-            }
-        }
-    }
-
-    @Nullable
-    protected WorkflowJobDependencyTrigger getWorkflowJobDependencyTrigger(@Nonnull ParameterizedJobMixIn.ParameterizedJob parameterizedJob) {
-        Map<TriggerDescriptor, Trigger<?>> triggers = parameterizedJob.getTriggers();
-        for (Trigger trigger : triggers.values()) {
-            if (trigger instanceof WorkflowJobDependencyTrigger) {
-                return (WorkflowJobDependencyTrigger) trigger;
-            }
-        }
-
-        if (parameterizedJob.getParent() instanceof ComputedFolder) {
-            // search for the triggers of MultiBranch pipelines
-            ComputedFolder<?> multiBranchProject = (ComputedFolder) parameterizedJob.getParent();
-            for (Trigger trigger : multiBranchProject.getTriggers().values()) {
-                if (trigger instanceof WorkflowJobDependencyTrigger) {
-                    return (WorkflowJobDependencyTrigger) trigger;
-                }
-            }
-
-            if (multiBranchProject.getParent() instanceof ComputedFolder) {
-                // search for the triggers of GitHubOrg folders / Bitbucket folders
-                ComputedFolder<?> grandParent = (ComputedFolder) multiBranchProject.getParent();
-                Map<TriggerDescriptor, Trigger<?>> grandParentTriggers = grandParent.getTriggers();
-                for (Trigger trigger : grandParentTriggers.values()) {
-                    if (trigger instanceof WorkflowJobDependencyTrigger) {
-                        return (WorkflowJobDependencyTrigger) trigger;
-                    }
-                }
-            }
-
-        }
-        return null;
-    }
-
-
-    protected boolean isUpstreamBuildVisibleByDownstreamBuildAuth(@Nonnull WorkflowJob upstreamPipeline, @Nonnull Queue.Task downstreamPipeline) {
-        Authentication auth = Tasks.getAuthenticationOf(downstreamPipeline);
-        Authentication downstreamPipelineAuth;
-        if (auth.equals(ACL.SYSTEM) && !QueueItemAuthenticatorConfiguration.get().getAuthenticators().isEmpty()) {
-            downstreamPipelineAuth = Jenkins.ANONYMOUS; // cf. BuildTrigger
-        } else {
-            downstreamPipelineAuth = auth;
-        }
-
-        try (ACLContext _ = ACL.as(downstreamPipelineAuth)) {
-            WorkflowJob upstreamPipelineObtainedAsImpersonated = Jenkins.getInstance().getItemByFullName(upstreamPipeline.getFullName(), WorkflowJob.class);
-            boolean result = upstreamPipelineObtainedAsImpersonated != null;
-            LOGGER.log(Level.FINE, "isUpstreamBuildVisibleByDownstreamBuildAuth({0}, {1}): taskAuth: {2}, downstreamPipelineAuth: {3}, upstreamPipelineObtainedAsImpersonated:{4}, result: {5}",
-                    new Object[]{upstreamPipeline, downstreamPipeline, auth, downstreamPipelineAuth, upstreamPipelineObtainedAsImpersonated, result});
-            return result;
-        }
-    }
-
-    protected boolean isDownstreamVisibleByUpstreamBuildAuth(@Nonnull Item downstreamPipeline) {
-        boolean result = Jenkins.getInstance().getItemByFullName(downstreamPipeline.getFullName()) != null;
-        LOGGER.log(Level.FINE, "isDownstreamVisibleByUpstreamBuildAuth({0}, auth: {1}): {2}",
-                new Object[]{downstreamPipeline, Jenkins.getAuthentication(), result});
-
-        return result;
-    }
 
 }

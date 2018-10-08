@@ -163,6 +163,19 @@ public class PipelineMavenPluginMonitoringDao implements PipelineMavenPluginDao 
         }
     }
 
+    @Nonnull
+    @Override
+    public SortedSet<String> listDownstreamJobs(String groupId, String artifactId, String version, String type) {
+        long nanosBefore = System.nanoTime();
+        try {
+            return delegate.listDownstreamJobs(groupId, artifactId, version, type);
+        } finally {
+            long nanosAfter = System.nanoTime();
+            findCount.incrementAndGet();
+            findDurationInNanos.addAndGet(nanosAfter - nanosBefore);
+        }
+    }
+
     @Override
     @Nonnull
     public Map<String, Integer> listUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {

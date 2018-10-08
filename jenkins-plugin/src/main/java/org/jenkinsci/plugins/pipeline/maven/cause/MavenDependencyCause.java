@@ -7,11 +7,14 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 /**
- *
- *
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public interface MavenDependencyCause {
     @Nonnull
     List<MavenArtifact> getMavenArtifacts();
+
+    void setMavenArtifacts(List<MavenArtifact> mavenArtifacts);
+
+    String getMavenArtifactsDescription();
+
 }

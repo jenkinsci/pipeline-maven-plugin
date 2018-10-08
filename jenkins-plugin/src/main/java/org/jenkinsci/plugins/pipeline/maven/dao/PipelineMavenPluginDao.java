@@ -178,6 +178,19 @@ public interface PipelineMavenPluginDao {
     Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@Nonnull String jobFullName, int buildNumber);
 
     /**
+     * List the downstream jobs who have a dependency on the given artifact.
+     *
+     * @param groupId Maven artifact group ID
+     * @param artifactId see {@link Run#getNumber()}
+     * @param version Maven artifact version
+     * @param type Maven artifact type
+     * @return list of job full names (see {@link Item#getFullName()}) by {@link MavenArtifact}
+     * @see Item#getFullName()
+     */
+    @Nonnull
+    SortedSet<String> listDownstreamJobs(String groupId, String artifactId, String version, String type);
+
+    /**
      * List the upstream jobs who generate an artifact that the given build depends on
      * (build identified by the given {@code jobFullName}, {@code buildNumber})
      *

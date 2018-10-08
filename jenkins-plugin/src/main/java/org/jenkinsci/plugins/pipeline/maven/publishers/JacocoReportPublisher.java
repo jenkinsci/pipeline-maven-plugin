@@ -28,9 +28,7 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
-import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
-import hudson.plugins.findbugs.FindBugsPublisher;
 import hudson.plugins.jacoco.JacocoPublisher;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
@@ -42,9 +40,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

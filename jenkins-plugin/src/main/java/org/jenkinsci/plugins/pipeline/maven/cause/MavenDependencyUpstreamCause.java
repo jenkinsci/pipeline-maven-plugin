@@ -19,7 +19,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements MavenDependencyCause {
-    private final List<MavenArtifact> mavenArtifacts;
+    private List<MavenArtifact> mavenArtifacts;
 
     public MavenDependencyUpstreamCause(Run<?, ?> up, @Nonnull MavenArtifact... mavenArtifact) {
         super(up);
@@ -107,6 +107,11 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
     @Override
     public List<MavenArtifact> getMavenArtifacts() {
         return mavenArtifacts;
+    }
+
+    @Override
+    public void setMavenArtifacts(List<MavenArtifact> mavenArtifacts) {
+        this.mavenArtifacts = mavenArtifacts;
     }
 
     @Override
