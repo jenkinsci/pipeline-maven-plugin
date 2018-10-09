@@ -188,7 +188,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
                 dao.recordDependency(run.getParent().getFullName(), run.getNumber(),
                         dependency.groupId, dependency.artifactId, dependency.baseVersion, dependency.type, dependency.getScope(),
-                        this.ignoreUpstreamTriggers, null);
+                        this.ignoreUpstreamTriggers, dependency.classifier);
 
             } catch (RuntimeException e) {
                 listener.error("[withMaven] pipelineGraphPublisher - WARNING: Exception recording " + dependency.getId() + " on build, skip");
