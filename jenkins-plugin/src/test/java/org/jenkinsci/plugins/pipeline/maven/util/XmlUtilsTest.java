@@ -9,7 +9,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -287,14 +286,14 @@ public class XmlUtilsTest {
         Assert.assertThat(generatedArtifacts.size(), Matchers.is(2)); // a jar file and a pom file are generated
 
         for (MavenArtifact mavenArtifact:generatedArtifacts) {
-            Assert.assertThat(mavenArtifact.groupId, Matchers.is("com.example"));
-            Assert.assertThat(mavenArtifact.artifactId, Matchers.is("my-jar"));
-            if("pom".equals(mavenArtifact.type)) {
-                Assert.assertThat(mavenArtifact.extension, Matchers.is("pom"));
-                Assert.assertThat(mavenArtifact.classifier, Matchers.isEmptyOrNullString());
-            } else if ("jar".equals(mavenArtifact.type)) {
-                Assert.assertThat(mavenArtifact.extension, Matchers.is("jar"));
-                Assert.assertThat(mavenArtifact.classifier, Matchers.isEmptyOrNullString());
+            Assert.assertThat(mavenArtifact.getGroupId(), Matchers.is("com.example"));
+            Assert.assertThat(mavenArtifact.getArtifactId(), Matchers.is("my-jar"));
+            if("pom".equals(mavenArtifact.getType())) {
+                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("pom"));
+                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
+            } else if ("jar".equals(mavenArtifact.getType())) {
+                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("jar"));
+                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
             } else {
                 throw new AssertionFailedError("Unsupported type for " + mavenArtifact);
             }
@@ -310,17 +309,17 @@ public class XmlUtilsTest {
         Assert.assertThat(generatedArtifacts.size(), Matchers.is(3)); // a jar file and a pom file are generated
 
         for (MavenArtifact mavenArtifact:generatedArtifacts) {
-            Assert.assertThat(mavenArtifact.groupId, Matchers.is("com.example"));
-            Assert.assertThat(mavenArtifact.artifactId, Matchers.is("my-jar"));
-            if("pom".equals(mavenArtifact.type)) {
-                Assert.assertThat(mavenArtifact.extension, Matchers.is("pom"));
-                Assert.assertThat(mavenArtifact.classifier, Matchers.isEmptyOrNullString());
-            } else if ("jar".equals(mavenArtifact.type)) {
-                Assert.assertThat(mavenArtifact.extension, Matchers.is("jar"));
-                Assert.assertThat(mavenArtifact.classifier, Matchers.isEmptyOrNullString());
-            } else if ("java-source".equals(mavenArtifact.type)) {
-                Assert.assertThat(mavenArtifact.extension, Matchers.is("jar"));
-                Assert.assertThat(mavenArtifact.classifier, Matchers.is("sources"));
+            Assert.assertThat(mavenArtifact.getGroupId(), Matchers.is("com.example"));
+            Assert.assertThat(mavenArtifact.getArtifactId(), Matchers.is("my-jar"));
+            if("pom".equals(mavenArtifact.getType())) {
+                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("pom"));
+                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
+            } else if ("jar".equals(mavenArtifact.getType())) {
+                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("jar"));
+                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
+            } else if ("java-source".equals(mavenArtifact.getType())) {
+                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("jar"));
+                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.is("sources"));
             } else {
                 throw new AssertionFailedError("Unsupported type for " + mavenArtifact);
             }
@@ -338,14 +337,14 @@ public class XmlUtilsTest {
         Assert.assertThat(generatedArtifacts.size(), Matchers.is(2)); // pom artifact plus 1 attachment
 
         for (MavenArtifact mavenArtifact : generatedArtifacts) {
-            Assert.assertThat(mavenArtifact.groupId, Matchers.is("com.example"));
-            Assert.assertThat(mavenArtifact.artifactId, Matchers.is("my-jar"));
-            if ("pom".equals(mavenArtifact.type)) {
-                Assert.assertThat(mavenArtifact.extension, Matchers.is("pom"));
-                Assert.assertThat(mavenArtifact.classifier, Matchers.isEmptyOrNullString());
-            } else if ("ova".equals(mavenArtifact.type)) {
-                Assert.assertThat(mavenArtifact.extension, Matchers.is("ova"));
-                Assert.assertThat(mavenArtifact.classifier, Matchers.isEmptyOrNullString());
+            Assert.assertThat(mavenArtifact.getGroupId(), Matchers.is("com.example"));
+            Assert.assertThat(mavenArtifact.getArtifactId(), Matchers.is("my-jar"));
+            if ("pom".equals(mavenArtifact.getType())) {
+                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("pom"));
+                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
+            } else if ("ova".equals(mavenArtifact.getType())) {
+                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("ova"));
+                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
             } else {
                 throw new AssertionFailedError("Unsupported type for " + mavenArtifact);
             }

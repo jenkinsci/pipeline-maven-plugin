@@ -109,7 +109,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
 
         Map<String, String> artifactsToFingerPrint = new HashMap<>(); // artifactPathInFingerprintZone -> artifactMd5
         for (MavenDependency dependency : dependencies) {
-            if (dependency.snapshot) {
+            if (dependency.isSnapshot()) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
                         listener.getLogger().println("[withMaven] Skip fingerprinting snapshot dependency: " + dependency);
@@ -132,16 +132,16 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
             }
 
             try {
-                if (StringUtils.isEmpty(dependency.file)) {
+                if (StringUtils.isEmpty(dependency.getFile())) {
                     if (LOGGER.isLoggable(Level.FINER)) {
                         listener.getLogger().println("[withMaven] Can't fingerprint maven dependency with no file attached: " + dependency);
                     }
                     continue;
                 }
 
-                FilePath dependencyFilePath = new FilePath(workspace, dependency.file);
+                FilePath dependencyFilePath = new FilePath(workspace, dependency.getFile());
 
-                if (!(dependency.file.endsWith("." + dependency.extension))) {
+                if (!(dependency.getFile().endsWith("." + dependency.getExtension()))) {
                     if (dependencyFilePath.isDirectory()) {
                         if (LOGGER.isLoggable(Level.FINE)) {
                             listener.getLogger().println("[withMaven] Skip fingerprinting of maven dependency of type directory " + dependency);
@@ -151,9 +151,9 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
                 }
 
                 String dependencyMavenRepoStyleFilePath =
-                        dependency.groupId.replace('.', '/') + "/" +
-                                dependency.artifactId + "/" +
-                                dependency.baseVersion + "/" +
+                        dependency.getGroupId().replace('.', '/') + "/" +
+                                dependency.getArtifactId() + "/" +
+                                dependency.getBaseVersion() + "/" +
                                 dependency.getFileNameWithBaseVersion();
 
 

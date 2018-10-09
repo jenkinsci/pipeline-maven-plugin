@@ -151,12 +151,12 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                     while (rst.next()) {
                         MavenDependency artifact = new MavenDependency();
 
-                        artifact.groupId = rst.getString("maven_artifact.group_id");
-                        artifact.artifactId = rst.getString("maven_artifact.artifact_id");
-                        artifact.version = rst.getString("maven_artifact.version");
-                        artifact.snapshot = artifact.version.endsWith("-SNAPSHOT");
-                        artifact.type = rst.getString("maven_artifact.type");
-                        artifact.classifier = rst.getString("maven_artifact.classifier");
+                        artifact.setGroupId(rst.getString("maven_artifact.group_id"));
+                        artifact.setArtifactId(rst.getString("maven_artifact.artifact_id"));
+                        artifact.setVersion(rst.getString("maven_artifact.version"));
+                        artifact.setSnapshot(artifact.getVersion().endsWith("-SNAPSHOT"));
+                        artifact.setType(rst.getString("maven_artifact.type"));
+                        artifact.setClassifier(rst.getString("maven_artifact.classifier"));
                         artifact.setScope(rst.getString("maven_dependency.scope"));
                         results.add(artifact);
                     }
@@ -740,13 +740,13 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 try (ResultSet rst = stmt.executeQuery()) {
                     while (rst.next()) {
                         MavenArtifact artifact = new MavenArtifact();
-                        artifact.groupId = rst.getString("group_id");
-                        artifact.artifactId = rst.getString("artifact_id");
-                        artifact.version = rst.getString("generated_maven_artifact.version");
-                        artifact.baseVersion = rst.getString("maven_artifact.version");
-                        artifact.type = rst.getString("type");
-                        artifact.classifier = rst.getString("classifier");
-                        artifact.extension = rst.getString("extension");
+                        artifact.setGroupId(rst.getString("group_id"));
+                        artifact.setArtifactId(rst.getString("artifact_id"));
+                        artifact.setVersion(rst.getString("generated_maven_artifact.version"));
+                        artifact.setBaseVersion(rst.getString("maven_artifact.version"));
+                        artifact.setType(rst.getString("type"));
+                        artifact.setClassifier(rst.getString("classifier"));
+                        artifact.setExtension(rst.getString("extension"));
                         String downstreamJobFullName = rst.getString("full_name");
 
                         if(results.containsKey(artifact)) {
@@ -830,13 +830,13 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                 try (ResultSet rst = stmt.executeQuery()) {
                     while (rst.next()) {
                         MavenArtifact artifact = new MavenArtifact();
-                        artifact.groupId = rst.getString("group_id");
-                        artifact.artifactId = rst.getString("artifact_id");
-                        artifact.version = rst.getString("generated_maven_artifact.version");
-                        artifact.baseVersion = rst.getString("maven_artifact.version");
-                        artifact.type = rst.getString("type");
-                        artifact.classifier = rst.getString("classifier");
-                        artifact.extension = rst.getString("extension");
+                        artifact.setGroupId(rst.getString("group_id"));
+                        artifact.setArtifactId(rst.getString("artifact_id"));
+                        artifact.setVersion(rst.getString("generated_maven_artifact.version"));
+                        artifact.setBaseVersion(rst.getString("maven_artifact.version"));
+                        artifact.setType(rst.getString("type"));
+                        artifact.setClassifier(rst.getString("classifier"));
+                        artifact.setExtension(rst.getString("extension"));
                         String downstreamJobFullName = rst.getString("full_name");
 
                         if(results.containsKey(artifact)) {
@@ -996,16 +996,16 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
                     while (rst.next()) {
                         MavenArtifact artifact = new MavenArtifact();
 
-                        artifact.groupId = rst.getString("maven_artifact.group_id");
-                        artifact.artifactId = rst.getString("maven_artifact.artifact_id");
-                        artifact.version = rst.getString("maven_artifact.version");
-                        artifact.type = rst.getString("maven_artifact.type");
-                        artifact.classifier = rst.getString("maven_artifact.classifier");
+                        artifact.setGroupId(rst.getString("maven_artifact.group_id"));
+                        artifact.setArtifactId(rst.getString("maven_artifact.artifact_id"));
+                        artifact.setVersion(rst.getString("maven_artifact.version"));
+                        artifact.setType(rst.getString("maven_artifact.type"));
+                        artifact.setClassifier(rst.getString("maven_artifact.classifier"));
 
-                        artifact.baseVersion = rst.getString("generated_maven_artifact.version");
-                        artifact.repositoryUrl = rst.getString("generated_maven_artifact.repository_url");
-                        artifact.extension = rst.getString("generated_maven_artifact.extension");
-                        artifact.snapshot = artifact.version.endsWith("-SNAPSHOT");
+                        artifact.setBaseVersion(rst.getString("generated_maven_artifact.version"));
+                        artifact.setRepositoryUrl(rst.getString("generated_maven_artifact.repository_url"));
+                        artifact.setExtension(rst.getString("generated_maven_artifact.extension"));
+                        artifact.setSnapshot(artifact.getVersion().endsWith("-SNAPSHOT"));
 
                         // artifact.put("skip_downstream_triggers", rst.getString("generated_maven_artifact.skip_downstream_triggers"));
                         results.add(artifact);

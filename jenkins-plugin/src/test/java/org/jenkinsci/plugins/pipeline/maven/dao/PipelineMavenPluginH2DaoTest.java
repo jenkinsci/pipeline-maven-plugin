@@ -189,10 +189,10 @@ public class PipelineMavenPluginH2DaoTest {
         assertThat(mavenDependencies.size(), is(1));
         MavenDependency dependency = mavenDependencies.get(0);
 
-        assertThat(dependency.groupId, is("com.h2.database"));
-        assertThat(dependency.artifactId, is("h2"));
-        assertThat(dependency.version, is("1.4.196"));
-        assertThat(dependency.type, is("jar"));
+        assertThat(dependency.getGroupId(), is("com.h2.database"));
+        assertThat(dependency.getArtifactId(), is("h2"));
+        assertThat(dependency.getVersion(), is("1.4.196"));
+        assertThat(dependency.getType(), is("jar"));
         assertThat(dependency.getScope(), is("compile"));
 
     }
@@ -362,11 +362,11 @@ public class PipelineMavenPluginH2DaoTest {
                 generatedArtifacts.size(),
                 is(2));
         for(MavenArtifact generatedArtifact: generatedArtifacts) {
-            assertThat(generatedArtifact.groupId, is("com.mycompany"));
-            assertThat(generatedArtifact.artifactId, is("core"));
-            assertThat(generatedArtifact.baseVersion, is("1.0-SNAPSHOT"));
-            assertThat(generatedArtifact.type, Matchers.isIn(Arrays.asList("war", "jar")));
-            assertThat(generatedArtifact.extension, Matchers.isIn(Arrays.asList("war", "jar")));
+            assertThat(generatedArtifact.getGroupId(), is("com.mycompany"));
+            assertThat(generatedArtifact.getArtifactId(), is("core"));
+            assertThat(generatedArtifact.getBaseVersion(), is("1.0-SNAPSHOT"));
+            assertThat(generatedArtifact.getType(), Matchers.isIn(Arrays.asList("war", "jar")));
+            assertThat(generatedArtifact.getExtension(), Matchers.isIn(Arrays.asList("war", "jar")));
         }
 
         SqlTestsUtils.dump("select * from JENKINS_BUILD LEFT OUTER JOIN JENKINS_JOB ON JENKINS_BUILD.JOB_ID = JENKINS_JOB.ID", jdbcConnectionPool, System.out);
@@ -522,12 +522,12 @@ public class PipelineMavenPluginH2DaoTest {
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
-            expectedMavenArtifact.groupId = "com.mycompany";
-            expectedMavenArtifact.artifactId = "core";
-            expectedMavenArtifact.baseVersion = "1.0-SNAPSHOT";
-            expectedMavenArtifact.version = "1.0-SNAPSHOT";
-            expectedMavenArtifact.type = "jar";
-            expectedMavenArtifact.extension = "jar";
+            expectedMavenArtifact.setGroupId("com.mycompany");
+            expectedMavenArtifact.setArtifactId("core");
+            expectedMavenArtifact.setBaseVersion("1.0-SNAPSHOT");
+            expectedMavenArtifact.setVersion("1.0-SNAPSHOT");
+            expectedMavenArtifact.setType("jar");
+            expectedMavenArtifact.setExtension("jar");
 
             Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 1);
 
@@ -550,12 +550,12 @@ public class PipelineMavenPluginH2DaoTest {
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
-            expectedMavenArtifact.groupId = "com.mycompany";
-            expectedMavenArtifact.artifactId = "core";
-            expectedMavenArtifact.version = "1.1-SNAPSHOT";
-            expectedMavenArtifact.baseVersion = "1.1-SNAPSHOT";
-            expectedMavenArtifact.type = "jar";
-            expectedMavenArtifact.extension = "jar";
+            expectedMavenArtifact.setGroupId("com.mycompany");
+            expectedMavenArtifact.setArtifactId("core");
+            expectedMavenArtifact.setVersion("1.1-SNAPSHOT");
+            expectedMavenArtifact.setBaseVersion("1.1-SNAPSHOT");
+            expectedMavenArtifact.setType("jar");
+            expectedMavenArtifact.setExtension("jar");
 
             Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 2);
 
@@ -582,12 +582,12 @@ public class PipelineMavenPluginH2DaoTest {
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
-            expectedMavenArtifact.groupId = "com.mycompany";
-            expectedMavenArtifact.artifactId = "upstream-1";
-            expectedMavenArtifact.version = "1.0-SNAPSHOT";
-            expectedMavenArtifact.baseVersion = "1.0-SNAPSHOT";
-            expectedMavenArtifact.type = "jar";
-            expectedMavenArtifact.extension = "jar";
+            expectedMavenArtifact.setGroupId("com.mycompany");
+            expectedMavenArtifact.setArtifactId("upstream-1");
+            expectedMavenArtifact.setVersion("1.0-SNAPSHOT");
+            expectedMavenArtifact.setBaseVersion("1.0-SNAPSHOT");
+            expectedMavenArtifact.setType("jar");
+            expectedMavenArtifact.setExtension("jar");
 
             Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 1);
             System.out.println(downstreamJobsByArtifactForBuild1);
@@ -652,12 +652,12 @@ public class PipelineMavenPluginH2DaoTest {
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
-            expectedMavenArtifact.groupId = "com.mycompany.pom";
-            expectedMavenArtifact.artifactId = "parent-pom";
-            expectedMavenArtifact.baseVersion = "1.0-SNAPSHOT";
-            expectedMavenArtifact.version = "1.0-SNAPSHOT";
-            expectedMavenArtifact.type = "pom";
-            expectedMavenArtifact.extension = "pom";
+            expectedMavenArtifact.setGroupId("com.mycompany.pom");
+            expectedMavenArtifact.setArtifactId("parent-pom");
+            expectedMavenArtifact.setBaseVersion("1.0-SNAPSHOT");
+            expectedMavenArtifact.setVersion("1.0-SNAPSHOT");
+            expectedMavenArtifact.setType("pom");
+            expectedMavenArtifact.setExtension("pom");
 
             Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pom-pipeline-1", 1);
 
@@ -726,12 +726,12 @@ public class PipelineMavenPluginH2DaoTest {
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
-            expectedMavenArtifact.groupId = "com.mycompany";
-            expectedMavenArtifact.artifactId = "core";
-            expectedMavenArtifact.version = "1.0-SNAPSHOT";
-            expectedMavenArtifact.baseVersion = "1.0-SNAPSHOT";
-            expectedMavenArtifact.type = "jar";
-            expectedMavenArtifact.extension = "jar";
+            expectedMavenArtifact.setGroupId("com.mycompany");
+            expectedMavenArtifact.setArtifactId("core");
+            expectedMavenArtifact.setVersion("1.0-SNAPSHOT");
+            expectedMavenArtifact.setBaseVersion("1.0-SNAPSHOT");
+            expectedMavenArtifact.setType("jar");
+            expectedMavenArtifact.setExtension("jar");
 
             Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 1);
 
@@ -757,12 +757,12 @@ public class PipelineMavenPluginH2DaoTest {
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
-            expectedMavenArtifact.groupId = "com.mycompany";
-            expectedMavenArtifact.artifactId = "core";
-            expectedMavenArtifact.version = "1.1-SNAPSHOT";
-            expectedMavenArtifact.baseVersion = "1.1-SNAPSHOT";
-            expectedMavenArtifact.type = "jar";
-            expectedMavenArtifact.extension = "jar";
+            expectedMavenArtifact.setGroupId("com.mycompany");
+            expectedMavenArtifact.setArtifactId("core");
+            expectedMavenArtifact.setVersion("1.1-SNAPSHOT");
+            expectedMavenArtifact.setBaseVersion("1.1-SNAPSHOT");
+            expectedMavenArtifact.setType("jar");
+            expectedMavenArtifact.setExtension("jar");
 
             Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 2);
 
@@ -831,10 +831,10 @@ public class PipelineMavenPluginH2DaoTest {
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
-            expectedMavenArtifact.groupId = "com.mycompany";
-            expectedMavenArtifact.artifactId = "core";
-            expectedMavenArtifact.version = "1.0-SNAPSHOT";
-            expectedMavenArtifact.type = "jar";
+            expectedMavenArtifact.setGroupId("com.mycompany");
+            expectedMavenArtifact.setArtifactId("core");
+            expectedMavenArtifact.setVersion("1.0-SNAPSHOT");
+            expectedMavenArtifact.setType("jar");
 
             Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 1);
             assertThat(downstreamJobsByArtifactForBuild1.size(), is(0));
@@ -855,12 +855,12 @@ public class PipelineMavenPluginH2DaoTest {
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
-            expectedMavenArtifact.groupId = "com.mycompany";
-            expectedMavenArtifact.artifactId = "core";
-            expectedMavenArtifact.version = "1.1-SNAPSHOT";
-            expectedMavenArtifact.baseVersion = "1.1-SNAPSHOT";
-            expectedMavenArtifact.type = "jar";
-            expectedMavenArtifact.extension = "jar";
+            expectedMavenArtifact.setGroupId("com.mycompany");
+            expectedMavenArtifact.setArtifactId("core");
+            expectedMavenArtifact.setVersion("1.1-SNAPSHOT");
+            expectedMavenArtifact.setBaseVersion("1.1-SNAPSHOT");
+            expectedMavenArtifact.setType("jar");
+            expectedMavenArtifact.setExtension("jar");
 
             Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 2);
 
@@ -930,12 +930,12 @@ public class PipelineMavenPluginH2DaoTest {
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
-            expectedMavenArtifact.groupId = "com.mycompany";
-            expectedMavenArtifact.artifactId = "core";
-            expectedMavenArtifact.version = "1.0-20170808.155524-63";
-            expectedMavenArtifact.baseVersion = "1.0-SNAPSHOT";
-            expectedMavenArtifact.type = "jar";
-            expectedMavenArtifact.extension = "jar";
+            expectedMavenArtifact.setGroupId("com.mycompany");
+            expectedMavenArtifact.setArtifactId("core");
+            expectedMavenArtifact.setVersion("1.0-20170808.155524-63");
+            expectedMavenArtifact.setBaseVersion("1.0-SNAPSHOT");
+            expectedMavenArtifact.setType("jar");
+            expectedMavenArtifact.setExtension("jar");
 
             Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 1);
 
@@ -960,12 +960,12 @@ public class PipelineMavenPluginH2DaoTest {
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
-            expectedMavenArtifact.groupId = "com.mycompany";
-            expectedMavenArtifact.artifactId = "core";
-            expectedMavenArtifact.version = "1.1-20170808.155524-65";
-            expectedMavenArtifact.baseVersion = "1.1-SNAPSHOT";
-            expectedMavenArtifact.type = "jar";
-            expectedMavenArtifact.extension = "jar";
+            expectedMavenArtifact.setGroupId("com.mycompany");
+            expectedMavenArtifact.setArtifactId("core");
+            expectedMavenArtifact.setVersion("1.1-20170808.155524-65");
+            expectedMavenArtifact.setBaseVersion("1.1-SNAPSHOT");
+            expectedMavenArtifact.setType("jar");
+            expectedMavenArtifact.setExtension("jar");
 
             Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 2);
 
@@ -1092,12 +1092,12 @@ public class PipelineMavenPluginH2DaoTest {
         dao.updateBuildOnCompletion("pipeline-core", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
 
         MavenArtifact expectedMavenArtifact = new MavenArtifact();
-        expectedMavenArtifact.groupId = "com.mycompany";
-        expectedMavenArtifact.artifactId = "framework";
-        expectedMavenArtifact.version = "1.0-SNAPSHOT";
-        expectedMavenArtifact.baseVersion = "1.0-SNAPSHOT";
-        expectedMavenArtifact.type = "jar";
-        expectedMavenArtifact.extension = "jar";
+        expectedMavenArtifact.setGroupId("com.mycompany");
+        expectedMavenArtifact.setArtifactId("framework");
+        expectedMavenArtifact.setVersion("1.0-SNAPSHOT");
+        expectedMavenArtifact.setBaseVersion("1.0-SNAPSHOT");
+        expectedMavenArtifact.setType("jar");
+        expectedMavenArtifact.setExtension("jar");
 
         {
             Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifact = dao.listDownstreamJobsByArtifact("pipeline-framework", 1);

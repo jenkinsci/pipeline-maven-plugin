@@ -24,31 +24,31 @@ public class MavenDependency extends MavenArtifact {
     @Override
     public String toString() {
         return "MavenDependency{" +
-                groupId + ":" +
-                artifactId + ":" +
-                type +
-                (classifier == null ? "" : ":" + classifier) + ":" +
-                baseVersion + ", " +
+                getGroupId() + ":" +
+                getArtifactId() + ":" +
+                getType() +
+                (getClassifier() == null ? "" : ":" + getClassifier()) + ":" +
+                getBaseVersion() + ", " +
                 "scope: " + scope + ", " +
                 " optional: " + optional +
-                " version: " + version +
-                " snapshot: " + snapshot +
-                (file == null ? "" : " " + file) +
+                " version: " + getVersion() +
+                " snapshot: " + isSnapshot() +
+                (getFile() == null ? "" : " " + getFile()) +
                 '}';
     }
 
     public MavenArtifact asMavenArtifact() {
         MavenArtifact result = new MavenArtifact();
 
-        result.groupId = groupId;
-        result.artifactId = artifactId;
-        result.version = version;
-        result.baseVersion = baseVersion;
-        result.type = type;
-        result.classifier = classifier;
-        result.extension = extension;
-        result.file = file;
-        result.snapshot = snapshot;
+        result.setGroupId(getGroupId());
+        result.setArtifactId(getArtifactId());
+        result.setVersion(getVersion());
+        result.setBaseVersion(getBaseVersion());
+        result.setType(getType());
+        result.setClassifier(getClassifier());
+        result.setExtension(getExtension());
+        result.setFile(getFile());
+        result.setSnapshot(isSnapshot());
 
         return result;
     }

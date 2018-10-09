@@ -15,7 +15,39 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
 
     private static final long serialVersionUID = 1L;
 
-    public String groupId, artifactId;
+    public MavenArtifact() {
+
+    }
+
+    /**
+     * @param identifier Maven {@code $groupId:$artifactId:$version } (GAV) or {@code $groupId:$artifactId:$type:$version} (GATV)
+     * @throws IllegalArgumentException unsupported identifier
+     */
+    public MavenArtifact(String identifier) throws IllegalArgumentException {
+        String[] args = identifier.split(":");
+        switch (args.length) {
+            case 4:
+                this.setGroupId(args[0]);
+                this.setArtifactId(args[1]);
+                this.setType(args[2]);
+                this.setVersion(args[3]);
+                break;
+            case 3:
+                this.setGroupId(args[0]);
+                this.setArtifactId(args[1]);
+                this.setVersion(args[2]);
+                break;
+            default:
+                throw new IllegalArgumentException("unsupported format: " + identifier);
+        }
+        if (getVersion().endsWith("SNAPSHOT")) {
+            setSnapshot(true);
+        }
+    }
+
+    private String groupId;
+    private String artifactId;
+
     /**
      * Gets the version of this artifact, for example "1.0-20100529-1213". Note that in case of meta versions like
      * "1.0-SNAPSHOT", the artifact's version depends on the state of the artifact. Artifacts that have been resolved or
@@ -23,30 +55,32 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      *
      * @see org.eclipse.aether.artifact.Artifact#getVersion()
      */
-    public String version;
+    private String version;
     /**
      * Gets the base version of this artifact, for example "1.0-SNAPSHOT". In contrast to the org.eclipse.aether.artifact.Artifact#getVersion(), the
      * base version will always refer to the unresolved meta version.
      *
      * @see org.eclipse.aether.artifact.Artifact#getBaseVersion()
      */
-    public String baseVersion;
-    public String type, classifier, extension;
+    private String baseVersion;
+    private String type;
+    private String classifier;
+    private String extension;
     @Nullable
-    public String file;
-    public boolean snapshot;
+    private String file;
+    private boolean snapshot;
     /**
      * URL on of the Maven repository on which the artifact has been deployed ("mvn deploy")
      */
     @Nullable
-    public String repositoryUrl;
+    private String repositoryUrl;
 
     /**
      * @see MavenArtifact#version
      */
     @Nonnull
     public String getFileName() {
-        return artifactId + "-" + version + ((classifier == null || classifier.isEmpty()) ? "" : "-" + classifier) + "." + extension;
+        return getArtifactId() + "-" + getVersion() + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : "-" + getClassifier()) + "." + getExtension();
     }
 
     /**
@@ -54,7 +88,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      */
     @Nonnull
     public String getFileNameWithBaseVersion() {
-        return artifactId + "-" + baseVersion + ((classifier == null || classifier.isEmpty()) ? "" : "-" + classifier) + "." + extension;
+        return getArtifactId() + "-" + getBaseVersion() + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : "-" + getClassifier()) + "." + getExtension();
     }
 
     /**
@@ -62,71 +96,76 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      */
     @Nonnull
     public String getId() {
-        return groupId + ":" + artifactId  + ":" +
-                type + ":" +
-                ((classifier == null || classifier.isEmpty()) ? "" : classifier + ":") +
-                (baseVersion == null ? version : baseVersion) ;
+        return getGroupId() + ":" + getArtifactId() + ":" +
+                getType() + ":" +
+                ((getClassifier() == null || getClassifier().isEmpty()) ? "" : getClassifier() + ":") +
+                (getBaseVersion() == null ? getVersion() : getBaseVersion());
     }
 
+    /**
+     * Gets a human readable description of this artifact
+     */
     @Nonnull
     public String getShortDescription() {
-        if (baseVersion == null) {
+        if (getBaseVersion() == null) {
             return getId();
         } else {
-            return groupId + ":" + artifactId  + ":" +
-                    type + ":" +
-                    ((classifier == null || classifier.isEmpty()) ? "" :  classifier + ":")  +
-                     baseVersion + "(" + version + ")";
+            return getGroupId() + ":" + getArtifactId() + ":" +
+                    getType() + ":" +
+                    ((getClassifier() == null || getClassifier().isEmpty()) ? "" : getClassifier() + ":") +
+                    getBaseVersion() + "(" + getVersion() + ")";
         }
     }
 
 
     /**
      * URL of the artifact on the maven repository on which it has been deployed if it has been deployed.
+     *
      * @return URL of the artifact or {@code null} if the artifact has not been deployed (if "{@code mvn deploy}" was not invoked)
      */
     @Nullable
     public String getUrl() {
-        if (repositoryUrl == null)
+        if (getRepositoryUrl() == null)
             return null;
-        return repositoryUrl + "/" + groupId.replace('.', '/') + "/" + artifactId + "/" + version + "/" + getFileNameWithBaseVersion();
+        return getRepositoryUrl() + "/" + getGroupId().replace('.', '/') + "/" + getArtifactId() + "/" + getVersion() + "/" + getFileNameWithBaseVersion();
     }
 
     @Override
     public String toString() {
         return "MavenArtifact{" +
-                groupId + ":" +
-                artifactId + ":" +
-                type +
-                (classifier == null ? "" : ":" + classifier) + ":" +
-                baseVersion + "(version: " + version + ", snapshot:" + snapshot + ") " +
-                (file == null ? "" : " " + file) +
+                getGroupId() + ":" +
+                getArtifactId() + ":" +
+                getType() +
+                (getClassifier() == null ? "" : ":" + getClassifier()) + ":" +
+                getBaseVersion() + "(version: " + getVersion() + ", snapshot:" + isSnapshot() + ") " +
+                (getFile() == null ? "" : " " + getFile()) +
                 '}';
     }
 
     @Override
     public int compareTo(MavenArtifact o) {
         return new CompareToBuilder().
-                append(this.groupId, o.groupId).
-                append(this.artifactId, o.artifactId).
-                append(this.baseVersion, o.baseVersion).
-                append(this.version, o.version).
-                append(this.type, o.type).
-                append(this.classifier, o.classifier).
+                append(this.getGroupId(), o.getGroupId()).
+                append(this.getArtifactId(), o.getArtifactId()).
+                append(this.getBaseVersion(), o.getBaseVersion()).
+                append(this.getVersion(), o.getVersion()).
+                append(this.getType(), o.getType()).
+                append(this.getClassifier(), o.getClassifier()).
                 toComparison();
     }
 
     /**
      * Artifact has been deployed to a Maven repository ("mvn deploy")
+     *
      * @see #getUrl()
      */
     public boolean isDeployed() {
-        return this.repositoryUrl != null && !repositoryUrl.isEmpty();
+        return this.getRepositoryUrl() != null && !getRepositoryUrl().isEmpty();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(groupId, artifactId, baseVersion, version);
+        return Objects.hash(getGroupId(), getArtifactId(), getBaseVersion(), getVersion());
     }
 
     @Override
@@ -138,37 +177,169 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
         if (getClass() != obj.getClass())
             return false;
         MavenArtifact other = (MavenArtifact) obj;
-        if (groupId == null) {
-            if (other.groupId != null)
+        if (getGroupId() == null) {
+            if (other.getGroupId() != null)
                 return false;
-        } else if (!groupId.equals(other.groupId))
+        } else if (!getGroupId().equals(other.getGroupId()))
             return false;
-        if (artifactId == null) {
-            if (other.artifactId != null)
+        if (getArtifactId() == null) {
+            if (other.getArtifactId() != null)
                 return false;
-        } else if (!artifactId.equals(other.artifactId))
+        } else if (!getArtifactId().equals(other.getArtifactId()))
             return false;
-        if (baseVersion == null) {
-            if (other.baseVersion != null)
+        if (getBaseVersion() == null) {
+            if (other.getBaseVersion() != null)
                 return false;
-        } else if (!baseVersion.equals(other.baseVersion))
+        } else if (!getBaseVersion().equals(other.getBaseVersion()))
             return false;
-        if (version == null) {
-            if (other.version != null)
+        if (getVersion() == null) {
+            if (other.getVersion() != null)
                 return false;
-        } else if (!version.equals(other.version))
+        } else if (!getVersion().equals(other.getVersion()))
             return false;
-        if (type == null) {
-            if (other.type != null)
+        if (getType() == null) {
+            if (other.getType() != null)
                 return false;
-        } else if (!type.equals(other.type))
+        } else if (!getType().equals(other.getType()))
             return false;
-        if (classifier == null) {
-            if (other.classifier != null)
+        if (getClassifier() == null) {
+            if (other.getClassifier() != null)
                 return false;
-        } else if (!classifier.equals(other.classifier))
+        } else if (!getClassifier().equals(other.getClassifier()))
             return false;
 
         return true;
+    }
+
+    /**
+     * Gets the base version of this artifact, for example "1.0-SNAPSHOT". In contrast to the org.eclipse.aether.artifact.Artifact#getVersion(), the
+     * base version will always refer to the unresolved meta version.
+     *
+     * @see org.eclipse.aether.artifact.Artifact#getBaseVersion()
+     */
+    public String getBaseVersion() {
+        return baseVersion;
+    }
+
+    public void setBaseVersion(String baseVersion) {
+        this.baseVersion = baseVersion;
+        if (baseVersion != null && baseVersion.endsWith("SNAPSHOT")) {
+            this.snapshot = true;
+        }
+    }
+
+    /**
+     * Gets the version of this artifact, for example "1.0-20100529-1213". Note that in case of meta versions like
+     * "1.0-SNAPSHOT", the artifact's version depends on the state of the artifact. Artifacts that have been resolved or
+     * deployed will usually have the meta version expanded.
+     *
+     * @see org.eclipse.aether.artifact.Artifact#getVersion()
+     */
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+        if (version != null && version.endsWith("SNAPSHOT")) {
+            this.snapshot = true;
+        }
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    public String getArtifactId() {
+        return artifactId;
+    }
+
+    public void setArtifactId(String artifactId) {
+        this.artifactId = artifactId;
+    }
+
+    /**
+     * @return The type of this artifact, for example "jar".
+     */
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    /**
+     * Gets the classifier of this artifact, for example "sources".
+     *
+     * @return The classifier or {@code null} if none, never empty.
+     * @see org.eclipse.aether.artifact.Artifact#getClassifier()
+     */
+    @Nullable
+    public String getClassifier() {
+        return classifier;
+    }
+
+    public void setClassifier(String classifier) {
+        this.classifier = classifier;
+    }
+
+    /**
+     * Extension of the generated file
+     * @return file extension (e.g. "jar", "war"...)
+     * @see org.eclipse.aether.artifact.Artifact#getExtension()
+     */
+    public String getExtension() {
+        return extension;
+    }
+
+    public void setExtension(String extension) {
+        this.extension = extension;
+    }
+
+    /**
+     * Not persisted in the database
+     *
+     * @return absolute path of the generated file in the build agent workspace
+     */
+    @Nullable
+    public String getFile() {
+        return file;
+    }
+
+    public void setFile(@Nullable String file) {
+        this.file = file;
+    }
+
+    public boolean isSnapshot() {
+        return snapshot;
+    }
+
+    public void setSnapshot(boolean snapshot) {
+        this.snapshot = snapshot;
+    }
+
+    /**
+     * <p>
+     * URL of the Maven repository on which the artifact has been deployed ("mvn deploy").
+     * </p>
+     * <p>Sample: "https://nexus.my-company.com/content/repositories/snapshots/"</p>
+     */
+    @Nullable
+    public String getRepositoryUrl() {
+        return repositoryUrl;
+    }
+
+    /**
+     *
+     * @param repositoryUrl URL of the maven repository the artifact was uploaded to.
+     * @see #getRepositoryUrl()
+     */
+    public void setRepositoryUrl(@Nullable String repositoryUrl) {
+        this.repositoryUrl = repositoryUrl;
     }
 }

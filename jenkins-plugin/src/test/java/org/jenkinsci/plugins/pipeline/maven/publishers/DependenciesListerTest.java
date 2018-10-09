@@ -32,11 +32,11 @@ public class DependenciesListerTest {
         Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
 
         MavenArtifact dependencyArtifact = mavenArtifacts.get(0);
-        Assert.assertThat(dependencyArtifact.artifactId, CoreMatchers.is("spring-test"));
-        Assert.assertThat(dependencyArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/spring-test/3.2.16.RELEASE/spring-test-3.2.16.RELEASE.jar"));
+        Assert.assertThat(dependencyArtifact.getArtifactId(), CoreMatchers.is("spring-test"));
+        Assert.assertThat(dependencyArtifact.getFile(), CoreMatchers.is("/path/to/spring-petclinic/spring-test/3.2.16.RELEASE/spring-test-3.2.16.RELEASE.jar"));
 
         dependencyArtifact = mavenArtifacts.get(1);
-        Assert.assertThat(dependencyArtifact.artifactId, CoreMatchers.is("spring-core"));
-        Assert.assertThat(dependencyArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/3.2.16.RELEASE/spring-core-3.2.16.RELEASE.jar"));
+        Assert.assertThat(dependencyArtifact.getArtifactId(), CoreMatchers.is("spring-core"));
+        Assert.assertThat(dependencyArtifact.getFile(), CoreMatchers.is("/path/to/spring-petclinic/3.2.16.RELEASE/spring-core-3.2.16.RELEASE.jar"));
     }
 }

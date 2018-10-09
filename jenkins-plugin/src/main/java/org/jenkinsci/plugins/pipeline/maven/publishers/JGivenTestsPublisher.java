@@ -78,7 +78,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
         boolean foundJGivenDependency = false;
         List<MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
         for (MavenDependency dependency : dependencies) {
-            if (dependency.artifactId.contains("jgiven")) {
+            if (dependency.getArtifactId().contains("jgiven")) {
                 foundJGivenDependency = true;
                 break;
             }

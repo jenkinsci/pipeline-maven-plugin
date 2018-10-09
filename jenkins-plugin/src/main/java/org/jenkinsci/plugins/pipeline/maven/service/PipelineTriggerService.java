@@ -57,11 +57,11 @@ public class PipelineTriggerService {
         long startTimeInNanos = System.nanoTime();
 
         MavenArtifact mavenArtifact = new MavenArtifact();
-        mavenArtifact.groupId = groupId;
-        mavenArtifact.artifactId = artifactId;
-        mavenArtifact.baseVersion = baseVersion;
-        mavenArtifact.version = version;
-        mavenArtifact.type = type;
+        mavenArtifact.setGroupId(groupId);
+        mavenArtifact.setArtifactId(artifactId);
+        mavenArtifact.setBaseVersion(baseVersion);
+        mavenArtifact.setVersion(version);
+        mavenArtifact.setType(type);
         SortedSet<String> downstreamPipelines = globalPipelineMavenConfig.getDao().listDownstreamJobs(groupId, artifactId, version, type);
 
         SortedSet<String> jobsToTrigger = new TreeSet<>();

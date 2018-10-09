@@ -50,7 +50,7 @@ public class DependenciesLister {
                     logger.log(Level.WARNING, "listDependencies: no associated file found for "
                             + dependencyArtifact + " in " + XmlUtils.toString(dependencyElt));
                 } else {
-                    dependencyArtifact.file = StringUtils.trim(fileElt.getTextContent());
+                    dependencyArtifact.setFile(StringUtils.trim(fileElt.getTextContent()));
                 }
 
                 result.add(dependencyArtifact);
@@ -80,11 +80,11 @@ public class DependenciesLister {
             }
             final MavenArtifact parentProject = new MavenArtifact();
 
-            parentProject.groupId = parentProjectElt.getAttribute("groupId");
-            parentProject.artifactId = parentProjectElt.getAttribute("artifactId");
-            parentProject.version = parentProjectElt.getAttribute("version");
-            parentProject.baseVersion = parentProject.version;
-            parentProject.snapshot = parentProject.version.endsWith("-SNAPSHOT");
+            parentProject.setGroupId(parentProjectElt.getAttribute("groupId"));
+            parentProject.setArtifactId(parentProjectElt.getAttribute("artifactId"));
+            parentProject.setVersion(parentProjectElt.getAttribute("version"));
+            parentProject.setBaseVersion(parentProject.getVersion());
+            parentProject.setSnapshot(parentProject.getVersion().endsWith("-SNAPSHOT"));
 
             result.add(parentProject);
         }
