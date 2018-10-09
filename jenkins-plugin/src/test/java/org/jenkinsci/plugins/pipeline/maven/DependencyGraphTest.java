@@ -217,16 +217,16 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
             @Override
             public boolean apply(@Nullable MavenArtifact input) {
                 return input != null &&
-                        input.groupId.equals("jenkins.mvn.test.bundle") &&
-                        input.artifactId.equals("print-api") &&
-                        input.version.equals("0.0.1-SNAPSHOT");
+                        input.getGroupId().equals("jenkins.mvn.test.bundle") &&
+                        input.getArtifactId().equals("print-api") &&
+                        input.getVersion().equals("0.0.1-SNAPSHOT");
             }
         });
 
         Iterable<String> matchingArtifactTypes = Iterables.transform(matchingGeneratedArtifacts, new Function<MavenArtifact, String>() {
             @Override
             public String apply(@Nullable MavenArtifact input) {
-                return input.type;
+                return input.getType();
             }
         });
 

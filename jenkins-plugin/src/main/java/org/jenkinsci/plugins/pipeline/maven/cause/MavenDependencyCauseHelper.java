@@ -1,8 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.cause;
 
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import hudson.model.Cause;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
@@ -10,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-
-import javax.annotation.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -23,39 +19,31 @@ public class MavenDependencyCauseHelper {
      *
      * TODO add unit tests
      */
-    public static boolean isSameCause(MavenDependencyCause newMavenCause, Cause olderMavenCause) {
-        if (!(olderMavenCause instanceof MavenDependencyCause)) {
+    public static boolean isSameCause(MavenDependencyCause newMavenCause, Cause oldMavenCause) {
+        if (!(oldMavenCause instanceof MavenDependencyCause)) {
             return false;
         }
 
         List<MavenArtifact> newCauseArtifacts = newMavenCause.getMavenArtifacts();
-        List<MavenArtifact> olderCauseArtifacts = ((MavenDependencyCause) olderMavenCause).getMavenArtifacts();
+        List<MavenArtifact> oldCauseArtifacts = ((MavenDependencyCause) oldMavenCause).getMavenArtifacts();
 
-        final List<MavenArtifact> duplicateArtifacts = new ArrayList<>();
         for (MavenArtifact newCauseArtifact : newCauseArtifacts) {
-            if (newCauseArtifact.snapshot && Objects.equals(newCauseArtifact.baseVersion, newCauseArtifact.baseVersion)) {
+            if (newCauseArtifact.isSnapshot() && newCauseArtifact.getVersion().contains("SNAPSHOT")) {
                 // snapshot without exact version, cannot search for same cause
             } else {
-                for (MavenArtifact olderCauseArtifact : olderCauseArtifacts) {
-                    if (Objects.equals(newCauseArtifact.groupId, olderCauseArtifact.groupId) &&
-                            Objects.equals(newCauseArtifact.artifactId, olderCauseArtifact.artifactId) &&
-                            Objects.equals(newCauseArtifact.version, olderCauseArtifact.version) &&
-                            Objects.equals(newCauseArtifact.baseVersion, olderCauseArtifact.baseVersion) &&
-                            Objects.equals(newCauseArtifact.type, olderCauseArtifact.type)) {
-                        duplicateArtifacts.add(newCauseArtifact);
-                        break;
+                for (MavenArtifact oldCauseArtifact : oldCauseArtifacts) {
+                    if (
+                            Objects.equals(newCauseArtifact.getGroupId(),       oldCauseArtifact.getGroupId()) &&
+                            Objects.equals(newCauseArtifact.getArtifactId(),    oldCauseArtifact.getArtifactId()) &&
+                            Objects.equals(newCauseArtifact.getVersion(),       oldCauseArtifact.getVersion()) &&
+                            Objects.equals(newCauseArtifact.getBaseVersion(),   oldCauseArtifact.getBaseVersion()) &&
+                            Objects.equals(newCauseArtifact.getType(),          oldCauseArtifact.getType())) {
+                        return true;
                     }
                 }
             }
         }
 
-        Collection<MavenArtifact> nonDuplicateArtifacts = Collections2.filter(newCauseArtifacts, new Predicate<MavenArtifact>() {
-            @Override
-            public boolean apply(@Nullable MavenArtifact mavenArtifact) {
-                return !duplicateArtifacts.contains(mavenArtifact);
-            }
-        });
-
-        return nonDuplicateArtifacts.isEmpty();
+        return false;
     }
 }

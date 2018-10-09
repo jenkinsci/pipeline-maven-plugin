@@ -55,21 +55,21 @@ public class GeneratedArtifactsReporterTest {
         Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
 
         MavenArtifact pomArtifact = mavenArtifacts.get(0);
-        Assert.assertThat(pomArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
-        Assert.assertThat(pomArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/pom.xml"));
+        Assert.assertThat(pomArtifact.getArtifactId(), CoreMatchers.is("spring-petclinic"));
+        Assert.assertThat(pomArtifact.getFile(), CoreMatchers.is("/path/to/spring-petclinic/pom.xml"));
         Assert.assertThat(pomArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".pom"));
 
         Element projectStartedElt = XmlUtils.getExecutionEvents(this.mavenSpyLogsOnMacOSX.getDocumentElement(), "ProjectStarted").get(0);
         String workspace = XmlUtils.getUniqueChildElement(projectStartedElt, "project").getAttribute("baseDir");
 
-        String pomPathInWorkspace = XmlUtils.getPathInWorkspace(pomArtifact.file, new FilePath(new File(workspace)));
+        String pomPathInWorkspace = XmlUtils.getPathInWorkspace(pomArtifact.getFile(), new FilePath(new File(workspace)));
         System.out.println("workspace: " + workspace);
         System.out.println("pomPathInWorkspace: " + pomPathInWorkspace);
 
 
         MavenArtifact mavenArtifact = mavenArtifacts.get(1);
-        Assert.assertThat(mavenArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
-        Assert.assertThat(mavenArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
+        Assert.assertThat(mavenArtifact.getArtifactId(), CoreMatchers.is("spring-petclinic"));
+        Assert.assertThat(mavenArtifact.getFile(), CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
         Assert.assertThat(mavenArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".jar"));    }
 
     @Test
@@ -79,21 +79,21 @@ public class GeneratedArtifactsReporterTest {
         Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
 
         MavenArtifact pomArtifact = mavenArtifacts.get(0);
-        Assert.assertThat(pomArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
-        Assert.assertThat(pomArtifact.file, CoreMatchers.is("C:\\path\\to\\spring-petclinic\\pom.xml"));
+        Assert.assertThat(pomArtifact.getArtifactId(), CoreMatchers.is("spring-petclinic"));
+        Assert.assertThat(pomArtifact.getFile(), CoreMatchers.is("C:\\path\\to\\spring-petclinic\\pom.xml"));
         Assert.assertThat(pomArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".pom"));
 
         Element projectStartedElt = XmlUtils.getExecutionEvents(this.mavenSpyLogsOnWindows.getDocumentElement(), "ProjectStarted").get(0);
         String workspace = XmlUtils.getUniqueChildElement(projectStartedElt, "project").getAttribute("baseDir");
 
-        String pomPathInWorkspace = XmlUtils.getPathInWorkspace(pomArtifact.file, new FilePath(new File(workspace)));
+        String pomPathInWorkspace = XmlUtils.getPathInWorkspace(pomArtifact.getFile(), new FilePath(new File(workspace)));
         System.out.println("workspace: " + workspace);
         System.out.println("pomPathInWorkspace: " + pomPathInWorkspace);
 
 
         MavenArtifact mavenArtifact = mavenArtifacts.get(1);
-        Assert.assertThat(mavenArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
-        Assert.assertThat(mavenArtifact.file, CoreMatchers.is("C:\\path\\to\\spring-petclinic\\target\\spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
+        Assert.assertThat(mavenArtifact.getArtifactId(), CoreMatchers.is("spring-petclinic"));
+        Assert.assertThat(mavenArtifact.getFile(), CoreMatchers.is("C:\\path\\to\\spring-petclinic\\target\\spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
         Assert.assertThat(mavenArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
     }
 
@@ -103,9 +103,9 @@ public class GeneratedArtifactsReporterTest {
         Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(3));
         MavenArtifact mavenArtifact = mavenArtifacts.get(2); // 1st is pom, 2nd is jar, 3rd is sources
         System.out.println(mavenArtifacts);
-        Assert.assertThat(mavenArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
-        Assert.assertThat(mavenArtifact.classifier, CoreMatchers.is("sources"));
-        Assert.assertThat(mavenArtifact.file, CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-" + PETCLINIC_VERSION + "-sources.jar"));
+        Assert.assertThat(mavenArtifact.getArtifactId(), CoreMatchers.is("spring-petclinic"));
+        Assert.assertThat(mavenArtifact.getClassifier(), CoreMatchers.is("sources"));
+        Assert.assertThat(mavenArtifact.getFile(), CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-" + PETCLINIC_VERSION + "-sources.jar"));
     }
 
     @Test
@@ -114,9 +114,9 @@ public class GeneratedArtifactsReporterTest {
         Assert.assertThat(mavenArtifacts.size(), CoreMatchers.is(3));
         MavenArtifact mavenArtifact = mavenArtifacts.get(2); // 1st is pom, 2nd is jar, 3rd is sources
         System.out.println(mavenArtifacts);
-        Assert.assertThat(mavenArtifact.artifactId, CoreMatchers.is("spring-petclinic"));
-        Assert.assertThat(mavenArtifact.classifier, CoreMatchers.is("sources"));
-        Assert.assertThat(mavenArtifact.file, CoreMatchers.is("C:\\path\\to\\spring-petclinic\\target\\spring-petclinic-" + PETCLINIC_VERSION + "-sources.jar"));
+        Assert.assertThat(mavenArtifact.getArtifactId(), CoreMatchers.is("spring-petclinic"));
+        Assert.assertThat(mavenArtifact.getClassifier(), CoreMatchers.is("sources"));
+        Assert.assertThat(mavenArtifact.getFile(), CoreMatchers.is("C:\\path\\to\\spring-petclinic\\target\\spring-petclinic-" + PETCLINIC_VERSION + "-sources.jar"));
     }
 
 }

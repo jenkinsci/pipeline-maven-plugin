@@ -38,11 +38,6 @@ public abstract class MavenDependencyAbstractCause extends Cause implements Mave
 
     @Nonnull
     public String getMavenArtifactsDescription() {
-        return Joiner.on(",").join(Collections2.transform(mavenArtifacts, new Function<MavenArtifact, String>() {
-            @Override
-            public String apply(@Nullable MavenArtifact mavenArtifact) {
-                return mavenArtifact == null ? "null" : mavenArtifact.getShortDescription();
-            }
-        }));
+        return Joiner.on(",").join(Collections2.transform(mavenArtifacts, mavenArtifact -> mavenArtifact == null ? "null" : mavenArtifact.getShortDescription()));
     }
 }

@@ -22,7 +22,6 @@ import org.w3c.dom.Element;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,13 +65,13 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
         Map<String, String> artifactsToFingerPrint = new HashMap<>(); // artifactPathInArchiveZone -> artifactMd5
         for (MavenArtifact mavenArtifact : join) {
             try {
-                if (StringUtils.isEmpty(mavenArtifact.file)) {
+                if (StringUtils.isEmpty(mavenArtifact.getFile())) {
                     if (LOGGER.isLoggable(Level.FINER)) {
                         listener.getLogger().println("[withMaven] artifactsPublisher - Can't archive maven artifact with no file attached: " + mavenArtifact);
                     }
                     continue;
-                } else if (!(mavenArtifact.file.endsWith("." + mavenArtifact.extension))) {
-                    FilePath mavenGeneratedArtifact = workspace.child(XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace));
+                } else if (!(mavenArtifact.getFile().endsWith("." + mavenArtifact.getExtension()))) {
+                    FilePath mavenGeneratedArtifact = workspace.child(XmlUtils.getPathInWorkspace(mavenArtifact.getFile(), workspace));
                     if (mavenGeneratedArtifact.isDirectory()) {
                         if (LOGGER.isLoggable(Level.FINE)) {
                             listener.getLogger().println("[withMaven] artifactsPublisher - Skip archiving for generated maven artifact of type directory (it's likely to be target/classes, see JENKINS-43714) " + mavenArtifact);
@@ -82,16 +81,16 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                 }
 
                 String artifactPathInArchiveZone =
-                        mavenArtifact.groupId.replace(".", fileSeparatorOnAgent) + fileSeparatorOnAgent +
-                                mavenArtifact.artifactId + fileSeparatorOnAgent +
-                                mavenArtifact.baseVersion + fileSeparatorOnAgent +
+                        mavenArtifact.getGroupId().replace(".", fileSeparatorOnAgent) + fileSeparatorOnAgent +
+                                mavenArtifact.getArtifactId() + fileSeparatorOnAgent +
+                                mavenArtifact.getBaseVersion() + fileSeparatorOnAgent +
                                 mavenArtifact.getFileNameWithBaseVersion();
 
-                String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.file, workspace);
+                String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.getFile(), workspace);
                 if (StringUtils.isEmpty(artifactPathInWorkspace)) {
                     listener.error("[withMaven] artifactsPublisher - Invalid path in the workspace (" + workspace.getRemote() + ") for artifact " + mavenArtifact);
-                } else if (Objects.equals(artifactPathInArchiveZone, mavenArtifact.file)) { // troubleshoot JENKINS-44088
-                    listener.error("[withMaven] artifactsPublisher - Failed to relativize '" + mavenArtifact.file + "' in workspace '" + workspace.getRemote() + "' with file separator '" + fileSeparatorOnAgent + "'");
+                } else if (Objects.equals(artifactPathInArchiveZone, mavenArtifact.getFile())) { // troubleshoot JENKINS-44088
+                    listener.error("[withMaven] artifactsPublisher - Failed to relativize '" + mavenArtifact.getFile() + "' in workspace '" + workspace.getRemote() + "' with file separator '" + fileSeparatorOnAgent + "'");
                 } else {
                     FilePath artifactFilePath = new FilePath(workspace, artifactPathInWorkspace);
                     if (artifactFilePath.exists()) {
