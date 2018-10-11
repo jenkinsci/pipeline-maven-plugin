@@ -1,5 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import hudson.Extension;
 import hudson.console.ModelHyperlinkNote;
 import hudson.model.Cause;
@@ -13,11 +15,13 @@ import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCauseHelper;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -206,9 +210,17 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             if (downstreamJobLastBuild == null) {
                 // should never happen, we need at least one build to know the dependencies
             } else {
-                List<Cause> causes = downstreamJobLastBuild.getCauses();
-                for (Cause downstreamCause : causes) {
-                    // TODO check if it is the "same cause"
+                List<MavenArtifact> matchingMavenDependencies = MavenDependencyCauseHelper.isSameCause(cause, downstreamJobLastBuild.getCauses());
+                if (matchingMavenDependencies.size() > 0) {
+                    downstreamJobLastBuild.addAction(new CauseAction(cause));
+                    listener.getLogger().println("Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
+                                    Joiner.on(", ").join(Collections2.transform(matchingMavenDependencies, mavenDependency -> mavenDependency == null ? null : mavenDependency.getShortDescription())));
+                    try {
+                        downstreamJobLastBuild.save();
+                    } catch (IOException e) {
+                        listener.getLogger().println("Failure to update build " + downstreamJobLastBuild.getFullDisplayName() + ": " + e.toString());
+                    }
+                    continue;
                 }
             }
 

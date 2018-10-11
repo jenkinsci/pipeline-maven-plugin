@@ -600,7 +600,7 @@ public class PipelineMavenPluginH2DaoTest {
     }
 
     @Test
-    public void listDownstreamPipelinesBasedOnMavenDependencies_() {
+    public void listDownstreamPipelinesBasedOnMavenDependencies_noBaseVersion() {
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
         dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar", "compile", false, null);
         dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
@@ -609,10 +609,26 @@ public class PipelineMavenPluginH2DaoTest {
         dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar", "compile", false, null);
         dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 2222, 22);
 
-        SortedSet<String> downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar");
+        SortedSet<String> downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-SNAPSHOT", null, "jar");
         System.out.println(downstreamJobs);
         assertThat(downstreamJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1", "my-downstream-pipeline-2"));
     }
+
+    @Test
+    public void listDownstreamPipelinesBasedOnMavenDependencies_withBaseVersion() {
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
+        dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 1);
+        dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 2222, 22);
+
+        SortedSet<String> downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-20180318.225603-3", "1.0-SNAPSHOT",  "jar");
+        System.out.println(downstreamJobs);
+        assertThat(downstreamJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1", "my-downstream-pipeline-2"));
+    }
+
 
     @Deprecated
     @Test

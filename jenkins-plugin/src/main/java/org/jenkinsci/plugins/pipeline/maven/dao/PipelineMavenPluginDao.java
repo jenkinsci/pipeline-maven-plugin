@@ -26,6 +26,7 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import hudson.model.Item;
 import hudson.model.Run;
+import org.apache.maven.artifact.Artifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
@@ -180,15 +181,16 @@ public interface PipelineMavenPluginDao {
     /**
      * List the downstream jobs who have a dependency on the given artifact.
      *
-     * @param groupId Maven artifact group ID
-     * @param artifactId see {@link Run#getNumber()}
-     * @param version Maven artifact version
-     * @param type Maven artifact type
+     * @param groupId Maven artifact group ID  (see {@link Artifact#getArtifactId()})
+     * @param artifactId Maven artifact id (see {@link Artifact#getArtifactId()})
+     * @param version Maven artifact version (see {@link Artifact#getVersion()})
+     * @param baseVersion Maven artifact (see {@link Artifact#getBaseVersion()})
+     * @param type Maven artifact type (see {@link Artifact#getType()}})
      * @return list of job full names (see {@link Item#getFullName()}) by {@link MavenArtifact}
      * @see Item#getFullName()
      */
     @Nonnull
-    SortedSet<String> listDownstreamJobs(String groupId, String artifactId, String version, String type);
+    SortedSet<String> listDownstreamJobs(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nullable String baseVersion, @Nonnull String type);
 
     /**
      * List the upstream jobs who generate an artifact that the given build depends on

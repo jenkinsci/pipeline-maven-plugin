@@ -229,7 +229,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     }
 
     /**
-     * Gets the version of this artifact, for example "1.0-20100529-1213". Note that in case of meta versions like
+     * Gets the version of this artifact, for example "1.0-20180318.225603-3". Note that in case of meta versions like
      * "1.0-SNAPSHOT", the artifact's version depends on the state of the artifact. Artifacts that have been resolved or
      * deployed will usually have the meta version expanded.
      *

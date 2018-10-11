@@ -638,8 +638,8 @@ public class PipelineMavenPluginH2Dao implements PipelineMavenPluginDao {
 
     @Nonnull
     @Override
-    public SortedSet<String> listDownstreamJobs(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type) {
-        return listDownstreamPipelinesBasedOnMavenDependencies(groupId,artifactId,version,type);
+    public SortedSet<String> listDownstreamJobs(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nullable String baseVersion, @Nonnull String type) {
+        return listDownstreamPipelinesBasedOnMavenDependencies(groupId, artifactId, (baseVersion == null ? version : baseVersion), type);
     }
 
     protected SortedSet<String> listDownstreamPipelinesBasedOnMavenDependencies(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type) {
