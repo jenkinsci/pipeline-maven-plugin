@@ -108,7 +108,7 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
 
     @Nonnull
     @Override
-    public SortedSet<String> listDownstreamJobs(String groupId, String artifactId, String version, String type) {
+    public SortedSet<String> listDownstreamJobs(String groupId, String artifactId, String version, String baseVersion, String type) {
         return new TreeSet<>();
     }
 

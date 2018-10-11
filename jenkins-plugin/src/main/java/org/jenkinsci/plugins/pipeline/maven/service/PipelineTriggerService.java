@@ -1,6 +1,8 @@
 package org.jenkinsci.plugins.pipeline.maven.service;
 
 import com.cloudbees.hudson.plugins.folder.computed.ComputedFolder;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Collections2;
 import hudson.console.ModelHyperlinkNote;
 import hudson.model.Cause;
 import hudson.model.CauseAction;
@@ -21,9 +23,11 @@ import org.acegisecurity.Authentication;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCause;
+import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCauseHelper;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -52,7 +56,11 @@ public class PipelineTriggerService {
         this.globalPipelineMavenConfig = globalPipelineMavenConfig;
     }
 
-    public Collection<String> triggerDownstreamPipelines(String groupId, String artifactId, String baseVersion, String version, String type, MavenDependencyCause cause, ServiceLogger logger) {
+    public Collection<String> triggerDownstreamPipelines(@Nonnull String groupId, @Nonnull String artifactId, @Nullable String baseVersion, @Nonnull String version, @Nonnull String type, @Nonnull MavenDependencyCause cause, @Nonnull ServiceLogger logger) {
+
+        if (!(cause instanceof Cause)) {
+            throw new IllegalArgumentException("Given cause must extend hudson.model.Cause: " + cause);
+        }
 
         long startTimeInNanos = System.nanoTime();
 
@@ -62,7 +70,8 @@ public class PipelineTriggerService {
         mavenArtifact.setBaseVersion(baseVersion);
         mavenArtifact.setVersion(version);
         mavenArtifact.setType(type);
-        SortedSet<String> downstreamPipelines = globalPipelineMavenConfig.getDao().listDownstreamJobs(groupId, artifactId, version, type);
+
+        SortedSet<String> downstreamPipelines = globalPipelineMavenConfig.getDao().listDownstreamJobs(groupId, artifactId, version, baseVersion, type);
 
         SortedSet<String> jobsToTrigger = new TreeSet<>();
 
@@ -143,9 +152,18 @@ public class PipelineTriggerService {
             if (downstreamJobLastBuild == null) {
                 // should never happen, we need at least one build to know the dependencies
             } else {
-                List<Cause> causes = downstreamJobLastBuild.getCauses();
-                for (Cause downstreamCause : causes) {
-                    // TODO check if it is the "same cause"
+                List<MavenArtifact> matchingMavenDependencies = MavenDependencyCauseHelper.isSameCause(cause, downstreamJobLastBuild.getCauses());
+                if (matchingMavenDependencies.size() > 0) {
+                    downstreamJobLastBuild.addAction(new CauseAction((Cause) cause));
+                    logger.log(Level.INFO,
+                            "Skip scheduling downstream pipeline " + logger.modelHyperlinkNoteEncodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
+                            Joiner.on(", ").join(Collections2.transform(matchingMavenDependencies, mavenDependency -> mavenDependency == null ? null : mavenDependency.getShortDescription())));
+                    try {
+                        downstreamJobLastBuild.save();
+                    } catch (IOException e) {
+                        logger.log(Level.SEVERE, "Failure to update build " + downstreamJobLastBuild.getFullDisplayName() + ": " + e.toString());
+                    }
+                    continue;
                 }
             }
 
