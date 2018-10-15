@@ -79,7 +79,7 @@
     <!--
     stick to junit 1.20 clarifying the impact of the introduction of the dependencies
     workflow-step-api or workflow-api-->
-    <junit-plugin.version>1.21</junit-plugin.version>
+    <junit-plugin.version>1.23</junit-plugin.version>
     <asm.version>5.2</asm.version>
     <java.level>8</java.level>
   </properties>
