@@ -59,7 +59,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Configures maven environment to use within a pipeline job by calling <tt>sh mvn</tt> or <tt>bat mvn</tt>.
+ * Configures maven environment to use within a pipeline job by calling <code>sh mvn</code> or <code>bat mvn</code>.
  * The selected maven installation will be configured and prepended to the path.
  *
  */

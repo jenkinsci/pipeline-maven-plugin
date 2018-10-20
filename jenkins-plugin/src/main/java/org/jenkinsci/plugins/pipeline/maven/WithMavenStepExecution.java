@@ -140,7 +140,7 @@ class WithMavenStepExecution extends StepExecution {
     private transient BodyExecution body;
 
     /**
-     * Indicates if running on docker with <tt>docker.image()</tt> or <tt>container()</tt>
+     * Indicates if running on docker with <code>docker.image()</code> or <code>container()</code>
      */
     private boolean withContainer;
 
@@ -227,19 +227,19 @@ class WithMavenStepExecution extends StepExecution {
     }
 
     /**
-     * Detects if this step is running inside <tt>docker.image()</tt> or <tt>container()</tt>
+     * Detects if this step is running inside <code>docker.image()</code> or <code>container()</code>
      * <p>
      * This has the following implications:
      * <li>Tool intallers do no work, as they install in the host, see:
      * https://issues.jenkins-ci.org/browse/JENKINS-36159
      * <li>Environment variables do not apply because they belong either to the master or the agent, but not to the
-     * container running the <tt>sh</tt> command for maven This is due to the fact that <tt>docker.image()</tt> all it
-     * does is decorate the launcher and excute the command with a <tt>docker run</tt> which means that the inherited
+     * container running the <code>sh</code> command for maven This is due to the fact that <code>docker.image()</code> all it
+     * does is decorate the launcher and excute the command with a <code>docker run</code> which means that the inherited
      * environment from the OS will be totally different eg: MAVEN_HOME, JAVA_HOME, PATH, etc.
-     * <li>Kubernetes' <tt>container()</tt> support is still in early stages, and environment variables might not be
+     * <li>Kubernetes' <code>container()</code> support is still in early stages, and environment variables might not be
      * completely configured, depending on the version of the Jenkins Kubernetes plugin.
      *
-     * @return true if running inside a container with <tt>docker.image()</tt> or <tt>container()</tt>
+     * @return true if running inside a container with <code>docker.image()</code> or <code>container()</code>
      * @see <a href=
      * "https://github.com/jenkinsci/docker-workflow-plugin/blob/master/src/main/java/org/jenkinsci/plugins/docker/workflow/WithContainerStep.java">
      * WithContainerStep</a> and <a href=

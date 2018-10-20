@@ -2,8 +2,8 @@
   Specify a custom local repository path.
   Shell-like environment variable expansions work with this field, by using the ${VARIABLE} syntax.
   
-  Normally, Jenkins uses the local Maven repository as determined by Maven, by default <tt>~/.m2/repository</tt> and can be overridden by
-  &lt;localRepository> in <tt>~/.m2/settings.xml</tt> (see <a href="https://maven.apache.org/guides/mini/guide-configuring-maven.html#Configuring_your_Local_Repository">Configuring your Local Repository</a>)) 
+  Normally, Jenkins uses the local Maven repository as determined by Maven, by default <code>~/.m2/repository</code> and can be overridden by
+  &lt;localRepository> in <code>~/.m2/settings.xml</code> (see <a href="https://maven.apache.org/guides/mini/guide-configuring-maven.html#Configuring_your_Local_Repository">Configuring your Local Repository</a>))
 
   <p>
   This normally means that all the jobs that are executed on the same node shares a single Maven repository.
@@ -13,12 +13,12 @@
   repositories in POM might have them.
 
   <p>
-  By using this option, Jenkins will tell Maven to use a custom path for the build as the local Maven repository by using <tt>-Dmaven.repo.local</tt>
+  By using this option, Jenkins will tell Maven to use a custom path for the build as the local Maven repository by using <code>-Dmaven.repo.local</code>
   <br>
 
   If specified as a relative path then this value well be resolved against the workspace root and not the current working directory.
   <br>
-  ie. if <tt>.repository</tt> is specified then <tt>$WORKSPACE/.repository</tt> will be used.
+  ie. if <code>.repository</code> is specified then <code>$WORKSPACE/.repository</code> will be used.
 
   <p>
   This means each job could get its own isolated Maven repository just for itself. It fixes the above problems,

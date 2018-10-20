@@ -256,7 +256,7 @@ public class PipelineTriggerService {
             downstreamPipelineAuth = auth;
         }
 
-        try (ACLContext _ = ACL.as(downstreamPipelineAuth)) {
+        try (ACLContext ignored = ACL.as(downstreamPipelineAuth)) {
             WorkflowJob upstreamPipelineObtainedAsImpersonated = getItemByFullName(upstreamPipeline.getFullName(), WorkflowJob.class);
             boolean result = upstreamPipelineObtainedAsImpersonated != null;
             LOGGER.log(Level.FINE, "isUpstreamBuildVisibleByDownstreamBuildAuth({0}, {1}): taskAuth: {2}, downstreamPipelineAuth: {3}, upstreamPipelineObtainedAsImpersonated:{4}, result: {5}",
