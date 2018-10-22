@@ -171,7 +171,7 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
         Run run = context.get(Run.class);
         Launcher launcher = context.get(Launcher.class);
 
-         List<Element> spotbugsEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, "com.github.spotbugs", "spotbugs-maven-plugin", "spotbugs");
+         List<Element> spotbugsEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, "com.github.spotbugs", "spotbugs-maven-plugin", "spotbugs", "MojoSucceeded", "MojoFailed");
 
         if (spotbugsEvents.isEmpty()) {
             LOGGER.log(Level.FINE, "No com.github.spotbugs:spotbugs-maven-plugin:spotbugs execution found");

@@ -196,8 +196,8 @@ public class JunitTestsPublisher extends MavenPublisher {
             return;
         }
 
-        List<Element> sureFireTestEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL);
-        List<Element> failSafeTestEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL);
+        List<Element> sureFireTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL, "MojoSucceeded", "MojoFailed");
+        List<Element> failSafeTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL, "MojoSucceeded", "MojoFailed");
 
         executeReporter(context, listener, sureFireTestEvents, SUREFIRE_ID + ":" + SUREFIRE_GOAL);
         executeReporter(context, listener, failSafeTestEvents, FAILSAFE_ID + ":" + FAILSAFE_GOAL);
@@ -224,10 +224,6 @@ public class JunitTestsPublisher extends MavenPublisher {
         */
 
         for (Element testEvent : testEvents) {
-            String surefireEventType = testEvent.getAttribute("type");
-            if (!surefireEventType.equals("MojoSucceeded") && !surefireEventType.equals("MojoFailed")) {
-                continue;
-            }
             Element pluginElt = XmlUtils.getUniqueChildElement(testEvent, "plugin");
             Element reportsDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "reportsDirectory");
             Element projectElt = XmlUtils.getUniqueChildElement(testEvent, "project");

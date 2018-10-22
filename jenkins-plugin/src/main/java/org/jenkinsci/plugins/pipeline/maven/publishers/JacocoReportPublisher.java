@@ -123,10 +123,15 @@ public class JacocoReportPublisher extends MavenPublisher {
         Run run = context.get(Run.class);
         Launcher launcher = context.get(Launcher.class);
 
-        List<Element> jacocoPrepareAgentEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, "org.jacoco", "jacoco-maven-plugin", "prepare-agent");
+        List<Element> jacocoPrepareAgentEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, "org.jacoco", "jacoco-maven-plugin", "prepare-agent", "MojoSucceeded", "MojoFailed");
 
         if (jacocoPrepareAgentEvents.isEmpty()) {
             LOGGER.log(Level.FINE, "No org.jacoco:jacoco-maven-plugin:prepare-agent execution found");
+            return;
+        } else if (jacocoPrepareAgentEvents.size() > 1) { // JENKINS-54139
+            if (LOGGER.isLoggable(Level.FINE))
+            listener.getLogger().print("[withMaven - Jacoco] More than 1 Maven module (" + jacocoPrepareAgentEvents.size() + ") generated a Jacoco code coverage report, " +
+                    "skip automatic collect of Jacoco reports as the Jenkins Jacoco report is not designed to render multiple reports per build");
             return;
         }
         try {
@@ -140,10 +145,6 @@ public class JacocoReportPublisher extends MavenPublisher {
 
 
         for (Element jacocoPrepareAgentEvent : jacocoPrepareAgentEvents) {
-            String jacocoPrepareAgentEventType = jacocoPrepareAgentEvent.getAttribute("type");
-            if (!jacocoPrepareAgentEventType.equals("MojoSucceeded") && !jacocoPrepareAgentEventType.equals("MojoFailed")) {
-                continue;
-            }
 
             Element buildElement = XmlUtils.getUniqueChildElementOrNull(jacocoPrepareAgentEvent, "project", "build");
             if (buildElement == null) {

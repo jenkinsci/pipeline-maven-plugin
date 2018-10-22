@@ -93,8 +93,8 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         final Launcher launcher = context.get(Launcher.class);
 
         Set<String> concordionOutputDirPatterns = new HashSet<String>();
-        concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL)));
-        concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL)));
+        concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL, "MojoSucceeded", "MojoFailed")));
+        concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL, "MojoSucceeded", "MojoFailed")));
 
         if (concordionOutputDirPatterns.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
