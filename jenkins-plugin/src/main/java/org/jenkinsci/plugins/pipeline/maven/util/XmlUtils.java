@@ -261,64 +261,25 @@ public class XmlUtils {
    </ExecutionEvent>
      */
     @Nonnull
-    public static List<Element> getExecutionEvents(@Nonnull Element mavenSpyLogs, String pluginGroupId, String pluginArtifactId, String pluginGoal) {
-        List<Element> result = new ArrayList<>();
-        for (Element executionEventElt : getChildrenElements(mavenSpyLogs, "ExecutionEvent")) {
-            Element pluginElt = XmlUtils.getUniqueChildElementOrNull(executionEventElt, "plugin");
-            if (pluginElt == null) {
+    public static List<Element> getExecutionEventsByPlugin(@Nonnull Element mavenSpyLogs, String pluginGroupId, String pluginArtifactId, String pluginGoal, String... eventType) {
+        Set<String> eventTypes = new HashSet<>(Arrays.asList(eventType));
 
-            } else {
-                if (pluginElt.getAttribute("groupId").equals(pluginGroupId) &&
-                        pluginElt.getAttribute("artifactId").equals(pluginArtifactId) &&
-                        pluginElt.getAttribute("goal").equals(pluginGoal)) {
-                    result.add(executionEventElt);
-                } else {
-
-                }
-            }
-
-        }
-        return result;
-    }
-
-    /*
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-02 23:03:17.06">
-      <project artifactIdId="supplychain-portal" groupId="com.acmewidgets.supplychain" name="supplychain-portal" version="0.0.7" />
-      <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.18.1">
-         <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-      </plugin>
-    </ExecutionEvent>
-     */
-
-    /**
-     *
-     * @param mavenSpyLogs
-     * @param eventType e.g. "MojoSucceeded"
-     * @param pluginGroupId e.g. "org.apache.maven.plugins" artifactId=
-     * @param pluginArtifactId e.g. "maven-surefire-plugin"
-     * @param pluginGoal e.g. "test"
-     * @return
-     */
-    @Nonnull
-    public static List<Element> getExecutionEvents(@Nonnull Element mavenSpyLogs, String eventType, String pluginGroupId, String pluginArtifactId, String pluginGoal) {
         List<Element> result = new ArrayList<>();
         for (Element executionEventElt : getChildrenElements(mavenSpyLogs, "ExecutionEvent")) {
 
-            if (executionEventElt.getAttribute("type").equals(eventType)) {
+            if (eventTypes.contains(executionEventElt.getAttribute("type"))) {
                 Element pluginElt = XmlUtils.getUniqueChildElementOrNull(executionEventElt, "plugin");
                 if (pluginElt == null) {
-                    // ignore unexpected
+
                 } else {
                     if (pluginElt.getAttribute("groupId").equals(pluginGroupId) &&
                             pluginElt.getAttribute("artifactId").equals(pluginArtifactId) &&
                             pluginElt.getAttribute("goal").equals(pluginGoal)) {
                         result.add(executionEventElt);
                     } else {
-                        // ignore non matching plugin
+
                     }
                 }
-            } else {
-                // ignore not supported event type
             }
 
         }

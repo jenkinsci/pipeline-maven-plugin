@@ -173,7 +173,7 @@ public class FindbugsAnalysisPublisher extends AbstractHealthAwarePublisher {
         Launcher launcher = context.get(Launcher.class);
 
 
-         List<Element> findbugsEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, "org.codehaus.mojo", "findbugs-maven-plugin", "findbugs");
+         List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, "org.codehaus.mojo", "findbugs-maven-plugin", "findbugs", "MojoSucceeded", "MojoFailed");
 
         if (findbugsEvents.isEmpty()) {
             LOGGER.log(Level.FINE, "No org.codehaus.mojo:findbugs-maven-plugin:findbugs execution found");
@@ -190,10 +190,6 @@ public class FindbugsAnalysisPublisher extends AbstractHealthAwarePublisher {
 
 
         for (Element findBugsTestEvent : findbugsEvents) {
-            String findBugsEventType = findBugsTestEvent.getAttribute("type");
-            if (!findBugsEventType.equals("MojoSucceeded") && !findBugsEventType.equals("MojoFailed")) {
-                continue;
-            }
 
             Element pluginElt = XmlUtils.getUniqueChildElement(findBugsTestEvent, "plugin");
             Element xmlOutputDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "xmlOutputDirectory");

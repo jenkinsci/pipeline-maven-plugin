@@ -85,8 +85,8 @@ public class InvokerRunsPublisher extends MavenPublisher {
             listener = new StreamBuildListener((OutputStream) System.err);
         }
 
-        List<Element> invokerRunRunEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, RUN_GOAL);
-        List<Element> invokerRunIntegrationTestEvents = XmlUtils.getExecutionEvents(mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, INTEGRATION_TEST_GOAL);
+        List<Element> invokerRunRunEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, RUN_GOAL, "MojoSucceeded", "MojoFailed");
+        List<Element> invokerRunIntegrationTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, INTEGRATION_TEST_GOAL, "MojoSucceeded", "MojoFailed");
 
         if (invokerRunRunEvents.isEmpty() && invokerRunIntegrationTestEvents.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
@@ -118,10 +118,6 @@ public class InvokerRunsPublisher extends MavenPublisher {
         Launcher launcher = context.get(Launcher.class);
 
         for (Element testEvent : testEvents) {
-            String surefireEventType = testEvent.getAttribute("type");
-            if (!surefireEventType.equals("MojoSucceeded") && !surefireEventType.equals("MojoFailed")) {
-                continue;
-            }
             Element projectElt = XmlUtils.getUniqueChildElement(testEvent, "project");
             Element pluginElt = XmlUtils.getUniqueChildElement(testEvent, "plugin");
             Element reportsDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "reportsDirectory");

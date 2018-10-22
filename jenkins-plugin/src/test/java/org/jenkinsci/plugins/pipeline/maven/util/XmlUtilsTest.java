@@ -277,6 +277,19 @@ public class XmlUtilsTest {
     }
 
     @Test
+    public void test_getExecutionEventsByPlugin() throws Exception {
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
+        in.getClass(); // check non null
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+
+        List<Element> executionEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogs, "org.apache.maven.plugins", "maven-deploy-plugin","deploy", "MojoSucceeded", "MojoFailed");
+
+        Assert.assertThat(executionEvents.size(), Matchers.is(1));
+        Element deployExecutionEvent = executionEvents.get(0);
+        Assert.assertThat(deployExecutionEvent.getAttribute("type"), Matchers.is("MojoSucceeded"));
+    }
+
+    @Test
     public void test_listGeneratedArtifacts() throws Exception {
         InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
         in.getClass(); // check non null
