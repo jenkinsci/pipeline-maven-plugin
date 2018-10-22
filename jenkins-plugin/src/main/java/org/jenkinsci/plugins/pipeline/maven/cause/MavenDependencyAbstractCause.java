@@ -1,15 +1,12 @@
 package org.jenkinsci.plugins.pipeline.maven.cause;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 import hudson.model.Cause;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -38,6 +35,8 @@ public abstract class MavenDependencyAbstractCause extends Cause implements Mave
 
     @Nonnull
     public String getMavenArtifactsDescription() {
-        return Joiner.on(",").join(Collections2.transform(mavenArtifacts, mavenArtifact -> mavenArtifact == null ? "null" : mavenArtifact.getShortDescription()));
+        return mavenArtifacts.stream()
+                .map(mavenArtifact -> mavenArtifact == null ? "null" : mavenArtifact.getShortDescription())
+                .collect(Collectors.joining(","));
     }
 }

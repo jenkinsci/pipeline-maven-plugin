@@ -1,8 +1,5 @@
 package org.jenkinsci.plugins.pipeline.maven.cause;
 
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 import hudson.console.ModelHyperlinkNote;
 import hudson.model.Cause;
 import hudson.model.Run;
@@ -14,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -95,12 +93,9 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
 
     @Nonnull
     public String getMavenArtifactsDescription() {
-        return Joiner.on(",").join(Collections2.transform(mavenArtifacts, new Function<MavenArtifact, String>() {
-            @Override
-            public String apply(@Nullable MavenArtifact mavenArtifact) {
-                return mavenArtifact == null ? "null" : mavenArtifact.getShortDescription();
-            }
-        }));
+        return mavenArtifacts.stream()
+                .map(mavenArtifact -> mavenArtifact == null ? "null" : mavenArtifact.getShortDescription())
+                .collect(Collectors.joining(","));
     }
 
     @Nonnull
