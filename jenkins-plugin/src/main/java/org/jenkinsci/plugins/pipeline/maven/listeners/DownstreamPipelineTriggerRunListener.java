@@ -1,10 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 import hudson.Extension;
 import hudson.console.ModelHyperlinkNote;
-import hudson.model.Cause;
 import hudson.model.CauseAction;
 import hudson.model.Job;
 import hudson.model.Queue;
@@ -32,6 +29,7 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -214,7 +212,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 if (matchingMavenDependencies.size() > 0) {
                     downstreamJobLastBuild.addAction(new CauseAction(cause));
                     listener.getLogger().println("Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
-                                    Joiner.on(", ").join(Collections2.transform(matchingMavenDependencies, mavenDependency -> mavenDependency == null ? null : mavenDependency.getShortDescription())));
+                                    matchingMavenDependencies.stream().map(mavenDependency -> mavenDependency == null ? null : mavenDependency.getShortDescription()).collect(Collectors.joining(", ")));
                     try {
                         downstreamJobLastBuild.save();
                     } catch (IOException e) {

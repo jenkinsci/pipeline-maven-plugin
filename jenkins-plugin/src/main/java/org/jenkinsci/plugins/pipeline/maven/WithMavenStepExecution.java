@@ -39,9 +39,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -52,11 +55,6 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.IdCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.cloudbees.plugins.credentials.common.UsernameCredentials;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Iterables;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.AbortException;
@@ -179,7 +177,7 @@ class WithMavenStepExecution extends StepExecution {
 
         listener.getLogger().println("[withMaven] Options: " + step.getOptions());
         ExtensionList<MavenPublisher> availableMavenPublishers = Jenkins.getInstance().getExtensionList(MavenPublisher.class);
-        listener.getLogger().println("[withMaven] Available options: " + Joiner.on(",").join(availableMavenPublishers));
+        listener.getLogger().println("[withMaven] Available options: " + availableMavenPublishers.stream().map(publisher -> publisher.toString()).collect(Collectors.joining(",")));
 
         getComputer();
 
@@ -207,7 +205,7 @@ class WithMavenStepExecution extends StepExecution {
         setupMaven(credentials);
 
         if (LOGGER.isLoggable(Level.FINE)) {
-            LOGGER.log(Level.FINE, this.build + " - Track usage and mask password of credentials " + Joiner.on(", ").join(Collections2.transform(credentials, new CredentialsToPrettyString())));
+            LOGGER.log(Level.FINE, this.build + " - Track usage and mask password of credentials " + credentials.stream().map(new CredentialsToPrettyString()).collect(Collectors.joining(",")));
         }
         CredentialsProvider.trackAll(build, new ArrayList<>(credentials));
 
@@ -919,7 +917,7 @@ class WithMavenStepExecution extends StepExecution {
         try {
 
             // JENKINS-43787 handle null
-            final List<ServerCredentialMapping> serverCredentialMappings = Objects.firstNonNull(mavenSettingsConfig.getServerCredentialMappings(), Collections.<ServerCredentialMapping>emptyList());
+            final List<ServerCredentialMapping> serverCredentialMappings = Optional.ofNullable(mavenSettingsConfig.getServerCredentialMappings()).orElse(Collections.<ServerCredentialMapping>emptyList());
 
             final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
 
@@ -937,7 +935,7 @@ class WithMavenStepExecution extends StepExecution {
                 if (LOGGER.isLoggable(Level.FINE)) {
                     console.println("[withMaven] using Maven settings.xml '" + mavenSettingsConfig.id + "' with Maven servers credentials provided by Jenkins " +
                             "(replaceAll: " + mavenSettingsConfig.isReplaceAll + "): " +
-                            Joiner.on(", ").skipNulls().join(Iterables.transform(resolvedCredentials.entrySet(), new MavenServerToCredentialsMappingToStringFunction())));
+                            resolvedCredentials.entrySet().stream().map(new MavenServerToCredentialsMappingToStringFunction()).collect(Collectors.joining(", ")));
                 }
             }
 
@@ -977,7 +975,7 @@ class WithMavenStepExecution extends StepExecution {
 
         try {
             // JENKINS-43787 handle null
-            final List<ServerCredentialMapping> serverCredentialMappings = Objects.firstNonNull(mavenGlobalSettingsConfig.getServerCredentialMappings(), Collections.<ServerCredentialMapping>emptyList());
+            final List<ServerCredentialMapping> serverCredentialMappings = Optional.ofNullable(mavenGlobalSettingsConfig.getServerCredentialMappings()).orElse(Collections.<ServerCredentialMapping>emptyList());
 
             final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
 
@@ -993,7 +991,7 @@ class WithMavenStepExecution extends StepExecution {
                 mavenGlobalSettingsFileContent = CredentialsHelper.fillAuthentication(mavenGlobalSettingsConfig.content, mavenGlobalSettingsConfig.isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
                 console.println("[withMaven] using Maven global settings.xml '" + mavenGlobalSettingsConfig.id + "' with Maven servers credentials provided by Jenkins " +
                         "(replaceAll: " + mavenGlobalSettingsConfig.isReplaceAll + "): " +
-                        Joiner.on(", ").skipNulls().join(Iterables.transform(resolvedCredentials.entrySet(), new MavenServerToCredentialsMappingToStringFunction())));
+                        resolvedCredentials.entrySet().stream().map(new MavenServerToCredentialsMappingToStringFunction()).collect(Collectors.joining(", ")));
 
             }
 

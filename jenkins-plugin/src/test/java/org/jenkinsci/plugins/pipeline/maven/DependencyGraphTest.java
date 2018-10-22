@@ -1,8 +1,5 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
 import hudson.model.Cause;
 import hudson.model.CauseAction;
 import hudson.model.Result;
@@ -25,8 +22,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
-
-import javax.annotation.Nullable;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -213,23 +209,13 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
          */
         System.out.println("generated artifacts" + generatedArtifacts);
 
-        Iterable<MavenArtifact> matchingGeneratedArtifacts =Iterables.filter(generatedArtifacts, new Predicate<MavenArtifact>() {
-            @Override
-            public boolean apply(@Nullable MavenArtifact input) {
-                return input != null &&
+        Iterable<String> matchingArtifactTypes = generatedArtifacts.stream()
+                .filter(input -> input != null &&
                         input.getGroupId().equals("jenkins.mvn.test.bundle") &&
                         input.getArtifactId().equals("print-api") &&
-                        input.getVersion().equals("0.0.1-SNAPSHOT");
-            }
-        });
-
-        Iterable<String> matchingArtifactTypes = Iterables.transform(matchingGeneratedArtifacts, new Function<MavenArtifact, String>() {
-            @Override
-            public String apply(@Nullable MavenArtifact input) {
-                return input.getType();
-            }
-        });
-
+                        input.getVersion().equals("0.0.1-SNAPSHOT"))
+                .map(input -> input.getType())
+                .collect(Collectors.toList());
 
         assertThat(matchingArtifactTypes, Matchers.containsInAnyOrder("jar", "bundle", "pom"));
     }

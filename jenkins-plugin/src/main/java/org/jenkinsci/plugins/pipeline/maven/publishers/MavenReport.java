@@ -1,9 +1,5 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
 import hudson.model.Action;
 import hudson.model.Job;
 import hudson.model.Run;
@@ -19,11 +15,13 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -83,24 +81,17 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
 
     public synchronized Collection<Job> getDownstreamJobs() {
         List<String> downstreamJobFullNames = GlobalPipelineMavenConfig.get().getDao().listDownstreamJobs(run.getParent().getFullName(), run.getNumber());
-        Collection<Job> downstreamJobs = Collections2.transform(downstreamJobFullNames, new Function<String, Job>() {
-            @Override
-            public Job apply(@Nullable String jobFullName) {
-                if (jobFullName == null) {
-                    return null;
-                }
-                // security / authorization is checked by Jenkins#getItemByFullName
-                try {
-                    return Jenkins.getInstance().getItemByFullName(jobFullName, Job.class);
-                } catch (AccessDeniedException e) {
-                    return null;
-                }
-
+        return downstreamJobFullNames.stream().map(jobFullName -> {
+            if (jobFullName == null) {
+                return null;
             }
-        });
-
-        // filter null entries resulting from security/authorization filtering
-        return Collections2.filter(downstreamJobs, Predicates.notNull());
+            // security / authorization is checked by Jenkins#getItemByFullName
+            try {
+                return Jenkins.getInstance().getItemByFullName(jobFullName, Job.class);
+            } catch (AccessDeniedException e) {
+                return null;
+            }
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public synchronized SortedMap<MavenArtifact, Collection<Job>> getDownstreamJobsByArtifact() {
@@ -110,24 +101,17 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
         for(Map.Entry<MavenArtifact, SortedSet<String>> entry: downstreamJobsByArtifact.entrySet()) {
             MavenArtifact mavenArtifact = entry.getKey();
             SortedSet<String> downstreamJobFullNames = entry.getValue();
-
-            Collection<Job> downstreamJobs = Collections2.transform(downstreamJobFullNames, new Function<String, Job>() {
-                @Override
-                public Job apply(@Nullable String jobFullName) {
-                    if (jobFullName == null) {
-                        return null;
-                    }
-                    // security / authorization is checked by Jenkins#getItemByFullName
-                    try {
-                        return Jenkins.getInstance().getItemByFullName(jobFullName, Job.class);
-                    } catch (AccessDeniedException e) {
-                        return null;
-                    }
-
+            result.put(mavenArtifact, downstreamJobFullNames.stream().map(jobFullName -> {
+                if (jobFullName == null) {
+                    return null;
                 }
-            });
-            // filter null entries resulting from security/authorization filtering
-            result.put(mavenArtifact, Collections2.filter(downstreamJobs, Predicates.notNull()));
+                // security / authorization is checked by Jenkins#getItemByFullName
+                try {
+                    return Jenkins.getInstance().getItemByFullName(jobFullName, Job.class);
+                } catch (AccessDeniedException e) {
+                    return null;
+                }
+            }).filter(Objects::nonNull).collect(Collectors.toList()));
         }
 
         return result;
@@ -135,38 +119,31 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
 
     public synchronized Collection<Run> getUpstreamBuilds() {
         Map<String, Integer> upstreamJobs = GlobalPipelineMavenConfig.get().getDao().listUpstreamJobs(run.getParent().getFullName(), run.getNumber());
-        Collection<Run> upstreamBuilds = Collections2.transform(upstreamJobs.entrySet(), new Function<Map.Entry<String, Integer>, Run>() {
-            @Override
-            public Run apply(@Nullable Map.Entry<String, Integer> entry) {
-                if (entry == null)
-                    return null;
-                Job job;
-                // security / authorization is checked by Jenkins#getItemByFullName
-                try {
-                    job = Jenkins.getInstance().getItemByFullName(entry.getKey(), Job.class);
-                } catch (AccessDeniedException e) {
-                    return null;
-                }
-                if (job == null)
-                    return null;
-                Run run = job.getBuildByNumber(entry.getValue());
-                if (run == null) {
-                    return null;
-                }
-                return run;
+        return upstreamJobs.entrySet().stream().map(entry -> {
+            if (entry == null)
+                return null;
+            Job job;
+            // security / authorization is checked by Jenkins#getItemByFullName
+            try {
+                job = Jenkins.getInstance().getItemByFullName(entry.getKey(), Job.class);
+            } catch (AccessDeniedException e) {
+                return null;
             }
-        });
-        // filter null entries resulting from security/authorization filtering
-        return Collections2.filter(upstreamBuilds, Predicates.notNull());
+            if (job == null)
+                return null;
+            Run run = job.getBuildByNumber(entry.getValue());
+            if (run == null) {
+                return null;
+            }
+            return run;
+        }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
     public synchronized Collection<MavenArtifact> getDeployedArtifacts() {
-        return Collections2.filter(getGeneratedArtifacts(), new Predicate<MavenArtifact>() {
-            @Override
-            public boolean apply(@Nullable MavenArtifact mavenArtifact) {
-                return mavenArtifact == null ? false : mavenArtifact.isDeployed();
-            }
-        });
+        return getGeneratedArtifacts()
+                .stream()
+                .filter(mavenArtifact -> mavenArtifact == null ? false : mavenArtifact.isDeployed())
+                .collect(Collectors.toList());
     }
 
     public synchronized Collection<MavenDependency> getDependencies(){

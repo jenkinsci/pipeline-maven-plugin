@@ -1,8 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.service;
 
 import com.cloudbees.hudson.plugins.folder.computed.ComputedFolder;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Collections2;
 import hudson.console.ModelHyperlinkNote;
 import hudson.model.Cause;
 import hudson.model.CauseAction;
@@ -38,6 +36,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -157,7 +156,7 @@ public class PipelineTriggerService {
                     downstreamJobLastBuild.addAction(new CauseAction((Cause) cause));
                     logger.log(Level.INFO,
                             "Skip scheduling downstream pipeline " + logger.modelHyperlinkNoteEncodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
-                            Joiner.on(", ").join(Collections2.transform(matchingMavenDependencies, mavenDependency -> mavenDependency == null ? null : mavenDependency.getShortDescription())));
+                            matchingMavenDependencies.stream().map(mavenDependency -> mavenDependency == null ? null : mavenDependency.getShortDescription()).collect(Collectors.joining(", ")));
                     try {
                         downstreamJobLastBuild.save();
                     } catch (IOException e) {
