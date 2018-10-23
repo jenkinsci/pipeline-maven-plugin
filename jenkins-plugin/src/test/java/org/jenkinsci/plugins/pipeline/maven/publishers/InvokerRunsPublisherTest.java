@@ -44,7 +44,7 @@ public class InvokerRunsPublisherTest {
         InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(mavenSpyLogs);
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in);
         InvokerRunsPublisher invokerRunsPublisher = new InvokerRunsPublisher();
-        List<Element> invokerRunEvents = XmlUtils.getExecutionEvents(doc.getDocumentElement(), InvokerRunsPublisher.GROUP_ID, InvokerRunsPublisher.ARTIFACT_ID, goal);
+        List<Element> invokerRunEvents = XmlUtils.getExecutionEventsByPlugin(doc.getDocumentElement(), InvokerRunsPublisher.GROUP_ID, InvokerRunsPublisher.ARTIFACT_ID, goal, "MojoSucceeded");
 
         FilePath workspace = new FilePath(new File("/path/to/khmarbaise/maui/src/main/resources/mp-it-1"));
         TaskListener listener = new StreamTaskListener(System.out, StandardCharsets.UTF_8);
