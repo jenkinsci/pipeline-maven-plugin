@@ -40,10 +40,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.xml.parsers.DocumentBuilder;
@@ -61,14 +67,13 @@ public class MavenSpyLogProcessor implements Serializable {
 
     public void processMavenSpyLogs(@Nonnull StepContext context, @Nonnull FilePath mavenSpyLogFolder, @Nonnull List<MavenPublisher> options,
                                     @Nonnull MavenPublisherStrategy publisherStrategy) throws IOException, InterruptedException {
+
+        long nanosBefore = System.nanoTime();
+
         FilePath[] mavenSpyLogsList = mavenSpyLogFolder.list("maven-spy-*.log");
         LOGGER.log(Level.FINE, "Found {0} maven execution reports in {1}", new Object[]{mavenSpyLogsList.length, mavenSpyLogFolder});
 
         TaskListener listener = context.get(TaskListener.class);
-        if (listener == null) {
-            LOGGER.warning("TaskListener is NULL, default to stderr");
-            listener = new StreamBuildListener((OutputStream) System.err);
-        }
         FilePath workspace = context.get(FilePath.class);
 
         DocumentBuilder documentBuilder;
@@ -100,6 +105,7 @@ public class MavenSpyLogProcessor implements Serializable {
                     listener.getLogger().println("[withMaven] Maven Publisher Strategy: " + publisherStrategy.getDescription());
                 }
                 List<MavenPublisher> mavenPublishers = publisherStrategy.buildPublishersList(options, listener);
+                List<Map.Entry<String, Long>> durationInMillisPerPublisher = new ArrayList();
                 for (MavenPublisher mavenPublisher : mavenPublishers) {
                     String skipFileName = mavenPublisher.getDescriptor().getSkipFileName();
                     if (Boolean.TRUE.equals(mavenPublisher.isDisabled())) {
@@ -111,21 +117,32 @@ public class MavenSpyLogProcessor implements Serializable {
                             listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by marker file '" + skipFileName + "'");
                         }
                     } else {
+                        long nanosBeforePublisher = System.nanoTime();
                         if (LOGGER.isLoggable(Level.FINE)) {
                             listener.getLogger().println("[withMaven] Run '" + mavenPublisher.getDescriptor().getDisplayName() + "'...");
                         }
                         try {
                             mavenPublisher.process(context, mavenSpyLogsElt);
+                        } catch (InterruptedException e) {
+                            listener.error("[withMaven] Processing of Maven build outputs interrupted in " + mavenPublisher.toString() + " after " +
+                                    TimeUnit.MILLISECONDS.convert(System.nanoTime() - nanosBefore, TimeUnit.NANOSECONDS) + "ms.");
                         } catch (IOException | RuntimeException e) {
                             PrintWriter error = listener.error("[withMaven] WARNING Exception executing Maven reporter '" + mavenPublisher.getDescriptor().getDisplayName() +
                                     "' / " + mavenPublisher.getDescriptor().getId() + "." +
                                     " Please report a bug associated for the component 'pipeline-maven-plugin' at https://issues.jenkins-ci.org ");
                             e.printStackTrace(error);
-
+                        }  finally {
+                            durationInMillisPerPublisher.add(new AbstractMap.SimpleImmutableEntry(mavenPublisher.getDescriptor().getDisplayName(), TimeUnit.MILLISECONDS.convert(System.nanoTime() - nanosBeforePublisher, TimeUnit.NANOSECONDS)));
                         }
                     }
                 }
+                if (LOGGER.isLoggable(Level.INFO)){
+                    listener.getLogger().println("[withMaven] Publishers: " +
+                            durationInMillisPerPublisher.stream().filter(entry -> entry.getValue() > 0).
+                                    map(entry -> entry.getKey() + ": " + entry.getValue() + " ms").
+                                    collect(Collectors.joining(", ")));
 
+                }
             } catch (SAXException e) {
                 Run run = context.get(Run.class);
                 if (run.getActions(InterruptedBuildAction.class).isEmpty()) {
