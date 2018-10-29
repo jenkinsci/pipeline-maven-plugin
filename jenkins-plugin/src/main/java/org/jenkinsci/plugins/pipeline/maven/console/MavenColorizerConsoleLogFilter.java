@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.pipeline.maven.console;
 
 import hudson.console.ConsoleLogFilter;
 import hudson.model.Run;
-import hudson.tasks._maven.MavenConsoleAnnotator;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,14 +14,22 @@ import java.nio.charset.Charset;
 public class MavenColorizerConsoleLogFilter extends ConsoleLogFilter implements Serializable {
     private static final long serialVersionUID = 1;
     private final String charset;
+    private byte[][] notes = MavenConsoleAnnotator.createNotes();
 
     public MavenColorizerConsoleLogFilter(String charset) {
         this.charset = charset;
     }
 
+    private Object readResolve() {
+        if (notes == null) { // old program.dat
+            notes = MavenConsoleAnnotator.createNotes();
+        }
+        return this;
+    }
+
     @Override
     public OutputStream decorateLogger(Run run, final OutputStream logger)
             throws IOException, InterruptedException {
-        return new MavenConsoleAnnotator(logger, Charset.forName(charset));
+        return new MavenConsoleAnnotator(logger, Charset.forName(charset), notes);
     }
 }
