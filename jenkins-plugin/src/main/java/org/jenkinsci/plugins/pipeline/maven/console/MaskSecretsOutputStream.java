@@ -76,4 +76,16 @@ public class MaskSecretsOutputStream extends LineTransformationOutputStream {
             return o2.length() - o1.length();
         }
     };
+
+    @Override
+    public void flush() throws IOException {
+        delegate.flush();
+    }
+
+    @Override
+    public void close() throws IOException {
+        super.close();
+        delegate.close();
+    }
+
 }
