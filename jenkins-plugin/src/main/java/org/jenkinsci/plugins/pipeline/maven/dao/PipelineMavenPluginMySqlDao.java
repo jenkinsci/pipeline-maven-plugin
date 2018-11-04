@@ -24,38 +24,44 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import org.h2.jdbcx.JdbcConnectionPool;
-import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
+import com.mysql.cj.exceptions.MysqlErrorNumbers;
 
+import java.sql.SQLException;
+
+import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class PipelineMavenPluginH2DaoTest extends PipelineMavenPluginDaoAbstractTest {
-
-    @Override
-    public DataSource before_newDataSource() {
-        return JdbcConnectionPool.create("jdbc:h2:mem:", "sa", "");
+public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao {
+    public PipelineMavenPluginMySqlDao(@Nonnull DataSource ds) {
+        super(ds);
     }
 
     @Override
-    public AbstractPipelineMavenPluginDao before_newAbstractPipelineMavenPluginDao(DataSource ds) {
-        return new PipelineMavenPluginH2Dao(ds) {
-            @Override
-            protected MigrationStep.JenkinsDetails getJenkinsDetails() {
-                return new MigrationStep.JenkinsDetails() {
-                    @Override
-                    public String getMasterLegacyInstanceId() {
-                        return "123456";
-                    }
+    public String getJdbcScheme() {
+        return "mysql";
+    }
 
-                    @Override
-                    public String getMasterRootUrl() {
-                        return "https://jenkins.mycompany.com/";
-                    }
-                };
-            }
-        };
+    @Override
+    protected boolean isIgnoreSqlLoadingException(SQLException e) {
+        if ( MysqlErrorNumbers.SQL_STATE_ILLEGAL_ARGUMENT.equals(e.getSQLState())) {
+            // empty string
+            return true;
+        } else if (MysqlErrorNumbers.ER_EMPTY_QUERY == e.getErrorCode()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    protected void registerJdbcDriver() {
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("MySql driver 'com.mysql.cj.jdbc.Driver' not found. Please install the 'MySQL Database Plugin' to install the MySql driver");
+        }
     }
 }

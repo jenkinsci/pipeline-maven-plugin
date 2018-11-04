@@ -24,7 +24,8 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import org.h2.jdbcx.JdbcConnectionPool;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 
 import javax.sql.DataSource;
@@ -32,16 +33,20 @@ import javax.sql.DataSource;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class PipelineMavenPluginH2DaoTest extends PipelineMavenPluginDaoAbstractTest {
+public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
 
     @Override
     public DataSource before_newDataSource() {
-        return JdbcConnectionPool.create("jdbc:h2:mem:", "sa", "");
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://localhost/jenkins_jobs_test");
+        config.setUsername("jenkins");
+        config.setPassword("jenkins");
+        return new HikariDataSource(config);
     }
 
     @Override
     public AbstractPipelineMavenPluginDao before_newAbstractPipelineMavenPluginDao(DataSource ds) {
-        return new PipelineMavenPluginH2Dao(ds) {
+        return new PipelineMavenPluginMySqlDao(ds) {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {
