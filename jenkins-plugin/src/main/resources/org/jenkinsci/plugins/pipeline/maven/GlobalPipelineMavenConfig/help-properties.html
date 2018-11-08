@@ -1,0 +1,13 @@
+<div>
+    <p>Add a property (name/value pair) that will be used to configure the <code>DataSource</code>/<code>Driver</code>.
+    </p>
+
+    <p>In the case of a <code>DataSource</code>, the property names will be translated to Java setters following the
+        Java Bean naming convention. For example, the property <code>cachePrepStmts</code> will translate into <code>setCachePrepStmts()</code>
+        with the <code>value</code> passed as a parameter.
+    </p>
+    <p>
+        In the case of a <code>Driver</code>, the property will be added to a <code>Properties</code> instance that will
+        be passed to the driver during </code>java.sql.Driver#connect(String, Properties)</code> calls.
+    </p>
+</div>

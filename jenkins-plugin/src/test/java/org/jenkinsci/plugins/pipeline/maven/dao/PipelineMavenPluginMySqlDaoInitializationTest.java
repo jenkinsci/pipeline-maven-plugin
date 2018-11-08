@@ -26,22 +26,18 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-
-import javax.sql.DataSource;
+import org.junit.Test;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class PipelineMavenPluginH2DaoTest extends PipelineMavenPluginDaoAbstractTest {
+public class PipelineMavenPluginMySqlDaoInitializationTest {
 
-    @Override
-    public DataSource before_newDataSource() {
-        return JdbcConnectionPool.create("jdbc:h2:mem:", "sa", "");
-    }
+    @Test
+    public void initialize_database() {
+        JdbcConnectionPool jdbcConnectionPool = JdbcConnectionPool.create("jdbc:h2:mem:;MODE=MYSQL", "sa", "");
 
-    @Override
-    public AbstractPipelineMavenPluginDao before_newAbstractPipelineMavenPluginDao(DataSource ds) {
-        return new PipelineMavenPluginH2Dao(ds) {
+        AbstractPipelineMavenPluginDao dao = new PipelineMavenPluginMySqlDao(jdbcConnectionPool) {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {

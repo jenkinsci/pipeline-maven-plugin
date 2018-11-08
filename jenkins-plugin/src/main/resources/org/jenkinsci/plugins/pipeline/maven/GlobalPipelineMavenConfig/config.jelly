@@ -43,14 +43,20 @@ THE SOFTWARE.
         </f:entry>
 
         <f:advanced>
-            <f:section title="${%Pipeline Maven H2 Database}">
-                <f:entry title="${%JDBC URL}" field="jdbcUrl" description="H2 JDBC URL. If empty, then the embedded H2 database will be used">
+            <f:section title="${%Pipeline Maven Database}">
+                <f:entry title="${%JDBC URL}" field="jdbcUrl"
+                         description="JDBC URL. If empty, then the embedded H2 database will be used">
                     <f:textbox/>
                 </f:entry>
+                <f:entry title="${%Advanced Properties}" field="properties"
+                         description="DateSource and driver properties">
+                    <f:textarea/>
+                </f:entry>
 
-              <f:entry title="${%JDBC Credentials}" field="jdbcCredentialsId">
-                <c:select/>
-              </f:entry>
+                <f:entry title="${%JDBC Credentials}" field="jdbcCredentialsId">
+                    <c:select/>
+                </f:entry>
+                <f:validateButton title="${%Validate JDBC Connection}" method="validateJdbcConnection" with="jdbcUrl,properties,jdbcCredentialsId"/>
           </f:section>
         </f:advanced>
 

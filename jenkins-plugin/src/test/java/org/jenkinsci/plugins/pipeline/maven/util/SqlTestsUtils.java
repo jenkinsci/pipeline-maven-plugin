@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.util;
 
+import org.h2.api.ErrorCode;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import java.io.PrintStream;
@@ -9,10 +10,9 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.Nonnull;
+import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -20,8 +20,8 @@ import javax.annotation.Nonnull;
 public class SqlTestsUtils {
 
 
-    public static void dump(String sql, JdbcConnectionPool jdbcConnectionPool, PrintStream out) throws RuntimeSqlException {
-        try (Connection connection = jdbcConnectionPool.getConnection()) {
+    public static void dump(String sql, DataSource ds, PrintStream out) throws RuntimeSqlException {
+        try (Connection connection = ds.getConnection()) {
             out.println("# DUMP " + sql);
             out.println();
             try (Statement stmt = connection.createStatement()) {
@@ -55,14 +55,20 @@ public class SqlTestsUtils {
         out.println();
     }
 
-    public static int countRows(@Nonnull String sql, @Nonnull JdbcConnectionPool jdbcConnectionPool, Object... params) throws SQLException {
-        try (Connection cnn = jdbcConnectionPool.getConnection()) {
+    public static int countRows(@Nonnull String sql, @Nonnull DataSource ds, Object... params) throws SQLException {
+        try (Connection cnn = ds.getConnection()) {
             return countRows(sql, cnn, params);
         }
     }
 
     public static int countRows(@Nonnull String sql, @Nonnull Connection cnn, Object... params) throws SQLException {
-        try (PreparedStatement stmt = cnn.prepareStatement("select count(*) from (" + sql + ")")) {
+        String sqlQuery ;
+        if (sql.startsWith("select * from")){
+            sqlQuery = "select count(*) from " + sql.substring("select * from".length());
+        } else {
+            sqlQuery = "select count(*) from (" + sql + ")";        }
+
+        try (PreparedStatement stmt = cnn.prepareStatement(sqlQuery)) {
             int idx = 1;
             for (Object param : params) {
                 stmt.setObject(idx, param);
@@ -75,15 +81,17 @@ public class SqlTestsUtils {
         }
     }
 
-    public static void silentlyDeleteTableRows(JdbcConnectionPool jdbcConnectionPool, String... tables) {
+    public static void silentlyDeleteTableRows(DataSource ds, String... tables) {
         for (String table : tables) {
-            try (Connection cnn = jdbcConnectionPool.getConnection()) {
+            try (Connection cnn = ds.getConnection()) {
                 try (Statement stmt = cnn.createStatement()) {
                     int deleted = stmt.executeUpdate("delete from " + table);
                 }
             } catch (SQLException e) {
-                if (e.getErrorCode() == 42102) {
-                    // ignore "table not found"
+                if (e.getErrorCode() == ErrorCode.TABLE_OR_VIEW_NOT_FOUND_1) {
+                    // ignore "H2 table not found"
+                } else if (e.getErrorCode() == 1146) {
+                    // ignore "MySQL table not found"
                 } else {
                     throw new RuntimeSqlException(e);
                 }

@@ -1,12 +1,39 @@
+/*
+ * The MIT License
+ *
+ * Copyright (c) 2016, CloudBees, Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 package org.jenkinsci.plugins.pipeline.maven;
 
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import hudson.Extension;
 import hudson.model.Result;
 import hudson.security.ACL;
+import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 import hudson.util.Secret;
 import jenkins.model.GlobalConfiguration;
@@ -14,25 +41,39 @@ import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import jenkins.tools.ToolConfigurationCategory;
 import net.sf.json.JSONObject;
-import org.h2.jdbcx.JdbcConnectionPool;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginMonitoringDao;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginMySqlDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao;
 import org.jenkinsci.plugins.pipeline.maven.service.PipelineTriggerService;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.StringReader;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.File;
-import java.sql.SQLException;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -55,6 +96,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
     private String jdbcUrl;
     private String jdbcCredentialsId;
+    private String properties;
 
     @DataBoundConstructor
     public GlobalPipelineMavenConfig() {
@@ -160,43 +202,68 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     public synchronized PipelineMavenPluginDao getDao() {
         if (dao == null) {
             try {
-                if (jdbcUrl == null || jdbcUrl.trim().isEmpty()) {
-                    File jenkinsRootDir = Jenkins.getInstance().getRootDir();
-                    File databaseRootDir = new File(jenkinsRootDir, "jenkins-jobs");
+                String jdbcUrl, jdbcUserName, jdbcPassword;
+                if (StringUtils.isBlank(this.jdbcUrl)) {
+                    // default embedded H2 database
+                    File databaseRootDir = new File(Jenkins.getInstance().getRootDir(), "jenkins-jobs");
                     if (!databaseRootDir.exists()) {
                         boolean created = databaseRootDir.mkdirs();
                         if (!created) {
                             throw new IllegalStateException("Failure to create database root dir " + databaseRootDir);
                         }
                     }
-                    dao = new PipelineMavenPluginMonitoringDao(new PipelineMavenPluginH2Dao(databaseRootDir));
-                } else if (jdbcUrl.startsWith("jdbc:h2:")) {
-                    UsernamePasswordCredentials credentials;
-                    if (jdbcCredentialsId == null || jdbcCredentialsId.isEmpty()) {
-                        throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
-                    } else {
-                        credentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
-                                CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.getInstance(),
-                                        ACL.SYSTEM, Collections.EMPTY_LIST),
-                                CredentialsMatchers.withId(this.jdbcCredentialsId));
-                        if (credentials == null) {
-                            throw new IllegalStateException("Credentials '" + jdbcCredentialsId + "' defined for JDBC URL '" + jdbcUrl + "' NOT found");
-                        }
-                    }
-
-                    JdbcConnectionPool jdbcConnectionPool = JdbcConnectionPool.create(this.jdbcUrl, credentials.getUsername(), Secret.toString(credentials.getPassword()));
-                    try {
-                        dao = new PipelineMavenPluginMonitoringDao(new PipelineMavenPluginH2Dao(jdbcConnectionPool));
-                    } catch (Exception e) {
-                        throw new SQLException(
-                                "Exception connecting to '" + this.jdbcUrl + "' with credentials '" + this.jdbcCredentialsId + "' - " +
-                                        credentials.getUsername() + "/***", e);
-                    }
+                    jdbcUrl = "jdbc:h2:file:" + new File(databaseRootDir, "jenkins-jobs").getAbsolutePath() + ";" +
+                            "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
+                    jdbcUserName = "sa";
+                    jdbcPassword = "sa";
                 } else {
-                    LOGGER.warning("Unsupported jdbc URL '" + jdbcUrl + "'. JDBC URL must start with 'jdbc:h2:'");
-                    dao = new PipelineMavenPluginNullDao();
+                    jdbcUrl = this.jdbcUrl;
+                    if (this.jdbcCredentialsId == null)
+                        throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
+
+                    UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
+                            CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.getInstance(),
+                                    ACL.SYSTEM, Collections.EMPTY_LIST),
+                            CredentialsMatchers.withId(this.jdbcCredentialsId));
+                    if (jdbcCredentials == null) {
+                        throw new IllegalStateException("Credentials '" + jdbcCredentialsId + "' defined for JDBC URL '" + jdbcUrl + "' NOT found");
+                    }
+                    jdbcUserName = jdbcCredentials.getUsername();
+                    jdbcPassword = Secret.toString(jdbcCredentials.getPassword());
                 }
-            } catch (RuntimeException | SQLException e) {
+
+                HikariConfig dsConfig = new HikariConfig();
+                dsConfig.setJdbcUrl(jdbcUrl);
+                dsConfig.setUsername(jdbcUserName);
+                dsConfig.setPassword(jdbcPassword);
+
+                if (StringUtils.isNotBlank(properties)) {
+                    Properties p = new Properties();
+                    p.load(new StringReader(properties));
+                    dsConfig.setDataSourceProperties(p);
+                }
+
+                DataSource ds = new HikariDataSource(dsConfig);
+
+
+                Class<? extends PipelineMavenPluginDao> daoClass;
+                if (jdbcUrl.startsWith("jdbc:h2:")) {
+                    daoClass = PipelineMavenPluginH2Dao.class;
+                } else if (jdbcUrl.startsWith("jdbc:mysql:")) {
+                    daoClass = PipelineMavenPluginMySqlDao.class;
+                } else {
+                    throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
+                }
+                try {
+                    dao = new PipelineMavenPluginMonitoringDao(daoClass.getConstructor(DataSource.class).newInstance(ds));
+                } catch (Exception e) {
+                    throw new SQLException(
+                            "Exception connecting to '" + this.jdbcUrl + "' with credentials '" + this.jdbcCredentialsId + "' (" +
+                                    jdbcUserName + "/***) and DAO " + daoClass.getSimpleName(), e);
+                }
+
+
+            } catch (RuntimeException | SQLException | IOException e) {
                 LOGGER.log(Level.WARNING, "Exception creating database dao, skip", e);
                 dao = new PipelineMavenPluginNullDao();
             }
@@ -245,5 +312,80 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                                 Jenkins.getInstance(),
                                 ACL.SYSTEM,
                                 Collections.EMPTY_LIST));
+    }
+    public FormValidation doValidateJdbcConnection(
+                                     @QueryParameter String jdbcUrl,
+                                     @QueryParameter String properties,
+                                     @QueryParameter String jdbcCredentialsId) {
+        if (StringUtils.isBlank(jdbcUrl)) {
+            return FormValidation.ok("OK");
+        }
+
+        String driverClass = null;
+        try {
+            if (StringUtils.isBlank(jdbcUrl)) {
+                driverClass = "org.h2.Driver";
+            } else if (jdbcUrl.startsWith("jdbc:h2")) {
+                driverClass = "org.h2.Driver";
+            } else if (jdbcUrl.startsWith("jdbc:mysql")) {
+                driverClass = "com.mysql.cj.jdbc.Driver";
+            } else {
+                return FormValidation.error("Unsupported database specified in JDBC url '" + jdbcUrl + "'");
+            }
+            Class.forName(driverClass);
+
+            String jdbcUserName, jdbcPassword;
+            if (StringUtils.isEmpty(jdbcCredentialsId)) {
+                if (StringUtils.isBlank(jdbcUrl)) {
+                    // embedded database, assume OK
+                    return FormValidation.ok("OK");
+                } else {
+                    return FormValidation.error("No credentials specified for JDBC url '" + jdbcUrl + "'");
+                }
+            } else {
+                UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
+                        CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.getInstance(),
+                                ACL.SYSTEM, Collections.EMPTY_LIST),
+                        CredentialsMatchers.withId(jdbcCredentialsId));
+                if (jdbcCredentials == null) {
+                    return FormValidation.error("Credentials '" + jdbcCredentialsId + "' defined for JDBC URL '" + jdbcUrl + "' not found");
+                }
+                jdbcUserName = jdbcCredentials.getUsername();
+                jdbcPassword = Secret.toString(jdbcCredentials.getPassword());
+            }
+            HikariConfig dsConfig = new HikariConfig();
+            dsConfig.setJdbcUrl(jdbcUrl);
+            dsConfig.setUsername(jdbcUserName);
+            dsConfig.setPassword(jdbcPassword);
+
+            if (StringUtils.isNotBlank(properties)) {
+                Properties p = new Properties();
+                try {
+                    p.load(new StringReader(properties));
+                } catch (IOException e) {
+                    throw new IllegalStateException(e);
+                }
+                dsConfig.setDataSourceProperties(p);
+            }
+
+            try (HikariDataSource ds = new HikariDataSource(dsConfig)) {
+                try (Connection cnn = ds.getConnection()) {
+                    try (Statement stmt = cnn.createStatement()) {
+                        try (ResultSet rst = stmt.executeQuery("select 1")) {
+                            rst.next();
+                            // TODO more tests
+                        }
+                    }
+                } catch (SQLException e ){
+                    return FormValidation.error(e, "Failure to connect to the database " + jdbcUrl);
+                }
+            }
+            return FormValidation.ok("OK");
+        } catch (RuntimeException e) {
+            return FormValidation.error(e, "Failed to test JDBC connection '" + jdbcUrl + "'");
+        } catch (ClassNotFoundException e) {
+            return FormValidation.error(e, "Failed to load JDBC driver '" + driverClass + "' for JDBC connection '" + jdbcUrl + "'");
+        }
+
     }
 }
