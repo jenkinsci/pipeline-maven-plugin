@@ -39,7 +39,6 @@ import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -69,6 +68,7 @@ import javax.sql.DataSource;
  */
 public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPluginDao {
 
+    private static final int OPTIMIZATION_MAX_RECURSION_DEPTH = Integer.getInteger("org.jenkinsci.plugins.pipeline.PipelineMavenPluginDao.OPTIMIZATION_MAX_RECURSION_DEPTH",3);
     private static Logger LOGGER = Logger.getLogger(AbstractPipelineMavenPluginDao.class.getName());
 
     private transient DataSource ds;
@@ -961,10 +961,10 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
 
     @Nonnull
     public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
-        return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<String, Integer>());
+        return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<>(), 0);
     }
 
-    private Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, Map<String, Integer> transitiveUpstreamBuilds) {
+    private Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, Map<String, Integer> transitiveUpstreamBuilds, int recursionDepth) {
         Map<String, Integer> upstreamBuilds = listUpstreamJobs(jobFullName, buildNumber);
         for (Entry<String, Integer> upstreamBuild : upstreamBuilds.entrySet()) {
             String upstreamJobFullName = upstreamBuild.getKey();
@@ -973,7 +973,9 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 // job has already been visited, skip
             } else {
                 transitiveUpstreamBuilds.put(upstreamJobFullName, upstreamBuildNumber);
-                listTransitiveUpstreamJobs(upstreamJobFullName, upstreamBuildNumber, transitiveUpstreamBuilds);
+                if (recursionDepth < OPTIMIZATION_MAX_RECURSION_DEPTH) {
+                    listTransitiveUpstreamJobs(upstreamJobFullName, upstreamBuildNumber, transitiveUpstreamBuilds, recursionDepth++);
+                }
             }
         }
         return transitiveUpstreamBuilds;

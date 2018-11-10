@@ -77,6 +77,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
 
         Map<String, Set<MavenArtifact>> jobsToTrigger = new TreeMap<>();
 
+        // build the list of pipelines to trigger
         for(Map.Entry<MavenArtifact, SortedSet<String>> entry: downstreamPipelinesByArtifact.entrySet()) {
 
             MavenArtifact mavenArtifact = entry.getKey();
@@ -87,7 +88,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
 
                 if (jobsToTrigger.containsKey(downstreamPipelineFullName)) {
                     // downstream pipeline has already been added to the list of pipelines to trigger,
-                    // it's meeting requirements (not an infinite loop, authorized by security, not excessive triggering, buildable...)
+                    // we have already verified that it's meeting requirements (not an infinite loop, authorized by security, not excessive triggering, buildable...)
                     if (LOGGER.isLoggable(Level.FINEST)) {
                         listener.getLogger().println("[withMaven - DownstreamPipelineTriggerRunListener] Skip eligibility check of pipeline " + downstreamPipelineFullName + " for artifact " + mavenArtifact.getShortDescription() + ", eligibility already confirmed");
                     }
@@ -135,19 +136,23 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                     WorkflowJob transitiveUpstreamPipeline = Jenkins.getInstance().getItemByFullName(transitiveUpstreamPipelineName, WorkflowJob.class);
 
                     if (transitiveUpstreamPipeline == null) {
-                        // security: not allowed to view this transitive upstream pipeline, skip
+                        // security: not allowed to view this transitive upstream pipeline, continue to loop
                         continue;
-                    }
-                    if (!transitiveUpstreamPipeline.equals(upstreamPipeline) && (transitiveUpstreamPipeline.isBuilding() || transitiveUpstreamPipeline.isInQueue())) {
+                    } else if (transitiveUpstreamPipeline.getFullName().equals(upstreamPipeline.getFullName())) {
+                        // this upstream pipeline of  the current downstreamPipeline is the upstream pipeline itself, continue to loop
+                        continue;
+                    } else if (transitiveUpstreamPipeline.isBuilding()) {
+                        listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                                " because it has a dependency already building: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
+                        continue downstreamPipelinesLoop;
+                    } else if (transitiveUpstreamPipeline.isInQueue()) {
                         listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
                                 " because it has a dependency already building or in queue: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
                         continue downstreamPipelinesLoop;
-                    }
-
-                    // Skip if this downstream pipeline will be triggered by another one of our downstream pipelines
-                    // That's the case when one of the downstream's transitive upstream is our own downstream
-                    if (downstreamPipelines.contains(transitiveUpstreamPipelineName)) {
-                        listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                    } else if (downstreamPipelines.contains(transitiveUpstreamPipelineName)) {
+                         // Skip if this downstream pipeline will be triggered by another one of our downstream pipelines
+                         // That's the case when one of the downstream's transitive upstream is our own downstream
+                         listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
                                 " because it has a dependency on a pipeline that will be triggered by this build: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
                         continue downstreamPipelinesLoop;
                     }
@@ -192,6 +197,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             }
         }
 
+        // trigger the pipelines
         for (Map.Entry<String, Set<MavenArtifact>> entry: jobsToTrigger.entrySet()) {
             String downstreamJobFullName = entry.getKey();
             Job downstreamJob = Jenkins.getInstance().getItemByFullName(downstreamJobFullName, Job.class);
@@ -211,12 +217,12 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 List<MavenArtifact> matchingMavenDependencies = MavenDependencyCauseHelper.isSameCause(cause, downstreamJobLastBuild.getCauses());
                 if (matchingMavenDependencies.size() > 0) {
                     downstreamJobLastBuild.addAction(new CauseAction(cause));
-                    listener.getLogger().println("Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
+                    listener.getLogger().println("[withMaven] Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
                                     matchingMavenDependencies.stream().map(mavenDependency -> mavenDependency == null ? null : mavenDependency.getShortDescription()).collect(Collectors.joining(", ")));
                     try {
                         downstreamJobLastBuild.save();
                     } catch (IOException e) {
-                        listener.getLogger().println("Failure to update build " + downstreamJobLastBuild.getFullDisplayName() + ": " + e.toString());
+                        listener.getLogger().println("[withMaven] Failure to update build " + downstreamJobLastBuild.getFullDisplayName() + ": " + e.toString());
                     }
                     continue;
                 }
