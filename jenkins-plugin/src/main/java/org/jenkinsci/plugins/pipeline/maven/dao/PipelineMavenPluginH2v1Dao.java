@@ -40,7 +40,12 @@ import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -58,11 +63,12 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class PipelineMavenPluginH2v1Dao implements PipelineMavenPluginDao {
+public class PipelineMavenPluginH2v1Dao implements PipelineMavenPluginJdbcDao {
 
     private static Logger LOGGER = Logger.getLogger(PipelineMavenPluginH2v1Dao.class.getName());
 
@@ -109,8 +115,8 @@ public class PipelineMavenPluginH2v1Dao implements PipelineMavenPluginDao {
 
     @Override
     public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope, boolean ignoreUpstreamTriggers, String classifier) {
-        LOGGER.log(Level.FINE, "recordDependency({0}#{1}, {2}:{3}:{4}:{5}, {6}, ignoreUpstreamTriggers:{7}})",
-                new Object[]{jobFullName, buildNumber, groupId, artifactId, version, type, scope, ignoreUpstreamTriggers});
+        LOGGER.log(Level.FINE, "recordDependency({0}#{1}, {2}:{3}:{4}:{5}-{6}, {7}, ignoreUpstreamTriggers:{8}})",
+                new Object[]{jobFullName, buildNumber, groupId, artifactId, version, type, classifier, scope, ignoreUpstreamTriggers});
         long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
         long artifactPrimaryKey = getOrCreateArtifactPrimaryKey(groupId, artifactId, version, type, classifier);
 
@@ -1142,5 +1148,11 @@ public class PipelineMavenPluginH2v1Dao implements PipelineMavenPluginDao {
         } catch (SQLException e) {
             throw new RuntimeSqlException("Exception updating build " + jobFullName + "#" + buildNumber + " with result " + buildResultOrdinal, e);
         }
+    }
+
+    @Nonnull
+    @Override
+    public DataSource getDataSource() {
+        return this.jdbcConnectionPool;
     }
 }

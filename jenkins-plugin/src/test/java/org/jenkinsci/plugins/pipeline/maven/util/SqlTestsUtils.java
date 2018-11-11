@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.util;
 
+import com.google.common.base.Objects;
 import org.h2.api.ErrorCode;
 import org.h2.jdbcx.JdbcConnectionPool;
 
@@ -45,7 +46,8 @@ public class SqlTestsUtils {
         int rowCount = 0;
         while (rst.next()) {
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
-                out.print(rst.getObject(i) + "\t");
+                Object object = rst.getObject(i);
+                out.print(Objects.firstNonNull(object, "#null#") + "\t");
             }
             out.println();
             rowCount++;

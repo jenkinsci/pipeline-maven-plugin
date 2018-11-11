@@ -5,6 +5,8 @@ import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.sql.DataSource;
+
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -12,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class PipelineMavenPluginMonitoringDao implements PipelineMavenPluginDao {
+public class PipelineMavenPluginMonitoringDao implements PipelineMavenPluginJdbcDao {
 
     protected final PipelineMavenPluginDao delegate;
 
@@ -232,5 +234,16 @@ public class PipelineMavenPluginMonitoringDao implements PipelineMavenPluginDao 
                 "\r\n Performances: " +
                 "\r\n\t find: totalDurationInMs=" + TimeUnit.NANOSECONDS.toMillis(findDurationInNanos.get()) + ", count=" + findCount.get() +
                 "\r\n\t write: totalDurationInMs=" + TimeUnit.NANOSECONDS.toMillis(writeDurationInNanos.get()) + ", count=" + writeCount.get();
+    }
+
+    /**
+     *
+     * @return
+     * @throws ClassCastException when the underlying {@link PipelineMavenPluginDao} is not an instance of {@link PipelineMavenPluginJdbcDao}
+     */
+    @Nonnull
+    @Override
+    public DataSource getDataSource() {
+        return ((PipelineMavenPluginJdbcDao) delegate).getDataSource();
     }
 }

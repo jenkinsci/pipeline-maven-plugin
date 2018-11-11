@@ -66,13 +66,15 @@ import javax.sql.DataSource;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPluginDao {
+public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPluginJdbcDao {
 
     private static final int OPTIMIZATION_MAX_RECURSION_DEPTH = Integer.getInteger("org.jenkinsci.plugins.pipeline.PipelineMavenPluginDao.OPTIMIZATION_MAX_RECURSION_DEPTH",3);
     private static Logger LOGGER = Logger.getLogger(AbstractPipelineMavenPluginDao.class.getName());
 
+    @Nonnull
     private transient DataSource ds;
 
+    @Nullable
     private transient Long jenkinsMasterPrimaryKey;
 
     public AbstractPipelineMavenPluginDao(@Nonnull DataSource ds) {
@@ -1157,5 +1159,11 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         } catch (SQLException e) {
             throw new RuntimeSqlException("Exception updating build " + jobFullName + "#" + buildNumber + " with result " + buildResultOrdinal, e);
         }
+    }
+
+    @Override
+    @Nonnull
+    public DataSource getDataSource() {
+        return ds;
     }
 }
