@@ -284,8 +284,8 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
         return classifier;
     }
 
-    public void setClassifier(String classifier) {
-        this.classifier = classifier;
+    public void setClassifier(@Nullable String classifier) {
+        this.classifier = classifier == null || classifier.isEmpty() ? null : classifier;
     }
 
     /**

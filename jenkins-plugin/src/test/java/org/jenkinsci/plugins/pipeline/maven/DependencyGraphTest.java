@@ -7,9 +7,12 @@ import jenkins.branch.BranchSource;
 import jenkins.plugins.git.GitSCMSource;
 import jenkins.plugins.git.GitSampleRepoRule;
 import org.hamcrest.Matchers;
+import org.jenkinsci.plugins.pipeline.maven.dao.AbstractPipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginJdbcDao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
+import org.jenkinsci.plugins.pipeline.maven.util.SqlTestsUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.WorkflowMultibranchProjectTestsUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -100,6 +103,8 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         jenkinsRule.waitUntilNoActivity();
 
         WorkflowRun mavenWarPipelineLastRun = mavenWarPipeline.getLastBuild();
+        SqlTestsUtils.dump("select * from job_generated_artifacts", ((PipelineMavenPluginJdbcDao)GlobalPipelineMavenConfig.get().getDao()).getDataSource(), System.out);
+        SqlTestsUtils.dump("select * from job_dependencies", ((PipelineMavenPluginJdbcDao)GlobalPipelineMavenConfig.get().getDao()).getDataSource(), System.out);
 
         System.out.println("mavenWarPipelineLastBuild: " + mavenWarPipelineLastRun + " caused by " + mavenWarPipelineLastRun.getCauses());
 
