@@ -45,7 +45,7 @@ THE SOFTWARE.
         <f:advanced>
             <f:section title="${%Pipeline Maven Database}">
                 <f:entry title="${%JDBC URL}" field="jdbcUrl"
-                         description="JDBC URL. If empty, then the embedded H2 database will be used">
+                         description="JDBC URL. If empty, then the embedded H2 database will be used. To use a MySQL database, the 'MySQL Database Plugin' MUST be installed.">
                     <f:textbox/>
                 </f:entry>
                 <f:entry title="${%Advanced Properties}" field="properties"

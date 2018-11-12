@@ -246,22 +246,29 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 }
 
                 // TODO cleanup this quick fix for JENKINS-54587, we should have a better solution with the JDBC driver loaded by the DAO itself
-                Driver driver = DriverManager.getDriver(jdbcUrl);
-                if (driver == null) {
-                    if (jdbcUrl.startsWith("jdbc:h2:")) {
-                        try {
-                            Class.forName("org.h2.Driver");
-                        } catch (ClassNotFoundException e) {
-                            throw new IllegalStateException("H2 driver should be bundled with this plugin");
+                try {
+                    DriverManager.getDriver(jdbcUrl);
+                } catch (SQLException e) {
+                    if ("08001".equals(e.getSQLState()) && 0 == e.getErrorCode()) {
+                        // if it's a "No suitable driver" exception, we try to load the jdbc driver and retry
+                        if (jdbcUrl.startsWith("jdbc:h2:")) {
+                            try {
+                                Class.forName("org.h2.Driver");
+                            } catch (ClassNotFoundException cnfe) {
+                                throw new IllegalStateException("H2 driver should be bundled with this plugin");
+                            }
+                        } else if (jdbcUrl.startsWith("jdbc:mysql:")) {
+                            try {
+                                Class.forName("com.mysql.cj.jdbc.Driver");
+                            } catch (ClassNotFoundException cnfe) {
+                                throw new RuntimeException("MySql driver 'com.mysql.cj.jdbc.Driver' not found. Please install the 'MySQL Database Plugin' to install the MySql driver");
+                            }
+                        } else {
+                            throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
                         }
-                    } else if (jdbcUrl.startsWith("jdbc:mysql:")) {
-                        try {
-                            Class.forName("com.mysql.cj.jdbc.Driver");
-                        } catch (ClassNotFoundException e) {
-                            throw new RuntimeException("MySql driver 'com.mysql.cj.jdbc.Driver' not found. Please install the 'MySQL Database Plugin' to install the MySql driver");
-                        }
+                        DriverManager.getDriver(jdbcUrl);
                     } else {
-                        throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
+                        throw e;
                     }
                 }
 
