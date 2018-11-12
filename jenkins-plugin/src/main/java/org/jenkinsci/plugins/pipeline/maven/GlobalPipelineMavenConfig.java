@@ -58,6 +58,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -243,8 +245,27 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     dsConfig.setDataSourceProperties(p);
                 }
 
-                DataSource ds = new HikariDataSource(dsConfig);
+                // TODO cleanup this quick fix for JENKINS-54587, we should have a better solution with the JDBC driver loaded by the DAO itself
+                Driver driver = DriverManager.getDriver(jdbcUrl);
+                if (driver == null) {
+                    if (jdbcUrl.startsWith("jdbc:h2:")) {
+                        try {
+                            Class.forName("org.h2.Driver");
+                        } catch (ClassNotFoundException e) {
+                            throw new IllegalStateException("H2 driver should be bundled with this plugin");
+                        }
+                    } else if (jdbcUrl.startsWith("jdbc:mysql:")) {
+                        try {
+                            Class.forName("com.mysql.cj.jdbc.Driver");
+                        } catch (ClassNotFoundException e) {
+                            throw new RuntimeException("MySql driver 'com.mysql.cj.jdbc.Driver' not found. Please install the 'MySQL Database Plugin' to install the MySql driver");
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
+                    }
+                }
 
+                DataSource ds = new HikariDataSource(dsConfig);
 
                 Class<? extends PipelineMavenPluginDao> daoClass;
                 if (jdbcUrl.startsWith("jdbc:h2:")) {
