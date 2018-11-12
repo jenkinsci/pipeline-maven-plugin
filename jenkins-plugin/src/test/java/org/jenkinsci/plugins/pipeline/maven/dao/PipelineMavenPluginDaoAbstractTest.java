@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
+import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -72,8 +73,10 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         }
     }
 
+    @Nonnull
     public abstract DataSource before_newDataSource();
 
+    @Nonnull
     public abstract AbstractPipelineMavenPluginDao before_newAbstractPipelineMavenPluginDao(DataSource ds);
 
     @Test
@@ -1110,9 +1113,9 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.getOrCreateBuildPrimaryKey("pipeline-core", 2);
         dao.updateBuildOnCompletion("pipeline-core", 2, Result.FAILURE.ordinal, System.currentTimeMillis()-100, 11);
 
-        SqlTestsUtils.dump("select * from jenkins_job", this.ds, System.out);
-        SqlTestsUtils.dump("select * from job_generated_artifacts", this.ds, System.out);
-        SqlTestsUtils.dump("select * from job_dependencies", this.ds, System.out);
+        SqlTestsUtils.dump("select * from JENKINS_JOB", this.ds, System.out);
+        SqlTestsUtils.dump("select * from JOB_GENERATED_ARTIFACTS", this.ds, System.out);
+        SqlTestsUtils.dump("select * from JOB_DEPENDENCIES", this.ds, System.out);
 
         {
             List<String> downstreamJobs = dao.listDownstreamJobs("pipeline-framework", 1);
@@ -1154,9 +1157,9 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.getOrCreateBuildPrimaryKey("pipeline-core", 2);
         dao.updateBuildOnCompletion("pipeline-core", 2, Result.FAILURE.ordinal, System.currentTimeMillis() - 100, 11);
 
-        SqlTestsUtils.dump("select * from jenkins_job", this.ds, System.out);
-        SqlTestsUtils.dump("select * from job_generated_artifacts", this.ds, System.out);
-        SqlTestsUtils.dump("select * from job_dependencies", this.ds, System.out);
+        SqlTestsUtils.dump("select * from JENKINS_JOB", this.ds, System.out);
+        SqlTestsUtils.dump("select * from JOB_GENERATED_ARTIFACTS", this.ds, System.out);
+        SqlTestsUtils.dump("select * from JOB_DEPENDENCIES", this.ds, System.out);
 
         {
             Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifact = dao.listDownstreamJobsByArtifact("pipeline-framework", 1);

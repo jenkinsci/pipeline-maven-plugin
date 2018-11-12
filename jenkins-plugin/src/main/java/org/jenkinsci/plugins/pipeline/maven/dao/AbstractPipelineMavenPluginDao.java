@@ -133,13 +133,13 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     while (rst.next()) {
                         MavenDependency artifact = new MavenDependency();
 
-                        artifact.setGroupId(rst.getString("maven_artifact.group_id"));
-                        artifact.setArtifactId(rst.getString("maven_artifact.artifact_id"));
-                        artifact.setVersion(rst.getString("maven_artifact.version"));
+                        artifact.setGroupId(rst.getString("MAVEN_ARTIFACT.group_id"));
+                        artifact.setArtifactId(rst.getString("MAVEN_ARTIFACT.artifact_id"));
+                        artifact.setVersion(rst.getString("MAVEN_ARTIFACT.version"));
                         artifact.setSnapshot(artifact.getVersion().endsWith("-SNAPSHOT"));
-                        artifact.setType(rst.getString("maven_artifact.type"));
-                        artifact.setClassifier(rst.getString("maven_artifact.classifier"));
-                        artifact.setScope(rst.getString("maven_dependency.scope"));
+                        artifact.setType(rst.getString("MAVEN_ARTIFACT.type"));
+                        artifact.setClassifier(rst.getString("MAVEN_ARTIFACT.classifier"));
+                        artifact.setScope(rst.getString("MAVEN_DEPENDENCY.scope"));
                         results.add(artifact);
                     }
                 }
@@ -203,7 +203,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 new Object[]{upstreamJobName, upstreamBuildNumber, downstreamJobName, downstreamBuildNumber});
         try (Connection cnn = ds.getConnection()) {
             cnn.setAutoCommit(false);
-            String sql = "insert into jenkins_build_upstream_cause (upstream_build_id, downstream_build_id) values (?, ?)";
+            String sql = "insert into JENKINS_BUILD_UPSTREAM_CAUSE (upstream_build_id, downstream_build_id) values (?, ?)";
 
             long upstreamBuildPrimaryKey = getOrCreateBuildPrimaryKey(upstreamJobName, upstreamBuildNumber);
             long downstreamBuildPrimaryKey = getOrCreateBuildPrimaryKey(downstreamJobName, downstreamBuildNumber);
@@ -214,7 +214,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
 
                 int rowCount = stmt.executeUpdate();
                 if (rowCount != 1) {
-                    LOGGER.log(Level.INFO, "More/less ({0}) than 1 record inserted in jenkins_build_upstream_cause for upstreamBuild: {1}#{2}, downstreamBuild: {3}#{4}",
+                    LOGGER.log(Level.INFO, "More/less ({0}) than 1 record inserted in JENKINS_BUILD_UPSTREAM_CAUSE for upstreamBuild: {1}#{2}, downstreamBuild: {3}#{4}",
                             new Object[]{rowCount, upstreamJobName, upstreamBuildNumber, downstreamJobName, downstreamBuildNumber});
                 }
             }
@@ -661,11 +661,11 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnMavenDependencies({0}:{1}:{2}:{3})", new Object[]{groupId, artifactId, version, type});
 
         String sql = "select distinct downstream_job.full_name \n" +
-                "from maven_artifact  \n" +
-                "inner join maven_dependency on (maven_dependency.artifact_id = maven_artifact.id and maven_dependency.ignore_upstream_triggers = false) \n" +
-                "inner join jenkins_build as downstream_build on maven_dependency.build_id = downstream_build.id \n" +
-                "inner join jenkins_job as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
-                "where maven_artifact.group_id = ? and maven_artifact.artifact_id = ? and maven_artifact.version = ? and maven_artifact.type = ? and downstream_job.jenkins_master_id = ?";
+                "from MAVEN_ARTIFACT  \n" +
+                "inner join MAVEN_DEPENDENCY on (MAVEN_DEPENDENCY.artifact_id = MAVEN_ARTIFACT.id and MAVEN_DEPENDENCY.ignore_upstream_triggers = false) \n" +
+                "inner join JENKINS_BUILD as downstream_build on MAVEN_DEPENDENCY.build_id = downstream_build.id \n" +
+                "inner join JENKINS_JOB as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
+                "where MAVEN_ARTIFACT.group_id = ? and MAVEN_ARTIFACT.artifact_id = ? and MAVEN_ARTIFACT.version = ? and MAVEN_ARTIFACT.type = ? and downstream_job.jenkins_master_id = ?";
 
         SortedSet<String> downstreamJobsFullNames = new TreeSet<>();
 
@@ -695,13 +695,13 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         LOGGER.log(Level.FINER, "listDownstreamJobs({0}, {1})", new Object[]{jobFullName, buildNumber});
 
         String sql = "select distinct downstream_job.full_name \n" +
-                "from jenkins_job as upstream_job \n" +
-                "inner join jenkins_build as upstream_build on upstream_job.id = upstream_build.job_id \n" +
-                "inner join generated_maven_artifact on (upstream_build.id = generated_maven_artifact.build_id and generated_maven_artifact.skip_downstream_triggers = false) \n" +
-                "inner join maven_artifact on generated_maven_artifact.artifact_id = maven_artifact.id \n" +
-                "inner join maven_dependency on (maven_dependency.artifact_id = maven_artifact.id and maven_dependency.ignore_upstream_triggers = false) \n" +
-                "inner join jenkins_build as downstream_build on maven_dependency.build_id = downstream_build.id \n" +
-                "inner join jenkins_job as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
+                "from JENKINS_JOB as upstream_job \n" +
+                "inner join JENKINS_BUILD as upstream_build on upstream_job.id = upstream_build.job_id \n" +
+                "inner join GENERATED_MAVEN_ARTIFACT on (upstream_build.id = GENERATED_MAVEN_ARTIFACT.build_id and GENERATED_MAVEN_ARTIFACT.skip_downstream_triggers = false) \n" +
+                "inner join MAVEN_ARTIFACT on GENERATED_MAVEN_ARTIFACT.artifact_id = MAVEN_ARTIFACT.id \n" +
+                "inner join MAVEN_DEPENDENCY on (MAVEN_DEPENDENCY.artifact_id = MAVEN_ARTIFACT.id and MAVEN_DEPENDENCY.ignore_upstream_triggers = false) \n" +
+                "inner join JENKINS_BUILD as downstream_build on MAVEN_DEPENDENCY.build_id = downstream_build.id \n" +
+                "inner join JENKINS_JOB as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
                 "where upstream_job.full_name = ? and upstream_job.jenkins_master_id = ? and upstream_build.number = ? and downstream_job.jenkins_master_id = ?";
 
         List<String> downstreamJobsFullNames = new ArrayList<>();
@@ -732,15 +732,15 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
 
 
         String sql = "select distinct downstream_job.full_name, \n " +
-                "   maven_artifact.group_id, maven_artifact.artifact_id, maven_artifact.version, maven_artifact.type, maven_artifact.classifier, \n" +
-                "   generated_maven_artifact.version, generated_maven_artifact.extension \n" +
-                "from jenkins_job as upstream_job \n" +
-                "inner join jenkins_build as upstream_build on upstream_job.id = upstream_build.job_id \n" +
-                "inner join generated_maven_artifact on (upstream_build.id = generated_maven_artifact.build_id and generated_maven_artifact.skip_downstream_triggers = false) \n" +
-                "inner join maven_artifact on generated_maven_artifact.artifact_id = maven_artifact.id \n" +
-                "inner join maven_dependency on (maven_dependency.artifact_id = maven_artifact.id and maven_dependency.ignore_upstream_triggers = false) \n" +
-                "inner join jenkins_build as downstream_build on maven_dependency.build_id = downstream_build.id \n" +
-                "inner join jenkins_job as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
+                "   MAVEN_ARTIFACT.group_id, MAVEN_ARTIFACT.artifact_id, MAVEN_ARTIFACT.version, MAVEN_ARTIFACT.type, MAVEN_ARTIFACT.classifier, \n" +
+                "   GENERATED_MAVEN_ARTIFACT.version, GENERATED_MAVEN_ARTIFACT.extension \n" +
+                "from JENKINS_JOB as upstream_job \n" +
+                "inner join JENKINS_BUILD as upstream_build on upstream_job.id = upstream_build.job_id \n" +
+                "inner join GENERATED_MAVEN_ARTIFACT on (upstream_build.id = GENERATED_MAVEN_ARTIFACT.build_id and GENERATED_MAVEN_ARTIFACT.skip_downstream_triggers = false) \n" +
+                "inner join MAVEN_ARTIFACT on GENERATED_MAVEN_ARTIFACT.artifact_id = MAVEN_ARTIFACT.id \n" +
+                "inner join MAVEN_DEPENDENCY on (MAVEN_DEPENDENCY.artifact_id = MAVEN_ARTIFACT.id and MAVEN_DEPENDENCY.ignore_upstream_triggers = false) \n" +
+                "inner join JENKINS_BUILD as downstream_build on MAVEN_DEPENDENCY.build_id = downstream_build.id \n" +
+                "inner join JENKINS_JOB as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
                 "where upstream_job.full_name = ? and upstream_job.jenkins_master_id = ? and upstream_build.number = ? and downstream_job.jenkins_master_id = ?";
 
         LOGGER.log(Level.FINER, "sql: {0}, jobFullName:{1}, buildNumber: {2}", new Object[]{sql, jobFullName, buildNumber});
@@ -757,8 +757,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                         MavenArtifact artifact = new MavenArtifact();
                         artifact.setGroupId(rst.getString("group_id"));
                         artifact.setArtifactId(rst.getString("artifact_id"));
-                        artifact.setVersion(rst.getString("generated_maven_artifact.version"));
-                        artifact.setBaseVersion(rst.getString("maven_artifact.version"));
+                        artifact.setVersion(rst.getString("GENERATED_MAVEN_ARTIFACT.version"));
+                        artifact.setBaseVersion(rst.getString("MAVEN_ARTIFACT.version"));
                         artifact.setType(rst.getString("type"));
                         artifact.setClassifier(rst.getString("classifier"));
                         artifact.setExtension(rst.getString("extension"));
@@ -785,13 +785,13 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     protected List<String> listDownstreamPipelinesBasedOnParentProjectDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
         String sql = "select distinct downstream_job.full_name \n" +
-                "from jenkins_job as upstream_job \n" +
-                "inner join jenkins_build as upstream_build on upstream_job.id = upstream_build.job_id \n" +
-                "inner join generated_maven_artifact on (upstream_build.id = generated_maven_artifact.build_id and generated_maven_artifact.skip_downstream_triggers = false) \n" +
-                "inner join maven_artifact on generated_maven_artifact.artifact_id = maven_artifact.id \n" +
-                "inner join maven_parent_project on (maven_parent_project.artifact_id = maven_artifact.id and maven_parent_project.ignore_upstream_triggers = false) \n" +
-                "inner join jenkins_build as downstream_build on maven_parent_project.build_id = downstream_build.id \n" +
-                "inner join jenkins_job as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
+                "from JENKINS_JOB as upstream_job \n" +
+                "inner join JENKINS_BUILD as upstream_build on upstream_job.id = upstream_build.job_id \n" +
+                "inner join GENERATED_MAVEN_ARTIFACT on (upstream_build.id = GENERATED_MAVEN_ARTIFACT.build_id and GENERATED_MAVEN_ARTIFACT.skip_downstream_triggers = false) \n" +
+                "inner join MAVEN_ARTIFACT on GENERATED_MAVEN_ARTIFACT.artifact_id = MAVEN_ARTIFACT.id \n" +
+                "inner join MAVEN_PARENT_PROJECT on (MAVEN_PARENT_PROJECT.artifact_id = MAVEN_ARTIFACT.id and MAVEN_PARENT_PROJECT.ignore_upstream_triggers = false) \n" +
+                "inner join JENKINS_BUILD as downstream_build on MAVEN_PARENT_PROJECT.build_id = downstream_build.id \n" +
+                "inner join JENKINS_JOB as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
                 "where upstream_job.full_name = ? and upstream_job.jenkins_master_id = ? and upstream_build.number = ? and downstream_job.jenkins_master_id = ?";
 
         List<String> downstreamJobsFullNames = new ArrayList<>();
@@ -821,15 +821,15 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     protected Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifactBasedOnParentProjectDependencies(String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
         String sql = "select distinct downstream_job.full_name, \n" +
-                "   maven_artifact.group_id, maven_artifact.artifact_id, maven_artifact.version, maven_artifact.type, maven_artifact.classifier, \n" +
-                "   generated_maven_artifact.version, generated_maven_artifact.extension \n" +
-                "from jenkins_job as upstream_job \n" +
-                "inner join jenkins_build as upstream_build on upstream_job.id = upstream_build.job_id \n" +
-                "inner join generated_maven_artifact on (upstream_build.id = generated_maven_artifact.build_id and generated_maven_artifact.skip_downstream_triggers = false) \n" +
-                "inner join maven_artifact on generated_maven_artifact.artifact_id = maven_artifact.id \n" +
-                "inner join maven_parent_project on (maven_parent_project.artifact_id = maven_artifact.id and maven_parent_project.ignore_upstream_triggers = false) \n" +
-                "inner join jenkins_build as downstream_build on maven_parent_project.build_id = downstream_build.id \n" +
-                "inner join jenkins_job as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
+                "   MAVEN_ARTIFACT.group_id, MAVEN_ARTIFACT.artifact_id, MAVEN_ARTIFACT.version, MAVEN_ARTIFACT.type, MAVEN_ARTIFACT.classifier, \n" +
+                "   GENERATED_MAVEN_ARTIFACT.version, GENERATED_MAVEN_ARTIFACT.extension \n" +
+                "from JENKINS_JOB as upstream_job \n" +
+                "inner join JENKINS_BUILD as upstream_build on upstream_job.id = upstream_build.job_id \n" +
+                "inner join GENERATED_MAVEN_ARTIFACT on (upstream_build.id = GENERATED_MAVEN_ARTIFACT.build_id and GENERATED_MAVEN_ARTIFACT.skip_downstream_triggers = false) \n" +
+                "inner join MAVEN_ARTIFACT on GENERATED_MAVEN_ARTIFACT.artifact_id = MAVEN_ARTIFACT.id \n" +
+                "inner join MAVEN_PARENT_PROJECT on (MAVEN_PARENT_PROJECT.artifact_id = MAVEN_ARTIFACT.id and MAVEN_PARENT_PROJECT.ignore_upstream_triggers = false) \n" +
+                "inner join JENKINS_BUILD as downstream_build on MAVEN_PARENT_PROJECT.build_id = downstream_build.id \n" +
+                "inner join JENKINS_JOB as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
                 "where upstream_job.full_name = ? and upstream_job.jenkins_master_id = ? and upstream_build.number = ? and downstream_job.jenkins_master_id = ?";
 
         LOGGER.log(Level.FINER, "sql: {0}, jobFullName:{1}, buildNumber: {2}", new Object[]{sql, jobFullName, buildNumber});
@@ -847,8 +847,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                         MavenArtifact artifact = new MavenArtifact();
                         artifact.setGroupId(rst.getString("group_id"));
                         artifact.setArtifactId(rst.getString("artifact_id"));
-                        artifact.setVersion(rst.getString("generated_maven_artifact.version"));
-                        artifact.setBaseVersion(rst.getString("maven_artifact.version"));
+                        artifact.setVersion(rst.getString("GENERATED_MAVEN_ARTIFACT.version"));
+                        artifact.setBaseVersion(rst.getString("MAVEN_ARTIFACT.version"));
                         artifact.setType(rst.getString("type"));
                         artifact.setClassifier(rst.getString("classifier"));
                         artifact.setExtension(rst.getString("extension"));
@@ -892,13 +892,13 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         LOGGER.log(Level.FINER, "listUpstreamPipelinesBasedOnMavenDependencies({0}, {1})", new Object[]{downstreamJobFullName, downstreamBuildNumber});
 
         String sql = "select  upstream_job.full_name, upstream_build.number\n" +
-                "from jenkins_job as upstream_job\n" +
-                "inner join jenkins_build as upstream_build on (upstream_job.id = upstream_build.job_id and upstream_job.last_successful_build_number = upstream_build.number)\n" +
-                "inner join generated_maven_artifact on (upstream_build.id = generated_maven_artifact.build_id  and generated_maven_artifact.skip_downstream_triggers = false)\n" +
-                "inner join maven_artifact on generated_maven_artifact.artifact_id = maven_artifact.id\n" +
-                "inner join maven_dependency on (maven_dependency.artifact_id = maven_artifact.id and maven_dependency.ignore_upstream_triggers = false)\n" +
-                "inner join jenkins_build as downstream_build on maven_dependency.build_id = downstream_build.id\n" +
-                "inner join jenkins_job as downstream_job on downstream_build.job_id = downstream_job.id\n" +
+                "from JENKINS_JOB as upstream_job\n" +
+                "inner join JENKINS_BUILD as upstream_build on (upstream_job.id = upstream_build.job_id and upstream_job.last_successful_build_number = upstream_build.number)\n" +
+                "inner join GENERATED_MAVEN_ARTIFACT on (upstream_build.id = GENERATED_MAVEN_ARTIFACT.build_id  and GENERATED_MAVEN_ARTIFACT.skip_downstream_triggers = false)\n" +
+                "inner join MAVEN_ARTIFACT on GENERATED_MAVEN_ARTIFACT.artifact_id = MAVEN_ARTIFACT.id\n" +
+                "inner join MAVEN_DEPENDENCY on (MAVEN_DEPENDENCY.artifact_id = MAVEN_ARTIFACT.id and MAVEN_DEPENDENCY.ignore_upstream_triggers = false)\n" +
+                "inner join JENKINS_BUILD as downstream_build on MAVEN_DEPENDENCY.build_id = downstream_build.id\n" +
+                "inner join JENKINS_JOB as downstream_job on downstream_build.job_id = downstream_job.id\n" +
                 "where downstream_job.full_name = ? and downstream_job.jenkins_master_id = ? and  downstream_build.number = ? and upstream_job.jenkins_master_id = ?";
 
         Map<String, Integer> upstreamJobsFullNames = new HashMap<>();
@@ -928,13 +928,13 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         LOGGER.log(Level.FINER, "listUpstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{downstreamJobFullName, downstreamBuildNumber});
 
         String sql = "select  upstream_job.full_name, upstream_build.number\n" +
-                "from jenkins_job as upstream_job\n" +
-                "inner join jenkins_build as upstream_build on (upstream_job.id = upstream_build.job_id and upstream_job.last_successful_build_number = upstream_build.number)\n" +
-                "inner join generated_maven_artifact on (upstream_build.id = generated_maven_artifact.build_id  and generated_maven_artifact.skip_downstream_triggers = false)\n" +
-                "inner join maven_artifact on generated_maven_artifact.artifact_id = maven_artifact.id\n" +
-                "inner join maven_parent_project on (maven_parent_project.artifact_id = maven_artifact.id and maven_parent_project.ignore_upstream_triggers = false)\n" +
-                "inner join jenkins_build as downstream_build on maven_parent_project.build_id = downstream_build.id\n" +
-                "inner join jenkins_job as downstream_job on downstream_build.job_id = downstream_job.id\n" +
+                "from JENKINS_JOB as upstream_job\n" +
+                "inner join JENKINS_BUILD as upstream_build on (upstream_job.id = upstream_build.job_id and upstream_job.last_successful_build_number = upstream_build.number)\n" +
+                "inner join GENERATED_MAVEN_ARTIFACT on (upstream_build.id = GENERATED_MAVEN_ARTIFACT.build_id  and GENERATED_MAVEN_ARTIFACT.skip_downstream_triggers = false)\n" +
+                "inner join MAVEN_ARTIFACT on GENERATED_MAVEN_ARTIFACT.artifact_id = MAVEN_ARTIFACT.id\n" +
+                "inner join MAVEN_PARENT_PROJECT on (MAVEN_PARENT_PROJECT.artifact_id = MAVEN_ARTIFACT.id and MAVEN_PARENT_PROJECT.ignore_upstream_triggers = false)\n" +
+                "inner join JENKINS_BUILD as downstream_build on MAVEN_PARENT_PROJECT.build_id = downstream_build.id\n" +
+                "inner join JENKINS_JOB as downstream_job on downstream_build.job_id = downstream_job.id\n" +
                 "where downstream_job.full_name = ? and downstream_job.jenkins_master_id = ? and  downstream_build.number = ? and upstream_job.jenkins_master_id = ?";
 
 
@@ -1013,18 +1013,18 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     while (rst.next()) {
                         MavenArtifact artifact = new MavenArtifact();
 
-                        artifact.setGroupId(rst.getString("maven_artifact.group_id"));
-                        artifact.setArtifactId(rst.getString("maven_artifact.artifact_id"));
-                        artifact.setVersion(rst.getString("maven_artifact.version"));
-                        artifact.setType(rst.getString("maven_artifact.type"));
-                        artifact.setClassifier(rst.getString("maven_artifact.classifier"));
+                        artifact.setGroupId(rst.getString("MAVEN_ARTIFACT.group_id"));
+                        artifact.setArtifactId(rst.getString("MAVEN_ARTIFACT.artifact_id"));
+                        artifact.setVersion(rst.getString("MAVEN_ARTIFACT.version"));
+                        artifact.setType(rst.getString("MAVEN_ARTIFACT.type"));
+                        artifact.setClassifier(rst.getString("MAVEN_ARTIFACT.classifier"));
 
-                        artifact.setBaseVersion(rst.getString("generated_maven_artifact.version"));
-                        artifact.setRepositoryUrl(rst.getString("generated_maven_artifact.repository_url"));
-                        artifact.setExtension(rst.getString("generated_maven_artifact.extension"));
+                        artifact.setBaseVersion(rst.getString("GENERATED_MAVEN_ARTIFACT.version"));
+                        artifact.setRepositoryUrl(rst.getString("GENERATED_MAVEN_ARTIFACT.repository_url"));
+                        artifact.setExtension(rst.getString("GENERATED_MAVEN_ARTIFACT.extension"));
                         artifact.setSnapshot(artifact.getVersion().endsWith("-SNAPSHOT"));
 
-                        // artifact.put("skip_downstream_triggers", rst.getString("generated_maven_artifact.skip_downstream_triggers"));
+                        // artifact.put("skip_downstream_triggers", rst.getString("GENERATED_MAVEN_ARTIFACT.skip_downstream_triggers"));
                         results.add(artifact);
                     }
                 }
@@ -1127,7 +1127,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 stmt.setLong(4, buildPrimaryKey);
                 int count = stmt.executeUpdate();
                 if (count != 1) {
-                    LOGGER.log(Level.WARNING, "updateBuildOnCompletion - more/less than 1 jenkins_build record updated (" +
+                    LOGGER.log(Level.WARNING, "updateBuildOnCompletion - more/less than 1 JENKINS_BUILD record updated (" +
                             count + ") for " + jobFullName + "#" + buildNumber);
                 }
             }
@@ -1139,7 +1139,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     stmt.setString(3, jobFullName);
                     int count = stmt.executeUpdate();
                     if (count != 1) {
-                        LOGGER.log(Level.WARNING, "updateBuildOnCompletion - more/less than 1 jenkins_job record updated (" +
+                        LOGGER.log(Level.WARNING, "updateBuildOnCompletion - more/less than 1 JENKINS_JOB record updated (" +
                                 count + ") for " + jobFullName + "#" + buildNumber);
                     }
                 }
@@ -1149,7 +1149,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     stmt.setString(2, jobFullName);
                     int count = stmt.executeUpdate();
                     if (count != 1) {
-                        LOGGER.log(Level.WARNING, "updateBuildOnCompletion - more/less than 1 jenkins_job record updated (" +
+                        LOGGER.log(Level.WARNING, "updateBuildOnCompletion - more/less than 1 JENKINS_JOB record updated (" +
                                 count + ") for " + jobFullName + "#" + buildNumber);
                     }
                 }
