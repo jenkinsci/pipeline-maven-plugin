@@ -57,7 +57,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
 
         if (!globalPipelineMavenConfig.getTriggerDownstreamBuildsResultsCriteria().contains(upstreamBuild.getResult())) {
             if (LOGGER.isLoggable(Level.FINER)) {
-                listener.getLogger().println("[withMaven] Skip downstream job triggering for upstream build with ignored result status " + upstreamBuild + ": " + upstreamBuild.getResult());
+                listener.getLogger().println("[withMaven] Skip triggering downstream jobs for upstream build with ignored result status " + upstreamBuild + ": " + upstreamBuild.getResult());
             }
             return;
         }
@@ -119,9 +119,9 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 for (Map.Entry<MavenArtifact, SortedSet<String>> entry2 : downstreamDownstreamPipelinesByArtifact.entrySet()) {
                     SortedSet<String> downstreamDownstreamPipelines = entry2.getValue();
                     if (downstreamDownstreamPipelines.contains(upstreamPipelineFullName)) {
-                            listener.getLogger().println("[withMaven] Infinite loop detected: not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " " +
-                                    " (dependency: " + mavenArtifact.getId() + ") because it is itself triggering this pipeline " +
-                                    ModelHyperlinkNote.encodeTo(upstreamPipeline) + " (dependency: " + entry2.getKey() + ")");
+                            listener.getLogger().println("[withMaven] Infinite loop detected: skip triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " " +
+                                    " (dependency: " + mavenArtifact.getShortDescription() + ") because it is itself triggering this pipeline " +
+                                    ModelHyperlinkNote.encodeTo(upstreamPipeline) + " (dependency: " + entry2.getKey().getShortDescription() + ")");
                         // prevent infinite loop
                         continue downstreamPipelinesLoop;
                     }
@@ -142,17 +142,17 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                         // this upstream pipeline of  the current downstreamPipeline is the upstream pipeline itself, continue to loop
                         continue;
                     } else if (transitiveUpstreamPipeline.isBuilding()) {
-                        listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                        listener.getLogger().println("[withMaven] Skip triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
                                 " because it has a dependency already building: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
                         continue downstreamPipelinesLoop;
                     } else if (transitiveUpstreamPipeline.isInQueue()) {
-                        listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                        listener.getLogger().println("[withMaven] Skip triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
                                 " because it has a dependency already building or in queue: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
                         continue downstreamPipelinesLoop;
                     } else if (downstreamPipelines.contains(transitiveUpstreamPipelineName)) {
                          // Skip if this downstream pipeline will be triggered by another one of our downstream pipelines
                          // That's the case when one of the downstream's transitive upstream is our own downstream
-                         listener.getLogger().println("[withMaven] Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                         listener.getLogger().println("[withMaven] Skip triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
                                 " because it has a dependency on a pipeline that will be triggered by this build: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
                         continue downstreamPipelinesLoop;
                     }
@@ -217,7 +217,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 List<MavenArtifact> matchingMavenDependencies = MavenDependencyCauseHelper.isSameCause(cause, downstreamJobLastBuild.getCauses());
                 if (matchingMavenDependencies.size() > 0) {
                     downstreamJobLastBuild.addAction(new CauseAction(cause));
-                    listener.getLogger().println("[withMaven] Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
+                    listener.getLogger().println("[withMaven] Skip triggering downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
                                     matchingMavenDependencies.stream().map(mavenDependency -> mavenDependency == null ? null : mavenDependency.getShortDescription()).collect(Collectors.joining(", ")));
                     try {
                         downstreamJobLastBuild.save();
@@ -232,10 +232,10 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
 
             String dependenciesMessage = cause.getMavenArtifactsDescription();
             if (queuedItem == null) {
-                listener.getLogger().println("[withMaven] Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " due to dependencies on " +
+                listener.getLogger().println("[withMaven] Skip triggering downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " due to dependencies on " +
                         dependenciesMessage + ", invocation rejected.");
             } else {
-                listener.getLogger().println("[withMaven] Scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + "#" + downstreamJob.getNextBuildNumber() + " due to dependency on " +
+                listener.getLogger().println("[withMaven] Triggering downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + "#" + downstreamJob.getNextBuildNumber() + " due to dependency on " +
                         dependenciesMessage + " ...");
             }
 
