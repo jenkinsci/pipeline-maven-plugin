@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.pipeline.maven.db.migration.h2;
+package org.jenkinsci.plugins.pipeline.maven.db.migration;
 
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 

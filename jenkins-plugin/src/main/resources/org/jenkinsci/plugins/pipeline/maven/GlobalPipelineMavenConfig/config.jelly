@@ -43,7 +43,7 @@ THE SOFTWARE.
         </f:entry>
 
         <f:advanced>
-            <f:section title="${%Pipeline Maven H2 Database}">
+            <f:section title="${%Pipeline Maven Database}">
                 <f:entry title="${%JDBC URL}" field="jdbcUrl" description="H2 JDBC URL. If empty, then the embedded H2 database will be used">
                     <f:textbox/>
                 </f:entry>

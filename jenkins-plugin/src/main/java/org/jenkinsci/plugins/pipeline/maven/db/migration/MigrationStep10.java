@@ -1,7 +1,6 @@
-package org.jenkinsci.plugins.pipeline.maven.db.migration.h2;
+package org.jenkinsci.plugins.pipeline.maven.db.migration;
 
 import hudson.model.Run;
-import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
