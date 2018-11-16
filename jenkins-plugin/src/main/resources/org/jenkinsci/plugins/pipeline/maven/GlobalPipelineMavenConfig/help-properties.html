@@ -1,13 +1,20 @@
 <div>
-    <p>Add a property (name/value pair) that will be used to configure the <code>DataSource</code>/<code>Driver</code>.
+    <p>Add a property (name/value pair) that will be used to configure the Hikari CP <code>DataSource</code> / JDBC <code>Driver</code>.
     </p>
 
-    <p>In the case of a <code>DataSource</code>, the property names will be translated to Java setters following the
-        Java Bean naming convention. For example, the property <code>cachePrepStmts</code> will translate into <code>setCachePrepStmts()</code>
-        with the <code>value</code> passed as a parameter.
+    <p>In the case of a <code>DataSource</code>, the property names should be prefixed by <code>dataSource.</code>, these properties
+        will be translated to Java setters following the Java Bean naming convention.
+        For example, the property <code>dataSource.cachePrepStmts</code> will translate into <code>setCachePrepStmts()</code>
+        with the <code>value</code> passed as a parameter. See details on
+        <a href="https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby">Hikari CP</a>.
     </p>
     <p>
         In the case of a <code>Driver</code>, the property will be added to a <code>Properties</code> instance that will
         be passed to the driver during </code>java.sql.Driver#connect(String, Properties)</code> calls.
+    </p>
+    <p>
+        For MySQL connections, the Pipeline Maven Plugin will uses by default the settings recommended in
+        <a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">Hikari CP / MySQL Configuration</a>.
+        To overwrite these settings, define the desired settings in the properties text area with different values.
     </p>
 </div>

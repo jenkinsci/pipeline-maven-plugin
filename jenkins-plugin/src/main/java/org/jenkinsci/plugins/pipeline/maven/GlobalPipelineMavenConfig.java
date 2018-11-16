@@ -280,6 +280,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 // todo refactor the DAO to inject config defaults in the DAO
                 if (jdbcUrl.startsWith("jdbc:mysql")) {
                     // https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
+                    // https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
                     p.setProperty("dataSource.cachePrepStmts", "true");
                     p.setProperty("dataSource.prepStmtCacheSize", "250");
                     p.setProperty("dataSource.prepStmtCacheSqlLimit", "2048");
@@ -325,6 +326,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     }
                 }
 
+                LOGGER.log(Level.INFO, "Connect to database {0} with username {1} and properties {2}", new Object[]{jdbcUrl, jdbcUserName, p});
                 DataSource ds = new HikariDataSource(dsConfig);
 
                 Class<? extends PipelineMavenPluginDao> daoClass;
