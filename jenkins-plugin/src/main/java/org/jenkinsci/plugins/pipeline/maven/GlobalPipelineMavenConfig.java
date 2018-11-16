@@ -54,11 +54,11 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -174,7 +174,15 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     @DataBoundSetter
     public synchronized void setJdbcUrl(String jdbcUrl) {
         if (!Objects.equals(jdbcUrl, this.jdbcUrl)) {
+            PipelineMavenPluginDao daoToClose = this.dao;
             this.dao = null;
+            if (daoToClose instanceof Closeable) {
+                try {
+                    ((Closeable) daoToClose).close();
+                } catch (IOException e) {
+                    LOGGER.log(Level.WARNING, "Exception closing the previous DAO", e);
+                }
+            }
         }
         this.jdbcUrl = jdbcUrl;
     }
@@ -183,10 +191,38 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         return jdbcCredentialsId;
     }
 
+    public synchronized String getProperties() {
+        return properties;
+    }
+
+    @DataBoundSetter
+    public void setProperties(String properties) {
+        if (!Objects.equals(properties, this.properties)) {
+            PipelineMavenPluginDao daoToClose = this.dao;
+            this.dao = null;
+            if (daoToClose instanceof Closeable) {
+                try {
+                    ((Closeable) daoToClose).close();
+                } catch (IOException e) {
+                    LOGGER.log(Level.WARNING, "Exception closing the previous DAO", e);
+                }
+            }
+        }
+        this.properties = properties;
+    }
+
     @DataBoundSetter
     public synchronized void setJdbcCredentialsId(String jdbcCredentialsId) {
         if (!Objects.equals(jdbcCredentialsId, this.jdbcCredentialsId)) {
+            PipelineMavenPluginDao daoToClose = this.dao;
             this.dao = null;
+            if (daoToClose instanceof Closeable) {
+                try {
+                    ((Closeable) daoToClose).close();
+                } catch (IOException e) {
+                    LOGGER.log(Level.WARNING, "Exception closing the previous DAO", e);
+                }
+            }
         }
         this.jdbcCredentialsId = jdbcCredentialsId;
     }
@@ -238,12 +274,30 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 dsConfig.setJdbcUrl(jdbcUrl);
                 dsConfig.setUsername(jdbcUserName);
                 dsConfig.setPassword(jdbcPassword);
+                dsConfig.setAutoCommit(false);
 
-                if (StringUtils.isNotBlank(properties)) {
-                    Properties p = new Properties();
-                    p.load(new StringReader(properties));
-                    dsConfig.setDataSourceProperties(p);
+                Properties p = new Properties();
+                // todo refactor the DAO to inject config defaults in the DAO
+                if (jdbcUrl.startsWith("jdbc:mysql")) {
+                    // https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby 
+                    p.setProperty("dataSource.cachePrepStmts", "true");
+                    p.setProperty("dataSource.prepStmtCacheSize", "250");
+                    p.setProperty("dataSource.prepStmtCacheSqlLimit", "2048");
+                    p.setProperty("dataSource.useServerPrepStmts", "true");
+                    p.setProperty("dataSource.useLocalSessionState", "true");
+                    p.setProperty("dataSource.rewriteBatchedStatements", "true");
+                    p.setProperty("dataSource.cacheResultSetMetadata", "true");
+                    p.setProperty("dataSource.cacheServerConfiguration", "true");
+                    p.setProperty("dataSource.elideSetAutoCommits", "true");
+                    p.setProperty("dataSource.maintainTimeStats", "false");
+                } else if (jdbcUrl.startsWith("jdbc:h2")) {
+                    dsConfig.setDataSourceClassName("org.h2.jdbcx.JdbcDataSource");
+                    p.setProperty("dataSource.cachePrepStmts", "true");
                 }
+                if (StringUtils.isNotBlank(properties)) {
+                    p.load(new StringReader(properties));
+                }
+                dsConfig.setDataSourceProperties(p);
 
                 // TODO cleanup this quick fix for JENKINS-54587, we should have a better solution with the JDBC driver loaded by the DAO itself
                 try {

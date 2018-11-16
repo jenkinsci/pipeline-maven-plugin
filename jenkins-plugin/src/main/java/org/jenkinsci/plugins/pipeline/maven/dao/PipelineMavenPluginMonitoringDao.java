@@ -7,6 +7,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.sql.DataSource;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -14,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class PipelineMavenPluginMonitoringDao implements PipelineMavenPluginJdbcDao {
+public class PipelineMavenPluginMonitoringDao implements PipelineMavenPluginJdbcDao, Closeable {
 
     protected final PipelineMavenPluginDao delegate;
 
@@ -245,5 +247,12 @@ public class PipelineMavenPluginMonitoringDao implements PipelineMavenPluginJdbc
     @Override
     public DataSource getDataSource() {
         return ((PipelineMavenPluginJdbcDao) delegate).getDataSource();
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (delegate instanceof Closeable) {
+            ((Closeable) delegate).close();
+        }
     }
 }
