@@ -36,6 +36,7 @@ import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
@@ -66,7 +67,7 @@ import javax.sql.DataSource;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPluginJdbcDao {
+public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPluginJdbcDao, Closeable {
 
     private static final int OPTIMIZATION_MAX_RECURSION_DEPTH = Integer.getInteger("org.jenkinsci.plugins.pipeline.PipelineMavenPluginDao.OPTIMIZATION_MAX_RECURSION_DEPTH",3);
     private static Logger LOGGER = Logger.getLogger(AbstractPipelineMavenPluginDao.class.getName());
@@ -937,7 +938,6 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 "inner join JENKINS_JOB as downstream_job on downstream_build.job_id = downstream_job.id\n" +
                 "where downstream_job.full_name = ? and downstream_job.jenkins_master_id = ? and  downstream_build.number = ? and upstream_job.jenkins_master_id = ?";
 
-
         Map<String, Integer> upstreamJobsFullNames = new HashMap<>();
         LOGGER.log(Level.FINER, "sql: {0}, jobFullName:{1}, buildNumber: {2}", new Object[]{sql, downstreamJobFullName, downstreamBuildNumber});
 
@@ -1165,5 +1165,13 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     @Nonnull
     public DataSource getDataSource() {
         return ds;
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (this.ds instanceof Closeable) {
+            Closeable closeable = (Closeable) this.ds;
+            closeable.close();
+        }
     }
 }
