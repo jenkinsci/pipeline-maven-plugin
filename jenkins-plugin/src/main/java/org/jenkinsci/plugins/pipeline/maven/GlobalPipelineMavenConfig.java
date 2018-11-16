@@ -196,7 +196,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     }
 
     @DataBoundSetter
-    public void setProperties(String properties) {
+    public synchronized void setProperties(String properties) {
         if (!Objects.equals(properties, this.properties)) {
             PipelineMavenPluginDao daoToClose = this.dao;
             this.dao = null;
@@ -279,7 +279,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 Properties p = new Properties();
                 // todo refactor the DAO to inject config defaults in the DAO
                 if (jdbcUrl.startsWith("jdbc:mysql")) {
-                    // https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby 
+                    // https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
                     p.setProperty("dataSource.cachePrepStmts", "true");
                     p.setProperty("dataSource.prepStmtCacheSize", "250");
                     p.setProperty("dataSource.prepStmtCacheSqlLimit", "2048");
@@ -291,8 +291,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     p.setProperty("dataSource.elideSetAutoCommits", "true");
                     p.setProperty("dataSource.maintainTimeStats", "false");
                 } else if (jdbcUrl.startsWith("jdbc:h2")) {
-                    dsConfig.setDataSourceClassName("org.h2.jdbcx.JdbcDataSource");
-                    p.setProperty("dataSource.cachePrepStmts", "true");
+                    // dsConfig.setDataSourceClassName("org.h2.jdbcx.JdbcDataSource"); don't specify the datasource due to a classloading issue
                 }
                 if (StringUtils.isNotBlank(properties)) {
                     p.load(new StringReader(properties));

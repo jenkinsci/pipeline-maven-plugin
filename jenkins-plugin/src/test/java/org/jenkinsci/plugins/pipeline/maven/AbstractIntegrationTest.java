@@ -6,6 +6,7 @@ import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -13,6 +14,8 @@ import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.ExtendedToolInstallations;
 import org.jvnet.hudson.test.JenkinsRule;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,6 +43,13 @@ public abstract class AbstractIntegrationTest {
         GlobalMavenConfig globalMavenConfig = jenkinsRule.get(GlobalMavenConfig.class);
         globalMavenConfig.setGlobalSettingsProvider(new DefaultGlobalSettingsProvider());
         globalMavenConfig.setSettingsProvider(new DefaultSettingsProvider());
+    }
+
+    public void after() throws IOException {
+        PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
+        if (dao instanceof Closeable) {
+            ((Closeable) dao).close();
+        }
     }
 
     @Rule
