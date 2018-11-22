@@ -1103,7 +1103,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
             LOGGER.log(Level.WARNING, "SQLException getting a connection to " + ds, e);
         }
 
-        StringBuilder result = new StringBuilder("PipelineMavenPluginH2v1Dao ");
+        StringBuilder result = new StringBuilder(getClass().getName() + " ");
         for (String prettyString : prettyStrings) {
             result.append("\r\n\t" + prettyString);
         }
