@@ -81,7 +81,7 @@ public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao 
             try (Statement stmt = cnn.createStatement()) {
                 try (ResultSet rst = stmt.executeQuery("select AURORA_VERSION()")) {
                     rst.next();
-                    version += " / " + rst.getString(1);
+                    version += " / Amazon Aurora " + rst.getString(1);
                 } catch (SQLException e) {
                     if (e.getErrorCode() == MysqlErrorNumbers.ER_SP_DOES_NOT_EXIST) {
                         // not amazon aurora, the function aurora_version() does not exist
