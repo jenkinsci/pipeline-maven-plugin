@@ -25,8 +25,14 @@
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import com.mysql.cj.exceptions.MysqlErrorNumbers;
+import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
 
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
@@ -45,14 +51,16 @@ public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao 
     }
 
     @Override
-    protected boolean isIgnoreSqlLoadingException(SQLException e) {
+    protected void handleDatabaseInitialisationException(SQLException e) {
         if ( MysqlErrorNumbers.SQL_STATE_ILLEGAL_ARGUMENT.equals(e.getSQLState())) {
-            // empty string
-            return true;
+            LOGGER.log(Level.FINE, "Ignore sql exception " + e.getErrorCode() + " - " + e.getSQLState(), e);
         } else if (MysqlErrorNumbers.ER_EMPTY_QUERY == e.getErrorCode()) {
-            return true;
+            LOGGER.log(Level.FINE, "Ignore sql exception " + e.getErrorCode() + " - " + e.getSQLState(), e);
+        } else if (MysqlErrorNumbers.ER_TOO_LONG_KEY == e.getErrorCode()) {
+            // see JENKINS-54784
+            throw new RuntimeSqlException(e);
         } else {
-            return false;
+            throw new RuntimeSqlException(e);
         }
     }
 
@@ -62,6 +70,29 @@ public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao 
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("MySql driver 'com.mysql.cj.jdbc.Driver' not found. Please install the 'MySQL Database Plugin' to install the MySql driver");
+        }
+    }
+
+    @Override
+    protected String getDatabaseDescription() {
+        try (Connection cnn = getDataSource().getConnection()) {
+            DatabaseMetaData metaData = cnn.getMetaData();
+            String version = metaData. getDatabaseProductName() + " " + metaData.getDatabaseProductVersion();
+            try (Statement stmt = cnn.createStatement()) {
+                try (ResultSet rst = stmt.executeQuery("select AURORA_VERSION()")) {
+                    rst.next();
+                    version += " / " + rst.getString(1);
+                } catch (SQLException e) {
+                    if (e.getErrorCode() == MysqlErrorNumbers.ER_SP_DOES_NOT_EXIST) {
+                        // not amazon aurora, the function aurora_version() does not exist
+                    } else {
+                        LOGGER.log(Level.WARNING, "Exception checking Amazon Aurora version", e);
+                    }
+                }
+            }
+            return version;
+        } catch (SQLException e) {
+            return "#" + e.toString() + "#";
         }
     }
 }

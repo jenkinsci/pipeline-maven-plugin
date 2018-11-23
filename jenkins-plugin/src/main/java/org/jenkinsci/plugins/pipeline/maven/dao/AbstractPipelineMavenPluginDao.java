@@ -40,6 +40,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -70,7 +71,7 @@ import javax.sql.DataSource;
 public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPluginJdbcDao, Closeable {
 
     private static final int OPTIMIZATION_MAX_RECURSION_DEPTH = Integer.getInteger("org.jenkinsci.plugins.pipeline.PipelineMavenPluginDao.OPTIMIZATION_MAX_RECURSION_DEPTH",3);
-    private static Logger LOGGER = Logger.getLogger(AbstractPipelineMavenPluginDao.class.getName());
+    protected final Logger LOGGER = Logger.getLogger(getClass().getName());
 
     @Nonnull
     private transient DataSource ds;
@@ -499,12 +500,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                             try (Statement stmt = cnn.createStatement()) {
                                 stmt.execute(sqlCommand);
                             } catch (SQLException e) {
-                                boolean ignore = isIgnoreSqlLoadingException(e);
-                                if (ignore) {
-                                    LOGGER.log(Level.FINE, "sql exception " + e.getErrorCode() + " - " + e.getSQLState(), e);
-                                } else {
-                                    throw new RuntimeSqlException(e);
-                                }
+                                handleDatabaseInitialisationException(e);
                             }
                         }
                     }
@@ -543,12 +539,9 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         }
     }
 
-    /**
-     * Ignore exceptions caused by empty statements
-     * @param e
-     * @return
-     */
-    protected abstract boolean isIgnoreSqlLoadingException(@Nonnull SQLException e);
+    protected void handleDatabaseInitialisationException(SQLException e) {
+        throw new RuntimeSqlException(e);
+    }
 
     /**
      *
@@ -1103,11 +1096,20 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
             LOGGER.log(Level.WARNING, "SQLException getting a connection to " + ds, e);
         }
 
-        StringBuilder result = new StringBuilder(getClass().getName() + " ");
+        StringBuilder result = new StringBuilder(getClass().getName() + " - " + getDatabaseDescription());
         for (String prettyString : prettyStrings) {
             result.append("\r\n\t" + prettyString);
         }
         return result.toString();
+    }
+
+    protected String getDatabaseDescription() {
+        try (Connection cnn = ds.getConnection()) {
+            DatabaseMetaData metaData = cnn.getMetaData();
+            return metaData. getDatabaseProductName() + " " + metaData.getDatabaseProductVersion();
+        } catch (SQLException e) {
+            return "#" + e.toString() + "#";
+        }
     }
 
     @Override
