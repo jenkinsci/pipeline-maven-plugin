@@ -27,9 +27,6 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import java.io.File;
-import java.sql.Driver;
-import java.sql.SQLException;
-import java.util.logging.Level;
 
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
@@ -61,8 +58,4 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
         return "h2";
     }
 
-    @Override
-    protected boolean isIgnoreSqlLoadingException(SQLException e) {
-        return false;
-    }
 }
