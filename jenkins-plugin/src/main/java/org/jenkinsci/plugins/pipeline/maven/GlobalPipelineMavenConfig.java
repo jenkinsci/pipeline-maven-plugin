@@ -59,6 +59,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -453,17 +454,64 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
             try (HikariDataSource ds = new HikariDataSource(dsConfig)) {
                 try (Connection cnn = ds.getConnection()) {
+                    DatabaseMetaData metaData = cnn.getMetaData();
+                    String databaseVersionDescription = metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion();
+                    if ("MySQL".equals(metaData.getDatabaseProductName())) {
+                        String amazonAuroraVersion;
+                        try (Statement stmt = cnn.createStatement()) {
+                            try (ResultSet rst = stmt.executeQuery("select AURORA_VERSION()")) {
+                                rst.next();
+                                amazonAuroraVersion = rst.getString(1);
+                                databaseVersionDescription += " / Aurora " + rst.getString(1);
+                            } catch (SQLException e) {
+                                if (e.getErrorCode() == 1305) { // com.mysql.cj.exceptions.MysqlErrorNumbers.ER_SP_DOES_NOT_EXIST
+                                    amazonAuroraVersion = null;
+                                } else {
+                                    LOGGER.log(Level.WARNING,"Exception checking Amazon Aurora version", e);
+                                    amazonAuroraVersion = null;
+                                }
+                            }
+                        }
+                        switch (metaData.getDatabaseMajorVersion()) {
+                            case 8:
+                                // OK
+                                break;
+                            case 5:
+                                switch (metaData.getDatabaseMinorVersion()) {
+                                    case 7:
+                                        // ok
+                                        break;
+                                    case 6:
+                                        if(amazonAuroraVersion == null) {
+                                            // see JENKINS-54784
+                                            return FormValidation.warning("Non validated MySQL version " + metaData.getDatabaseProductVersion() + ". MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ is required");
+                                        } else {
+                                            // we have successfully tested on Amazon Aurora MySQL 5.6.10a
+                                            break;
+                                        }
+                                    case 5:
+                                        return FormValidation.warning("Non validated MySQL version " + metaData.getDatabaseProductVersion() + ". MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ is required");
+                                    default:
+                                        return FormValidation.error("Non supported MySQL version " + metaData.getDatabaseProductVersion() + ". MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ is required");
+                                }
+                                break;
+                            default:
+                                return FormValidation.error("Non supported MySQL version " + metaData.getDatabaseProductVersion() + ". MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ is required");
+                        }
+                    } else {
+                        return FormValidation.warning("Non production grade database. MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ is required for production grade workloads");
+                    }
                     try (Statement stmt = cnn.createStatement()) {
                         try (ResultSet rst = stmt.executeQuery("select 1")) {
                             rst.next();
                             // TODO more tests
                         }
                     }
+                    return FormValidation.ok(databaseVersionDescription + " is a supported database");
                 } catch (SQLException e ){
                     return FormValidation.error(e, "Failure to connect to the database " + jdbcUrl);
                 }
             }
-            return FormValidation.ok("OK");
         } catch (RuntimeException e) {
             return FormValidation.error(e, "Failed to test JDBC connection '" + jdbcUrl + "'");
         } catch (ClassNotFoundException e) {
