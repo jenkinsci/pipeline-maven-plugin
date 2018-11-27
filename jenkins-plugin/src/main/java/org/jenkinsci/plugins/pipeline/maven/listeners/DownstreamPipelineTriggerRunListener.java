@@ -225,6 +225,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                         listener.getLogger().println("[withMaven] Failure to update build " + downstreamJobLastBuild.getFullDisplayName() + ": " + e.toString());
                     }
                     continue;
+                } else {
+                    // trigger build
                 }
             }
 
