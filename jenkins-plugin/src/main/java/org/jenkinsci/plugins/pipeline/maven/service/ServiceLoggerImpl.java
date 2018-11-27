@@ -27,7 +27,6 @@ package org.jenkinsci.plugins.pipeline.maven.service;
 import hudson.model.Item;
 
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
