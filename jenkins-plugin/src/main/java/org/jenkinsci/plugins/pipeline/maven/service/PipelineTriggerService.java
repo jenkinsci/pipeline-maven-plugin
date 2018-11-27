@@ -22,17 +22,23 @@ import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCause;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCauseHelper;
+import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -56,13 +62,6 @@ public class PipelineTriggerService {
     }
 
     public Collection<String> triggerDownstreamPipelines(@Nonnull String groupId, @Nonnull String artifactId, @Nullable String baseVersion, @Nonnull String version, @Nonnull String type, @Nonnull MavenDependencyCause cause, @Nonnull ServiceLogger logger) {
-
-        if (!(cause instanceof Cause)) {
-            throw new IllegalArgumentException("Given cause must extend hudson.model.Cause: " + cause);
-        }
-
-        long startTimeInNanos = System.nanoTime();
-
         MavenArtifact mavenArtifact = new MavenArtifact();
         mavenArtifact.setGroupId(groupId);
         mavenArtifact.setArtifactId(artifactId);
@@ -70,83 +69,134 @@ public class PipelineTriggerService {
         mavenArtifact.setVersion(version);
         mavenArtifact.setType(type);
 
-        SortedSet<String> downstreamPipelines = globalPipelineMavenConfig.getDao().listDownstreamJobs(groupId, artifactId, version, baseVersion, type);
+        return triggerDownstreamPipelines(Collections.singleton(mavenArtifact), cause, logger);
+    }
 
-        SortedSet<String> jobsToTrigger = new TreeSet<>();
+    public Collection<String> triggerDownstreamPipelines(@Nonnull Set<MavenArtifact> upstreamArtifacts, @Nonnull MavenDependencyCause cause, @Nonnull ServiceLogger logger) {
 
-        downstreamPipelinesLoop:
-        for (String downstreamPipelineFullName : downstreamPipelines) {
+        if (!(cause instanceof Cause)) {
+            throw new IllegalArgumentException("Given cause must extend hudson.model.Cause: " + cause);
+        }
 
-            final WorkflowJob downstreamPipeline = getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
-            if (downstreamPipeline == null || downstreamPipeline.getLastBuild() == null) {
-                logger.log(Level.FINE, "Downstream pipeline " + downstreamPipelineFullName + " or downstream pipeline last build not found. Database synchronization issue or security restriction?");
-                continue;
-            }
+        long startTimeInNanos = System.nanoTime();
 
-            int downstreamBuildNumber = downstreamPipeline.getLastBuild().getNumber();
+        Map<MavenArtifact, SortedSet<String>> downstreamPipelinesByArtifact = new HashMap<>();
+        for(MavenArtifact mavenArtifact: upstreamArtifacts) {
+            PipelineMavenPluginDao dao = globalPipelineMavenConfig.getDao();
+            // FIXME use classifier in search query
+            SortedSet<String> downstreamPipelines = dao.listDownstreamJobs(mavenArtifact.getGroupId(), mavenArtifact.getArtifactId(), mavenArtifact.getVersion(), mavenArtifact.getBaseVersion(), mavenArtifact.getType());
+            downstreamPipelinesByArtifact.put(mavenArtifact, downstreamPipelines);
+        }
 
-            // Avoid excessive triggering
-            // See #46313
-            Map<String, Integer> transitiveUpstreamPipelines = globalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber);
-            for (String transitiveUpstreamPipelineName : transitiveUpstreamPipelines.keySet()) {
-                // Skip if one of the downstream's upstream is already building or in queue
-                // Then it will get triggered anyway by that upstream, we don't need to trigger it again
-                WorkflowJob transitiveUpstreamPipeline = getItemByFullName(transitiveUpstreamPipelineName, WorkflowJob.class);
+        Map<String, Set<MavenArtifact>> jobsToTrigger = new TreeMap<>();
 
-                if (transitiveUpstreamPipeline == null) {
-                    // security: not allowed to view this transitive upstream pipeline, skip
+        // build the list of pipelines to trigger
+        for(Map.Entry<MavenArtifact, SortedSet<String>> entry: downstreamPipelinesByArtifact.entrySet()) {
+
+            MavenArtifact mavenArtifact = entry.getKey();
+            SortedSet<String> downstreamPipelines = entry.getValue();
+
+            downstreamPipelinesLoop:
+            for (String downstreamPipelineFullName : downstreamPipelines) {
+
+                if (jobsToTrigger.containsKey(downstreamPipelineFullName)) {
+                    // downstream pipeline has already been added to the list of pipelines to trigger,
+                    // we have already verified that it's meeting requirements (not an infinite loop, authorized by security, not excessive triggering, buildable...)
+                    if (logger.isLoggable(Level.FINEST)) {
+                        logger.log(Level.FINEST, "Skip eligibility check of pipeline " + downstreamPipelineFullName + " for artifact " + mavenArtifact.getShortDescription() + ", eligibility already confirmed");
+                    }
+                    Set<MavenArtifact> mavenArtifacts = jobsToTrigger.get(downstreamPipelineFullName);
+                    if (mavenArtifacts == null) {
+                        logger.log(Level.INFO, "Invalid state, no artifacts found for pipeline '" + downstreamPipelineFullName + "' while evaluating " + mavenArtifact.getShortDescription());
+                    } else {
+                        mavenArtifacts.add(mavenArtifact);
+                    }
                     continue;
                 }
-                if (transitiveUpstreamPipeline.isBuilding() || transitiveUpstreamPipeline.isInQueue()) {
-                    logger.log(Level.INFO, "Not triggering " + logger.modelHyperlinkNoteEncodeTo(downstreamPipeline) +
-                            " because it has a dependency already building or in queue: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
-                    continue downstreamPipelinesLoop;
+
+                final WorkflowJob downstreamPipeline = Jenkins.getInstance().getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
+                if (downstreamPipeline == null || downstreamPipeline.getLastBuild() == null) {
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.log(Level.FINE, "Downstream pipeline " + downstreamPipelineFullName + " or downstream pipeline last build not found. Database synchronization issue or security restriction?");
+                    }
+                    continue;
                 }
 
-                // Skip if this downstream pipeline will be triggered by another one of our downstream pipelines
-                // That's the case when one of the downstream's transitive upstream is our own downstream
-                if (downstreamPipelines.contains(transitiveUpstreamPipelineName)) {
-                    logger.log(Level.INFO, "Not triggering " + logger.modelHyperlinkNoteEncodeTo(downstreamPipeline) +
-                            " because it has a dependency on a pipeline that will be triggered by this build: " +  logger.modelHyperlinkNoteEncodeTo(transitiveUpstreamPipeline));
-                    continue downstreamPipelinesLoop;
+                int downstreamBuildNumber = downstreamPipeline.getLastBuild().getNumber();
+
+                // Avoid excessive triggering
+                // See #46313
+                Map<String, Integer> transitiveUpstreamPipelines = globalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber);
+                for (String transitiveUpstreamPipelineName : transitiveUpstreamPipelines.keySet()) {
+                    // Skip if one of the downstream's upstream is already building or in queue
+                    // Then it will get triggered anyway by that upstream, we don't need to trigger it again
+                    WorkflowJob transitiveUpstreamPipeline = Jenkins.getInstance().getItemByFullName(transitiveUpstreamPipelineName, WorkflowJob.class);
+
+                    if (transitiveUpstreamPipeline == null) {
+                        // security: not allowed to view this transitive upstream pipeline, continue to loop
+                        continue;
+                    } else if (transitiveUpstreamPipeline.isBuilding()) {
+                        logger.log(Level.INFO, "Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                                " because it has a dependency already building: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
+                        continue downstreamPipelinesLoop;
+                    } else if (transitiveUpstreamPipeline.isInQueue()) {
+                        logger.log(Level.INFO, "Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                                " because it has a dependency already building or in queue: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
+                        continue downstreamPipelinesLoop;
+                    } else if (downstreamPipelines.contains(transitiveUpstreamPipelineName)) {
+                        // Skip if this downstream pipeline will be triggered by another one of our downstream pipelines
+                        // That's the case when one of the downstream's transitive upstream is our own downstream
+                        logger.log(Level.INFO, "Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                                " because it has a dependency on a pipeline that will be triggered by this build: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
+                        continue downstreamPipelinesLoop;
+                    }
                 }
-            }
 
-            if (!downstreamPipeline.isBuildable()) {
-                logger.log(Level.FINE, "Skip triggering of non buildable (disabled: " +
-                        downstreamPipeline.isDisabled() + ", isHoldOffBuildUntilSave: " +
-                        downstreamPipeline.isHoldOffBuildUntilSave() + ") downstream pipeline " + downstreamPipeline.getFullName());
-                continue;
-            }
+                if (!downstreamPipeline.isBuildable()) {
+                    if (logger.isLoggable(Level.FINE)) {
+                        logger.log(Level.FINE, "Skip triggering of non buildable (disabled: " + downstreamPipeline.isDisabled() +
+                                ", isHoldOffBuildUntilSave: " + downstreamPipeline.isHoldOffBuildUntilSave() +
+                                ") downstream pipeline " + downstreamPipeline.getFullName());
+                    }
+                    continue;
+                }
 
-            WorkflowJobDependencyTrigger downstreamPipelineTrigger = getWorkflowJobDependencyTrigger(downstreamPipeline);
-            if (downstreamPipelineTrigger == null) {
-                if (logger.isLoggable(Level.FINE))
-                    logger.log(Level.FINE, "Skip triggering of downstream pipeline " + downstreamPipeline.getFullName() + ": dependency trigger not configured");
-                continue;
-            }
+                WorkflowJobDependencyTrigger downstreamPipelineTrigger = this.globalPipelineMavenConfig.getPipelineTriggerService().getWorkflowJobDependencyTrigger(downstreamPipeline);
+                if (downstreamPipelineTrigger == null) {
+                    LOGGER.log(Level.FINE, "Skip triggering of downstream pipeline {0}: dependency trigger not configured", new Object[]{downstreamPipeline.getFullName()});
+                    continue;
+                }
 
-            boolean downstreamVisibleByUpstreamBuildAuth = isDownstreamVisibleByUpstreamBuildAuth(downstreamPipeline);
+                boolean downstreamVisibleByUpstreamBuildAuth = this.globalPipelineMavenConfig.getPipelineTriggerService().isDownstreamVisibleByUpstreamBuildAuth(downstreamPipeline);
 
-            if (downstreamVisibleByUpstreamBuildAuth) {
-
-                jobsToTrigger.add(downstreamPipelineFullName);
-
-            } else {
-                LOGGER.log(Level.FINE, "Skip triggering of {0} by CLI , not allowed to see downstream", new Object[]{downstreamPipeline.getFullName()});
+                if (downstreamVisibleByUpstreamBuildAuth) {
+                    Set<MavenArtifact> mavenArtifacts = jobsToTrigger.get(downstreamPipelineFullName);
+                    if (mavenArtifacts == null) {
+                        mavenArtifacts = new TreeSet<>();
+                        jobsToTrigger.put(downstreamPipelineFullName, mavenArtifacts);
+                    }
+                    if(mavenArtifacts.contains(mavenArtifact)) {
+                        // TODO display warning
+                    } else {
+                        mavenArtifacts.add(mavenArtifact);
+                    }
+                } else {
+                    LOGGER.log(Level.FINE, "Skip triggering of {0} by {1}", new Object[]{downstreamPipeline.getFullName(), cause});
+                }
             }
         }
 
-        for (String downstreamJobFullName : jobsToTrigger) {
-            Job downstreamJob = getItemByFullName(downstreamJobFullName, Job.class);
+        List<String> triggeredPipelines = new ArrayList<>();
+        // trigger the pipelines
+        for (Map.Entry<String, Set<MavenArtifact>> entry: jobsToTrigger.entrySet()) {
+            String downstreamJobFullName = entry.getKey();
+            Job downstreamJob = Jenkins.getInstance().getItemByFullName(downstreamJobFullName, Job.class);
             if (downstreamJob == null) {
-                logger.log(Level.WARNING, "Illegal state: downstream job " + downstreamJobFullName + " not resolved");
+                logger.log(Level.INFO, "Illegal state: " + downstreamJobFullName + " not resolved");
                 continue;
             }
 
             // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
-            cause.setMavenArtifacts(Collections.singletonList(mavenArtifact));
-
             Run downstreamJobLastBuild = downstreamJob.getLastBuild();
             if (downstreamJobLastBuild == null) {
                 // should never happen, we need at least one build to know the dependencies
@@ -154,15 +204,16 @@ public class PipelineTriggerService {
                 List<MavenArtifact> matchingMavenDependencies = MavenDependencyCauseHelper.isSameCause(cause, downstreamJobLastBuild.getCauses());
                 if (matchingMavenDependencies.size() > 0) {
                     downstreamJobLastBuild.addAction(new CauseAction((Cause) cause));
-                    logger.log(Level.INFO,
-                            "Skip scheduling downstream pipeline " + logger.modelHyperlinkNoteEncodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
+                    logger.log(Level.INFO, "Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
                             matchingMavenDependencies.stream().map(mavenDependency -> mavenDependency == null ? null : mavenDependency.getShortDescription()).collect(Collectors.joining(", ")));
                     try {
                         downstreamJobLastBuild.save();
                     } catch (IOException e) {
-                        logger.log(Level.SEVERE, "Failure to update build " + downstreamJobLastBuild.getFullDisplayName() + ": " + e.toString());
+                        logger.log(Level.INFO, "Failure to update build " + downstreamJobLastBuild.getFullDisplayName() + ": " + e.toString());
                     }
                     continue;
+                } else {
+                    // trigger build
                 }
             }
 
@@ -170,22 +221,21 @@ public class PipelineTriggerService {
 
             String dependenciesMessage = cause.getMavenArtifactsDescription();
             if (queuedItem == null) {
-                logger.log(Level.INFO, "Skip scheduling downstream pipeline " + logger.modelHyperlinkNoteEncodeTo(downstreamJob) + " due to dependencies on " +
+                triggeredPipelines.add(downstreamJobFullName);
+                logger.log(Level.INFO, "Skip triggering downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " due to dependencies on " +
                         dependenciesMessage + ", invocation rejected.");
             } else {
-                logger.log(Level.INFO, "Scheduling downstream pipeline " +  logger.modelHyperlinkNoteEncodeTo(downstreamJob) + "#" + downstreamJob.getNextBuildNumber() + " due to dependency on " +
+                logger.log(Level.FINE, "Triggering downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + "#" + downstreamJob.getNextBuildNumber() + " due to dependency on " +
                         dependenciesMessage + " ...");
             }
-        }
 
+        }
         long durationInMillis = TimeUnit.MILLISECONDS.convert(System.nanoTime() - startTimeInNanos, TimeUnit.NANOSECONDS);
         if (durationInMillis > TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS) || logger.isLoggable(Level.FINE)) {
             logger.log(Level.INFO, "triggerDownstreamPipelines completed in " + durationInMillis + " ms");
         }
-
-        return jobsToTrigger;
+        return triggeredPipelines;
     }
-
 
     /**
      * Check NO infinite loop of job triggers caused by {@link hudson.model.Cause.UpstreamCause}.
