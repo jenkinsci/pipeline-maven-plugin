@@ -72,7 +72,7 @@ public class PipelineTriggerService {
         return triggerDownstreamPipelines(Collections.singleton(mavenArtifact), cause, logger);
     }
 
-    public Collection<String> triggerDownstreamPipelines(@Nonnull Set<MavenArtifact> upstreamArtifacts, @Nonnull MavenDependencyCause cause, @Nonnull ServiceLogger logger) {
+    public Collection<String> triggerDownstreamPipelines(@Nonnull Collection<MavenArtifact> upstreamArtifacts, @Nonnull MavenDependencyCause cause, @Nonnull ServiceLogger logger) {
 
         if (!(cause instanceof Cause)) {
             throw new IllegalArgumentException("Given cause must extend hudson.model.Cause: " + cause);
