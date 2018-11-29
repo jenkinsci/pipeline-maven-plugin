@@ -66,6 +66,7 @@ import java.util.Set;
 public class WithMavenStep extends Step {
 
 
+    private String tempBinDir;
     private String mavenSettingsConfig;
     private String mavenSettingsFilePath = "";
     private String globalMavenSettingsConfig;
@@ -81,7 +82,15 @@ public class WithMavenStep extends Step {
     public WithMavenStep() {
     }
 
-    
+    public String getTempBinDir() {
+        return tempBinDir;
+    }
+
+    @DataBoundSetter
+    public void setTempBinDir(String tempBinDir) {
+        this.tempBinDir = tempBinDir;
+    }
+
     public String getMavenSettingsConfig() {
         return mavenSettingsConfig;
     }
@@ -216,7 +225,7 @@ public class WithMavenStep extends Step {
         public SettingsProvider getDefaultSettingsProvider() {
             return GlobalMavenConfig.get().getSettingsProvider();
         }
-        
+
         private Maven.DescriptorImpl getMavenDescriptor() {
             return Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class);
         }
