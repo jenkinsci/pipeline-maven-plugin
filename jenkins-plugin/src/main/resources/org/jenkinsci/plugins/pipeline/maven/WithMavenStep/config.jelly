@@ -32,6 +32,9 @@ THE SOFTWARE.
     <f:entry title="${%JDK}" field="jdk">
         <f:select/>
     </f:entry>
+    <f:entry title="${%Temporary Binary Directory}" field="tempBinDir">
+        <f:textbox/>
+    </f:entry>
     <f:entry title="${%Maven Settings Config}" field="mavenSettingsConfig">
         <f:select/>
     </f:entry>

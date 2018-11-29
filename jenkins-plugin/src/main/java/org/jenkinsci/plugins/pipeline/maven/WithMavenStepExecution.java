@@ -103,6 +103,8 @@ import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
 import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
+import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
+import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import org.springframework.util.ClassUtils;
 
 @SuppressFBWarnings(value = "SE_TRANSIENT_FIELD_NOT_RESTORED", justification = "Contextual fields used only in start(); no onResume needed")
@@ -166,6 +168,7 @@ class WithMavenStepExecution extends StepExecution {
             LOGGER.log(Level.FINE, "Maven: {0}", step.getMaven());
             LOGGER.log(Level.FINE, "Jdk: {0}", step.getJdk());
             LOGGER.log(Level.FINE, "MavenOpts: {0}", step.getMavenOpts());
+            LOGGER.log(Level.FINE, "Temporary Binary Directory: {0}", step.getTempBinDir());
             LOGGER.log(Level.FINE, "Settings Config: {0}", step.getMavenSettingsConfig());
             LOGGER.log(Level.FINE, "Settings FilePath: {0}", step.getMavenSettingsFilePath());
             LOGGER.log(Level.FINE, "Global settings Config: {0}", step.getGlobalMavenSettingsConfig());
@@ -306,7 +309,18 @@ class WithMavenStepExecution extends StepExecution {
      */
     private void setupMaven(@Nonnull Collection<Credentials> credentials) throws IOException, InterruptedException {
         // Temp dir with the wrapper that will be prepended to the path and the temporary files used by withMaven (settings files...)
-        tempBinDir = tempDir(ws).child("withMaven" + Util.getDigestOf(UUID.randomUUID().toString()).substring(0, 8));
+        if (step.getTempBinDir() != null && !step.getTempBinDir().isEmpty()) {
+            String expandedTargetLocation = step.getTempBinDir();
+            try {
+                expandedTargetLocation = TokenMacro.expandAll(build, ws, listener, expandedTargetLocation);
+            } catch (MacroEvaluationException e) {
+                listener.getLogger().println("[ERROR] failed to expand variables in target location '" + expandedTargetLocation + "' : " + e.getMessage());
+            }
+            tempBinDir = new FilePath(ws, expandedTargetLocation);
+        }
+        if (tempBinDir == null) {
+            tempBinDir = tempDir(ws).child("withMaven" + Util.getDigestOf(UUID.randomUUID().toString()).substring(0, 8));
+        }
         tempBinDir.mkdirs();
         envOverride.put("MVN_CMD_DIR", tempBinDir.getRemote());
 
