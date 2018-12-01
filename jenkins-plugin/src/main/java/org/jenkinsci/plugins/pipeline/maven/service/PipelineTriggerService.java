@@ -78,6 +78,10 @@ public class PipelineTriggerService {
             throw new IllegalArgumentException("Given cause must extend hudson.model.Cause: " + cause);
         }
 
+        if (cause.getMavenArtifacts() == null) {
+            cause.setMavenArtifacts(new ArrayList<>(upstreamArtifacts));
+        }
+
         long startTimeInNanos = System.nanoTime();
 
         Map<MavenArtifact, SortedSet<String>> downstreamPipelinesByArtifact = new HashMap<>();
@@ -136,18 +140,18 @@ public class PipelineTriggerService {
                         // security: not allowed to view this transitive upstream pipeline, continue to loop
                         continue;
                     } else if (transitiveUpstreamPipeline.isBuilding()) {
-                        logger.log(Level.INFO, "Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
-                                " because it has a dependency already building: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
+                        logger.log(Level.INFO, "Not triggering " + logger.modelHyperlinkNoteEncodeTo(downstreamPipeline) +
+                                " because it has a dependency already building: " + logger.modelHyperlinkNoteEncodeTo(transitiveUpstreamPipeline));
                         continue downstreamPipelinesLoop;
                     } else if (transitiveUpstreamPipeline.isInQueue()) {
-                        logger.log(Level.INFO, "Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
-                                " because it has a dependency already building or in queue: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
+                        logger.log(Level.INFO, "Not triggering " + logger.modelHyperlinkNoteEncodeTo(downstreamPipeline) +
+                                " because it has a dependency already building or in queue: " + logger.modelHyperlinkNoteEncodeTo(transitiveUpstreamPipeline));
                         continue downstreamPipelinesLoop;
                     } else if (downstreamPipelines.contains(transitiveUpstreamPipelineName)) {
                         // Skip if this downstream pipeline will be triggered by another one of our downstream pipelines
                         // That's the case when one of the downstream's transitive upstream is our own downstream
-                        logger.log(Level.INFO, "Not triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
-                                " because it has a dependency on a pipeline that will be triggered by this build: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
+                        logger.log(Level.INFO, "Not triggering " + logger.modelHyperlinkNoteEncodeTo(downstreamPipeline) +
+                                " because it has a dependency on a pipeline that will be triggered by this build: " + logger.modelHyperlinkNoteEncodeTo(transitiveUpstreamPipeline));
                         continue downstreamPipelinesLoop;
                     }
                 }
@@ -204,7 +208,7 @@ public class PipelineTriggerService {
                 List<MavenArtifact> matchingMavenDependencies = MavenDependencyCauseHelper.isSameCause(cause, downstreamJobLastBuild.getCauses());
                 if (matchingMavenDependencies.size() > 0) {
                     downstreamJobLastBuild.addAction(new CauseAction((Cause) cause));
-                    logger.log(Level.INFO, "Skip scheduling downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
+                    logger.log(Level.INFO, "Skip scheduling downstream pipeline " + logger.modelHyperlinkNoteEncodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
                             matchingMavenDependencies.stream().map(mavenDependency -> mavenDependency == null ? null : mavenDependency.getShortDescription()).collect(Collectors.joining(", ")));
                     try {
                         downstreamJobLastBuild.save();
@@ -221,11 +225,11 @@ public class PipelineTriggerService {
 
             String dependenciesMessage = cause.getMavenArtifactsDescription();
             if (queuedItem == null) {
-                triggeredPipelines.add(downstreamJobFullName);
-                logger.log(Level.INFO, "Skip triggering downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " due to dependencies on " +
+                logger.log(Level.INFO, "Skip triggering downstream pipeline " + logger.modelHyperlinkNoteEncodeTo(downstreamJob) + " due to dependencies on " +
                         dependenciesMessage + ", invocation rejected.");
             } else {
-                logger.log(Level.FINE, "Triggering downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + "#" + downstreamJob.getNextBuildNumber() + " due to dependency on " +
+                triggeredPipelines.add(downstreamJobFullName);
+                logger.log(Level.FINE, "Triggering downstream pipeline " +  logger.modelHyperlinkNoteEncodeTo(downstreamJob) + "#" + downstreamJob.getNextBuildNumber() + " due to dependency on " +
                         dependenciesMessage + " ...");
             }
 

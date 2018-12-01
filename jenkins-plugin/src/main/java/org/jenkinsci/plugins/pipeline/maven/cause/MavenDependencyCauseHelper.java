@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.cause;
 
+import com.google.common.base.Preconditions;
 import hudson.model.Cause;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
@@ -24,8 +25,8 @@ public class MavenDependencyCauseHelper {
             return Collections.emptyList();
         }
 
-        List<MavenArtifact> newCauseArtifacts = newMavenCause.getMavenArtifacts();
-        List<MavenArtifact> oldCauseArtifacts = ((MavenDependencyCause) oldMavenCause).getMavenArtifacts();
+        List<MavenArtifact> newCauseArtifacts = Preconditions.checkNotNull(newMavenCause.getMavenArtifacts(), "newMavenCause.mavenArtifacts should not be null");
+        List<MavenArtifact> oldCauseArtifacts =  Preconditions.checkNotNull(((MavenDependencyCause) oldMavenCause).getMavenArtifacts(), "oldMavenCause.mavenArtifacts should not be null");
 
         List<MavenArtifact> matchingArtifacts = new ArrayList<>();
         for (MavenArtifact newCauseArtifact : newCauseArtifacts) {
