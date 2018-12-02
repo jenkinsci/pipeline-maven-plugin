@@ -61,7 +61,7 @@ public abstract class MavenPublisher extends AbstractDescribableImpl<MavenPublis
 
     public static abstract class DescriptorImpl extends Descriptor<MavenPublisher> implements Comparable<DescriptorImpl> {
         /**
-         * @return the ordinal of this reporter to execute publishers in predictable order
+         * @return the ordinal of this reporter to execute publishers in predictable order. The smallest ordinal is executed first.
          * @see #compareTo(MavenPublisher)
          */
         public int ordinal() {
