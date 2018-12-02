@@ -89,12 +89,12 @@ public class PipelineGraphPublisher extends MavenPublisher {
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogsElt, true);
         List<String> executedLifecyclePhases = XmlUtils.getExecutedLifecyclePhases(mavenSpyLogsElt);
         
-        recordParentProject(parentProjects, generatedArtifacts, run,listener, dao);
+        recordParentProject(parentProjects, run,listener, dao);
         recordDependencies(dependencies, generatedArtifacts, run, listener, dao);
         recordGeneratedArtifacts(generatedArtifacts, executedLifecyclePhases, run, listener, dao);
     }
 
-    protected void recordParentProject(List<MavenArtifact> parentProjects, List<MavenArtifact> generatedArtifacts,
+    protected void recordParentProject(List<MavenArtifact> parentProjects,
                                        @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordParentProject - filter: " +
@@ -102,13 +102,6 @@ public class PipelineGraphPublisher extends MavenPublisher {
         }
 
         for (MavenArtifact parentProject : parentProjects) {
-            // Exclude self-generated artifacts (#47996)
-            if(generatedArtifacts.contains(parentProject)) {
-                if (LOGGER.isLoggable(Level.FINER)) {
-                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording parent project to generated artifact: " + parentProject.getId());
-                }
-                continue;
-            }
             if (parentProject.isSnapshot()) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
@@ -152,13 +145,6 @@ public class PipelineGraphPublisher extends MavenPublisher {
         }
 
         for (MavenDependency dependency : dependencies) {
-            // Exclude self-generated artifacts (#47996)
-            if(generatedArtifacts.contains(dependency.asMavenArtifact())) {
-                if (LOGGER.isLoggable(Level.FINER)) {
-                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording dependency to generated artifact: " + dependency.getId());
-                }
-                continue;
-            }
             if (dependency.isSnapshot()) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
@@ -343,7 +329,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
         @Override
         public int ordinal() {
-            return 20;
+            return 0;
         }
 
         @Nonnull
