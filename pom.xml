@@ -27,7 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>pipeline-maven-parent</artifactId>
-    <version>3.6.4-beta-1</version>
+    <version>3.6.4-beta-2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Pipeline Maven Integration Plugin Parent</name>
