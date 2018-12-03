@@ -101,6 +101,9 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
     @Nonnull
     @Override
     public List<MavenArtifact> getMavenArtifacts() {
+        if (mavenArtifacts == null) {
+            mavenArtifacts = new ArrayList<>();
+        }
         return mavenArtifacts;
     }
 

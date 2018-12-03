@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.service;
 
 import com.cloudbees.hudson.plugins.folder.computed.ComputedFolder;
-import hudson.console.ModelHyperlinkNote;
 import hudson.model.Cause;
 import hudson.model.CauseAction;
 import hudson.model.Item;
@@ -22,7 +21,6 @@ import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCause;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCauseHelper;
-import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -79,7 +77,7 @@ public class PipelineTriggerService {
         }
 
         if (cause.getMavenArtifacts() == null) {
-            cause.setMavenArtifacts(new ArrayList<>(upstreamArtifacts));
+            throw new IllegalArgumentException("given cause.mavenArtifacts cannot be null");
         }
 
         long startTimeInNanos = System.nanoTime();
