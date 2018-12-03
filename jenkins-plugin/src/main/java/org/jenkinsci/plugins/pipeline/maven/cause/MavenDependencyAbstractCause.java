@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.pipeline.maven.cause;
 import hudson.model.Cause;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +26,9 @@ public abstract class MavenDependencyAbstractCause extends Cause implements Mave
     @Nonnull
     @Override
     public List<MavenArtifact> getMavenArtifacts() {
+        if (mavenArtifacts == null) {
+            mavenArtifacts = new ArrayList<>();
+        }
         return mavenArtifacts;
     }
 
