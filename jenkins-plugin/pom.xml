@@ -37,6 +37,7 @@
   <artifactId>pipeline-maven</artifactId>
   <packaging>hpi</packaging>
   <version>${revision}${changelist}</version>
+>>>>>>> master
 
   <name>Pipeline Maven Integration Plugin</name>
   <description>
@@ -73,7 +74,7 @@
   </developers>
 
   <properties>
-    <revision>3.6.4</revision>
+    <revision>3.6.5</revision>
     <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.89.4</jenkins.version>
     <java.level>8</java.level>
