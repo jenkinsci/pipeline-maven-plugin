@@ -29,14 +29,14 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>3.9</version>
+    <version>3.28</version>
     <relativePath />
   </parent>
 
   <groupId>org.jenkins-ci.plugins</groupId>
   <artifactId>pipeline-maven</artifactId>
   <packaging>hpi</packaging>
-  <version>3.6.4-SNAPSHOT</version>
+  <version>${revision}${changelist}</version>
 
   <name>Pipeline Maven Integration Plugin</name>
   <description>
@@ -56,7 +56,7 @@
     <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
     <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
-    <tag>HEAD</tag>
+    <tag>${scmTag}</tag>
   </scm>
 
   <developers>
@@ -73,7 +73,10 @@
   </developers>
 
   <properties>
+    <revision>3.6.4</revision>
+    <changelist>-SNAPSHOT</changelist>
     <jenkins.version>2.89.4</jenkins.version>
+    <java.level>8</java.level>
     <scm-api-plugin.version>2.2.6</scm-api-plugin.version>
     <git-plugin.version>3.6.4</git-plugin.version>
     <!--
@@ -98,6 +101,10 @@
           <!-- Require upper bound dependencies error for com.google.inject:guice:4.0-beta paths to dependency are:...-->
           <groupId>com.google.inject</groupId>
           <artifactId>guice</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-net</groupId>
+          <artifactId>commons-net</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -139,7 +146,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-step-api</artifactId>
-      <version>2.14</version>
+      <version>2.17-rc491.f7bec8d9dc29</version> <!-- TODO https://github.com/jenkinsci/workflow-step-api-plugin/pull/38 -->
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
