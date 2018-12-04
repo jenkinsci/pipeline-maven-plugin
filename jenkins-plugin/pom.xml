@@ -37,7 +37,6 @@
   <artifactId>pipeline-maven</artifactId>
   <packaging>hpi</packaging>
   <version>${revision}${changelist}</version>
->>>>>>> master
 
   <name>Pipeline Maven Integration Plugin</name>
   <description>
