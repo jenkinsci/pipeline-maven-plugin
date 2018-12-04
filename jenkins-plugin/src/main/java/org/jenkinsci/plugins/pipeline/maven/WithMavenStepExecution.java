@@ -25,30 +25,6 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.net.URL;
-import java.security.CodeSource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-
 import com.cloudbees.hudson.plugins.folder.AbstractFolder;
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -97,18 +73,45 @@ import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
 import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
 import org.jenkinsci.plugins.pipeline.maven.console.MaskPasswordsConsoleLogFilter;
 import org.jenkinsci.plugins.pipeline.maven.console.MavenColorizerConsoleLogFilter;
+import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
+import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
 import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
 import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
 import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
+import org.jenkinsci.plugins.workflow.steps.GeneralNonBlockingStepExecution;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
-import org.jenkinsci.plugins.workflow.steps.StepExecution;
-import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
-import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import org.springframework.util.ClassUtils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.net.URL;
+import java.security.CodeSource;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+
+/**
+ * FIXME rename into `WithMavenStepExecution2` and create an empty `WithMavenStepExecution` (just `throw new AssertionError()` on `start()`) for binary compatibility
+ */
 @SuppressFBWarnings(value = "SE_TRANSIENT_FIELD_NOT_RESTORED", justification = "Contextual fields used only in start(); no onResume needed")
-class WithMavenStepExecution extends StepExecution {
+class WithMavenStepExecution extends GeneralNonBlockingStepExecution {
 
     private static final long serialVersionUID = 1L;
     private static final String M2_HOME = "M2_HOME";
@@ -159,8 +162,12 @@ class WithMavenStepExecution extends StepExecution {
         build = context.get(Run.class);
     }
 
-    @Override
-    public boolean start() throws Exception {
+    @Override public boolean start() throws Exception {
+        run(this::doStart);
+        return false;
+    }
+
+    public boolean doStart() throws Exception {
         envOverride = new EnvVars();
         console = listener.getLogger();
 
@@ -1053,7 +1060,7 @@ class WithMavenStepExecution extends StepExecution {
 
         private final MavenSpyLogProcessor mavenSpyLogProcessor = new MavenSpyLogProcessor();
 
-        public WithMavenStepExecutionCallBack(@Nonnull FilePath tempBinDir, @Nonnull List<MavenPublisher> options,
+        private WithMavenStepExecutionCallBack(@Nonnull FilePath tempBinDir, @Nonnull List<MavenPublisher> options,
                                               @Nonnull MavenPublisherStrategy mavenPublisherStrategy) {
             this.tempBinDir = tempBinDir;
             this.options = options;
