@@ -149,8 +149,11 @@ public class MavenSpyLogProcessor implements Serializable {
                 }
                 listener.error(e.toString());
             } catch (InterruptedException e) {
-                listener.error("[withMaven] Processing of Maven build outputs interrupted after " +
+                PrintWriter errorWriter = listener.error("[withMaven] Processing of Maven build outputs interrupted after " +
                         TimeUnit.MILLISECONDS.convert(System.nanoTime() - nanosBefore, TimeUnit.NANOSECONDS) + "ms.");
+                if (LOGGER.isLoggable(Level.FINE)) {
+                    e.printStackTrace(errorWriter);
+                }
                 Thread.currentThread().interrupt();  // set interrupt flag
                 return;
             } catch (Exception e) {

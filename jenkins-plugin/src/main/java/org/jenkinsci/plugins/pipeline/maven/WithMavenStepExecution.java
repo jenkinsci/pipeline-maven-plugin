@@ -76,7 +76,6 @@ import org.jenkinsci.plugins.pipeline.maven.console.MavenColorizerConsoleLogFilt
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
-import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
 import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
 import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
 import org.jenkinsci.plugins.workflow.steps.GeneralNonBlockingStepExecution;
@@ -192,7 +191,7 @@ class WithMavenStepExecution extends GeneralNonBlockingStepExecution {
         getComputer();
 
         withContainer = detectWithContainer();
-
+        
         if (withContainer) {
             listener.getLogger().println("[withMaven] WARNING: \"withMaven(){...}\" step running within a container." +
                     " Since the Docker Pipeline Plugin version 1.14, you MUST:");
@@ -1051,7 +1050,7 @@ class WithMavenStepExecution extends GeneralNonBlockingStepExecution {
     /**
      * Callback to cleanup tmp script after finishing the job
      */
-    private static class WithMavenStepExecutionCallBack extends BodyExecutionCallback.TailCall {
+    private class WithMavenStepExecutionCallBack extends GeneralNonBlockingStepExecution.TailCall {
         private final FilePath tempBinDir;
 
         private final MavenPublisherStrategy mavenPublisherStrategy;
