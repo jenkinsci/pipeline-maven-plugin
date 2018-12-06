@@ -28,36 +28,20 @@
 
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
-    <artifactId>plugin</artifactId>
-    <version>3.9</version>
-    <relativePath />
+    <artifactId>pipeline-maven-parent</artifactId>
+    <version>${revision}${changelist}</version>
   </parent>
 
   <groupId>org.jenkins-ci.plugins</groupId>
   <artifactId>pipeline-maven</artifactId>
   <packaging>hpi</packaging>
-  <version>3.6.5-SNAPSHOT</version>
-
+  <version>${revision}${changelist}</version>
   <name>Pipeline Maven Integration Plugin</name>
   <description>
     This plugin provides integration with Pipeline, configures maven environment to use within a pipeline job by calling sh mvn or bat mvn.
     The selected maven installation will be configured and prepended to the path.
   </description>
   <url>https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Maven+Plugin</url>
-  <licenses>
-    <license>
-      <name>The MIT license</name>
-      <url>http://www.opensource.org/licenses/mit-license.php</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
-  <scm>
-    <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
-    <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
-    <tag>pipeline-maven-3.6.4-beta-1</tag>
-  </scm>
 
   <developers>
     <developer>
@@ -73,7 +57,6 @@
   </developers>
 
   <properties>
-    <jenkins.version>2.89.4</jenkins.version>
     <scm-api-plugin.version>2.2.6</scm-api-plugin.version>
     <git-plugin.version>3.6.4</git-plugin.version>
     <!--
@@ -81,7 +64,7 @@
     workflow-step-api or workflow-api-->
     <junit-plugin.version>1.23</junit-plugin.version>
     <asm.version>5.2</asm.version>
-    <java.level>8</java.level>
+    <workflow-support-plugin.version>2.18</workflow-support-plugin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -98,6 +81,10 @@
           <!-- Require upper bound dependencies error for com.google.inject:guice:4.0-beta paths to dependency are:...-->
           <groupId>com.google.inject</groupId>
           <artifactId>guice</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-net</groupId>
+          <artifactId>commons-net</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -139,7 +126,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-step-api</artifactId>
-      <version>2.17-SNAPSHOT</version>
+      <version>2.17-rc491.f7bec8d9dc29</version> <!-- TODO https://github.com/jenkinsci/workflow-step-api-plugin/pull/38 -->
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
@@ -168,6 +155,11 @@
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <version>1.4.196</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>script-security</artifactId>
+      <version>1.39</version>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -281,7 +273,13 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-support</artifactId>
-      <version>2.18</version>
+      <version>${workflow-support-plugin.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-support</artifactId>
+      <version>${workflow-support-plugin.version}</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
@@ -361,19 +359,9 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.jenkins-ci.plugins.workflow</groupId>
-        <artifactId>workflow-support</artifactId>
-        <version>2.18</version>
-      </dependency>
-      <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>mailer</artifactId>
         <version>1.20</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>script-security</artifactId>
-        <version>1.39</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
@@ -607,17 +595,4 @@
       </plugin>
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <id>repo.jenkins-ci.org</id>
-      <url>https://repo.jenkins-ci.org/public/</url>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>repo.jenkins-ci.org</id>
-      <url>https://repo.jenkins-ci.org/public/</url>
-    </pluginRepository>
-  </pluginRepositories>
 </project>
