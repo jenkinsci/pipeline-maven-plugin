@@ -166,7 +166,7 @@ class WithMavenStepExecution extends GeneralNonBlockingStepExecution {
         return false;
     }
 
-    public boolean doStart() throws Exception {
+    protected boolean doStart() throws Exception {
         envOverride = new EnvVars();
         console = listener.getLogger();
 
@@ -191,7 +191,7 @@ class WithMavenStepExecution extends GeneralNonBlockingStepExecution {
         getComputer();
 
         withContainer = detectWithContainer();
-        
+
         if (withContainer) {
             listener.getLogger().println("[withMaven] WARNING: \"withMaven(){...}\" step running within a container." +
                     " Since the Docker Pipeline Plugin version 1.14, you MUST:");
@@ -1050,7 +1050,7 @@ class WithMavenStepExecution extends GeneralNonBlockingStepExecution {
     /**
      * Callback to cleanup tmp script after finishing the job
      */
-    private class WithMavenStepExecutionCallBack extends GeneralNonBlockingStepExecution.TailCall {
+    private class WithMavenStepExecutionCallBack extends TailCall {
         private final FilePath tempBinDir;
 
         private final MavenPublisherStrategy mavenPublisherStrategy;
