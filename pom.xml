@@ -25,9 +25,14 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.jenkins-ci.plugins</groupId>
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>3.28</version>
+        <relativePath />
+    </parent>
     <artifactId>pipeline-maven-parent</artifactId>
-    <version>3.6.4-beta-2-SNAPSHOT</version>
+    <version>${revision}${changelist}</version>
     <packaging>pom</packaging>
 
     <name>Pipeline Maven Integration Plugin Parent</name>
@@ -57,11 +62,18 @@
         </developer>
     </developers>
 
+    <properties>
+        <revision>3.6.5</revision>
+        <changelist>-SNAPSHOT</changelist>
+        <jenkins.version>2.89.4</jenkins.version>
+        <java.level>8</java.level>
+    </properties>
+
     <scm>
         <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
-        <tag>pipeline-maven-3.6.4-beta-1</tag>
+        <tag>${scmTag}</tag>
     </scm>
     <modules>
         <module>maven-spy</module>
@@ -92,15 +104,4 @@
             <url>https://repo.jenkins-ci.org/public/</url>
         </pluginRepository>
     </pluginRepositories>
-    <distributionManagement>
-        <repository>
-            <uniqueVersion>false</uniqueVersion>
-            <id>maven.jenkins-ci.org</id>
-            <url>https://repo.jenkins-ci.org/releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>maven.jenkins-ci.org</id>
-            <url>https://repo.jenkins-ci.org/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
 </project>
