@@ -61,7 +61,6 @@
         <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
-        <tag>pipeline-maven-3.6.4-beta-1</tag>
     </scm>
     <modules>
         <module>maven-spy</module>
