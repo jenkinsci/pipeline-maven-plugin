@@ -27,7 +27,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>pipeline-maven-parent</artifactId>
-    <version>3.6.4-beta-2-SNAPSHOT</version>
+    <version>3.6.4</version>
     <packaging>pom</packaging>
 
     <name>Pipeline Maven Integration Plugin Parent</name>
@@ -61,7 +61,8 @@
         <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
-    </scm>
+      <tag>pipeline-maven-3.6.4</tag>
+  </scm>
     <modules>
         <module>maven-spy</module>
         <module>jenkins-plugin</module>
