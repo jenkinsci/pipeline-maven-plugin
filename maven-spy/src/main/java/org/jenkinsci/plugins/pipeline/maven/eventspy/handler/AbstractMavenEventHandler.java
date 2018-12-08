@@ -27,6 +27,8 @@ package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Build;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.RuntimeIOException;
@@ -88,7 +90,7 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         return element;
     }
 
-    public Xpp3Dom newElement(@Nonnull String name, @Nullable MavenProject project) {
+    public Xpp3Dom newElement(@Nonnull String name, @Nullable final MavenProject project) {
         Xpp3Dom projectElt = new Xpp3Dom(name);
         if (project == null) {
             return projectElt;
@@ -125,7 +127,17 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
                 // TODO see if there is a better way to implement this "workaround"
                 absolutePath = absolutePath.replace(File.separator + "dependency-reduced-pom.xml", File.separator + "pom.xml");
             } else {
-                logger.warn("[jenkins-event-spy] Unexpected Maven project file name '" + projectFile.getName() + "', problems may occur");
+                String flattenedPomFilename = getMavenFlattenPluginFlattenedPomFilename(project);
+                logger.warn("[jenkins-event-spy] FIXME flattenedPomFilename=" + flattenedPomFilename);
+                if (flattenedPomFilename == null) {
+                    logger.warn("[jenkins-event-spy] Unexpected Maven project file name '" + projectFile.getName() + "', problems may occur");
+                } else {
+                    if (absolutePath.endsWith(File.separator + flattenedPomFilename)) {
+                        absolutePath = absolutePath.replace(File.separator + flattenedPomFilename, File.separator + "pom.xml");
+                    } else {
+                        logger.warn("[jenkins-event-spy] Unexpected Maven project file name '" + projectFile.getName() + "', problems may occur");
+                    }
+                }
             }
             projectElt.setAttribute("file", absolutePath);
         }
@@ -144,6 +156,48 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         }
 
         return projectElt;
+    }
+
+    /**
+     * If the Maven project uses the "flatten-maven-plugin" and defines the config parameter "flattenedPomFilename", get its value.
+     *
+     * TODO optimize and keep in cache this result
+     *
+     * @param project
+     * @return the "flattenedPomFilename" defined at the "flatten" execution level or at the plugin definition level. {@code null}
+     */
+    @Nullable
+    protected String getMavenFlattenPluginFlattenedPomFilename(@Nonnull MavenProject project) {
+        for(Plugin buildPlugin : project.getBuildPlugins()) {
+            if ("org.codehaus.mojo:flatten-maven-plugin".equals(buildPlugin.getKey())) {
+                String mavenConfigurationElement = "flattenedPomFilename";
+                for(PluginExecution execution: buildPlugin.getExecutions()) {
+                    if (execution.getGoals().contains("flatten")) {
+                        if (execution.getConfiguration() instanceof Xpp3Dom) {
+                            Xpp3Dom configuration = (Xpp3Dom) execution.getConfiguration();
+                            Xpp3Dom flattenedPomFilename = configuration.getChild(mavenConfigurationElement);
+                            if (flattenedPomFilename != null) {
+                                return flattenedPomFilename.getValue();
+                            }
+                        } else {
+                            // unexpected configuration type
+                        }
+                    }
+                }
+                if (buildPlugin.getConfiguration() instanceof Xpp3Dom) {
+                    Xpp3Dom configuration = (Xpp3Dom) buildPlugin.getConfiguration();
+                    Xpp3Dom flattenedPomFilename = configuration.getChild(mavenConfigurationElement);
+                    if (flattenedPomFilename != null) {
+                        return flattenedPomFilename.getValue();
+                    }
+                } else {
+                    // unexpected configuration type
+                }
+            } else {
+
+            }
+        }
+        return null;
     }
 
     public Xpp3Dom newElement(@Nonnull String name, @Nullable Throwable t) {
