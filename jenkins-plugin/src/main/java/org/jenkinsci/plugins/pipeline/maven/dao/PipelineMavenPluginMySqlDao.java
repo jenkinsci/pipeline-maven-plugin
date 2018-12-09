@@ -95,4 +95,9 @@ public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao 
             return "#" + e.toString() + "#";
         }
     }
+
+    @Override
+    public boolean isEnoughProductionGradeForTheWorkload() {
+        return true;
+    }
 }

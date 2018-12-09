@@ -145,4 +145,9 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     public String toPrettyString() {
         return "PipelineMavenPluginNullDao";
     }
+
+    @Override
+    public boolean isEnoughProductionGradeForTheWorkload() {
+        return true;
+    }
 }

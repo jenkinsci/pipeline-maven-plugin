@@ -1155,4 +1155,32 @@ public class PipelineMavenPluginH2v1Dao implements PipelineMavenPluginJdbcDao {
     public DataSource getDataSource() {
         return this.jdbcConnectionPool;
     }
+
+    @Override
+    public boolean isEnoughProductionGradeForTheWorkload() {
+        try (Connection cnn = getDataSource().getConnection()) {
+            try (Statement stmt = cnn.createStatement()) {
+                try (ResultSet rst = stmt.executeQuery("select count(*) from MAVEN_DEPENDENCY")) {
+                    rst.next();
+                    int count = rst.getInt(1);
+                    if (count > 100) {
+                        return false;
+                    }
+                }
+            }
+            try (Statement stmt = cnn.createStatement()) {
+                try (ResultSet rst = stmt.executeQuery("select count(*) from GENERATED_MAVEN_ARTIFACT")) {
+                    rst.next();
+                    int count = rst.getInt(1);
+                    if (count > 100) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } catch (SQLException e) {
+            LOGGER.log(Level.INFO, "Exception counting rows", e);
+            return false;
+        }
+    }
 }
