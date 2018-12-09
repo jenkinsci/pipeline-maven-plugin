@@ -27,6 +27,11 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
 
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
@@ -58,4 +63,31 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
         return "h2";
     }
 
+    @Override
+    public boolean isEnoughProductionGradeForTheWorkload() {
+        try (Connection cnn = getDataSource().getConnection()) {
+            try (Statement stmt = cnn.createStatement()) {
+                try (ResultSet rst = stmt.executeQuery("select count(*) from MAVEN_DEPENDENCY")) {
+                    rst.next();
+                    int count = rst.getInt(1);
+                    if (count > 100) {
+                        return false;
+                    }
+                }
+            }
+            try (Statement stmt = cnn.createStatement()) {
+                try (ResultSet rst = stmt.executeQuery("select count(*) from GENERATED_MAVEN_ARTIFACT")) {
+                    rst.next();
+                    int count = rst.getInt(1);
+                    if (count > 100) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        } catch (SQLException e) {
+            LOGGER.log(Level.INFO, "Exception counting rows", e);
+            return false;
+        }
+    }
 }

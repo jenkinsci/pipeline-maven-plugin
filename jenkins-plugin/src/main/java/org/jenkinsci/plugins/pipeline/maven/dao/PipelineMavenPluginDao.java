@@ -240,4 +240,13 @@ public interface PipelineMavenPluginDao {
      * @param durationInMillis see {@link Run#getDuration()}
      */
     void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis);
+
+    /**
+     * Indicates if the underlying database is production grade enough for the workload.
+     *
+     * H2 database is not enough for production grade workloads of the pipeline-maven-plugin.
+     *
+     * @return {@code false} if the underlying database is not production grade enough for the workload
+     */
+    boolean isEnoughProductionGradeForTheWorkload();
 }
