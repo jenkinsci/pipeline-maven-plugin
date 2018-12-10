@@ -255,4 +255,9 @@ public class PipelineMavenPluginMonitoringDao implements PipelineMavenPluginJdbc
             ((Closeable) delegate).close();
         }
     }
+
+    @Override
+    public boolean isEnoughProductionGradeForTheWorkload() {
+        return delegate.isEnoughProductionGradeForTheWorkload();
+    }
 }
