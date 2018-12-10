@@ -195,7 +195,7 @@ public class WithMavenStep extends Step {
 
     @Override
     public StepExecution start(StepContext context) throws Exception {
-        return new WithMavenStepExecution(context, this);
+        return new WithMavenStepExecution2(context, this);
     }
 
     @Extension
