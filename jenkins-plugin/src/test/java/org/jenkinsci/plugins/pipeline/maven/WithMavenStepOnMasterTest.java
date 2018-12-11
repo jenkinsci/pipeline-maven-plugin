@@ -80,7 +80,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     @Before
     public void before() {
         // Many log messages checked here are not logged if we are not in FINE level.
-        logger = Logger.getLogger(WithMavenStepExecution.class.getName());
+        logger = Logger.getLogger(WithMavenStepExecution2.class.getName());
         savedLevel = logger.getLevel();
         logger.setLevel(Level.FINE);
     }

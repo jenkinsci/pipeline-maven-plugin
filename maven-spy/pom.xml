@@ -29,8 +29,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>pipeline-maven-parent</artifactId>
-        <version>3.6.5-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
+        <version>${revision}${changelist}</version>
     </parent>
 
     <artifactId>pipeline-maven-spy</artifactId>
@@ -41,21 +40,10 @@
         Jenkins Pipeline withMaven(){} step.
     </description>
 
-    <licenses>
-        <license>
-            <name>The MIT license</name>
-            <url>http://www.opensource.org/licenses/mit-license.php</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <scm>
-        <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
-      <tag>pipeline-maven-3.6.4-beta-1</tag>
-    </scm>
-
+    <properties>
+        <revision>3.6.5</revision>
+        <changelist>-SNAPSHOT</changelist>
+    </properties>
     <developers>
         <developer>
             <id>cleclerc</id>
@@ -147,6 +135,24 @@
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>display-info</id>
+                        <configuration>
+                            <rules>
+                                <requireUpperBoundDeps>
+                                    <excludes combine.children="append">
+                                        <!-- jenkins-test-harness dep irrelevant here -->
+                                        <exclude>org.apache.commons:commons-lang3</exclude>
+                                    </excludes>
+                                </requireUpperBoundDeps>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
