@@ -357,6 +357,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         // MAVEN_CONFIG
         StringBuilder mavenConfig = new StringBuilder();
         mavenConfig.append("--batch-mode ");
+        mavenConfig.append("-Dstyle.color=always ");
         mavenConfig.append("--show-version ");
         if (StringUtils.isNotEmpty(settingsFilePath)) {
             mavenConfig.append("--settings \"" + settingsFilePath + "\" ");
