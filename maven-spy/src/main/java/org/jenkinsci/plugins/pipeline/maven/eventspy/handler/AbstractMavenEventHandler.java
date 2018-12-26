@@ -128,7 +128,6 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
                 absolutePath = absolutePath.replace(File.separator + "dependency-reduced-pom.xml", File.separator + "pom.xml");
             } else {
                 String flattenedPomFilename = getMavenFlattenPluginFlattenedPomFilename(project);
-                logger.warn("[jenkins-event-spy] FIXME flattenedPomFilename=" + flattenedPomFilename);
                 if (flattenedPomFilename == null) {
                     logger.warn("[jenkins-event-spy] Unexpected Maven project file name '" + projectFile.getName() + "', problems may occur");
                 } else {
