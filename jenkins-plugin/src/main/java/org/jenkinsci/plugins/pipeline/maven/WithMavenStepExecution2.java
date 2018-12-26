@@ -51,6 +51,9 @@ import hudson.model.Job;
 import hudson.model.Node;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.plugins.ansicolor.AnsiColorConsoleLogFilter;
+import hudson.plugins.ansicolor.AnsiColorMap;
+import hudson.plugins.ansicolor.ColorizedAction;
 import hudson.slaves.WorkspaceList;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
@@ -222,11 +225,11 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         ConsoleLogFilter originalFilter = getContext().get(ConsoleLogFilter.class);
         ConsoleLogFilter maskSecretsFilter = MaskPasswordsConsoleLogFilter.newMaskPasswordsConsoleLogFilter(credentials, getComputer().getDefaultCharset());
-        MavenColorizerConsoleLogFilter mavenColorizerFilter = new MavenColorizerConsoleLogFilter(getComputer().getDefaultCharset().name());
+        //ConsoleLogFilter mavenColorizerFilter = new MavenColorizerConsoleLogFilter(getComputer().getDefaultCharset().name());
 
-        ConsoleLogFilter newFilter = BodyInvoker.mergeConsoleLogFilters(
-                BodyInvoker.mergeConsoleLogFilters(originalFilter, maskSecretsFilter),
-                mavenColorizerFilter);
+        ConsoleLogFilter newFilter = BodyInvoker.mergeConsoleLogFilters(originalFilter, maskSecretsFilter);
+        build.replaceAction(new ColorizedAction(AnsiColorMap.DefaultName));
+
 
         EnvironmentExpander envEx = EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), new ExpanderImpl(envOverride));
 
