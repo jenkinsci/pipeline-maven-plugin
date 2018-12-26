@@ -214,7 +214,7 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         rootElt.addChild(stackTraceElt);
         StringWriter stackTrace = new StringWriter();
         t.printStackTrace(new PrintWriter(stackTrace, true));
-        messageElt.setValue(stackTrace.toString());
+        stackTraceElt.setValue(stackTrace.toString());
         return rootElt;
     }
 

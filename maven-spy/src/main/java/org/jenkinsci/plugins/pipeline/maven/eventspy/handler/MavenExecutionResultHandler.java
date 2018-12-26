@@ -56,9 +56,6 @@ public class MavenExecutionResultHandler extends AbstractMavenEventHandler<Maven
                 buildSummary.setAttribute("time", Long.toString(summary.getTime()));
             }
         }
-        for(Throwable throwable: result.getExceptions()) {
-            root.addChild(newElement("exception", throwable));
-        }
         reporter.print(root);
         return true;
     }

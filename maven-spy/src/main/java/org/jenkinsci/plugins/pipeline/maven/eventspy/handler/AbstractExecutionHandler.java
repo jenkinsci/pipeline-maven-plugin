@@ -115,6 +115,10 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
 
         addDetails(executionEvent, root);
 
+        if(executionEvent.getException() != null) {
+            root.addChild(newElement("exception", executionEvent.getException()));
+        }
+
         reporter.print(root);
 
         return true;
@@ -127,10 +131,18 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
     @Nonnull
     protected abstract List<String> getConfigurationParametersToReport(ExecutionEvent executionEvent);
 
+    /**
+     *
+     * @return {@code null} if all event types are supported by this {@link AbstractExecutionHandler}
+     */
     @Nullable
     protected abstract ExecutionEvent.Type getSupportedType();
 
 
+    /**
+     *
+     * @return {@code null} if all goals are supported by this {@link AbstractExecutionHandler}
+     */
     @Nullable
     protected String getSupportedPluginGoal() {
         return null;
