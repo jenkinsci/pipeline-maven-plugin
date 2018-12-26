@@ -31,6 +31,7 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.IdCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.cloudbees.plugins.credentials.common.UsernameCredentials;
+import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.AbortException;
@@ -70,6 +71,7 @@ import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnGlobalSettingsProvider;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnSettingsProvider;
 import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
+import org.jenkinsci.plugins.configfiles.maven.security.MavenServerIdRequirement;
 import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
 import org.jenkinsci.plugins.pipeline.maven.console.MaskPasswordsConsoleLogFilter;
 import org.jenkinsci.plugins.pipeline.maven.console.MavenColorizerConsoleLogFilter;
@@ -97,6 +99,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -107,7 +110,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 /**
- * FIXME rename into `WithMavenStepExecution2` and create an empty `WithMavenStepExecution` (just `throw new AssertionError()` on `start()`) for binary compatibility
  * TODO when there is enough adoption of workflow-step-api with https://github.com/jenkinsci/workflow-step-api-plugin/pull/38
  * Replace org.jenkinsci.plugins.pipeline.maven.fix.jenkins49337.GeneralNonBlockingStepExecution by org.jenkinsci.plugins.workflow.steps.GeneralNonBlockingStepExecution;
  */
@@ -122,10 +124,6 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * Environment variable of the path to the wrapped "mvn" command, you can just invoke "$MVN_CMD clean package"
      */
     private static final String MVN_CMD = "MVN_CMD";
-    /**
-     * Environment variable of the path to the parent folder of the wrapper of the "mvn" command, you can add it to the "PATH" with "export PATH=$MVN_CMD_DIR:$PATH"
-     */
-    private static final String MVN_CMD_DIR = "MVN_CMD_DIR";
 
     private static final Logger LOGGER = Logger.getLogger(WithMavenStepExecution2.class.getName());
 
@@ -937,13 +935,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         }
 
         try {
-
-            // JENKINS-43787 handle null
-            final List<ServerCredentialMapping> serverCredentialMappings = Optional.ofNullable(mavenSettingsConfig.getServerCredentialMappings()).orElse(Collections.<ServerCredentialMapping>emptyList());
-
-            final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
-
-            credentials.addAll(resolvedCredentials.values());
+            final Map<String, StandardUsernameCredentials> resolvedCredentials = resolveCredentials(mavenSettingsConfig.getServerCredentialMappings(), "Maven settings");
 
             String mavenSettingsFileContent;
             if (resolvedCredentials.isEmpty()) {
@@ -952,7 +944,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                     console.println("[withMaven] using Maven settings.xml '" + mavenSettingsConfig.id + "' with NO Maven servers credentials provided by Jenkins");
                 }
             } else {
-                List<String> tempFiles = new ArrayList<String>();
+                credentials.addAll(resolvedCredentials.values());
+                List<String> tempFiles = new ArrayList<>();
                 mavenSettingsFileContent = CredentialsHelper.fillAuthentication(mavenSettingsConfig.content, mavenSettingsConfig.isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
                 if (LOGGER.isLoggable(Level.FINE)) {
                     console.println("[withMaven] using Maven settings.xml '" + mavenSettingsConfig.id + "' with Maven servers credentials provided by Jenkins " +
@@ -996,12 +989,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         }
 
         try {
-            // JENKINS-43787 handle null
-            final List<ServerCredentialMapping> serverCredentialMappings = Optional.ofNullable(mavenGlobalSettingsConfig.getServerCredentialMappings()).orElse(Collections.<ServerCredentialMapping>emptyList());
-
-            final Map<String, StandardUsernameCredentials> resolvedCredentials = CredentialsHelper.resolveCredentials(build, serverCredentialMappings);
-
-            credentials.addAll(resolvedCredentials.values());
+            final Map<String, StandardUsernameCredentials> resolvedCredentials = resolveCredentials(mavenGlobalSettingsConfig.getServerCredentialMappings(), " Global Maven settings");
 
             String mavenGlobalSettingsFileContent;
             if (resolvedCredentials.isEmpty()) {
@@ -1009,7 +997,9 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                 console.println("[withMaven] using Maven global settings.xml '" + mavenGlobalSettingsConfig.id + "' with NO Maven servers credentials provided by Jenkins");
 
             } else {
-                List<String> tempFiles = new ArrayList<String>();
+                credentials.addAll(resolvedCredentials.values());
+
+                List<String> tempFiles = new ArrayList<>();
                 mavenGlobalSettingsFileContent = CredentialsHelper.fillAuthentication(mavenGlobalSettingsConfig.content, mavenGlobalSettingsConfig.isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
                 console.println("[withMaven] using Maven global settings.xml '" + mavenGlobalSettingsConfig.id + "' with Maven servers credentials provided by Jenkins " +
                         "(replaceAll: " + mavenGlobalSettingsConfig.isReplaceAll + "): " +
@@ -1024,6 +1014,43 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             throw new IllegalStateException("Exception injecting Maven settings.xml " + mavenGlobalSettingsConfig.id +
                     " during the build: " + build + ": " + e.getMessage(), e);
         }
+    }
+
+    /**
+     *
+     * @param serverCredentialMappings
+     * @param logMessagePrefix
+     * @return credentials by Maven server Id
+     */
+    @Nonnull
+    public Map<String, StandardUsernameCredentials> resolveCredentials(@Nullable final List<ServerCredentialMapping> serverCredentialMappings, String logMessagePrefix) {
+        Map<String, StandardUsernameCredentials> mavenServerIdToCredentials = new TreeMap<>();
+        if (serverCredentialMappings == null) {
+            return mavenServerIdToCredentials;
+        }
+        List<ServerCredentialMapping> unresolvedServerCredentialsMappings = new ArrayList<>();
+        for (ServerCredentialMapping serverCredentialMapping : serverCredentialMappings) {
+
+            List<DomainRequirement> domainRequirements = StringUtils.isBlank(serverCredentialMapping.getServerId()) ?  Collections.emptyList(): Collections.singletonList(new MavenServerIdRequirement(serverCredentialMapping.getServerId()));
+            @Nullable
+            final StandardUsernameCredentials credentials = CredentialsProvider.findCredentialById(serverCredentialMapping.getCredentialsId(), StandardUsernameCredentials.class, build, domainRequirements);
+
+            if (credentials == null) {
+                unresolvedServerCredentialsMappings.add(serverCredentialMapping);
+            } else {
+                mavenServerIdToCredentials.put(serverCredentialMapping.getServerId(), credentials);
+            }
+        }
+        if (!unresolvedServerCredentialsMappings.isEmpty()) {
+            /*
+             * we prefer to print a warning message rather than failing the build with an AbortException if some credentials are NOT found for backward compatibility reasons.
+             * The behaviour of org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper.resolveCredentials(hudson.model.Run<?,?>, java.util.List<org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping>, hudson.model.TaskListener)
+             * is to just print a warning message
+             */
+            console.println("[withMaven] WARNING " + logMessagePrefix + " - Silently skip Maven server Ids with missing associated Jenkins credentials: " +
+                    unresolvedServerCredentialsMappings.stream().map(new ServerCredentialMappingToStringFunction()).collect(Collectors.joining(", ")));
+        }
+        return mavenServerIdToCredentials;
     }
 
     /**
@@ -1153,6 +1180,13 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      */
     private static FilePath tempDir(FilePath ws) {
         return WorkspaceList.tempDir(ws);
+    }
+
+    private static class ServerCredentialMappingToStringFunction implements Function<ServerCredentialMapping, String> {
+        @Override
+        public String apply(ServerCredentialMapping mapping) {
+            return "[mavenServerId: " + mapping.getServerId() + ", jenkinsCredentials: " + mapping.getCredentialsId() + "]";
+        }
     }
 
     /**
