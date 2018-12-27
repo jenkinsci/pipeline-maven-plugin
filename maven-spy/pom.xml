@@ -41,7 +41,7 @@
     </description>
 
     <properties>
-        <revision>3.6.6</revision>
+        <revision>3.6.6-beta-2</revision>
         <changelist>-SNAPSHOT</changelist>
     </properties>
     <developers>
