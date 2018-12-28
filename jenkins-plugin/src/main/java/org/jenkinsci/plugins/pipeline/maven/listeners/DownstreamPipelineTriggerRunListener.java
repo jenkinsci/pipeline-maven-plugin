@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import hudson.Extension;
 import hudson.console.ModelHyperlinkNote;
 import hudson.model.Cause;
@@ -25,11 +24,11 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -109,7 +108,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                     // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
                     Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(omittedPipeline, -1, new CauseAction(omittedPipelineTriggerCauses));
                     if(queuedItem == null) {
-                        listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Illegal state: " + entry.getKey() + " not resolved");
+                        listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Failure to trigger omitted pipeline " + ModelHyperlinkNote.encodeTo(omittedPipeline) + " due to causes " +
+                                omittedPipelineTriggerCauses + ", invocation rejected.");
                     } else {
                         listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - triggered " +  ModelHyperlinkNote.encodeTo(omittedPipeline) + " despite build result " + upstreamBuild.getResult() + " for the upstream causes: " + omittedPipelineTriggerCauses.stream().map(c -> c.getShortDescription()).collect(Collectors.joining(", ")));
                     }
@@ -265,6 +265,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 }
             }
         }
+
+        // note: we could verify that the upstreamBuild.getCauses().getOmittedPipelineFullNames are listed in jobsToTrigger
 
         // trigger the pipelines
         for (Map.Entry<String, Set<MavenArtifact>> entry: jobsToTrigger.entrySet()) {

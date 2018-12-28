@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.pipeline.maven.cause;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import hudson.console.ModelHyperlinkNote;
 import hudson.model.Cause;
 import hudson.model.Run;
@@ -10,6 +9,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
