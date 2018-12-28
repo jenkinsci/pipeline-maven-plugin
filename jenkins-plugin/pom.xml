@@ -32,7 +32,6 @@
     <version>${revision}${changelist}</version>
   </parent>
 
-  <groupId>org.jenkins-ci.plugins</groupId>
   <artifactId>pipeline-maven</artifactId>
   <packaging>hpi</packaging>
   <version>${revision}${changelist}</version>
@@ -57,8 +56,6 @@
   </developers>
 
   <properties>
-    <revision>3.6.6-beta-2</revision>
-    <changelist>-SNAPSHOT</changelist>
     <scm-api-plugin.version>2.2.6</scm-api-plugin.version>
     <git-plugin.version>3.6.4</git-plugin.version>
     <!--
