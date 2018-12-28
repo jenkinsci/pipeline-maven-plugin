@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.pipeline.maven.listeners;
 
 import hudson.Extension;
 import hudson.console.ModelHyperlinkNote;
+import hudson.model.Cause;
 import hudson.model.CauseAction;
 import hudson.model.Job;
 import hudson.model.Queue;
@@ -12,13 +13,19 @@ import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyAbstractCause;
+import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCause;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCauseHelper;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause;
+import org.jenkinsci.plugins.pipeline.maven.cause.OtherMavenDependencyCause;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,8 +63,57 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         }
 
         if (!globalPipelineMavenConfig.getTriggerDownstreamBuildsResultsCriteria().contains(upstreamBuild.getResult())) {
-            if (LOGGER.isLoggable(Level.FINER)) {
-                listener.getLogger().println("[withMaven] Skip triggering downstream jobs for upstream build with ignored result status " + upstreamBuild + ": " + upstreamBuild.getResult());
+            Map<String, List<MavenDependencyCause>> omittedPipelineFullNamesAndCauses =  new HashMap<>();
+            for (Cause cause: upstreamBuild.getCauses()) {
+                if (cause instanceof MavenDependencyCause) {
+                    MavenDependencyCause mavenDependencyCause = (MavenDependencyCause) cause;
+                    for(String omittedPipelineFullName: mavenDependencyCause.getOmittedPipelineFullNames()) {
+                        omittedPipelineFullNamesAndCauses.computeIfAbsent(omittedPipelineFullName, p-> new ArrayList<>()).add(mavenDependencyCause);
+                    }
+                }
+            }
+            if (omittedPipelineFullNamesAndCauses.isEmpty()) {
+                if (LOGGER.isLoggable(Level.FINER)) {
+                    listener.getLogger().println("[withMaven] Skip triggering downstream jobs for upstream build with ignored result status " + upstreamBuild + ": " + upstreamBuild.getResult());
+                }
+            } else {
+                for(Map.Entry<String, List<MavenDependencyCause>> entry: omittedPipelineFullNamesAndCauses.entrySet()) {
+                    Job omittedPipeline = Jenkins.getInstance().getItemByFullName(entry.getKey(), Job.class);
+                    if (omittedPipeline == null) {
+                        listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Illegal state: " + entry.getKey() + " not resolved");
+                        continue;
+                    }
+
+                    List<Cause> omittedPipelineTriggerCauses = new ArrayList<>();
+                    for(MavenDependencyCause cause: entry.getValue()) {
+                        if (cause instanceof MavenDependencyUpstreamCause) {
+                            MavenDependencyUpstreamCause mavenDependencyUpstreamCause = (MavenDependencyUpstreamCause) cause;
+                            Run<?, ?> upstreamRun = mavenDependencyUpstreamCause.getUpstreamRun() == null ? upstreamBuild:  mavenDependencyUpstreamCause.getUpstreamRun();
+                            omittedPipelineTriggerCauses.add(new MavenDependencyUpstreamCause(upstreamRun, mavenDependencyUpstreamCause.getMavenArtifacts(), Collections.emptyList()));
+                        } else if (cause instanceof MavenDependencyAbstractCause) {
+                            try {
+                                MavenDependencyCause mavenDependencyCause = ((MavenDependencyAbstractCause)cause).clone();
+                                mavenDependencyCause.setOmittedPipelineFullNames(Collections.emptyList());
+                                omittedPipelineTriggerCauses.add((Cause) mavenDependencyCause);
+                            } catch (CloneNotSupportedException e) {
+                                listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Failure to clone pipeline cause " + cause + " : " + e);
+                                omittedPipelineTriggerCauses.add(new OtherMavenDependencyCause(((MavenDependencyAbstractCause) cause).getShortDescription()));
+                            }
+                        } else {
+                            omittedPipelineTriggerCauses.add(new OtherMavenDependencyCause(((MavenDependencyAbstractCause) cause).getShortDescription()));
+                        }
+                    }
+                    // TODO deduplicate pipeline triggers
+
+                    // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
+                    Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(omittedPipeline, -1, new CauseAction(omittedPipelineTriggerCauses));
+                    if(queuedItem == null) {
+                        listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Failure to trigger omitted pipeline " + ModelHyperlinkNote.encodeTo(omittedPipeline) + " due to causes " +
+                                omittedPipelineTriggerCauses + ", invocation rejected.");
+                    } else {
+                        listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - triggered " +  ModelHyperlinkNote.encodeTo(omittedPipeline) + " despite build result " + upstreamBuild.getResult() + " for the upstream causes: " + omittedPipelineTriggerCauses.stream().map(c -> c.getShortDescription()).collect(Collectors.joining(", ")));
+                    }
+                }
             }
             return;
         }
@@ -76,6 +132,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         Map<MavenArtifact, SortedSet<String>> downstreamPipelinesByArtifact = globalPipelineMavenConfig.getDao().listDownstreamJobsByArtifact(upstreamPipelineFullName, upstreamBuildNumber);
 
         Map<String, Set<MavenArtifact>> jobsToTrigger = new TreeMap<>();
+        Map<String, Set<String>>  omittedPipelineTriggersByPipelineFullname = new HashMap<>();
 
         // build the list of pipelines to trigger
         for(Map.Entry<MavenArtifact, SortedSet<String>> entry: downstreamPipelinesByArtifact.entrySet()) {
@@ -169,6 +226,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                          // That's the case when one of the downstream's transitive upstream is our own downstream
                          listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
                                 " because it has a dependency on a pipeline that will be triggered by this build: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
+                        omittedPipelineTriggersByPipelineFullname.computeIfAbsent(transitiveUpstreamPipelineName, p -> new TreeSet<>()).add(downstreamPipelineFullName);
                         continue downstreamPipelinesLoop;
                     }
                 }
@@ -208,6 +266,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             }
         }
 
+        // note: we could verify that the upstreamBuild.getCauses().getOmittedPipelineFullNames are listed in jobsToTrigger
+
         // trigger the pipelines
         for (Map.Entry<String, Set<MavenArtifact>> entry: jobsToTrigger.entrySet()) {
             String downstreamJobFullName = entry.getKey();
@@ -219,7 +279,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             Set<MavenArtifact> mavenArtifacts = entry.getValue();
 
             // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
-            MavenDependencyUpstreamCause cause = new MavenDependencyUpstreamCause(upstreamBuild, mavenArtifacts);
+            MavenDependencyUpstreamCause cause = new MavenDependencyUpstreamCause(upstreamBuild, mavenArtifacts, omittedPipelineTriggersByPipelineFullname.get(downstreamJobFullName));
 
             Run downstreamJobLastBuild = downstreamJob.getLastBuild();
             if (downstreamJobLastBuild == null) {

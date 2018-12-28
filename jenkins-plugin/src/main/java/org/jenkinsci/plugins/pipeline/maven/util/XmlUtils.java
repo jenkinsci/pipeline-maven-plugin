@@ -24,7 +24,6 @@
 
 package org.jenkinsci.plugins.pipeline.maven.util;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.FilePath;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
@@ -418,8 +417,8 @@ public class XmlUtils {
     /**
      * Concatenate the given {@code elements} using the given {@code delimiter} to concatenate.
      */
-    @NonNull
-    public static String join(@NonNull Iterable<String> elements, @NonNull String delimiter) {
+    @Nonnull
+    public static String join(@Nonnull Iterable<String> elements, @Nonnull String delimiter) {
         StringBuilder result = new StringBuilder();
         Iterator<String> it = elements.iterator();
         while (it.hasNext()) {

@@ -9,6 +9,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -19,14 +20,17 @@ import javax.annotation.Nullable;
 public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements MavenDependencyCause {
     private List<MavenArtifact> mavenArtifacts;
 
+    private List<String> omittedPipelineFullNames;
+
     public MavenDependencyUpstreamCause(Run<?, ?> up, @Nonnull MavenArtifact... mavenArtifact) {
         super(up);
         this.mavenArtifacts = Arrays.asList(mavenArtifact);
     }
 
-    public MavenDependencyUpstreamCause(Run<?, ?> up, @Nonnull Collection<MavenArtifact> mavenArtifacts) {
+    public MavenDependencyUpstreamCause(Run<?, ?> up, @Nullable Collection<MavenArtifact> mavenArtifacts, @Nullable Collection<String> omittedPipelineFullNames) {
         super(up);
-        this.mavenArtifacts = new ArrayList<>(mavenArtifacts);
+        this.mavenArtifacts = mavenArtifacts == null ? Collections.emptyList() : new ArrayList<>(mavenArtifacts);
+        this.omittedPipelineFullNames = omittedPipelineFullNames == null ? Collections.emptyList() : new ArrayList<>(omittedPipelineFullNames);
     }
 
     @Override
@@ -105,6 +109,20 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
             mavenArtifacts = new ArrayList<>();
         }
         return mavenArtifacts;
+    }
+
+    @Nonnull
+    @Override
+    public List<String> getOmittedPipelineFullNames() {
+        if (omittedPipelineFullNames == null) {
+            omittedPipelineFullNames = new ArrayList<>();
+        }
+        return omittedPipelineFullNames;
+    }
+
+    @Override
+    public void setOmittedPipelineFullNames(List<String> omittedPipelineFullNames) {
+        this.omittedPipelineFullNames = omittedPipelineFullNames;
     }
 
     @Override
