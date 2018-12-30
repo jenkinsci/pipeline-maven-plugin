@@ -93,10 +93,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.UUID;
@@ -935,22 +937,22 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         }
 
         try {
-            final Map<String, StandardUsernameCredentials> resolvedCredentials = resolveCredentials(mavenSettingsConfig.getServerCredentialMappings(), "Maven settings");
+            final Map<String, StandardUsernameCredentials> resolvedCredentialsByMavenServerId = resolveCredentials(mavenSettingsConfig.getServerCredentialMappings(), "Maven settings");
 
             String mavenSettingsFileContent;
-            if (resolvedCredentials.isEmpty()) {
+            if (resolvedCredentialsByMavenServerId.isEmpty()) {
                 mavenSettingsFileContent = mavenSettingsConfig.content;
                 if (LOGGER.isLoggable(Level.FINE)) {
                     console.println("[withMaven] using Maven settings.xml '" + mavenSettingsConfig.id + "' with NO Maven servers credentials provided by Jenkins");
                 }
             } else {
-                credentials.addAll(resolvedCredentials.values());
+                credentials.addAll(resolvedCredentialsByMavenServerId.values());
                 List<String> tempFiles = new ArrayList<>();
-                mavenSettingsFileContent = CredentialsHelper.fillAuthentication(mavenSettingsConfig.content, mavenSettingsConfig.isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
+                mavenSettingsFileContent = CredentialsHelper.fillAuthentication(mavenSettingsConfig.content, mavenSettingsConfig.isReplaceAll, resolvedCredentialsByMavenServerId, tempBinDir, tempFiles);
                 if (LOGGER.isLoggable(Level.FINE)) {
                     console.println("[withMaven] using Maven settings.xml '" + mavenSettingsConfig.id + "' with Maven servers credentials provided by Jenkins " +
                             "(replaceAll: " + mavenSettingsConfig.isReplaceAll + "): " +
-                            resolvedCredentials.entrySet().stream().map(new MavenServerToCredentialsMappingToStringFunction()).collect(Collectors.joining(", ")));
+                            resolvedCredentialsByMavenServerId.entrySet().stream().map(new MavenServerToCredentialsMappingToStringFunction()).sorted().collect(Collectors.joining(", ")));
                 }
             }
 
@@ -989,21 +991,21 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         }
 
         try {
-            final Map<String, StandardUsernameCredentials> resolvedCredentials = resolveCredentials(mavenGlobalSettingsConfig.getServerCredentialMappings(), " Global Maven settings");
+            final Map<String, StandardUsernameCredentials> resolvedCredentialsByMavenServerId = resolveCredentials(mavenGlobalSettingsConfig.getServerCredentialMappings(), " Global Maven settings");
 
             String mavenGlobalSettingsFileContent;
-            if (resolvedCredentials.isEmpty()) {
+            if (resolvedCredentialsByMavenServerId.isEmpty()) {
                 mavenGlobalSettingsFileContent = mavenGlobalSettingsConfig.content;
                 console.println("[withMaven] using Maven global settings.xml '" + mavenGlobalSettingsConfig.id + "' with NO Maven servers credentials provided by Jenkins");
 
             } else {
-                credentials.addAll(resolvedCredentials.values());
+                credentials.addAll(resolvedCredentialsByMavenServerId.values());
 
                 List<String> tempFiles = new ArrayList<>();
-                mavenGlobalSettingsFileContent = CredentialsHelper.fillAuthentication(mavenGlobalSettingsConfig.content, mavenGlobalSettingsConfig.isReplaceAll, resolvedCredentials, tempBinDir, tempFiles);
+                mavenGlobalSettingsFileContent = CredentialsHelper.fillAuthentication(mavenGlobalSettingsConfig.content, mavenGlobalSettingsConfig.isReplaceAll, resolvedCredentialsByMavenServerId, tempBinDir, tempFiles);
                 console.println("[withMaven] using Maven global settings.xml '" + mavenGlobalSettingsConfig.id + "' with Maven servers credentials provided by Jenkins " +
                         "(replaceAll: " + mavenGlobalSettingsConfig.isReplaceAll + "): " +
-                        resolvedCredentials.entrySet().stream().map(new MavenServerToCredentialsMappingToStringFunction()).collect(Collectors.joining(", ")));
+                        resolvedCredentialsByMavenServerId.entrySet().stream().map(new MavenServerToCredentialsMappingToStringFunction()).sorted().collect(Collectors.joining(", ")));
 
             }
 
@@ -1024,7 +1026,9 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      */
     @Nonnull
     public Map<String, StandardUsernameCredentials> resolveCredentials(@Nullable final List<ServerCredentialMapping> serverCredentialMappings, String logMessagePrefix) {
-        Map<String, StandardUsernameCredentials> mavenServerIdToCredentials = new TreeMap<>();
+        // CredentialsHelper.removeMavenServerDefinitions() requires a Map implementation that supports `null` values. `HashMap` supports `null` values, `TreeMap` doesn't
+        // https://github.com/jenkinsci/config-file-provider-plugin/blob/config-file-provider-2.16.4/src/main/java/org/jenkinsci/plugins/configfiles/maven/security/CredentialsHelper.java#L252
+        Map<String, StandardUsernameCredentials> mavenServerIdToCredentials = new HashMap<>();
         if (serverCredentialMappings == null) {
             return mavenServerIdToCredentials;
         }
@@ -1044,8 +1048,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         if (!unresolvedServerCredentialsMappings.isEmpty()) {
             /*
              * we prefer to print a warning message rather than failing the build with an AbortException if some credentials are NOT found for backward compatibility reasons.
-             * The behaviour of org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper.resolveCredentials(hudson.model.Run<?,?>, java.util.List<org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping>, hudson.model.TaskListener)
-             * is to just print a warning message
+             * The behaviour of o.j.p.configfiles.m.s.CredentialsHelper.resolveCredentials(model.Run, List<ServerCredentialMapping>, TaskListener)` is to just print a warning message
              */
             console.println("[withMaven] WARNING " + logMessagePrefix + " - Silently skip Maven server Ids with missing associated Jenkins credentials: " +
                     unresolvedServerCredentialsMappings.stream().map(new ServerCredentialMappingToStringFunction()).collect(Collectors.joining(", ")));
