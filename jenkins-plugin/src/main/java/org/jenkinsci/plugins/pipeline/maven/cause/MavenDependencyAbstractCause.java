@@ -57,7 +57,7 @@ public abstract class MavenDependencyAbstractCause extends Cause implements Mave
 
     @Nonnull
     public String getMavenArtifactsDescription() {
-        return mavenArtifacts.stream()
+        return getMavenArtifacts().stream()
                 .map(mavenArtifact -> mavenArtifact == null ? "null" : mavenArtifact.getShortDescription())
                 .collect(Collectors.joining(","));
     }
