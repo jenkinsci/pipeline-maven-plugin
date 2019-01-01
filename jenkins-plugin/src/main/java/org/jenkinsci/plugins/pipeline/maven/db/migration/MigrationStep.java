@@ -5,6 +5,7 @@ import jenkins.model.Jenkins;
 import javax.annotation.Nonnull;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public interface MigrationStep {
     void execute(@Nonnull Connection cnn, @Nonnull JenkinsDetails jenkinsDetails) throws SQLException;
@@ -12,13 +13,15 @@ public interface MigrationStep {
     /**
      * for unit tests outside of Jenkins
      */
-    public static class JenkinsDetails {
+    class JenkinsDetails {
+        @Nonnull
         public String getMasterLegacyInstanceId() {
             return Jenkins.getInstance().getLegacyInstanceId();
         }
 
+        @Nonnull
         public String getMasterRootUrl(){
-            return Jenkins.getInstance().getRootUrl();
+            return Objects.toString(Jenkins.getInstance().getRootUrl(), "");
         }
     }
 }

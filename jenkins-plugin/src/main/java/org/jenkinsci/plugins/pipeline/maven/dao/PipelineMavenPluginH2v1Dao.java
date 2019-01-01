@@ -56,6 +56,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -1032,16 +1033,18 @@ public class PipelineMavenPluginH2v1Dao implements PipelineMavenPluginJdbcDao {
             String jenkinsMasterLegacyInstanceId = getJenkinsDetails().getMasterLegacyInstanceId();
             String jenkinsMasterUrl = getJenkinsDetails().getMasterRootUrl();
 
-            try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM JENKINS_MASTER WHERE LEGACY_INSTANCE_ID=?")) {
+            String jenkinsMasterUrlValueInDb = null;
+            try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID, URL FROM JENKINS_MASTER WHERE LEGACY_INSTANCE_ID=?")) {
                 stmt.setString(1, jenkinsMasterLegacyInstanceId);
                 try (ResultSet rst = stmt.executeQuery()) {
                     if (rst.next()) {
                         this.jenkinsMasterPrimaryKey = rst.getLong("ID");
+                        jenkinsMasterUrlValueInDb = rst.getString("URL");
                     }
                 }
             }
-            if (this.jenkinsMasterPrimaryKey == null) {
-                try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO JENKINS_MASTER(LEGACY_INSTANCE_ID, URL) values (?, ?)")) {
+            if (this.jenkinsMasterPrimaryKey == null) { // NOT FOUND IN DB
+                try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO JENKINS_MASTER(LEGACY_INSTANCE_ID, URL) values (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                     stmt.setString(1, jenkinsMasterLegacyInstanceId);
                     stmt.setString(2, jenkinsMasterUrl);
                     stmt.execute();
@@ -1050,6 +1053,18 @@ public class PipelineMavenPluginH2v1Dao implements PipelineMavenPluginJdbcDao {
                             this.jenkinsMasterPrimaryKey = rst.getLong(1);
                         } else {
                             throw new IllegalStateException();
+                        }
+                    }
+                }
+            } else { // FOUND IN DB, UPDATE IF NEEDED
+                if (!Objects.equals(jenkinsMasterUrl, jenkinsMasterUrlValueInDb)) {
+                    LOGGER.log(Level.INFO, "Update url from \"{0}\" to \"{1}\" for master with legacyId {2}", new Object[]{jenkinsMasterUrlValueInDb, jenkinsMasterUrl, jenkinsMasterLegacyInstanceId});
+                    try (PreparedStatement stmt = cnn.prepareStatement("UPDATE JENKINS_MASTER set URL = ? where ID = ?")) {
+                        stmt.setString(1, jenkinsMasterUrl);
+                        stmt.setLong(2, this.jenkinsMasterPrimaryKey);
+                        int count = stmt.executeUpdate();
+                        if (count != 1) {
+                            LOGGER.warning("Updated more/less than 1 JENKINS_MASTER.URL=" + jenkinsMasterUrl + " for ID=" + this.jenkinsMasterPrimaryKey);
                         }
                     }
                 }
