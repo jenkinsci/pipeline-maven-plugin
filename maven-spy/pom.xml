@@ -29,7 +29,7 @@
     <parent>
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>pipeline-maven-parent</artifactId>
-        <version>3.6.6-beta-3</version>
+        <version>${revision}${changelist}</version>
     </parent>
 
     <artifactId>pipeline-maven-spy</artifactId>
