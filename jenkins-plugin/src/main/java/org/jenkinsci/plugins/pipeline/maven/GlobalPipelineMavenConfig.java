@@ -455,8 +455,14 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
             try (HikariDataSource ds = new HikariDataSource(dsConfig)) {
                 try (Connection cnn = ds.getConnection()) {
                     DatabaseMetaData metaData = cnn.getMetaData();
+                    // getDatabaseProductVersion():
+                    // * MySQL: "8.0.13"
+                    // * Amazon Aurora: "5.6.10"
+                    // * MariaDB: "5.5.5-10.2.20-MariaDB", "5.5.5-10.3.11-MariaDB-1:10.3.11+maria~bionic"
                     String databaseVersionDescription = metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion();
+                    String databaseRequirement = "MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ or MariaDB 10.2+ is required";
                     if ("MySQL".equals(metaData.getDatabaseProductName())) {
+                        @Nullable
                         String amazonAuroraVersion;
                         try (Statement stmt = cnn.createStatement()) {
                             try (ResultSet rst = stmt.executeQuery("select AURORA_VERSION()")) {
@@ -472,6 +478,9 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                                 }
                             }
                         }
+                        @Nullable
+                        String mariaDbVersion = PipelineMavenPluginMySqlDao.extractMariaDbVersion(metaData.getDatabaseProductVersion());
+
                         switch (metaData.getDatabaseMajorVersion()) {
                             case 8:
                                 // OK
@@ -482,24 +491,29 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                                         // ok
                                         break;
                                     case 6:
-                                        if(amazonAuroraVersion == null) {
+                                        if (amazonAuroraVersion == null) {
                                             // see JENKINS-54784
-                                            return FormValidation.warning("Non validated MySQL version " + metaData.getDatabaseProductVersion() + ". MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ is required");
+                                            return FormValidation.warning("Non validated MySQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
                                         } else {
                                             // we have successfully tested on Amazon Aurora MySQL 5.6.10a
                                             break;
                                         }
                                     case 5:
-                                        return FormValidation.warning("Non validated MySQL version " + metaData.getDatabaseProductVersion() + ". MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ is required");
+                                        if (mariaDbVersion == null) {
+                                            return FormValidation.warning("Non validated MySQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
+                                        } else {
+                                            // JENKINS-55378 have successfully tested with "5.5.5-10.2.20-MariaDB"
+                                            return FormValidation.ok("MariaDB version " + mariaDbVersion + " detected. Please ensure that your MariaDB version is at least version 10.2+");
+                                        }
                                     default:
-                                        return FormValidation.error("Non supported MySQL version " + metaData.getDatabaseProductVersion() + ". MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ is required");
+                                        return FormValidation.error("Non supported MySQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
                                 }
                                 break;
                             default:
-                                return FormValidation.error("Non supported MySQL version " + metaData.getDatabaseProductVersion() + ". MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ is required");
+                                return FormValidation.error("Non supported MySQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
                         }
                     } else {
-                        return FormValidation.warning("Non production grade database. MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ is required for production grade workloads");
+                        return FormValidation.warning("Non production grade database. For production workloads, " + databaseRequirement);
                     }
                     try (Statement stmt = cnn.createStatement()) {
                         try (ResultSet rst = stmt.executeQuery("select 1")) {
