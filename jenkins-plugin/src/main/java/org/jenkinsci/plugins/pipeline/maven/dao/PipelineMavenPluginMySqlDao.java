@@ -25,6 +25,7 @@
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import com.mysql.cj.exceptions.MysqlErrorNumbers;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 
 import java.sql.Connection;
@@ -35,12 +36,40 @@ import java.sql.Statement;
 import java.util.logging.Level;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao {
+
+    /**
+     * Extract the MariaDB server version from {@link DatabaseMetaData#getDatabaseProductVersion()}
+     *
+     * @param jdbcDatabaseProductVersion such as  "5.5.5-10.2.20-MariaDB", "5.5.5-10.3.11-MariaDB-1:10.3.11+maria~bionic"
+     * @return {@code null} if this is not a MariaDB version, the MariaDB server version (e.g. "10.2.20", "10.3.11") if parsed, the entire {@link DatabaseMetaData#getDatabaseProductVersion()} if the parsing oof the MariaDB server version failed
+     */
+    @Nullable
+    public  static String extractMariaDbVersion(@Nullable String jdbcDatabaseProductVersion) {
+        if (jdbcDatabaseProductVersion == null) {
+            return null;
+        }
+
+        if(!jdbcDatabaseProductVersion.contains("MariaDB")) {
+            return null;
+        }
+
+        String mariaDbVersion = StringUtils.substringBetween(jdbcDatabaseProductVersion, "-", "-MariaDB");
+
+        if (mariaDbVersion == null) { // MariaDB version format has changed.
+           return jdbcDatabaseProductVersion;
+        } else {
+            return mariaDbVersion;
+        }
+    }
+
+
     public PipelineMavenPluginMySqlDao(@Nonnull DataSource ds) {
         super(ds);
     }

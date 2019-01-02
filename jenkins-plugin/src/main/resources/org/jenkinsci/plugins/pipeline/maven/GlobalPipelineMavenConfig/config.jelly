@@ -32,7 +32,7 @@ THE SOFTWARE.
         </f:entry>
         <f:entry title="${%Database Configuration}">
             <f:entry title="${%JDBC URL}" field="jdbcUrl"
-                     description="JDBC URL. For production grade workloads, use MySQL. If empty, then a non production grade H2 embedded database will be used.">
+                     description="JDBC URL. For production grade workloads, use MySQL / MariaDB. If empty, then a non production grade H2 embedded database will be used.">
                 <f:textbox/>
             </f:entry>
             <f:entry title="${%JDBC Credentials}" field="jdbcCredentialsId">
