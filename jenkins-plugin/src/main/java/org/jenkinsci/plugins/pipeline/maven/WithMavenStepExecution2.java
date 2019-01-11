@@ -139,7 +139,6 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
     private transient Computer computer;
     private transient FilePath tempBinDir;
-    private transient BodyExecution body;
 
     /**
      * Indicates if running on docker with <code>docker.image()</code> or <code>container()</code>
@@ -228,7 +227,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         LOGGER.log(Level.FINEST, "envOverride: {0}", envOverride); // JENKINS-40484
 
-        body = getContext().newBodyInvoker().withContexts(envEx, newFilter).withCallback(new WithMavenStepExecutionCallBack(tempBinDir, step.getOptions(), step.getPublisherStrategy())).start();
+        getContext().newBodyInvoker().withContexts(envEx, newFilter).withCallback(new WithMavenStepExecutionCallBack(tempBinDir, step.getOptions(), step.getPublisherStrategy())).start();
 
         return false;
     }
@@ -1121,13 +1120,6 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      */
     private static MavenInstallation[] getMavenInstallations() {
         return Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class).getInstallations();
-    }
-
-    @Override
-    public void stop(Throwable cause) throws Exception {
-        if (body != null) {
-            body.cancel(cause);
-        }
     }
 
     /**
