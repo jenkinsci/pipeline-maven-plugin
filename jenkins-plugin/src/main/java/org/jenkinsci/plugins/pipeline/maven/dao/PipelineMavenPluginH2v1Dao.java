@@ -756,11 +756,7 @@ public class PipelineMavenPluginH2v1Dao implements PipelineMavenPluginJdbcDao {
                         artifact.setExtension(rst.getString("extension"));
                         String downstreamJobFullName = rst.getString("full_name");
 
-                        if(results.containsKey(artifact)) {
-                            results.get(artifact).add(downstreamJobFullName);
-                        } else {
-                            results.put(artifact, new TreeSet<>(Collections.singleton(downstreamJobFullName)));
-                        }
+                        results.computeIfAbsent(artifact, a -> new TreeSet<>()).add(downstreamJobFullName);
                     }
                 }
             }
@@ -846,11 +842,7 @@ public class PipelineMavenPluginH2v1Dao implements PipelineMavenPluginJdbcDao {
                         artifact.setExtension(rst.getString("extension"));
                         String downstreamJobFullName = rst.getString("full_name");
 
-                        if(results.containsKey(artifact)) {
-                            results.get(artifact).add(jobFullName);
-                        } else {
-                            results.put(artifact, new TreeSet<>(Collections.singleton(downstreamJobFullName)));
-                        }
+                        results.computeIfAbsent(artifact, a -> new TreeSet<>()).add(downstreamJobFullName);
                     }
                 }
             }

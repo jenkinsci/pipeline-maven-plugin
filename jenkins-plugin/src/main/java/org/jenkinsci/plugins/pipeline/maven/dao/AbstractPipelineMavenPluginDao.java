@@ -617,7 +617,6 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactBasedOnMavenDependencies = listDownstreamJobsByArtifactBasedOnMavenDependencies(jobFullName, buildNumber);
         Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactBasedOnParentProjectDependencies = listDownstreamJobsByArtifactBasedOnParentProjectDependencies(jobFullName, buildNumber);
 
-
         Map<MavenArtifact, SortedSet<String>> results = new HashMap<>();
         results.putAll(downstreamJobsByArtifactBasedOnMavenDependencies);
 
@@ -759,11 +758,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                         artifact.setExtension(rst.getString("extension"));
                         String downstreamJobFullName = rst.getString("full_name");
 
-                        if(results.containsKey(artifact)) {
-                            results.get(artifact).add(downstreamJobFullName);
-                        } else {
-                            results.put(artifact, new TreeSet<>(Collections.singleton(downstreamJobFullName)));
-                        }
+                        results.computeIfAbsent(artifact, a -> new TreeSet<>()).add(downstreamJobFullName);
                     }
                 }
             }
@@ -849,11 +844,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                         artifact.setExtension(rst.getString("extension"));
                         String downstreamJobFullName = rst.getString("full_name");
 
-                        if(results.containsKey(artifact)) {
-                            results.get(artifact).add(jobFullName);
-                        } else {
-                            results.put(artifact, new TreeSet<>(Collections.singleton(downstreamJobFullName)));
-                        }
+                        results.computeIfAbsent(artifact, a -> new TreeSet<>()).add(downstreamJobFullName);
                     }
                 }
             }
