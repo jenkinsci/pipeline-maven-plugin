@@ -69,8 +69,10 @@ public class JunitTestsPublisher extends MavenPublisher {
     private static final String GROUP_ID = "org.apache.maven.plugins";
     private static final String SUREFIRE_ID = "maven-surefire-plugin";
     private static final String FAILSAFE_ID = "maven-failsafe-plugin";
+    private static final String TYCHO_ID = "tycho-surefire-plugin";
     private static final String SUREFIRE_GOAL = "test";
     private static final String FAILSAFE_GOAL = "integration-test";
+    private static final String TYCHO_GOAL = "test";
 
     private static final long serialVersionUID = 1L;
 
@@ -198,9 +200,13 @@ public class JunitTestsPublisher extends MavenPublisher {
 
         List<Element> sureFireTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL, "MojoSucceeded", "MojoFailed");
         List<Element> failSafeTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL, "MojoSucceeded", "MojoFailed");
+        List<Element> tychoTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, TYCHO_ID, TYCHO_GOAL, "MojoSucceeded", "MojoFailed");
+
+
 
         executeReporter(context, listener, sureFireTestEvents, SUREFIRE_ID + ":" + SUREFIRE_GOAL);
         executeReporter(context, listener, failSafeTestEvents, FAILSAFE_ID + ":" + FAILSAFE_GOAL);
+        executeReporter(context, listener, tychoTestEvents, TYCHO_ID + ":" + TYCHO_GOAL);
     }
 
     private void executeReporter(StepContext context, TaskListener listener, List<Element> testEvents, String goal) throws IOException, InterruptedException {
