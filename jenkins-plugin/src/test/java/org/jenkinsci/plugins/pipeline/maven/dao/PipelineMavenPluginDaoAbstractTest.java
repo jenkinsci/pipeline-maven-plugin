@@ -37,10 +37,13 @@ import org.jvnet.hudson.test.Issue;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
