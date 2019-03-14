@@ -499,6 +499,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                             // ignore empty query
                         } else {
                             try (Statement stmt = cnn.createStatement()) {
+                                LOGGER.log(Level.FINER, "Execute command {0}", sqlCommand);
                                 stmt.execute(sqlCommand);
                             } catch (SQLException e) {
                                 handleDatabaseInitialisationException(e);
