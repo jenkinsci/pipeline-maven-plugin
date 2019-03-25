@@ -269,7 +269,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         // note: we could verify that the upstreamBuild.getCauses().getOmittedPipelineFullNames are listed in jobsToTrigger
 
         // trigger the pipelines
-		triggerjobs:
+		triggerPipelinesLoop:
         for (Map.Entry<String, Set<MavenArtifact>> entry: jobsToTrigger.entrySet()) {
             String downstreamJobFullName = entry.getKey();
             Job downstreamJob = Jenkins.getInstance().getItemByFullName(downstreamJobFullName, Job.class);
@@ -285,9 +285,20 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             Run downstreamJobLastBuild = downstreamJob.getLastBuild();
             if (downstreamJobLastBuild == null) {
                 // should never happen, we need at least one build to know the dependencies
+                // trigger downstream pipeline anyway
             } else {
                 List<MavenArtifact> matchingMavenDependencies = MavenDependencyCauseHelper.isSameCause(cause, downstreamJobLastBuild.getCauses());
-                if (matchingMavenDependencies.size() > 0) {
+                if (matchingMavenDependencies.isEmpty()) {
+                    for (Map.Entry<String, Set<String>> omittedPipeline : omittedPipelineTriggersByPipelineFullname.entrySet()) {
+                        if (omittedPipeline.getValue().contains(downstreamJobFullName)) {
+                            Job transitiveDownstreamJob = Jenkins.getInstance().getItemByFullName(entry.getKey(), Job.class);
+                            listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering "
+                                    + "downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + "because it will be triggered by transitive downstream " + ModelHyperlinkNote.encodeTo(transitiveDownstreamJob));
+                            continue triggerPipelinesLoop; // don't trigger downstream pipeline
+                        }
+                    }
+                    // trigger downstream pipeline
+                } else {
                     downstreamJobLastBuild.addAction(new CauseAction(cause));
                     listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
                                     matchingMavenDependencies.stream().map(mavenDependency -> mavenDependency == null ? null : mavenDependency.getShortDescription()).collect(Collectors.joining(", ")));
@@ -296,17 +307,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                     } catch (IOException e) {
                         listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Failure to update build " + downstreamJobLastBuild.getFullDisplayName() + ": " + e.toString());
                     }
-                    continue;
-                } else {
-                    for(Map.Entry<String, Set<String>> omittedPipeline: omittedPipelineTriggersByPipelineFullname.entrySet()){
-                        if(omittedPipeline.getValue().contains(downstreamJobFullName)) {
-                            Job transitiveDownstreamJob = Jenkins.getInstance().getItemByFullName(entry.getKey(), Job.class);
-                            listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering "
-                                                       + "downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + "because it will be triggered by transitive downstream " + ModelHyperlinkNote.encodeTo(transitiveDownstreamJob));
-                            continue triggerjobs;
-                        }
-                    }
-                  // trigger build
+                    continue; // don't trigger downstream pipeline
                 }
             }
 
