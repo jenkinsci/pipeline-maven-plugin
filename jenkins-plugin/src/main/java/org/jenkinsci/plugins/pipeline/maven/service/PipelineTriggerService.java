@@ -203,7 +203,11 @@ public class PipelineTriggerService {
                 continue;
             }
 
-            cause.setOmittedPipelineFullNames(new ArrayList<>(omittedPipelineTriggersByPipelineFullname.get(downstreamJobFullName)));
+            Set<String> omittedPipelines = omittedPipelineTriggersByPipelineFullname.get(downstreamJobFullName);
+            if (omittedPipelines == null) {
+                omittedPipelines = Collections.emptySet();
+            }
+            cause.setOmittedPipelineFullNames(new ArrayList<>(omittedPipelines));
             // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
             Run downstreamJobLastBuild = downstreamJob.getLastBuild();
             if (downstreamJobLastBuild == null) {
