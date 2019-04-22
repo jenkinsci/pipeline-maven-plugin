@@ -75,6 +75,7 @@ import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
 import org.jenkinsci.plugins.pipeline.maven.console.MaskPasswordsConsoleLogFilter;
 import org.jenkinsci.plugins.pipeline.maven.console.MavenColorizerConsoleLogFilter;
 import org.jenkinsci.plugins.pipeline.maven.fix.jenkins49337.GeneralNonBlockingStepExecution;
+import org.jenkinsci.plugins.pipeline.maven.util.FileUtils;
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
@@ -666,9 +667,13 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         } else {
             // resolve relative/absolute with workspace as base
             String expandedPath = envOverride.expand(env.expand(step.getMavenLocalRepo()));
-            FilePath repoPath = new FilePath(ws, expandedPath);
-            repoPath.mkdirs();
-            expandedMavenLocalRepo = repoPath.getRemote();
+            if (FileUtils.isAbsolutePath(expandedPath)) {
+                expandedMavenLocalRepo = expandedPath;
+            } else {
+                FilePath repoPath = new FilePath(ws, expandedPath);
+                repoPath.mkdirs();
+                expandedMavenLocalRepo = repoPath.getRemote();
+            }
         }
         LOGGER.log(Level.FINEST, "setupMavenLocalRepo({0}): {1}", new Object[]{step.getMavenLocalRepo(), expandedMavenLocalRepo});
         return expandedMavenLocalRepo;
