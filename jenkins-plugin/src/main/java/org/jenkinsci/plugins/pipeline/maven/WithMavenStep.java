@@ -66,7 +66,7 @@ import java.util.Set;
 public class WithMavenStep extends Step {
 
 
-    private String tempBinDir;
+    private String tempBinDir = "";
     private String mavenSettingsConfig;
     private String mavenSettingsFilePath = "";
     private String globalMavenSettingsConfig;
