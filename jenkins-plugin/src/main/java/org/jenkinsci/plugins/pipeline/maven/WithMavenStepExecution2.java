@@ -196,7 +196,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         withContainer = detectWithContainer();
 
         if (withContainer) {
-            listener.getLogger().print("[withMaven]\"withMaven(){...}\" step running within a Docker container. See " );
+            listener.getLogger().print("[withMaven] IMPORTANT \"withMaven(){...}\" step running within a Docker container. See " );
             listener.hyperlink("https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/jenkins-plugin/src/resources/faq.md#how-to-use-the-pipeline-maven-plugin-with-docker-since-version-303", "Pipeline Maven Plugin FAQ");
             listener.getLogger().println(" in case of problem.");
         }
