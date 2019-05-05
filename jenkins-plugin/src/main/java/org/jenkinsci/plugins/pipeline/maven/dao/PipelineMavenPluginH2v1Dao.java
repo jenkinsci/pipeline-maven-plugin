@@ -997,11 +997,15 @@ public class PipelineMavenPluginH2v1Dao implements PipelineMavenPluginJdbcDao {
 
                         artifact.setGroupId(rst.getString("maven_artifact.group_id"));
                         artifact.setArtifactId(rst.getString("maven_artifact.artifact_id"));
-                        artifact.setVersion(rst.getString("maven_artifact.version"));
+                        artifact.setBaseVersion(rst.getString("maven_artifact.version"));
                         artifact.setType(rst.getString("maven_artifact.type"));
                         artifact.setClassifier(rst.getString("maven_artifact.classifier"));
 
-                        artifact.setBaseVersion(rst.getString("generated_maven_artifact.version"));
+                        String version = rst.getString("generated_maven_artifact.version");
+                        if (version == null || version.isEmpty()) {
+                            version = rst.getString("maven_artifact.version");
+                        }
+                        artifact.setVersion(version);
                         artifact.setRepositoryUrl(rst.getString("generated_maven_artifact.repository_url"));
                         artifact.setExtension(rst.getString("generated_maven_artifact.extension"));
                         artifact.setSnapshot(artifact.getVersion().endsWith("-SNAPSHOT"));
