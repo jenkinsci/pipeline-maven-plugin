@@ -1001,11 +1001,15 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
 
                         artifact.setGroupId(rst.getString("MAVEN_ARTIFACT.group_id"));
                         artifact.setArtifactId(rst.getString("MAVEN_ARTIFACT.artifact_id"));
-                        artifact.setVersion(rst.getString("MAVEN_ARTIFACT.version"));
+                        artifact.setBaseVersion(rst.getString("MAVEN_ARTIFACT.version"));
                         artifact.setType(rst.getString("MAVEN_ARTIFACT.type"));
                         artifact.setClassifier(rst.getString("MAVEN_ARTIFACT.classifier"));
 
-                        artifact.setBaseVersion(rst.getString("GENERATED_MAVEN_ARTIFACT.version"));
+                        String version = rst.getString("GENERATED_MAVEN_ARTIFACT.version");
+                        if (version == null || version.isEmpty()) {
+                            version = rst.getString("MAVEN_ARTIFACT.version");
+                        }
+                        artifact.setVersion(version);
                         artifact.setRepositoryUrl(rst.getString("GENERATED_MAVEN_ARTIFACT.repository_url"));
                         artifact.setExtension(rst.getString("GENERATED_MAVEN_ARTIFACT.extension"));
                         artifact.setSnapshot(artifact.getVersion().endsWith("-SNAPSHOT"));
