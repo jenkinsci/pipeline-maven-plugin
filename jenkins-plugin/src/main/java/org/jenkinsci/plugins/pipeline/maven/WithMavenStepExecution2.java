@@ -347,16 +347,23 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         //
         // MAVEN_CONFIG
+        boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
         StringBuilder mavenConfig = new StringBuilder();
         mavenConfig.append("--batch-mode ");
         mavenConfig.append("--show-version ");
         if (StringUtils.isNotEmpty(settingsFilePath)) {
+            // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
+        	if (!isUnix) settingsFilePath=settingsFilePath.replace("%", "%%");
             mavenConfig.append("--settings \"" + settingsFilePath + "\" ");
         }
         if (StringUtils.isNotEmpty(globalSettingsFilePath)) {
+            // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
+        	if (!isUnix) globalSettingsFilePath=globalSettingsFilePath.replace("%", "%%");
             mavenConfig.append("--global-settings \"" + globalSettingsFilePath + "\" ");
         }
         if (StringUtils.isNotEmpty(mavenLocalRepo)) {
+            // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
+        	if (!isUnix) mavenLocalRepo=mavenLocalRepo.replace("%", "%%");
             mavenConfig.append("\"-Dmaven.repo.local=" + mavenLocalRepo + "\" ");
         }
 
@@ -616,8 +623,6 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             String lineSep = "\r\n";
             script.append("@echo off").append(lineSep);
             script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
-            // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
-            mavenConfig = mavenConfig.replace("%", "%%");
             script.append("\"" + mvnExec.getRemote() + "\" " + mavenConfig + " %*").append(lineSep);
         }
 
