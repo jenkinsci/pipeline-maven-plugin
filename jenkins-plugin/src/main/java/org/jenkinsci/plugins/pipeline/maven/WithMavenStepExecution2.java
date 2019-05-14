@@ -616,6 +616,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             String lineSep = "\r\n";
             script.append("@echo off").append(lineSep);
             script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
+            // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
+            mavenConfig = mavenConfig.replace("%", "%%");
             script.append("\"" + mvnExec.getRemote() + "\" " + mavenConfig + " %*").append(lineSep);
         }
 
