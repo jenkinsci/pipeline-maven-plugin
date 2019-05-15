@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class MigrationStep8 implements MigrationStep {
 
@@ -21,7 +22,7 @@ public class MigrationStep8 implements MigrationStep {
             }
         }
         if (masterId == null) {
-            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO JENKINS_MASTER(LEGACY_INSTANCE_ID, URL) values (?, ?)")) {
+            try (PreparedStatement stmt = cnn.prepareStatement("INSERT INTO JENKINS_MASTER(LEGACY_INSTANCE_ID, URL) values (?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                 stmt.setString(1, jenkinsDetails.getMasterLegacyInstanceId());
                 stmt.setString(2, jenkinsDetails.getMasterRootUrl());
                 stmt.execute();
