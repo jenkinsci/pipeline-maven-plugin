@@ -27,8 +27,8 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 import com.google.common.base.Preconditions;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.commons.lang.Validate;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
+import org.junit.Before;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,12 +39,15 @@ import javax.sql.DataSource;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
+public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
 
     @Override
-    public DataSource before_newDataSource() {
+    public DataSource before_newDataSource() throws Exception {
+
+        Class.forName("org.postgresql.Driver");
+
         HikariConfig config = new HikariConfig();
-        String configurationFilePath = ".mysql_config";
+        String configurationFilePath = ".postgresql_config";
         InputStream propertiesInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(configurationFilePath);
 
         Properties properties = new Properties();
@@ -60,13 +63,12 @@ public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstrac
         config.setJdbcUrl(Preconditions.checkNotNull(properties.getProperty("jdbc.url")));
         config.setUsername(Preconditions.checkNotNull(properties.getProperty("jdbc.username")));
         config.setPassword(Preconditions.checkNotNull(properties.getProperty("jdbc.password")));
-        config.setDataSourceProperties(properties);
         return new HikariDataSource(config);
     }
 
     @Override
     public AbstractPipelineMavenPluginDao before_newAbstractPipelineMavenPluginDao(DataSource ds) {
-        return new PipelineMavenPluginMySqlDao(ds) {
+        return new PipelineMavenPluginPostgreSqlDao(ds) {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {
@@ -83,4 +85,5 @@ public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstrac
             }
         };
     }
+
 }

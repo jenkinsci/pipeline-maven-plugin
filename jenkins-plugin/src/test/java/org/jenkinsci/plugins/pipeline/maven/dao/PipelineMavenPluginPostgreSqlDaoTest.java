@@ -24,44 +24,22 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import com.google.common.base.Preconditions;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import org.apache.commons.lang.Validate;
+import org.h2.jdbcx.JdbcConnectionPool;
+import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
+import org.junit.Assert;
+import org.junit.Test;
 
 import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
+public class PipelineMavenPluginPostgreSqlDaoTest extends PipelineMavenPluginDaoAbstractTest {
 
     @Override
     public DataSource before_newDataSource() {
-        HikariConfig config = new HikariConfig();
-        String configurationFilePath = ".mysql_config";
-        InputStream propertiesInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(configurationFilePath);
-
-        Properties properties = new Properties();
-        if (propertiesInputStream == null) {
-            throw new IllegalArgumentException("Config file " + configurationFilePath + " not found in classpath");
-        } else {
-            try {
-                properties.load(propertiesInputStream);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        config.setJdbcUrl(Preconditions.checkNotNull(properties.getProperty("jdbc.url")));
-        config.setUsername(Preconditions.checkNotNull(properties.getProperty("jdbc.username")));
-        config.setPassword(Preconditions.checkNotNull(properties.getProperty("jdbc.password")));
-        config.setDataSourceProperties(properties);
-        return new HikariDataSource(config);
+        return JdbcConnectionPool.create("jdbc:h2:mem:;MODE=PostgreSQL", "sa", "");
     }
 
     @Override
@@ -83,4 +61,5 @@ public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstrac
             }
         };
     }
+
 }

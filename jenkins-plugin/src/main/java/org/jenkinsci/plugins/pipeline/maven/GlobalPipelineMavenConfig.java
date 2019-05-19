@@ -48,6 +48,7 @@ import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginMonitoringDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginMySqlDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginPostgreSqlDao;
 import org.jenkinsci.plugins.pipeline.maven.service.PipelineTriggerService;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -292,6 +293,8 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     p.setProperty("dataSource.cacheServerConfiguration", "true");
                     p.setProperty("dataSource.elideSetAutoCommits", "true");
                     p.setProperty("dataSource.maintainTimeStats", "false");
+                } else if (jdbcUrl.startsWith("jdbc:postgresql")) {
+                    // FIXME tune PostgreSQL Data Source settings
                 } else if (jdbcUrl.startsWith("jdbc:h2")) {
                     // dsConfig.setDataSourceClassName("org.h2.jdbcx.JdbcDataSource"); don't specify the datasource due to a classloading issue
                 }
@@ -318,6 +321,12 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                             } catch (ClassNotFoundException cnfe) {
                                 throw new RuntimeException("MySql driver 'com.mysql.cj.jdbc.Driver' not found. Please install the 'MySQL Database Plugin' to install the MySql driver");
                             }
+                        } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
+                            try {
+                                Class.forName("org.postgresql.Driver");
+                            } catch (ClassNotFoundException cnfe) {
+                                throw new RuntimeException("PostgreSQL driver 'org.postgresql.Driver' not found. Please install the 'PostgreSQL Database Plugin' to install the PostgreSQL driver");
+                            }
                         } else {
                             throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
                         }
@@ -335,6 +344,8 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     daoClass = PipelineMavenPluginH2Dao.class;
                 } else if (jdbcUrl.startsWith("jdbc:mysql:")) {
                     daoClass = PipelineMavenPluginMySqlDao.class;
+                } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
+                    daoClass = PipelineMavenPluginPostgreSqlDao.class;
                 } else {
                     throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
                 }
@@ -413,6 +424,8 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 driverClass = "org.h2.Driver";
             } else if (jdbcUrl.startsWith("jdbc:mysql")) {
                 driverClass = "com.mysql.cj.jdbc.Driver";
+            } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
+                driverClass = "org.postgresql.Driver";
             } else {
                 return FormValidation.error("Unsupported database specified in JDBC url '" + jdbcUrl + "'");
             }
@@ -511,6 +524,15 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                                 break;
                             default:
                                 return FormValidation.error("Non supported MySQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
+                        }
+                    } else if ("PostgreSQL".equals(metaData.getDatabaseProductName())) {
+                        // Fixme better postgresql handling
+                        switch (metaData.getDatabaseMajorVersion()) {
+                            case 11:
+                                // OK
+                                break;
+                            default:
+                                return FormValidation.warning("Non tested PostgreSQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement + " Tested version: 11");
                         }
                     } else {
                         return FormValidation.warning("Non production grade database. For production workloads, " + databaseRequirement);

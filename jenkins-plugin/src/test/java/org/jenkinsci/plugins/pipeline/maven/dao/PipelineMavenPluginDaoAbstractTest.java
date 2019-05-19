@@ -62,7 +62,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
     protected AbstractPipelineMavenPluginDao dao;
 
     @Before
-    public void before() {
+    public void before() throws Exception {
         ds = before_newDataSource();
         SqlTestsUtils.silentlyDeleteTableRows(ds, "JENKINS_MASTER", "JENKINS_JOB", "JENKINS_BUILD", "MAVEN_ARTIFACT", "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT");
         dao = before_newAbstractPipelineMavenPluginDao(ds);
@@ -79,7 +79,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
     }
 
     @Nonnull
-    public abstract DataSource before_newDataSource();
+    public abstract DataSource before_newDataSource() throws Exception;
 
     @Nonnull
     public abstract AbstractPipelineMavenPluginDao before_newAbstractPipelineMavenPluginDao(DataSource ds);
