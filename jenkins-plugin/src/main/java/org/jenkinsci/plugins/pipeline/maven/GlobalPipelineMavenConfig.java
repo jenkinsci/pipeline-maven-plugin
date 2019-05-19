@@ -294,7 +294,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     p.setProperty("dataSource.elideSetAutoCommits", "true");
                     p.setProperty("dataSource.maintainTimeStats", "false");
                 } else if (jdbcUrl.startsWith("jdbc:postgresql")) {
-                    // FIXME tune PostgreSQL Data Source settings
+                    // no tuning recommendations found for postgresql
                 } else if (jdbcUrl.startsWith("jdbc:h2")) {
                     // dsConfig.setDataSourceClassName("org.h2.jdbcx.JdbcDataSource"); don't specify the datasource due to a classloading issue
                 }
@@ -473,7 +473,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     // * Amazon Aurora: "5.6.10"
                     // * MariaDB: "5.5.5-10.2.20-MariaDB", "5.5.5-10.3.11-MariaDB-1:10.3.11+maria~bionic"
                     String databaseVersionDescription = metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion();
-                    String databaseRequirement = "MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ or MariaDB 10.2+ is required";
+                    String databaseRequirement = "MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ or MariaDB 10.2+ or PostgreSQL 11+ or Amazon Aurora PostgreSQL 10.6+ is required";
                     if ("MySQL".equals(metaData.getDatabaseProductName())) {
                         @Nullable
                         String amazonAuroraVersion;
@@ -526,13 +526,37 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                                 return FormValidation.error("Non supported MySQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
                         }
                     } else if ("PostgreSQL".equals(metaData.getDatabaseProductName())) {
-                        // Fixme better postgresql handling
+                        // Fixme better postgresql handling. Aurora seems to be PG9
+
+                        @Nullable
+                        String amazonAuroraVersion; // https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Updates.html
+                        try (Statement stmt = cnn.createStatement()) {
+                            try (ResultSet rst = stmt.executeQuery("select AURORA_VERSION()")) {
+                                rst.next();
+                                amazonAuroraVersion = rst.getString(1);
+                                databaseVersionDescription += " / Aurora " + rst.getString(1);
+                            } catch (SQLException e) {
+                                if ("42883".equals(e.getSQLState())) { // org.postgresql.util.PSQLState.UNDEFINED_FUNCTION.getState()
+                                    amazonAuroraVersion = null;
+                                } else {
+                                    LOGGER.log(Level.WARNING,"Exception checking Amazon Aurora version", e);
+                                    amazonAuroraVersion = null;
+                                }
+                            }
+                        }
                         switch (metaData.getDatabaseMajorVersion()) {
                             case 11:
                                 // OK
                                 break;
+                            case 10:
+                                if (amazonAuroraVersion == null) {
+                                    return FormValidation.warning("Non tested PostgreSQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
+                                } else {
+                                    // we have successfully tested on Amazon Aurora PostgreSQL 10.6
+                                    break;
+                                }
                             default:
-                                return FormValidation.warning("Non tested PostgreSQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement + " Tested version: 11");
+                                return FormValidation.warning("Non tested PostgreSQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
                         }
                     } else {
                         return FormValidation.warning("Non production grade database. For production workloads, " + databaseRequirement);

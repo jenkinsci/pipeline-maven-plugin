@@ -76,7 +76,6 @@ public class PipelineMavenPluginPostgreSqlDao extends AbstractPipelineMavenPlugi
                 } catch (SQLException e) {
                     if (PSQLState.UNDEFINED_FUNCTION.getState().equals(e.getSQLState())) { // " 42883 - ERROR: function aurora_version() does not exist"
                         // not Amazon aurora, the function aurora_version() does not exist
-                        // FIXME verify aurora verification on Amazon Aurora
                     } else {
                         LOGGER.log(Level.WARNING, "Exception checking Amazon Aurora version", e);
                     }
