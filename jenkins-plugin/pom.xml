@@ -158,11 +158,8 @@
       <version>6.1.2</version>
     </dependency>
     <dependency>
-      <!--
-      Cant upgrade to 1.4.197 because "META-INF/versions/9/org/h2/util/Bits.class targeted to 53.0"
-      -->
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>h2-api</artifactId>
       <version>1.4.199</version>
     </dependency>
     <dependency>
