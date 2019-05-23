@@ -24,9 +24,6 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import com.mysql.cj.exceptions.MysqlErrorNumbers;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 import org.postgresql.util.PSQLState;
 
 import java.sql.Connection;
@@ -38,7 +35,6 @@ import java.sql.Statement;
 import java.util.logging.Level;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.sql.DataSource;
 
 /**

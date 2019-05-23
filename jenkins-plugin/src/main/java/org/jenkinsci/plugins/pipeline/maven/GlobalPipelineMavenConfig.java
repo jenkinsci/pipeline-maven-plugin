@@ -526,8 +526,6 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                                 return FormValidation.error("Non supported MySQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
                         }
                     } else if ("PostgreSQL".equals(metaData.getDatabaseProductName())) {
-                        // Fixme better postgresql handling. Aurora seems to be PG9
-
                         @Nullable
                         String amazonAuroraVersion; // https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Updates.html
                         try (Statement stmt = cnn.createStatement()) {
