@@ -56,7 +56,7 @@ public class PipelineMavenPluginPostgreSqlDao extends AbstractPipelineMavenPlugi
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("PostgreSQL driver 'org.postgresql.Driver' not found. Please install the 'PostgreSQL Database Plugin' to install the PostgreSQL driver");
+            throw new RuntimeException("PostgreSQL driver 'org.postgresql.Driver' not found. Please install the 'PostgreSQL API Plugin' to install the PostgreSQL driver");
         }
     }
 
