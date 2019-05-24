@@ -94,6 +94,8 @@ public class SqlTestsUtils {
                     // ignore "H2 table not found"
                 } else if (e.getErrorCode() == 1146) {
                     // ignore "MySQL table not found"
+                } else if ("42P01".equals(e.getSQLState())) {
+                    // ignore PostgreSQL "ERROR: relation "..." does not exist
                 } else {
                     throw new RuntimeSqlException(e);
                 }

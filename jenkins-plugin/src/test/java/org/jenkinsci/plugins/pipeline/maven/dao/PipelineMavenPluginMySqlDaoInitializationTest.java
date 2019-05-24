@@ -100,7 +100,7 @@ public class PipelineMavenPluginMySqlDaoInitializationTest {
             }
         }
 
-        PipelineMavenPluginH2v1Dao daoWithValidJenkinsUrl = new PipelineMavenPluginH2v1Dao(jdbcConnectionPool) {
+        PipelineMavenPluginH2Dao daoWithValidJenkinsUrl = new PipelineMavenPluginH2Dao(jdbcConnectionPool) {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {

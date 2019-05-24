@@ -35,6 +35,7 @@ import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
+import org.jenkinsci.plugins.pipeline.maven.util.SqlUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -118,7 +119,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     @Override
     public List<MavenDependency> listDependencies(@Nonnull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
-        String dependenciesSql = "SELECT DISTINCT MAVEN_ARTIFACT.*,  MAVEN_DEPENDENCY.scope " +
+        String dependenciesSql = "SELECT DISTINCT MAVEN_ARTIFACT.group_id, MAVEN_ARTIFACT.artifact_id, MAVEN_ARTIFACT.version, MAVEN_ARTIFACT.type, MAVEN_ARTIFACT.classifier,  MAVEN_DEPENDENCY.scope " +
                 " FROM MAVEN_ARTIFACT " +
                 " INNER JOIN MAVEN_DEPENDENCY ON MAVEN_ARTIFACT.ID = MAVEN_DEPENDENCY.ARTIFACT_ID" +
                 " INNER JOIN JENKINS_BUILD ON MAVEN_DEPENDENCY.BUILD_ID = JENKINS_BUILD.ID " +
@@ -136,13 +137,13 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     while (rst.next()) {
                         MavenDependency artifact = new MavenDependency();
 
-                        artifact.setGroupId(rst.getString("MAVEN_ARTIFACT.group_id"));
-                        artifact.setArtifactId(rst.getString("MAVEN_ARTIFACT.artifact_id"));
-                        artifact.setVersion(rst.getString("MAVEN_ARTIFACT.version"));
+                        artifact.setGroupId(rst.getString("group_id"));
+                        artifact.setArtifactId(rst.getString("artifact_id"));
+                        artifact.setVersion(rst.getString("version"));
                         artifact.setSnapshot(artifact.getVersion().endsWith("-SNAPSHOT"));
-                        artifact.setType(rst.getString("MAVEN_ARTIFACT.type"));
-                        artifact.setClassifier(rst.getString("MAVEN_ARTIFACT.classifier"));
-                        artifact.setScope(rst.getString("MAVEN_DEPENDENCY.scope"));
+                        artifact.setType(rst.getString("type"));
+                        artifact.setClassifier(rst.getString("classifier"));
+                        artifact.setScope(rst.getString("scope"));
                         results.add(artifact);
                     }
                 }
@@ -295,14 +296,14 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 Integer newLastBuildNumber = (lastBuildNumber == buildNumber) ? null : lastBuildNumber;
                 Integer newLastSuccessfulBuildNumber = (lastSuccessfulBuildNumber == buildNumber) ? null : lastSuccessfulBuildNumber;
 
-                try (PreparedStatement stmt = cnn.prepareStatement("SELECT JENKINS_BUILD.NUMBER, RESULT_ID FROM JENKINS_BUILD WHERE JOB_ID = ? AND NUMBER != ? ORDER BY NUMBER DESC")) {
+                try (PreparedStatement stmt = cnn.prepareStatement("SELECT JENKINS_BUILD.number, JENKINS_BUILD.result_id FROM JENKINS_BUILD WHERE JOB_ID = ? AND NUMBER != ? ORDER BY NUMBER DESC")) {
                     stmt.setLong(1, jobPrimaryKey);
                     stmt.setInt(2, buildNumber);
                     stmt.setFetchSize(5);
                     try (ResultSet rst = stmt.executeQuery()) {
                         while (rst.next() && (newLastBuildNumber == null || newLastSuccessfulBuildNumber == null)) {
-                            int currentBuildNumber = rst.getInt("JENKINS_BUILD.NUMBER");
-                            int currentBuildResultId = rst.getInt("RESULT_ID");
+                            int currentBuildNumber = rst.getInt("number");
+                            int currentBuildResultId = rst.getInt("result_id");
 
                             if(newLastBuildNumber == null) {
                                 newLastBuildNumber = currentBuildNumber;
@@ -369,13 +370,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     stmt.setString(1, jobFullName);
                     stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
                     stmt.execute();
-                    try (ResultSet rst = stmt.getGeneratedKeys()) {
-                        if (rst.next()) {
-                            jobPrimaryKey = rst.getLong(1);
-                        } else {
-                            throw new IllegalStateException();
-                        }
-                    }
+                    jobPrimaryKey = getGeneratedPrimaryKey(stmt, "ID");
                 }
             }
             Long buildPrimaryKey = null;
@@ -394,13 +389,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     stmt.setLong(1, jobPrimaryKey);
                     stmt.setInt(2, buildNumber);
                     stmt.execute();
-                    try (ResultSet rst = stmt.getGeneratedKeys()) {
-                        if (rst.next()) {
-                            buildPrimaryKey = rst.getLong(1);
-                        } else {
-                            throw new IllegalStateException();
-                        }
-                    }
+                    buildPrimaryKey = getGeneratedPrimaryKey(stmt, "ID");
                 }
             }
             cnn.commit();
@@ -408,6 +397,18 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         } catch (SQLException e) {
             throw new RuntimeSqlException(e);
         }
+    }
+
+    protected Long getGeneratedPrimaryKey(PreparedStatement stmt, String column) throws SQLException {
+        Long jobPrimaryKey;
+        try (ResultSet rst = stmt.getGeneratedKeys()) {
+            if (rst.next()) {
+                jobPrimaryKey = rst.getLong(1);
+            } else {
+                throw new IllegalStateException();
+            }
+        }
+        return jobPrimaryKey;
     }
 
     protected long getOrCreateArtifactPrimaryKey(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nullable String classifier) {
@@ -454,13 +455,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     stmt.setString(5, classifier);
 
                     stmt.execute();
-                    try (ResultSet rst = stmt.getGeneratedKeys()) {
-                        if (rst.next()) {
-                            artifactPrimaryKey = rst.getLong(1);
-                        } else {
-                            throw new IllegalStateException();
-                        }
-                    }
+                    artifactPrimaryKey = getGeneratedPrimaryKey(stmt, "ID");
                 }
             }
             cnn.commit();
@@ -566,6 +561,9 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     schemaVersion = 0;
                 } else if (e.getErrorCode() == 1146) {
                     // MySQL TABLE_OR_VIEW_NOT_FOUND_1
+                    schemaVersion = 0;
+                } else if ("42P01".equals(e.getSQLState())) {
+                    // ignore PostgreSQL "ERROR: relation "..." does not exist
                     schemaVersion = 0;
                 } else {
                     throw new RuntimeSqlException(e);
@@ -727,8 +725,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
 
 
         String sql = "select distinct downstream_job.full_name, \n " +
-                "   MAVEN_ARTIFACT.group_id, MAVEN_ARTIFACT.artifact_id, MAVEN_ARTIFACT.version, MAVEN_ARTIFACT.type, MAVEN_ARTIFACT.classifier, \n" +
-                "   GENERATED_MAVEN_ARTIFACT.version, GENERATED_MAVEN_ARTIFACT.extension \n" +
+                "   MAVEN_ARTIFACT.group_id, MAVEN_ARTIFACT.artifact_id, MAVEN_ARTIFACT.version as base_version, MAVEN_ARTIFACT.type, MAVEN_ARTIFACT.classifier, \n" +
+                "   GENERATED_MAVEN_ARTIFACT.version as version, GENERATED_MAVEN_ARTIFACT.extension \n" +
                 "from JENKINS_JOB as upstream_job \n" +
                 "inner join JENKINS_BUILD as upstream_build on upstream_job.id = upstream_build.job_id \n" +
                 "inner join GENERATED_MAVEN_ARTIFACT on (upstream_build.id = GENERATED_MAVEN_ARTIFACT.build_id and GENERATED_MAVEN_ARTIFACT.skip_downstream_triggers = false) \n" +
@@ -752,8 +750,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                         MavenArtifact artifact = new MavenArtifact();
                         artifact.setGroupId(rst.getString("group_id"));
                         artifact.setArtifactId(rst.getString("artifact_id"));
-                        artifact.setVersion(rst.getString("GENERATED_MAVEN_ARTIFACT.version"));
-                        artifact.setBaseVersion(rst.getString("MAVEN_ARTIFACT.version"));
+                        artifact.setVersion(rst.getString("version"));
+                        artifact.setBaseVersion(rst.getString("base_version"));
                         artifact.setType(rst.getString("type"));
                         artifact.setClassifier(rst.getString("classifier"));
                         artifact.setExtension(rst.getString("extension"));
@@ -812,8 +810,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     protected Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifactBasedOnParentProjectDependencies(String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
         String sql = "select distinct downstream_job.full_name, \n" +
-                "   MAVEN_ARTIFACT.group_id, MAVEN_ARTIFACT.artifact_id, MAVEN_ARTIFACT.version, MAVEN_ARTIFACT.type, MAVEN_ARTIFACT.classifier, \n" +
-                "   GENERATED_MAVEN_ARTIFACT.version, GENERATED_MAVEN_ARTIFACT.extension \n" +
+                "   MAVEN_ARTIFACT.group_id, MAVEN_ARTIFACT.artifact_id, MAVEN_ARTIFACT.version as base_version, MAVEN_ARTIFACT.type, MAVEN_ARTIFACT.classifier, \n" +
+                "   GENERATED_MAVEN_ARTIFACT.version as version, GENERATED_MAVEN_ARTIFACT.extension \n" +
                 "from JENKINS_JOB as upstream_job \n" +
                 "inner join JENKINS_BUILD as upstream_build on upstream_job.id = upstream_build.job_id \n" +
                 "inner join GENERATED_MAVEN_ARTIFACT on (upstream_build.id = GENERATED_MAVEN_ARTIFACT.build_id and GENERATED_MAVEN_ARTIFACT.skip_downstream_triggers = false) \n" +
@@ -838,8 +836,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                         MavenArtifact artifact = new MavenArtifact();
                         artifact.setGroupId(rst.getString("group_id"));
                         artifact.setArtifactId(rst.getString("artifact_id"));
-                        artifact.setVersion(rst.getString("GENERATED_MAVEN_ARTIFACT.version"));
-                        artifact.setBaseVersion(rst.getString("MAVEN_ARTIFACT.version"));
+                        artifact.setVersion(rst.getString("version"));
+                        artifact.setBaseVersion(rst.getString("base_version"));
                         artifact.setType(rst.getString("type"));
                         artifact.setClassifier(rst.getString("classifier"));
                         artifact.setExtension(rst.getString("extension"));
@@ -979,7 +977,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     @Nonnull
     public List<MavenArtifact> getGeneratedArtifacts(@Nonnull String jobFullName, @Nonnull int buildNumber) {
         LOGGER.log(Level.FINER, "getGeneratedArtifacts({0}, {1})", new Object[]{jobFullName, buildNumber});
-        String generatedArtifactsSql = "SELECT DISTINCT MAVEN_ARTIFACT.*,  GENERATED_MAVEN_ARTIFACT.* " +
+        String generatedArtifactsSql = "SELECT DISTINCT MAVEN_ARTIFACT.group_id, MAVEN_ARTIFACT.artifact_id, MAVEN_ARTIFACT.type, MAVEN_ARTIFACT.classifier, MAVEN_ARTIFACT.version as base_version, " +
+                "GENERATED_MAVEN_ARTIFACT.version as version, GENERATED_MAVEN_ARTIFACT.repository_url, GENERATED_MAVEN_ARTIFACT.extension" +
                 " FROM MAVEN_ARTIFACT " +
                 " INNER JOIN GENERATED_MAVEN_ARTIFACT ON MAVEN_ARTIFACT.ID = GENERATED_MAVEN_ARTIFACT.ARTIFACT_ID" +
                 " INNER JOIN JENKINS_BUILD AS UPSTREAM_BUILD ON GENERATED_MAVEN_ARTIFACT.BUILD_ID = UPSTREAM_BUILD.ID " +
@@ -999,19 +998,19 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     while (rst.next()) {
                         MavenArtifact artifact = new MavenArtifact();
 
-                        artifact.setGroupId(rst.getString("MAVEN_ARTIFACT.group_id"));
-                        artifact.setArtifactId(rst.getString("MAVEN_ARTIFACT.artifact_id"));
-                        artifact.setBaseVersion(rst.getString("MAVEN_ARTIFACT.version"));
-                        artifact.setType(rst.getString("MAVEN_ARTIFACT.type"));
-                        artifact.setClassifier(rst.getString("MAVEN_ARTIFACT.classifier"));
+                        artifact.setGroupId(rst.getString("group_id"));
+                        artifact.setArtifactId(rst.getString("artifact_id"));
+                        artifact.setBaseVersion(rst.getString("base_version"));
+                        artifact.setType(rst.getString("type"));
+                        artifact.setClassifier(rst.getString("classifier"));
 
-                        String version = rst.getString("GENERATED_MAVEN_ARTIFACT.version");
+                        String version = rst.getString("version");
                         if (version == null || version.isEmpty()) {
-                            version = rst.getString("MAVEN_ARTIFACT.version");
+                            version = rst.getString("base_version");
                         }
                         artifact.setVersion(version);
-                        artifact.setRepositoryUrl(rst.getString("GENERATED_MAVEN_ARTIFACT.repository_url"));
-                        artifact.setExtension(rst.getString("GENERATED_MAVEN_ARTIFACT.extension"));
+                        artifact.setRepositoryUrl(rst.getString("repository_url"));
+                        artifact.setExtension(rst.getString("extension"));
                         artifact.setSnapshot(artifact.getVersion().endsWith("-SNAPSHOT"));
 
                         // artifact.put("skip_downstream_triggers", rst.getString("GENERATED_MAVEN_ARTIFACT.skip_downstream_triggers"));
@@ -1048,13 +1047,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     stmt.setString(1, jenkinsMasterLegacyInstanceId);
                     stmt.setString(2, jenkinsMasterUrl);
                     stmt.execute();
-                    try (ResultSet rst = stmt.getGeneratedKeys()) {
-                        if (rst.next()) {
-                            this.jenkinsMasterPrimaryKey = rst.getLong(1);
-                        } else {
-                            throw new IllegalStateException();
-                        }
-                    }
+                    this.jenkinsMasterPrimaryKey = getGeneratedPrimaryKey(stmt, "ID");
                 }
             } else { // FOUND IN DB, UPDATE IF NEEDED
                 if (!Objects.equals(jenkinsMasterUrl, jenkinsMasterUrlValueInDb)) {
@@ -1141,15 +1134,16 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 int count = stmt.executeUpdate();
                 if (count != 1) {
                     LOGGER.log(Level.WARNING, "updateBuildOnCompletion - more/less than 1 JENKINS_BUILD record updated (" +
-                            count + ") for " + jobFullName + "#" + buildNumber);
+                            count + ") for " + jobFullName + "#" + buildNumber + ", buildPrimaryKey=" + buildPrimaryKey);
                 }
             }
 
             if (Result.SUCCESS.ordinal == buildResultOrdinal) {
-                try (PreparedStatement stmt = cnn.prepareStatement("UPDATE JENKINS_JOB set LAST_BUILD_NUMBER = ?, LAST_SUCCESSFUL_BUILD_NUMBER = ? where FULL_NAME = ?")) {
+                try (PreparedStatement stmt = cnn.prepareStatement("UPDATE JENKINS_JOB set LAST_BUILD_NUMBER = ?, LAST_SUCCESSFUL_BUILD_NUMBER = ? where FULL_NAME = ? and JENKINS_MASTER_ID = ?")) {
                     stmt.setInt(1, buildNumber);
                     stmt.setInt(2, buildNumber);
                     stmt.setString(3, jobFullName);
+                    stmt.setLong(4, getJenkinsMasterPrimaryKey(cnn));
                     int count = stmt.executeUpdate();
                     if (count != 1) {
                         LOGGER.log(Level.WARNING, "updateBuildOnCompletion - more/less than 1 JENKINS_JOB record updated (" +
@@ -1157,9 +1151,10 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     }
                 }
             } else {
-                try (PreparedStatement stmt = cnn.prepareStatement("UPDATE JENKINS_JOB set LAST_BUILD_NUMBER = ? where FULL_NAME = ?")) {
+                try (PreparedStatement stmt = cnn.prepareStatement("UPDATE JENKINS_JOB set LAST_BUILD_NUMBER = ? where FULL_NAME = ?  and JENKINS_MASTER_ID = ?")) {
                     stmt.setInt(1, buildNumber);
                     stmt.setString(2, jobFullName);
+                    stmt.setLong(3, getJenkinsMasterPrimaryKey(cnn));
                     int count = stmt.executeUpdate();
                     if (count != 1) {
                         LOGGER.log(Level.WARNING, "updateBuildOnCompletion - more/less than 1 JENKINS_JOB record updated (" +
