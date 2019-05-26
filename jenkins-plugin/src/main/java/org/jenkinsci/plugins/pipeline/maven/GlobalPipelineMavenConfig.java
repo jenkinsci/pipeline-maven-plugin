@@ -473,7 +473,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     // * Amazon Aurora: "5.6.10"
                     // * MariaDB: "5.5.5-10.2.20-MariaDB", "5.5.5-10.3.11-MariaDB-1:10.3.11+maria~bionic"
                     String databaseVersionDescription = metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion();
-                    String databaseRequirement = "MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ or MariaDB 10.2+ or PostgreSQL 11+ or Amazon Aurora PostgreSQL 10.6+ is required";
+                    String databaseRequirement = "MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ or MariaDB 10.2+ or PostgreSQL 10+ is required";
                     if ("MySQL".equals(metaData.getDatabaseProductName())) {
                         @Nullable
                         String amazonAuroraVersion;
@@ -544,15 +544,9 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                         }
                         switch (metaData.getDatabaseMajorVersion()) {
                             case 11:
+                            case 10:
                                 // OK
                                 break;
-                            case 10:
-                                if (amazonAuroraVersion == null) {
-                                    return FormValidation.warning("Non tested PostgreSQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
-                                } else {
-                                    // we have successfully tested on Amazon Aurora PostgreSQL 10.6
-                                    break;
-                                }
                             default:
                                 return FormValidation.warning("Non tested PostgreSQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
                         }
