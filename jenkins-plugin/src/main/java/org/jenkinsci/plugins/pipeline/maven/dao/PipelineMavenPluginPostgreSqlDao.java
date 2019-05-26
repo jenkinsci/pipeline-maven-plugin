@@ -75,6 +75,7 @@ public class PipelineMavenPluginPostgreSqlDao extends AbstractPipelineMavenPlugi
                     } else {
                         LOGGER.log(Level.WARNING, "Exception checking Amazon Aurora version", e);
                     }
+                    cnn.rollback();
                 }
             }
             return version;

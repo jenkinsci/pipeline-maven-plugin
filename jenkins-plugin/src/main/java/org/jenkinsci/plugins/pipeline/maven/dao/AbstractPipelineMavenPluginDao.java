@@ -28,6 +28,7 @@ import hudson.model.Item;
 import hudson.model.Result;
 import hudson.model.Run;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.h2.api.ErrorCode;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
@@ -35,7 +36,6 @@ import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
-import org.jenkinsci.plugins.pipeline.maven.util.SqlUtils;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -565,6 +565,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 } else if ("42P01".equals(e.getSQLState())) {
                     // ignore PostgreSQL "ERROR: relation "..." does not exist
                     schemaVersion = 0;
+                    cnn.rollback(); // postgresql requires to rollback after a 42P01 error
                 } else {
                     throw new RuntimeSqlException(e);
                 }
@@ -1048,6 +1049,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     stmt.setString(2, jenkinsMasterUrl);
                     stmt.execute();
                     this.jenkinsMasterPrimaryKey = getGeneratedPrimaryKey(stmt, "ID");
+                } finally {
+                    cnn.commit();
                 }
             } else { // FOUND IN DB, UPDATE IF NEEDED
                 if (!Objects.equals(jenkinsMasterUrl, jenkinsMasterUrlValueInDb)) {
@@ -1059,6 +1062,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                         if (count != 1) {
                             LOGGER.warning("Updated more/less than 1 JENKINS_MASTER.URL=" + jenkinsMasterUrl + " for ID=" + this.jenkinsMasterPrimaryKey);
                         }
+                    } finally {
+                        cnn.commit();
                     }
                 }
             }
@@ -1077,7 +1082,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     public String toPrettyString() {
         List<String> prettyStrings = new ArrayList<>();
         try (Connection cnn = ds.getConnection()) {
-            prettyStrings.add("jdbc.url: " + cnn.getMetaData().getURL());
+            prettyStrings.add("JDBC URL: " + cnn.getMetaData().getURL());
             List<String> tables = Arrays.asList("JENKINS_MASTER", "MAVEN_ARTIFACT", "JENKINS_JOB", "JENKINS_BUILD",
                     "MAVEN_DEPENDENCY", "GENERATED_MAVEN_ARTIFACT", "MAVEN_PARENT_PROJECT", "JENKINS_BUILD_UPSTREAM_CAUSE");
             for (String table : tables) {
@@ -1100,7 +1105,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
             LOGGER.log(Level.WARNING, "SQLException getting a connection to " + ds, e);
         }
 
-        StringBuilder result = new StringBuilder(getClass().getName() + " - " + getDatabaseDescription());
+        StringBuilder result = new StringBuilder(StringUtils.substringAfterLast(getClass().getName(), ".") + " - " + getDatabaseDescription());
         for (String prettyString : prettyStrings) {
             result.append("\r\n\t" + prettyString);
         }
