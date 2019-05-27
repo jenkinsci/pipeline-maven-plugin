@@ -33,8 +33,12 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -509,5 +513,28 @@ public class XmlUtils {
         }
 
         return result;
+    }
+
+    /**
+     * Copy {@link jenkins.util.xml.RestrictiveEntityResolver} as it is secured by {@link org.kohsuke.accmod.restrictions.NoExternalUse}.
+     *
+     * @see jenkins.util.xml.RestrictiveEntityResolver
+     */
+    public final static class RestrictiveEntityResolver implements EntityResolver {
+
+        public final static RestrictiveEntityResolver INSTANCE = new RestrictiveEntityResolver();
+
+        private RestrictiveEntityResolver() {
+            // prevent multiple instantiation.
+            super();
+        }
+
+        /**
+         * Throws a SAXException if this tried to resolve any entity.
+         */
+        @Override
+        public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+            throw new SAXException("Refusing to resolve entity with publicId(" + publicId + ") and systemId (" + systemId + ")");
+        }
     }
 }
