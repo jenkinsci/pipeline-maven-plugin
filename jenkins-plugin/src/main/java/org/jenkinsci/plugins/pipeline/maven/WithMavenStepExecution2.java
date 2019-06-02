@@ -51,6 +51,8 @@ import hudson.model.Job;
 import hudson.model.Node;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.plugins.ansicolor.AnsiColorMap;
+import hudson.plugins.ansicolor.ColorizedAction;
 import hudson.slaves.WorkspaceList;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
@@ -73,12 +75,12 @@ import org.jenkinsci.plugins.configfiles.maven.security.CredentialsHelper;
 import org.jenkinsci.plugins.configfiles.maven.security.MavenServerIdRequirement;
 import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
 import org.jenkinsci.plugins.pipeline.maven.console.MaskPasswordsConsoleLogFilter;
-import org.jenkinsci.plugins.pipeline.maven.console.MavenColorizerConsoleLogFilter;
 import org.jenkinsci.plugins.pipeline.maven.fix.jenkins49337.GeneralNonBlockingStepExecution;
 import org.jenkinsci.plugins.pipeline.maven.util.FileUtils;
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
+import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
 import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
 import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -94,14 +96,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.logging.Level;
@@ -144,7 +142,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
     private transient Computer computer;
     private transient FilePath tempBinDir;
-    private transient BodyExecution body;
+    private transient BodyExecution bodyExecution;
 
     /**
      * Indicates if running on docker with <code>docker.image()</code> or <code>container()</code>
@@ -213,18 +211,30 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         CredentialsProvider.trackAll(build, new ArrayList<>(credentials));
 
         ConsoleLogFilter originalFilter = getContext().get(ConsoleLogFilter.class);
-        ConsoleLogFilter maskSecretsFilter = MaskPasswordsConsoleLogFilter.newMaskPasswordsConsoleLogFilter(credentials, getComputer().getDefaultCharset());
-        MavenColorizerConsoleLogFilter mavenColorizerFilter = new MavenColorizerConsoleLogFilter(getComputer().getDefaultCharset().name());
+        ConsoleLogFilter maskSecretsFilter = BodyInvoker.mergeConsoleLogFilters(originalFilter, MaskPasswordsConsoleLogFilter.newMaskPasswordsConsoleLogFilter(credentials, getComputer().getDefaultCharset()));
 
-        ConsoleLogFilter newFilter = BodyInvoker.mergeConsoleLogFilters(
-                BodyInvoker.mergeConsoleLogFilters(originalFilter, maskSecretsFilter),
-                mavenColorizerFilter);
 
-        EnvironmentExpander envEx = EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), new ExpanderImpl(envOverride));
+        // MavenColorizerConsoleLogFilter mavenColorizerFilter = new MavenColorizerConsoleLogFilter(getComputer().getDefaultCharset().name());
+        String colorMapName = AnsiColorMap.DefaultName;
+        build.replaceAction(new ColorizedAction(colorMapName));
+        EnvironmentExpander currentEnvironment = getContext().get(EnvironmentExpander.class);
+        EnvironmentExpander terminalEnvironment = EnvironmentExpander.constant(Collections.singletonMap("TERM", colorMapName));
+        EnvironmentExpander ansiColorEnvironmentExpander = EnvironmentExpander.merge(currentEnvironment, terminalEnvironment);
+
+
+        EnvironmentExpander environmentExpander = EnvironmentExpander.merge(getContext().get(EnvironmentExpander.class), new ExpanderImpl(envOverride));
 
         LOGGER.log(Level.FINEST, "envOverride: {0}", envOverride); // JENKINS-40484
 
-        body = getContext().newBodyInvoker().withContexts(envEx, newFilter).withCallback(new WithMavenStepExecutionCallBack(tempBinDir, step.getOptions(), step.getPublisherStrategy())).start();
+        WithMavenStepExecutionCallBack withMavenStepExecutionCallBack = new WithMavenStepExecutionCallBack(tempBinDir, step.getOptions(), step.getPublisherStrategy());
+
+        // bodyExecution = getContext().newBodyInvoker()
+        //         .withContexts(ansiColorEnvironmentExpander)
+        //         .withCallback(BodyExecutionCallback.wrap(getContext())).start();
+
+        bodyExecution = getContext().newBodyInvoker().
+                withContexts(environmentExpander, maskSecretsFilter, ansiColorEnvironmentExpander)
+                .withCallback(withMavenStepExecutionCallBack).start();
 
         return false;
     }
@@ -351,6 +361,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         StringBuilder mavenConfig = new StringBuilder();
         mavenConfig.append("--batch-mode ");
         mavenConfig.append("--show-version ");
+        mavenConfig.append("-Dstyle.color=always ");
         if (StringUtils.isNotEmpty(settingsFilePath)) {
             // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
         	if (!isUnix) settingsFilePath=settingsFilePath.replace("%", "%%");
@@ -1134,8 +1145,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
     @Override
     public void stop(Throwable cause) throws Exception {
-        if (body != null) {
-            body.cancel(cause);
+        if (bodyExecution != null) {
+            bodyExecution.cancel(cause);
         }
     }
 
