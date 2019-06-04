@@ -126,6 +126,11 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
                 // JENKINS-42302: maven-shade-plugin creates a temporary project file dependency-reduced-pom.xml
                 // TODO see if there is a better way to implement this "workaround"
                 absolutePath = absolutePath.replace(File.separator + "dependency-reduced-pom.xml", File.separator + "pom.xml");
+            } else if (absolutePath.endsWith(File.separator + ".git-versioned-pom.xml")) {
+                // JENKINS-56666 maven-git-versioning-extension causes warnings due to temporary pom.xml file name '.git-versioned-pom.xml'
+                // https://github.com/qoomon/maven-git-versioning-extension/blob/v4.1.0/src/main/java/me/qoomon/maven/gitversioning/VersioningMojo.java#L39
+                // TODO see if there is a better way to implement this "workaround"
+                absolutePath = absolutePath.replace(File.separator + ".git-versioned-pom.xml", File.separator + "pom.xml");
             } else {
                 String flattenedPomFilename = getMavenFlattenPluginFlattenedPomFilename(project);
                 if (flattenedPomFilename == null) {

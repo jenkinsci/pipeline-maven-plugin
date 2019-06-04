@@ -26,32 +26,30 @@ package org.jenkinsci.plugins.pipeline.maven;
 
 import hudson.FilePath;
 import hudson.model.Run;
-import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import jenkins.model.InterruptedBuildAction;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JenkinsMavenEventSpyLogsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -78,7 +76,38 @@ public class MavenSpyLogProcessor implements Serializable {
 
         DocumentBuilder documentBuilder;
         try {
-            documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+
+            // https://github.com/OWASP/CheatSheetSeries/blob/master/cheatsheets/XML_External_Entity_Prevention_Cheat_Sheet.md#jaxp-documentbuilderfactory-saxparserfactory-and-dom4j
+            dbf.setExpandEntityReferences(false);
+            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+
+            // This is the PRIMARY defense. If DTDs (doctypes) are disallowed, almost all
+            // XML entity attacks are prevented
+            // Xerces 2 only - http://xerces.apache.org/xerces2-j/features.html#disallow-doctype-decl
+            dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+
+            // If you can't completely disable DTDs, then at least do the following:
+            // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-general-entities
+            // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-general-entities
+            // JDK7+ - http://xml.org/sax/features/external-general-entities
+            dbf.setFeature("http://xml.org/sax/features/external-general-entities", false);
+
+            // Xerces 1 - http://xerces.apache.org/xerces-j/features.html#external-parameter-entities
+            // Xerces 2 - http://xerces.apache.org/xerces2-j/features.html#external-parameter-entities
+            // JDK7+ - http://xml.org/sax/features/external-parameter-entities
+            dbf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+
+            // Disable external DTDs as well
+            dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+
+            // and these as well, per Timothy Morgan's 2014 paper: "XML Schema, DTD, and Entity Attacks"
+            dbf.setXIncludeAware(false);
+
+            documentBuilder = dbf.newDocumentBuilder();
+
+            // See https://github.com/jenkinsci/jenkins/blob/jenkins-2.176/core/src/main/java/jenkins/util/xml/XMLUtils.java#L114
+            documentBuilder.setEntityResolver(XmlUtils.RestrictiveEntityResolver.INSTANCE);
         } catch (ParserConfigurationException e) {
             throw new IllegalStateException("Failure to create a DocumentBuilder", e);
         }

@@ -35,7 +35,6 @@ public abstract class AbstractIntegrationTest {
 
     @Before
     public void setup() throws Exception {
-        // Maven.MavenInstallation maven3 = ToolInstallations.configureMaven35();
         Maven.MavenInstallation maven3 = ExtendedToolInstallations.configureMaven35();
 
         mavenInstallationName = maven3.getName();

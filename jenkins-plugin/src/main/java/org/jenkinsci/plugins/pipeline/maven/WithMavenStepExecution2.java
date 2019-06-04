@@ -74,6 +74,7 @@ import org.jenkinsci.plugins.configfiles.maven.security.MavenServerIdRequirement
 import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
 import org.jenkinsci.plugins.pipeline.maven.console.MaskPasswordsConsoleLogFilter;
 import org.jenkinsci.plugins.pipeline.maven.console.MavenColorizerConsoleLogFilter;
+import org.jenkinsci.plugins.pipeline.maven.util.FileUtils;
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
@@ -190,18 +191,9 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         withContainer = detectWithContainer();
 
         if (withContainer) {
-            listener.getLogger().println("[withMaven] WARNING: \"withMaven(){...}\" step running within a container." +
-                    " Since the Docker Pipeline Plugin version 1.14, you MUST:");
-            listener.getLogger().println("[withMaven] * Either prepend the 'MVN_CMD_DIR' environment variable" +
-                    " to the 'PATH' environment variable in every 'sh' step that invokes 'mvn' (e.g. \"sh \'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy\' \"). ");
-            listener.getLogger().println("[withMaven] * Or use 'MVN_CMD' instead of invoking 'mvn'" +
-                    " (e.g. \"sh \'$MVN_CMD clean deploy\' \"). ");
-            listener.getLogger().print("[withMaven] * Or use ");
-            listener.hyperlink("https://github.com/takari/maven-wrapper", "Takari's Maven Wrapper");
-            listener.getLogger().println(" (e.g. \"sh './mvnw clean deploy'\")");
-            listener.getLogger().print("[withMaven] See ");
-            listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/Pipeline+Maven+Plugin#PipelineMavenPlugin-HowtousethePipelineMavenPluginwithDocker", "Pipeline Maven Plugin FAQ");
-            listener.getLogger().println(".");
+            listener.getLogger().print("[withMaven] IMPORTANT \"withMaven(){...}\" step running within a Docker container. See " );
+            listener.hyperlink("https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/jenkins-plugin/src/resources/faq.md#how-to-use-the-pipeline-maven-plugin-with-docker-since-version-303", "Pipeline Maven Plugin FAQ");
+            listener.getLogger().println(" in case of problem.");
         }
 
         setupJDK();
@@ -350,16 +342,23 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         //
         // MAVEN_CONFIG
+        boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
         StringBuilder mavenConfig = new StringBuilder();
         mavenConfig.append("--batch-mode ");
         mavenConfig.append("--show-version ");
         if (StringUtils.isNotEmpty(settingsFilePath)) {
+            // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
+        	if (!isUnix) settingsFilePath=settingsFilePath.replace("%", "%%");
             mavenConfig.append("--settings \"" + settingsFilePath + "\" ");
         }
         if (StringUtils.isNotEmpty(globalSettingsFilePath)) {
+            // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
+        	if (!isUnix) globalSettingsFilePath=globalSettingsFilePath.replace("%", "%%");
             mavenConfig.append("--global-settings \"" + globalSettingsFilePath + "\" ");
         }
         if (StringUtils.isNotEmpty(mavenLocalRepo)) {
+            // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
+        	if (!isUnix) mavenLocalRepo=mavenLocalRepo.replace("%", "%%");
             mavenConfig.append("\"-Dmaven.repo.local=" + mavenLocalRepo + "\" ");
         }
 
@@ -619,6 +618,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             String lineSep = "\r\n";
             script.append("@echo off").append(lineSep);
             script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
+            // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
+            mavenConfig = mavenConfig.replace("%", "%%");
             script.append("\"" + mvnExec.getRemote() + "\" " + mavenConfig + " %*").append(lineSep);
         }
 
@@ -661,9 +662,13 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         } else {
             // resolve relative/absolute with workspace as base
             String expandedPath = envOverride.expand(env.expand(step.getMavenLocalRepo()));
-            FilePath repoPath = new FilePath(ws, expandedPath);
-            repoPath.mkdirs();
-            expandedMavenLocalRepo = repoPath.getRemote();
+            if (FileUtils.isAbsolutePath(expandedPath)) {
+                expandedMavenLocalRepo = expandedPath;
+            } else {
+                FilePath repoPath = new FilePath(ws, expandedPath);
+                repoPath.mkdirs();
+                expandedMavenLocalRepo = repoPath.getRemote();
+            }
         }
         LOGGER.log(Level.FINEST, "setupMavenLocalRepo({0}): {1}", new Object[]{step.getMavenLocalRepo(), expandedMavenLocalRepo});
         return expandedMavenLocalRepo;

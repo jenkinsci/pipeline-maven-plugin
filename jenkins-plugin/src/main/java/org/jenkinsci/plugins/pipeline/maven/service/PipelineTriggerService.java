@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven.service;
 
 import com.cloudbees.hudson.plugins.folder.computed.ComputedFolder;
+import hudson.console.ModelHyperlinkNote;
 import hudson.model.Cause;
 import hudson.model.CauseAction;
 import hudson.model.Item;
@@ -91,6 +92,7 @@ public class PipelineTriggerService {
         }
 
         Map<String, Set<MavenArtifact>> jobsToTrigger = new TreeMap<>();
+        Map<String, Set<String>>  omittedPipelineTriggersByPipelineFullname = new HashMap<>();
 
         // build the list of pipelines to trigger
         for(Map.Entry<MavenArtifact, SortedSet<String>> entry: downstreamPipelinesByArtifact.entrySet()) {
@@ -150,6 +152,7 @@ public class PipelineTriggerService {
                         // That's the case when one of the downstream's transitive upstream is our own downstream
                         logger.log(Level.INFO, "Not triggering " + logger.modelHyperlinkNoteEncodeTo(downstreamPipeline) +
                                 " because it has a dependency on a pipeline that will be triggered by this build: " + logger.modelHyperlinkNoteEncodeTo(transitiveUpstreamPipeline));
+                        omittedPipelineTriggersByPipelineFullname.computeIfAbsent(transitiveUpstreamPipelineName, p -> new TreeSet<>()).add(downstreamPipelineFullName);
                         continue downstreamPipelinesLoop;
                     }
                 }
@@ -189,7 +192,9 @@ public class PipelineTriggerService {
         }
 
         List<String> triggeredPipelines = new ArrayList<>();
+
         // trigger the pipelines
+        triggerPipelinesLoop:
         for (Map.Entry<String, Set<MavenArtifact>> entry: jobsToTrigger.entrySet()) {
             String downstreamJobFullName = entry.getKey();
             Job downstreamJob = Jenkins.getInstance().getItemByFullName(downstreamJobFullName, Job.class);
@@ -198,13 +203,28 @@ public class PipelineTriggerService {
                 continue;
             }
 
+            Set<String> omittedPipelines = omittedPipelineTriggersByPipelineFullname.get(downstreamJobFullName);
+            if (omittedPipelines == null) {
+                omittedPipelines = Collections.emptySet();
+            }
+            cause.setOmittedPipelineFullNames(new ArrayList<>(omittedPipelines));
             // See jenkins.triggers.ReverseBuildTrigger.RunListenerImpl.onCompleted(Run, TaskListener)
             Run downstreamJobLastBuild = downstreamJob.getLastBuild();
             if (downstreamJobLastBuild == null) {
                 // should never happen, we need at least one build to know the dependencies
             } else {
                 List<MavenArtifact> matchingMavenDependencies = MavenDependencyCauseHelper.isSameCause(cause, downstreamJobLastBuild.getCauses());
-                if (matchingMavenDependencies.size() > 0) {
+                if (matchingMavenDependencies.isEmpty()) {
+                    for (Map.Entry<String, Set<String>> omittedPipeline : omittedPipelineTriggersByPipelineFullname.entrySet()) {
+                        if (omittedPipeline.getValue().contains(downstreamJobFullName)) {
+                            Job transitiveDownstreamJob = Jenkins.getInstance().getItemByFullName(entry.getKey(), Job.class);
+                            logger.log(Level.INFO,"[withMaven] downstreamPipelineTriggerRunListener - Skip triggering "
+                                    + "downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + "because it will be triggered by transitive downstream " + transitiveDownstreamJob);
+                            continue triggerPipelinesLoop; // don't trigger downstream pipeline
+                        }
+                    }
+                    // trigger downstream pipeline
+                } else {
                     downstreamJobLastBuild.addAction(new CauseAction((Cause) cause));
                     logger.log(Level.INFO, "Skip scheduling downstream pipeline " + logger.modelHyperlinkNoteEncodeTo(downstreamJob) + " as it was already triggered for Maven dependencies: " +
                             matchingMavenDependencies.stream().map(mavenDependency -> mavenDependency == null ? null : mavenDependency.getShortDescription()).collect(Collectors.joining(", ")));
@@ -213,9 +233,7 @@ public class PipelineTriggerService {
                     } catch (IOException e) {
                         logger.log(Level.INFO, "Failure to update build " + downstreamJobLastBuild.getFullDisplayName() + ": " + e.toString());
                     }
-                    continue;
-                } else {
-                    // trigger build
+                    continue; // don't trigger downstream pipeline
                 }
             }
 

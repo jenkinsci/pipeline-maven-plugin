@@ -92,6 +92,14 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     }
 
     /**
+     * @see MavenArtifact#baseVersion
+     */
+    @Nonnull
+    public String getFileNameWithVersion() {
+        return getArtifactId() + "-" + getVersion() + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : "-" + getClassifier()) + "." + getExtension();
+    }
+
+    /**
      * @see org.apache.maven.artifact.Artifact#getId()
      */
     @Nonnull
@@ -127,7 +135,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     public String getUrl() {
         if (getRepositoryUrl() == null)
             return null;
-        return getRepositoryUrl() + "/" + getGroupId().replace('.', '/') + "/" + getArtifactId() + "/" + getVersion() + "/" + getFileNameWithBaseVersion();
+        return getRepositoryUrl() + "/" + getGroupId().replace('.', '/') + "/" + getArtifactId() + "/" + getBaseVersion() + "/" + getFileNameWithVersion();
     }
 
     @Override
