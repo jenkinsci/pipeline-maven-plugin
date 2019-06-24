@@ -4,11 +4,14 @@ import hudson.Extension;
 import hudson.model.Run;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
+import org.jenkinsci.plugins.pipeline.maven.model.MavenExecutionDetails;
+import org.jenkinsci.plugins.pipeline.maven.model.ObjectFactory;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
+import java.util.Collections;
 
 
 /**
@@ -31,6 +34,7 @@ public class MavenLinkerPublisher2 extends MavenPublisher {
 
     private static final long serialVersionUID = 1L;
 
+
     @DataBoundConstructor
     public MavenLinkerPublisher2() {
         // default DataBoundConstructor
@@ -42,9 +46,15 @@ public class MavenLinkerPublisher2 extends MavenPublisher {
     @Override
     public synchronized void process(StepContext context, Element mavenSpyLogsElt) throws IOException, InterruptedException {
         Run<?, ?> run = context.get(Run.class);
+
+        MavenExecutionDetails mavenExecutionDetails = new ObjectFactory().analyseMavenBuildExecution(mavenSpyLogsElt);
+
         // we replace instead of because we want to refresh the cache org.jenkinsci.plugins.pipeline.maven.publishers.MavenReport.getGeneratedArtifacts()
-        run.addOrReplaceAction(new MavenReport(run));
+        run.addOrReplaceAction(new MavenReport(run, Collections.singletonList(mavenExecutionDetails)));
     }
+
+
+
 
     @Symbol("mavenLinkerPublisher")
     @Extension

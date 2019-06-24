@@ -86,6 +86,21 @@ Inspired by /hudson/tasks/Fingerprinter/FingerprintAction/index.jelly
                 </em>
             </f:section>
 
+            <f:section title="Build Details">
+                <ul>
+                    <j:forEach var="dependency" items="${it.dependencies}">
+                        <li>
+                            ${dependency.id} - ${dependency.type} - ${dependency.scope}
+                        </li>
+                    </j:forEach>
+                </ul>
+                <em>
+                    Dependencies recorded according to the settings of the "Pipeline Graph Publisher"
+                    <br/>
+                    By default, only "snapshot" dependencies are recorded and "release" dependencies are ignored
+                    to optimize the size on disk of the database of the "Pipeline Maven Plugin".
+                </em>
+            </f:section>
 
             <hr/>
             <em>Contributions to improve this dashboard are appreciated. Please feel free to submit a Pull Request or to
