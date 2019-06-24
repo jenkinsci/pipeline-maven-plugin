@@ -32,7 +32,7 @@ THE SOFTWARE.
         </f:entry>
         <f:entry title="${%Database Configuration}">
             <f:entry title="${%JDBC URL}" field="jdbcUrl"
-                     description="JDBC URL. For production workloads, use MySQL (incl. Amazon Aurora for MySQL, MariaDB...). Note that PostgreSQL 10+ support is experimental(2019-05). If empty, then a non production grade H2 embedded database will be used.">
+                     description="JDBC URL. For production workloads, use MySQL (incl. Amazon Aurora for MySQL, MariaDB...) or PostgreSQL. If empty, then a non production grade H2 embedded database will be used.">
                 <f:textbox/>
             </f:entry>
             <f:entry title="${%JDBC Credentials}" field="jdbcCredentialsId">

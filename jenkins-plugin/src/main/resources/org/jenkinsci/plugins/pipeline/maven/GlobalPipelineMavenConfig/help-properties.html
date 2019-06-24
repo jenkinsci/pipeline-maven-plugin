@@ -1,7 +1,6 @@
 <div>
     <p>Add a property (name/value pair) that will be used to configure the Hikari CP <code>DataSource</code> / JDBC <code>Driver</code>.
     </p>
-
     <p>In the case of a <code>DataSource</code>, the property names should be prefixed by <code>dataSource.</code>, these properties
         will be translated to Java setters following the Java Bean naming convention.
         For example, the property <code>dataSource.cachePrepStmts</code> will translate into <code>setCachePrepStmts()</code>
@@ -13,8 +12,11 @@
         be passed to the driver during </code>java.sql.Driver#connect(String, Properties)</code> calls.
     </p>
     <p>
-        For MySQL connections, the Pipeline Maven Plugin will uses by default the settings recommended in
+        For MySQL/MariaDB connections, the Pipeline Maven Plugin will uses by default the settings recommended in
         <a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">Hikari CP / MySQL Configuration</a>.
         To overwrite these settings, define the desired settings in the properties text area with different values.
+    </p>
+    <p>
+        For other databases than MySQL/MariaDB, we use the <a href="https://github.com/brettwooldridge/HikariCP#frequently-used">default settings of the Hikari CP data source.</a>
     </p>
 </div>
