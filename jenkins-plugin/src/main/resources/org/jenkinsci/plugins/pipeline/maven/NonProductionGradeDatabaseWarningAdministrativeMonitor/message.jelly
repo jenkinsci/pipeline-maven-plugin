@@ -24,13 +24,13 @@ THE SOFTWARE.
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-    <div class="warning">
+    <div class="alert alert-warning">
         <form method="post" action="${rootURL}/${it.url}/act" name="${it.id}">
             <div style="float:right">
                 <f:submit name="yes" value="${%Configure Pipeline Maven Plugin Database}"/>
                 <f:submit name="no" value="${%Dismiss}"/>
             </div>
-            The Pipeline Maven Plugin is currently using an embedded H2 database. A production grade MySQL database should be used (PostgreSQL is an experimentazl production grade database since 2019-05).
+            The Pipeline Maven Plugin is currently using an embedded H2 database. A production grade MySQL database should be used (PostgreSQL is an experimental production grade database since 2019-05).
         </form>
     </div>
 </j:jelly>
