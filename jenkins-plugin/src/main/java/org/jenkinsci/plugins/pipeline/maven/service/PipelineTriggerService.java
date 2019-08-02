@@ -316,21 +316,18 @@ public class PipelineTriggerService {
         return null;
     }
 
+    public boolean isUpstreamBuildVisibleByDownstreamBuildAuth(@Nonnull WorkflowJob upstreamPipeline, @Nonnull WorkflowJob downstreamPipeline) {
+        Authentication downstreamPipelineAuth = Tasks.getAuthenticationOf(downstreamPipeline);
 
-    public boolean isUpstreamBuildVisibleByDownstreamBuildAuth(@Nonnull WorkflowJob upstreamPipeline, @Nonnull Queue.Task downstreamPipeline) {
-        Authentication auth = Tasks.getAuthenticationOf(downstreamPipeline);
-        Authentication downstreamPipelineAuth;
-        if (auth.equals(ACL.SYSTEM) && !QueueItemAuthenticatorConfiguration.get().getAuthenticators().isEmpty()) {
-            downstreamPipelineAuth = Jenkins.ANONYMOUS; // cf. BuildTrigger
-        } else {
-            downstreamPipelineAuth = auth;
-        }
-
+        // see https://github.com/jenkinsci/jenkins/blob/jenkins-2.176.2/core/src/main/java/jenkins/triggers/ReverseBuildTrigger.java#L132
+        // jenkins.triggers.ReverseBuildTrigger#shouldTrigger
         try (ACLContext ignored = ACL.as(downstreamPipelineAuth)) {
             WorkflowJob upstreamPipelineObtainedAsImpersonated = getItemByFullName(upstreamPipeline.getFullName(), WorkflowJob.class);
             boolean result = upstreamPipelineObtainedAsImpersonated != null;
-            LOGGER.log(Level.FINE, "isUpstreamBuildVisibleByDownstreamBuildAuth({0}, {1}): taskAuth: {2}, downstreamPipelineAuth: {3}, upstreamPipelineObtainedAsImpersonated:{4}, result: {5}",
-                    new Object[]{upstreamPipeline, downstreamPipeline, auth, downstreamPipelineAuth, upstreamPipelineObtainedAsImpersonated, result});
+            if (LOGGER.isLoggable(Level.FINE)) {
+                LOGGER.log(Level.FINE, "isUpstreamBuildVisibleByDownstreamBuildAuth(upstreamPipeline: {0}, downstreamPipeline: {1}): downstreamPipelineAuth: {2}, upstreamPipelineObtainedAsImpersonated:{3}, result: {4}",
+                        new Object[]{upstreamPipeline.getFullName(), downstreamPipeline.getFullName(), downstreamPipelineAuth, upstreamPipelineObtainedAsImpersonated, result});
+            }
             return result;
         }
     }
