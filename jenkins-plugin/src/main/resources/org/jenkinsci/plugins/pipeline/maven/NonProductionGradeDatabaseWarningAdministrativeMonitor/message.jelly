@@ -30,7 +30,7 @@ THE SOFTWARE.
                 <f:submit name="yes" value="${%Configure Pipeline Maven Plugin Database}"/>
                 <f:submit name="no" value="${%Dismiss}"/>
             </div>
-            The Pipeline Maven Plugin is currently using an embedded H2 database. A production grade MySQL database should be used (PostgreSQL is an experimental production grade database since 2019-05).
+            The Pipeline Maven Plugin is currently using an embedded H2 database. A production grade database, MySQL or PostgreSQL, should be used.
         </form>
     </div>
 </j:jelly>
