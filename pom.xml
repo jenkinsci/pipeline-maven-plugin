@@ -32,7 +32,7 @@
         <relativePath />
     </parent>
     <artifactId>pipeline-maven-parent</artifactId>
-    <version>3.8.1</version>
+    <version>${revision}${changelist}</version>
     <packaging>pom</packaging>
 
     <name>Pipeline Maven Integration Plugin Parent</name>
@@ -63,7 +63,7 @@
     </developers>
 
     <properties>
-        <revision>3.8.1</revision>
+        <revision>3.8.2</revision>
         <changelist>-SNAPSHOT</changelist>
         <jenkins.version>2.138.4</jenkins.version>
         <java.level>8</java.level>
@@ -73,7 +73,7 @@
         <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
-        <tag>pipeline-maven-3.8.1</tag>
+        <tag>${scmTag}</tag>
     </scm>
     <modules>
         <module>maven-spy</module>
