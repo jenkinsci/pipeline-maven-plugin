@@ -429,7 +429,17 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
             } else {
                 return FormValidation.error("Unsupported database specified in JDBC url '" + jdbcUrl + "'");
             }
-            Class.forName(driverClass);
+            try {
+                Class.forName(driverClass);
+            } catch (ClassNotFoundException e) {
+                if ("com.mysql.cj.jdbc.Driver".equals(driverClass)) {
+                    return FormValidation.error(e, "MySQL JDBC driver '" + driverClass + "' not found, please install the Jenkins 'MySQL API Plugin'" + jdbcUrl);
+                } else if ("org.postgresql.Driver".equals(driverClass)) {
+                    return FormValidation.error(e, "PostgreSQL JDBC driver '" + driverClass + "' not found, please install the Jenkins 'PostgreSQL API Plugin'" + jdbcUrl);
+                } else {
+                    throw e;
+                }
+            }
 
             String jdbcUserName, jdbcPassword;
             if (StringUtils.isEmpty(jdbcCredentialsId)) {
