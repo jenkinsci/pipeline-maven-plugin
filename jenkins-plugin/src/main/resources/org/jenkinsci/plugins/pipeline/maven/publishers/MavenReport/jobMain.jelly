@@ -8,7 +8,7 @@
                 <ul>
                     <j:forEach var="artifact" items="${it.deployedArtifacts}">
                         <li>
-                            <a href="${artifact.url}">${artifact.fileName}</a>
+                            <a href="${artifact.url}">${artifact.fileName}</a> (type: ${artifact.type})
                         </li>
                     </j:forEach>
                 </ul>

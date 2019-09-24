@@ -131,6 +131,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
         String upstreamPipelineFullName = upstreamPipeline.getFullName();
         int upstreamBuildNumber = upstreamBuild.getNumber();
         Map<MavenArtifact, SortedSet<String>> downstreamPipelinesByArtifact = globalPipelineMavenConfig.getDao().listDownstreamJobsByArtifact(upstreamPipelineFullName, upstreamBuildNumber);
+        LOGGER.log(Level.FINER, "got downstreamPipelinesByArtifact for project {0} and build #{1}: {2}", new Object[]{upstreamPipelineFullName, upstreamBuildNumber, downstreamPipelinesByArtifact});
 
         Map<String, Set<MavenArtifact>> jobsToTrigger = new TreeMap<>();
         Map<String, Set<String>>  omittedPipelineTriggersByPipelineFullname = new HashMap<>();
