@@ -42,6 +42,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
+import org.jenkinsci.plugins.workflow.actions.WarningAction;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -334,8 +335,7 @@ public class JunitTestsPublisher extends MavenPublisher {
                 if (LOGGER.isLoggable(Level.FINE)) {
                     listener.getLogger().println("[withMaven] junitPublisher - " + testResultAction.getResult().getFailCount() + " unit test failure(s) found, mark job as unstable");
                 }
-                // TODO: Once JENKINS-43995 lands, update this to set the step status instead of the entire build.
-                // context.setResult(Result.UNSTABLE);
+                node.addAction(new WarningAction(Result.UNSTABLE).withMessage(testResultAction.getResult().getFailCount() + " unit test failure(s) found"));
                 run.setResult(Result.UNSTABLE);
             }
         } catch (Exception e) {
