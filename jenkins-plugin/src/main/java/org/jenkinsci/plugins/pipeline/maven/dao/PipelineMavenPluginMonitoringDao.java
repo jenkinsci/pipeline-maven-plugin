@@ -219,10 +219,10 @@ public class PipelineMavenPluginMonitoringDao implements PipelineMavenPluginJdbc
     }
 
     @Override
-    public void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
+    public void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, boolean successfull, long startTimeInMillis, long durationInMillis) {
         long nanosBefore = System.nanoTime();
         try {
-            delegate.updateBuildOnCompletion(jobFullName, buildNumber, buildResultOrdinal, startTimeInMillis, durationInMillis);
+            delegate.updateBuildOnCompletion(jobFullName, buildNumber, buildResultOrdinal, successfull, startTimeInMillis, durationInMillis);
         } finally {
             long nanosAfter = System.nanoTime();
             writeCount.incrementAndGet();

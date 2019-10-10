@@ -57,6 +57,7 @@ public class DatabaseSyncRunListener extends RunListener<WorkflowRun> {
                 workflowRun.getParent().getFullName(),
                 workflowRun.getNumber(),
                 result.ordinal,
+                globalPipelineMavenConfig.getTriggerDownstreamBuildsResultsCriteria().contains(result),
                 workflowRun.getStartTimeInMillis(),
                  Math.max(System.currentTimeMillis() - workflowRun.getStartTimeInMillis(), 0)); // @see HUDSON-5844
     }

@@ -25,7 +25,6 @@
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import hudson.model.Result;
-import org.h2.jdbcx.JdbcConnectionPool;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
@@ -37,13 +36,10 @@ import org.jvnet.hudson.test.Issue;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -653,6 +649,22 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
         dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar", "compile", false, null);
         dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
+
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 1);
+        dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 2222, 22);
+
+        SortedSet<String> downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-20180318.225603-3", "1.0-SNAPSHOT",  "jar");
+        System.out.println(downstreamJobs);
+        assertThat(downstreamJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1", "my-downstream-pipeline-2"));
+    }
+
+
+    @Test
+    public void listDownstreamPipelinesBasedOnMavenDependencies_withUnstableResult() {
+        dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
+        dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar", "compile", false, null);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.UNSTABLE.ordinal, System.currentTimeMillis() - 1111, 5);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 1);
         dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar", "compile", false, null);
