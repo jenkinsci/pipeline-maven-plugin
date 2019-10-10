@@ -338,7 +338,7 @@ public class JunitTestsPublisher extends MavenPublisher {
                 node.addAction(new WarningAction(Result.UNSTABLE).withMessage(testResultAction.getResult().getFailCount() + " unit test failure(s) found"));
                 run.setResult(Result.UNSTABLE);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             listener.error("[withMaven] junitPublisher - Silently ignore exception archiving JUnit results:" + testResults + ": " + e);
             LOGGER.log(Level.WARNING, "Exception processing " + testResults, e);
         }
