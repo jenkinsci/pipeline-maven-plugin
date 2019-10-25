@@ -22,6 +22,7 @@ Inspired by /hudson/tasks/Fingerprinter/FingerprintAction/index.jelly
                                 <j:otherwise>
                                     <a href="${artifact.url}">${artifact.fileName}</a>
                                 </j:otherwise>
+                                (type: ${artifact.type})
                             </j:choose>
                         </li>
                     </j:forEach>

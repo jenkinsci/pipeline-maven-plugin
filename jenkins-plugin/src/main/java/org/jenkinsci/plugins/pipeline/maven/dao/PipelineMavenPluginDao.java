@@ -190,7 +190,24 @@ public interface PipelineMavenPluginDao {
      * @see Item#getFullName()
      */
     @Nonnull
-    SortedSet<String> listDownstreamJobs(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nullable String baseVersion, @Nonnull String type);
+    default SortedSet<String> listDownstreamJobs(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nullable String baseVersion, @Nonnull String type) {
+        return listDownstreamJobs(groupId, artifactId, version, baseVersion, type, null);
+    }
+
+    /**
+     * List the downstream jobs who have a dependency on the given artifact.
+     *
+     * @param groupId Maven artifact group ID  (see {@link Artifact#getArtifactId()})
+     * @param artifactId Maven artifact id (see {@link Artifact#getArtifactId()})
+     * @param version Maven artifact version (see {@link Artifact#getVersion()})
+     * @param baseVersion Maven artifact (see {@link Artifact#getBaseVersion()})
+     * @param type Maven artifact type (see {@link Artifact#getType()}})
+     * @param classifier Maven artifact classifier (see {@link Artifact#getClassifier()}})
+     * @return list of job full names (see {@link Item#getFullName()}) by {@link MavenArtifact}
+     * @see Item#getFullName()
+     */
+    @Nonnull
+    SortedSet<String> listDownstreamJobs(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nullable String baseVersion, @Nonnull String type, @Nullable String classifier);
 
     /**
      * List the upstream jobs who generate an artifact that the given build depends on
