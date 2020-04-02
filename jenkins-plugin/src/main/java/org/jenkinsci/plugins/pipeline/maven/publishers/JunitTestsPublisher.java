@@ -70,6 +70,7 @@ import javax.annotation.Nullable;
 public class JunitTestsPublisher extends MavenPublisher {
     private static final Logger LOGGER = Logger.getLogger(JunitTestsPublisher.class.getName());
     private static final String APACHE_GROUP_ID = "org.apache.maven.plugins";
+    private static final String TYCHO_GROUP_ID = "org.eclipse.tycho";
     private static final String KARMA_GROUP_ID = "com.kelveden";
     private static final String SUREFIRE_ID = "maven-surefire-plugin";
     private static final String FAILSAFE_ID = "maven-failsafe-plugin";
@@ -206,7 +207,7 @@ public class JunitTestsPublisher extends MavenPublisher {
 
         List<Element> sureFireTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, APACHE_GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL, "MojoSucceeded", "MojoFailed");
         List<Element> failSafeTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, APACHE_GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL, "MojoSucceeded", "MojoFailed");
-        List<Element> tychoTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, APACHE_GROUP_ID, TYCHO_ID, TYCHO_GOAL, "MojoSucceeded", "MojoFailed");
+        List<Element> tychoTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, TYCHO_GROUP_ID, TYCHO_ID, TYCHO_GOAL, "MojoSucceeded", "MojoFailed");
         List<Element> karmaTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, KARMA_GROUP_ID, KARMA_ID, KARMA_GOAL, "MojoSucceeded", "MojoFailed");
 
 
