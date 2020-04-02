@@ -204,6 +204,14 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         return null;
     }
 
+    private static final Pattern ANSI_PATTERN = Pattern.compile("\\x1b\\[[0-9;]*m");
+    private static String removeAnsiColor(String input) {
+    	if (input!=null) {
+    		input = ANSI_PATTERN.matcher(input).replaceAll("");
+    	}
+    	return input;
+    }
+    
     public Xpp3Dom newElement(@Nonnull String name, @Nullable Throwable t) {
         Xpp3Dom rootElt = new Xpp3Dom(name);
         if (t == null) {
@@ -213,13 +221,13 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
 
         Xpp3Dom messageElt = new Xpp3Dom("message");
         rootElt.addChild(messageElt);
-        messageElt.setValue(t.getMessage());
+        messageElt.setValue(removeAnsiColor(t.getMessage()));
 
         Xpp3Dom stackTraceElt = new Xpp3Dom("stackTrace");
         rootElt.addChild(stackTraceElt);
         StringWriter stackTrace = new StringWriter();
         t.printStackTrace(new PrintWriter(stackTrace, true));
-        stackTraceElt.setValue(stackTrace.toString());
+        stackTraceElt.setValue(removeAnsiColor(stackTrace.toString()));
         return rootElt;
     }
 
