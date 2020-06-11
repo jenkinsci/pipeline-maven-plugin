@@ -56,6 +56,12 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
 
     protected final MavenEventReporter reporter;
 
+    /**
+     * Regex pattern to extract ANSI escape sequences
+     */
+    private static final Pattern ANSI_PATTERN = Pattern.compile("\\x1b\\[[0-9;]*m");
+
+
     protected AbstractMavenEventHandler(MavenEventReporter reporter) {
         this.reporter = reporter;
     }
@@ -205,7 +211,6 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         return null;
     }
 
-    private static final Pattern ANSI_PATTERN = Pattern.compile("\\x1b\\[[0-9;]*m");
     private static String removeAnsiColor(String input) {
     	if (input!=null) {
     		input = ANSI_PATTERN.matcher(input).replaceAll("");
