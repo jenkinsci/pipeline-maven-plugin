@@ -201,7 +201,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>junit-attachments</artifactId>
-      <version>1.4.2</version>
+      <version>1.6</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
