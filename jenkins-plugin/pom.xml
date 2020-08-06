@@ -62,7 +62,7 @@
 
   <properties>
     <scm-api-plugin.version>2.2.8</scm-api-plugin.version>
-    <git-plugin.version>3.9.2</git-plugin.version>
+    <git-plugin.version>4.3.0</git-plugin.version>
     <!--
     stick to junit 1.20 clarifying the impact of the introduction of the dependencies
     workflow-step-api or workflow-api-->
