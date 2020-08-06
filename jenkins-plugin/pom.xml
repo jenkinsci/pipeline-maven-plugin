@@ -53,6 +53,11 @@
       <name>Alvaro Lobato</name>
       <email>alobato@cloudbees.com</email>
     </developer>
+    <developer>
+      <id>aheritier</id>
+      <name>Arnaud Héritier</name>
+      <email>aheritier@apache.org</email>
+    </developer>
   </developers>
 
   <properties>
