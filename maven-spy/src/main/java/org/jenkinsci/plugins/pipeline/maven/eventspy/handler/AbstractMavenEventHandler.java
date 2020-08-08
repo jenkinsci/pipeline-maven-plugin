@@ -73,10 +73,8 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         Class<E> clazz = (Class<E>) type;
         if (clazz.isAssignableFrom(event.getClass())) {
             return _handle((E) event);
-        } else {
-            // print("event " + event + " not handled by " + toString());
-            return false;
         }
+        return false;
     }
 
     private Type getSupportedType() {
@@ -190,8 +188,6 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
                             if (flattenedPomFilename != null) {
                                 return flattenedPomFilename.getValue();
                             }
-                        } else {
-                            // unexpected configuration type
                         }
                     }
                 }
@@ -201,11 +197,7 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
                     if (flattenedPomFilename != null) {
                         return flattenedPomFilename.getValue();
                     }
-                } else {
-                    // unexpected configuration type
                 }
-            } else {
-
             }
         }
         return null;
