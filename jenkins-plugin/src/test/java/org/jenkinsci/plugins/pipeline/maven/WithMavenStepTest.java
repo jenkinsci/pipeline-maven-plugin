@@ -68,7 +68,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         JavaGitContainer slaveContainer = slaveRule.get();
 
         DumbSlave agent = new DumbSlave("remote", "", "/home/test/slave", "1", Node.Mode.NORMAL, "",
-                new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), "test", "test", "", ""),
+                new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), "test"),
                 RetentionStrategy.INSTANCE, Collections.<NodeProperty<?>>emptyList());
         jenkinsRule.jenkins.addNode(agent);
     }
