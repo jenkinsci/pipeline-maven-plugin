@@ -74,13 +74,13 @@ import org.jenkinsci.plugins.configfiles.maven.security.MavenServerIdRequirement
 import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
 import org.jenkinsci.plugins.pipeline.maven.console.MaskPasswordsConsoleLogFilter;
 import org.jenkinsci.plugins.pipeline.maven.console.MavenColorizerConsoleLogFilter;
-import org.jenkinsci.plugins.pipeline.maven.fix.jenkins49337.GeneralNonBlockingStepExecution;
 import org.jenkinsci.plugins.pipeline.maven.util.FileUtils;
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import org.jenkinsci.plugins.workflow.steps.BodyExecution;
 import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
 import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
+import org.jenkinsci.plugins.workflow.steps.GeneralNonBlockingStepExecution;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.springframework.util.ClassUtils;
 
@@ -112,10 +112,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-/**
- * TODO when there is enough adoption of workflow-step-api with https://github.com/jenkinsci/workflow-step-api-plugin/pull/38
- * Replace org.jenkinsci.plugins.pipeline.maven.fix.jenkins49337.GeneralNonBlockingStepExecution by org.jenkinsci.plugins.workflow.steps.GeneralNonBlockingStepExecution;
- */
 @SuppressFBWarnings(value = "SE_TRANSIENT_FIELD_NOT_RESTORED", justification = "Contextual fields used only in start(); no onResume needed")
 class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
@@ -144,7 +140,6 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
     private transient Computer computer;
     private transient FilePath tempBinDir;
-    private transient BodyExecution body;
 
     /**
      * Indicates if running on docker with <code>docker.image()</code> or <code>container()</code>
@@ -224,7 +219,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         LOGGER.log(Level.FINEST, "envOverride: {0}", envOverride); // JENKINS-40484
 
-        body = getContext().newBodyInvoker().withContexts(envEx, newFilter).withCallback(new WithMavenStepExecutionCallBack(tempBinDir, step.getOptions(), step.getPublisherStrategy())).start();
+        getContext().newBodyInvoker().withContexts(envEx, newFilter).withCallback(new WithMavenStepExecutionCallBack(tempBinDir, step.getOptions(), step.getPublisherStrategy())).start();
 
         return false;
     }
@@ -1130,13 +1125,6 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      */
     private static MavenInstallation[] getMavenInstallations() {
         return Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class).getInstallations();
-    }
-
-    @Override
-    public void stop(Throwable cause) throws Exception {
-        if (body != null) {
-            body.cancel(cause);
-        }
     }
 
     /**
