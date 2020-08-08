@@ -70,6 +70,11 @@
     <asm.version>5.2</asm.version>
     <workflow-support-plugin.version>2.22</workflow-support-plugin.version>
   </properties>
+
+  <scm>
+    <url>https://github.com/jenkinsci/pipeline-maven-plugin/jenkins-plugin</url>
+  </scm>
+
   <dependencies>
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>

@@ -58,6 +58,10 @@
         </developer>
     </developers>
 
+    <scm>
+        <url>https://github.com/jenkinsci/pipeline-maven-plugin/maven-spy</url>
+    </scm>
+
     <dependencies>
         <dependency>
             <groupId>javax.inject</groupId>
