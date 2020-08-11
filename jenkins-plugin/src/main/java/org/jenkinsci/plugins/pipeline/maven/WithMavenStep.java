@@ -30,6 +30,7 @@ import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.JDK;
 import hudson.model.Run;
@@ -231,8 +232,12 @@ public class WithMavenStep extends Step {
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
-        public ListBoxModel doFillMavenItems() {
+        public ListBoxModel doFillMavenItems(@AncestorInPath Item item) {
             ListBoxModel r = new ListBoxModel();
+            if (item == null) {
+                return r; // it's empty
+            }
+            item.checkPermission(Item.CONFIGURE);
             r.add("--- Use system default Maven ---",null);
             for (MavenInstallation installation : getMavenDescriptor().getInstallations()) {
                 r.add(installation.getName());
@@ -245,8 +250,12 @@ public class WithMavenStep extends Step {
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
-        public ListBoxModel doFillJdkItems() {
+        public ListBoxModel doFillJdkItems(@AncestorInPath Item item) {
             ListBoxModel r = new ListBoxModel();
+            if (item == null) {
+                return r; // it's empty
+            }
+            item.checkPermission(Item.CONFIGURE);
             r.add("--- Use system default JDK ---",null);
             for (JDK installation : getJDKDescriptor().getInstallations()) {
                 r.add(installation.getName());
@@ -255,8 +264,12 @@ public class WithMavenStep extends Step {
         }
         
         @Restricted(NoExternalUse.class) // Only for UI calls
-        public ListBoxModel doFillMavenSettingsConfigItems(@AncestorInPath ItemGroup context) {
+        public ListBoxModel doFillMavenSettingsConfigItems(@AncestorInPath Item item, @AncestorInPath ItemGroup context) {
             ListBoxModel r = new ListBoxModel();
+            if (item == null) {
+                return r; // it's empty
+            }
+            item.checkPermission(Item.CONFIGURE);
             r.add("--- Use system default settings or file path ---",null);
             for (Config config : ConfigFiles.getConfigsInContext(context, MavenSettingsConfigProvider.class)) {
                 r.add(config.name, config.id);
@@ -265,8 +278,12 @@ public class WithMavenStep extends Step {
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
-        public ListBoxModel doFillGlobalMavenSettingsConfigItems(@AncestorInPath ItemGroup context) {
+        public ListBoxModel doFillGlobalMavenSettingsConfigItems(@AncestorInPath Item item, @AncestorInPath ItemGroup context) {
             ListBoxModel r = new ListBoxModel();
+            if (item == null) {
+                return r; // it's empty
+            }
+            item.checkPermission(Item.CONFIGURE);
             r.add("--- Use system default settings or file path ---",null);
             for (Config config : ConfigFiles.getConfigsInContext(context, GlobalMavenSettingsConfigProvider.class)) {
                 r.add(config.name, config.id);
@@ -275,8 +292,12 @@ public class WithMavenStep extends Step {
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
-        public ListBoxModel doFillPublisherStrategyItems(@AncestorInPath ItemGroup context) {
+        public ListBoxModel doFillPublisherStrategyItems(@AncestorInPath Item item, @AncestorInPath ItemGroup context) {
             ListBoxModel r = new ListBoxModel();
+            if (item == null) {
+                return r; // it's empty
+            }
+            item.checkPermission(Item.CONFIGURE);
             for(MavenPublisherStrategy publisherStrategy: MavenPublisherStrategy.values()) {
                 r.add(publisherStrategy.getDescription(), publisherStrategy.name());
             }
