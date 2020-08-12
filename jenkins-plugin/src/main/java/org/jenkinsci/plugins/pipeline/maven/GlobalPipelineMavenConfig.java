@@ -54,6 +54,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.verb.POST;
 
 import java.io.Closeable;
 import java.io.File;
@@ -397,6 +398,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     }
 
     public ListBoxModel doFillJdbcCredentialsIdItems() {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
         // use deprecated "withMatching" because, even after 20 mins of research,
         // I didn't understand how to use the new "recommended" API
         return new StandardListBoxModel()
@@ -408,10 +410,13 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                                 ACL.SYSTEM,
                                 Collections.EMPTY_LIST));
     }
+
+    @POST
     public FormValidation doValidateJdbcConnection(
                                      @QueryParameter String jdbcUrl,
                                      @QueryParameter String properties,
                                      @QueryParameter String jdbcCredentialsId) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
         if (StringUtils.isBlank(jdbcUrl)) {
             return FormValidation.ok("OK");
         }
