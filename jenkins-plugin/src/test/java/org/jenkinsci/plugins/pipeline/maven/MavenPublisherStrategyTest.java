@@ -30,7 +30,7 @@ public class MavenPublisherStrategyTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         List<MavenPublisher> mavenPublishers = MavenPublisherStrategy.IMPLICIT.buildPublishersList(Collections.<MavenPublisher>emptyList(), new StreamTaskListener(baos));
-        Assert.assertThat(mavenPublishers.size(), CoreMatchers.is(12));
+        Assert.assertThat(mavenPublishers.size(), CoreMatchers.is(13));
 
         Map<String, MavenPublisher> reportersByDescriptorId = new HashMap<>();
         for(MavenPublisher mavenPublisher : mavenPublishers) {
@@ -47,5 +47,6 @@ public class MavenPublisherStrategyTest {
         assertThat(reportersByDescriptorId.containsKey(new JGivenTestsPublisher.DescriptorImpl().getId()), is(true));
         assertThat(reportersByDescriptorId.containsKey(new MavenLinkerPublisher2.DescriptorImpl().getId()), is(true));
         assertThat(reportersByDescriptorId.containsKey(new JacocoReportPublisher.DescriptorImpl().getId()), is(true));
+        assertThat(reportersByDescriptorId.containsKey(new MavenBuildDetailsPublisher.DescriptorImpl().getId()), is(true));
     }
 }

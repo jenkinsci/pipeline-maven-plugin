@@ -65,14 +65,19 @@ import javax.xml.transform.stream.StreamResult;
 public class XmlUtils {
     private static final Logger LOGGER = Logger.getLogger(XmlUtils.class.getName());
 
-    public static MavenArtifact newMavenArtifact(Element artifactElt) {
+    @Nonnull
+    public static MavenArtifact newMavenArtifact(@Nonnull Element artifactElt) {
+        if (!artifactElt.hasAttribute("groupId") || !artifactElt.hasAttribute("artifactId") || !artifactElt.hasAttribute("version")) {
+            LOGGER.log(Level.WARNING, "Invalid artifact element " + XmlUtils.toString(artifactElt));
+        }
         MavenArtifact mavenArtifact = new MavenArtifact();
         loadMavenArtifact(artifactElt, mavenArtifact);
 
         return mavenArtifact;
     }
 
-    public static MavenDependency newMavenDependency(Element dependencyElt) {
+    @Nonnull
+    public static MavenDependency newMavenDependency(@Nonnull Element dependencyElt) {
         MavenDependency dependency = new MavenDependency();
         loadMavenArtifact(dependencyElt, dependency);
         dependency.setScope(dependencyElt.getAttribute("scope"));
@@ -81,7 +86,7 @@ public class XmlUtils {
         return dependency;
     }
 
-    private static void loadMavenArtifact(Element artifactElt, MavenArtifact mavenArtifact) {
+    private static void loadMavenArtifact(@Nonnull Element artifactElt, @Nonnull MavenArtifact mavenArtifact) {
         mavenArtifact.setGroupId(artifactElt.getAttribute("groupId"));
         mavenArtifact.setArtifactId(artifactElt.getAttribute("artifactId"));
         mavenArtifact.setVersion(artifactElt.getAttribute("version"));
@@ -102,9 +107,10 @@ public class XmlUtils {
 
 
     /*
-  <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
- */
-    public static MavenSpyLogProcessor.PluginInvocation newPluginInvocation(Element pluginInvocationElt) {
+     *  <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
+     */
+    @Nonnull
+    public static MavenSpyLogProcessor.PluginInvocation newPluginInvocation(@Nonnull Element pluginInvocationElt) {
         MavenSpyLogProcessor.PluginInvocation pluginInvocation = new MavenSpyLogProcessor.PluginInvocation();
         pluginInvocation.groupId = pluginInvocationElt.getAttribute("groupId");
         pluginInvocation.artifactId = pluginInvocationElt.getAttribute("artifactId");

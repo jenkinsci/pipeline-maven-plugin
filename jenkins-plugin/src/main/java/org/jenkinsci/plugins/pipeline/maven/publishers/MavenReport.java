@@ -10,6 +10,8 @@ import org.acegisecurity.AccessDeniedException;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
+import org.jenkinsci.plugins.pipeline.maven.model.MavenExecutionDetails;
+import org.jenkinsci.plugins.pipeline.maven.model.MavenProjectExecutionDetails;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -25,7 +27,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Maven report for the build. Intended to be extended.
@@ -42,8 +43,11 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
 
     private transient List<MavenArtifact> generatedArtifacts;
 
-    public MavenReport(@Nonnull Run run) {
+    private List<MavenExecutionDetails> mavenExecutionDetails;
+
+    public MavenReport(@Nonnull Run run, @Nonnull List<MavenExecutionDetails> mavenExecutionDetails) {
         this.run = run;
+        this.mavenExecutionDetails = mavenExecutionDetails;
     }
 
     @Override
@@ -87,11 +91,16 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
             }
             // security / authorization is checked by Jenkins#getItemByFullName
             try {
-                return Jenkins.getInstance().getItemByFullName(jobFullName, Job.class);
+                return Jenkins.get().getItemByFullName(jobFullName, Job.class);
             } catch (AccessDeniedException e) {
                 return null;
             }
         }).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+
+    public List<MavenExecutionDetails> getMavenExecutionDetails() {
+        return this.mavenExecutionDetails;
     }
 
     public synchronized SortedMap<MavenArtifact, Collection<Job>> getDownstreamJobsByArtifact() {
@@ -171,4 +180,5 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
     public String getUrlName() {
         return "maven";
     }
+
 }

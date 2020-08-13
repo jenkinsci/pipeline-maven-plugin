@@ -1,29 +1,11 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import hudson.model.Fingerprint;
-import hudson.model.Job;
 import hudson.model.Result;
-import hudson.tasks.Maven;
-import jenkins.mvn.DefaultGlobalSettingsProvider;
-import jenkins.mvn.DefaultSettingsProvider;
-import jenkins.mvn.GlobalMavenConfig;
-import jenkins.plugins.git.GitSampleRepoRule;
-import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
-import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
-import org.jvnet.hudson.test.BuildWatcher;
-import org.jvnet.hudson.test.ExtendedToolInstallations;
-import org.jvnet.hudson.test.JenkinsRule;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Hashtable;
 
 import static org.hamcrest.CoreMatchers.*;
