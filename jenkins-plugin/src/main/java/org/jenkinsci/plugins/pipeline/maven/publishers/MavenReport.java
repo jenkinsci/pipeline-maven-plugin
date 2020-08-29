@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.model.Action;
+import hudson.model.Item;
 import hudson.model.Job;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
@@ -25,7 +26,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * Maven report for the build. Intended to be extended.
@@ -79,18 +79,29 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
         }
     }
 
+    /**
+     * Looks up a job by name.
+     * Returns null rather than throwing {@link AccessDeniedException} in case the user has {@link Item#DISCOVER} but not {@link Item#READ}.
+     */
+    private static @CheckForNull Job<?, ?> getJob(String fullName) {
+        try {
+            return Jenkins.get().getItemByFullName(fullName, Job.class);
+        } catch (RuntimeException x) { // TODO switch to simple catch (AccessDeniedException) when baseline includes Spring Security
+            if (x.getClass().getSimpleName().startsWith("AccessDeniedException")) {
+                return null;
+            } else {
+                throw x;
+            }
+        }
+    }
+
     public synchronized Collection<Job> getDownstreamJobs() {
         List<String> downstreamJobFullNames = GlobalPipelineMavenConfig.get().getDao().listDownstreamJobs(run.getParent().getFullName(), run.getNumber());
         return downstreamJobFullNames.stream().map(jobFullName -> {
             if (jobFullName == null) {
                 return null;
             }
-            // security / authorization is checked by Jenkins#getItemByFullName
-            try {
-                return Jenkins.getInstance().getItemByFullName(jobFullName, Job.class);
-            } catch (AccessDeniedException e) {
-                return null;
-            }
+            return getJob(jobFullName);
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
@@ -105,12 +116,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
                 if (jobFullName == null) {
                     return null;
                 }
-                // security / authorization is checked by Jenkins#getItemByFullName
-                try {
-                    return Jenkins.getInstance().getItemByFullName(jobFullName, Job.class);
-                } catch (AccessDeniedException e) {
-                    return null;
-                }
+                return getJob(jobFullName);
             }).filter(Objects::nonNull).collect(Collectors.toList()));
         }
 
@@ -122,13 +128,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
         return upstreamJobs.entrySet().stream().map(entry -> {
             if (entry == null)
                 return null;
-            Job job;
-            // security / authorization is checked by Jenkins#getItemByFullName
-            try {
-                job = Jenkins.getInstance().getItemByFullName(entry.getKey(), Job.class);
-            } catch (AccessDeniedException e) {
-                return null;
-            }
+            Job<?, ?> job = getJob(entry.getKey());
             if (job == null)
                 return null;
             Run run = job.getBuildByNumber(entry.getValue());
