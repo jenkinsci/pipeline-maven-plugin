@@ -28,7 +28,7 @@ public class MavenPublisherStrategyTest {
     public void listMavenPublishers() throws Exception {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        List<MavenPublisher> mavenPublishers = MavenPublisherStrategy.IMPLICIT.buildPublishersList(Collections.<MavenPublisher>emptyList(), new StreamTaskListener(baos));
+        List<MavenPublisher> mavenPublishers = MavenPublisherStrategy.IMPLICIT.buildPublishersList(Collections.emptyList(), new StreamTaskListener(baos));
         assertThat(mavenPublishers.size(), CoreMatchers.is(12));
 
         Map<String, MavenPublisher> reportersByDescriptorId = new HashMap<>();

@@ -56,7 +56,7 @@ public enum MavenPublisherStrategy {
             Map<String, MavenPublisher> globallyConfiguredPublishersById = new HashMap<>();
             GlobalPipelineMavenConfig globalPipelineMavenConfig = GlobalPipelineMavenConfig.get();
 
-            List<MavenPublisher> globallyConfiguredPublishers = globalPipelineMavenConfig == null ? Collections.<MavenPublisher>emptyList() : globalPipelineMavenConfig.getPublisherOptions();
+            List<MavenPublisher> globallyConfiguredPublishers = globalPipelineMavenConfig == null ? Collections.emptyList() : globalPipelineMavenConfig.getPublisherOptions();
             if (globallyConfiguredPublishers == null) {
                 globallyConfiguredPublishers = Collections.emptyList();
             }
