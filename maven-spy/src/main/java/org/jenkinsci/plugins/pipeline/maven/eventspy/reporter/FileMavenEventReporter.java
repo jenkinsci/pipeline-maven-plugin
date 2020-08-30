@@ -129,7 +129,7 @@ public class FileMavenEventReporter implements MavenEventReporter {
             File finalFile = new File(filePath);
 
             boolean result = outFile.renameTo(finalFile);
-            if (result == false) {
+            if (!result) {
                 logger.warn("[jenkins-event-spy] Failure to rename " + outFile + " into " + finalFile);
             } else {
                 outFile = finalFile;
