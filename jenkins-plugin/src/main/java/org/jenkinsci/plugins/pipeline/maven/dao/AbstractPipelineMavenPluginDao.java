@@ -40,6 +40,7 @@ import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -483,7 +484,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 } else {
                     String sqlScript;
                     try {
-                        sqlScript = IOUtils.toString(sqlScriptInputStream);
+                        sqlScript = IOUtils.toString(sqlScriptInputStream, StandardCharsets.UTF_8);
                     } catch (IOException e) {
                         throw new RuntimeIoException("Exception reading " + sqlScriptPath, e);
                     }
