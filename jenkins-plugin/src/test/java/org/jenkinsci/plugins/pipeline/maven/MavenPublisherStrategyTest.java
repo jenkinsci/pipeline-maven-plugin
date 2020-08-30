@@ -1,12 +1,11 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import hudson.util.StreamTaskListener;
 import org.hamcrest.CoreMatchers;
 import org.jenkinsci.plugins.pipeline.maven.publishers.*;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -30,7 +29,7 @@ public class MavenPublisherStrategyTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         List<MavenPublisher> mavenPublishers = MavenPublisherStrategy.IMPLICIT.buildPublishersList(Collections.<MavenPublisher>emptyList(), new StreamTaskListener(baos));
-        Assert.assertThat(mavenPublishers.size(), CoreMatchers.is(12));
+        assertThat(mavenPublishers.size(), CoreMatchers.is(12));
 
         Map<String, MavenPublisher> reportersByDescriptorId = new HashMap<>();
         for(MavenPublisher mavenPublisher : mavenPublishers) {

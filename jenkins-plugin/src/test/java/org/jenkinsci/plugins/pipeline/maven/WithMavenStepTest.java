@@ -42,7 +42,6 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.test.acceptance.docker.DockerRule;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -50,6 +49,8 @@ import org.jvnet.hudson.test.Issue;
 
 import java.io.File;
 import java.util.Collections;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class WithMavenStepTest extends AbstractIntegrationTest {
 
@@ -102,6 +103,6 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         jenkinsRule.assertBuildStatus(Result.SUCCESS, firstPipeline.scheduleBuild2(0));
         FingerprintMap fingerprintMap = jenkinsRule.jenkins.getFingerprintMap();
         Fingerprint fingerprint = fingerprintMap.get(commonsLang3version35Md5);
-        Assert.assertThat( fingerprint, Matchers.nullValue() );
+        assertThat( fingerprint, Matchers.nullValue() );
     }
 }

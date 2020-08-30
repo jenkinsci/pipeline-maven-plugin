@@ -6,11 +6,12 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.OutputStreamEventReporter;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -51,6 +52,6 @@ public class AbstractMavenEventHandlerTest {
         };
         String actual = mavenEventHandler.getMavenFlattenPluginFlattenedPomFilename(mavenProject);
         // this unit test does not expand Maven variables
-        Assert.assertThat(actual, Matchers.is(expected));
+        assertThat(actual, Matchers.is(expected));
     }
 }

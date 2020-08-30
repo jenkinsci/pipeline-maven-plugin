@@ -5,7 +5,6 @@ import junit.framework.AssertionFailedError;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -22,6 +21,8 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -43,7 +44,7 @@ public class XmlUtilsTest {
                         "</a>";
         Element documentElement = toXml(xml);
         Element actualElement = XmlUtils.getUniqueChildElementOrNull(documentElement, "b", "c");
-        Assert.assertThat(actualElement.getTextContent(), CoreMatchers.is("my text"));
+        assertThat(actualElement.getTextContent(), CoreMatchers.is("my text"));
     }
 
     @Test
@@ -55,7 +56,7 @@ public class XmlUtilsTest {
                         "</a>";
         Element documentElement = toXml(xml);
         Element actualElement = XmlUtils.getUniqueChildElementOrNull(documentElement, "does-npt-exist", "c");
-        Assert.assertThat(actualElement, CoreMatchers.nullValue());
+        assertThat(actualElement, CoreMatchers.nullValue());
     }
 
     @Test
@@ -67,7 +68,7 @@ public class XmlUtilsTest {
                         "</a>";
         Element documentElement = toXml(xml);
         Element actualElement = XmlUtils.getUniqueChildElementOrNull(documentElement, "b", "does-not-exist");
-        Assert.assertThat(actualElement, CoreMatchers.nullValue());
+        assertThat(actualElement, CoreMatchers.nullValue());
     }
 
     @Test
@@ -79,7 +80,7 @@ public class XmlUtilsTest {
                         "</a>";
         Element documentElement = toXml(xml);
         Element actualElement = XmlUtils.getUniqueChildElementOrNull(documentElement, "b");
-        Assert.assertThat(actualElement.getTextContent(), CoreMatchers.is("my text"));
+        assertThat(actualElement.getTextContent(), CoreMatchers.is("my text"));
     }
 
     @Test
@@ -90,7 +91,7 @@ public class XmlUtilsTest {
                         "</mavenExecution>";
         Element documentElement = toXml(xml);
         List<Element> actualElements = XmlUtils.getExecutionEvents(documentElement, "ProjectSucceeded");
-        Assert.assertThat(actualElements.size(), CoreMatchers.is(1));
+        assertThat(actualElements.size(), CoreMatchers.is(1));
     }
 
     @Test
@@ -101,7 +102,7 @@ public class XmlUtilsTest {
                         "</mavenExecution>";
         Element documentElement = toXml(xml);
         List<Element> actualElements = XmlUtils.getExecutionEvents(documentElement, "ProjectSucceeded", "ProjectFailed");
-        Assert.assertThat(actualElements.size(), CoreMatchers.is(1));
+        assertThat(actualElements.size(), CoreMatchers.is(1));
     }
 
     @Test
@@ -112,7 +113,7 @@ public class XmlUtilsTest {
                         "</mavenExecution>";
         Element documentElement = toXml(xml);
         List<Element> actualElements = XmlUtils.getExecutionEvents(documentElement, "ProjectSucceeded");
-        Assert.assertThat(actualElements.size(), CoreMatchers.is(0));
+        assertThat(actualElements.size(), CoreMatchers.is(0));
     }
 
     @Test
@@ -123,7 +124,7 @@ public class XmlUtilsTest {
                         "</mavenExecution>";
         Element documentElement = toXml(xml);
         List<Element> actualElements = XmlUtils.getExecutionEvents(documentElement, "ProjectSucceeded", "ProjectFailed");
-        Assert.assertThat(actualElements.size(), CoreMatchers.is(0));
+        assertThat(actualElements.size(), CoreMatchers.is(0));
     }
 
     private Element toXml(String xml) throws SAXException, IOException {
@@ -134,7 +135,7 @@ public class XmlUtilsTest {
     public void concatenate_two_strings(){
         List<String> elements = Arrays.asList("a", "b", "c");
         String actual = XmlUtils.join(elements, ",");
-        Assert.assertThat(actual, CoreMatchers.is("a,b,c"));
+        assertThat(actual, CoreMatchers.is("a,b,c"));
     }
 
     @Test
@@ -143,7 +144,7 @@ public class XmlUtilsTest {
         String absolutePath = "/path/to/spring-petclinic/pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "pom.xml";
-        Assert.assertThat(actual, CoreMatchers.is(expected));
+        assertThat(actual, CoreMatchers.is(expected));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -152,7 +153,7 @@ public class XmlUtilsTest {
         String absolutePath = "/different/path/to/spring-petclinic/pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "pom.xml";
-        Assert.assertThat(actual, CoreMatchers.is(expected));
+        assertThat(actual, CoreMatchers.is(expected));
     }
 
     @Test
@@ -161,7 +162,7 @@ public class XmlUtilsTest {
         String absolutePath = "/path/to/spring-petclinic/pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "pom.xml";
-        Assert.assertThat(actual, CoreMatchers.is(expected));
+        assertThat(actual, CoreMatchers.is(expected));
     }
 
     @Test
@@ -170,7 +171,7 @@ public class XmlUtilsTest {
         String absolutePath = "C:\\path\\to\\spring-petclinic\\pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "pom.xml";
-        Assert.assertThat(actual, CoreMatchers.is(expected));
+        assertThat(actual, CoreMatchers.is(expected));
     }
 
     @Test
@@ -179,7 +180,7 @@ public class XmlUtilsTest {
         String absolutePath = "C:\\path\\to\\spring-petclinic\\target/abc.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "target\\abc.xml";
-        Assert.assertThat(actual, CoreMatchers.is(expected));
+        assertThat(actual, CoreMatchers.is(expected));
     }
 
     @Issue("JENKINS-45221")
@@ -190,7 +191,7 @@ public class XmlUtilsTest {
         String absolutePath = "D:\\jenkins\\workspace\\d.admin_feature_Jenkinsfile-SCSMHLROYAGBAWY5ZNNG6ALR77MVLEH3F3EFF3O7XN3RO5BL6AMA\\admin\\xyz\\target\\pad-admin-xyz-2.4.0-SNAPSHOT-tests.jar";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "admin\\xyz\\target\\pad-admin-xyz-2.4.0-SNAPSHOT-tests.jar";
-        Assert.assertThat(actual, CoreMatchers.is(expected));
+        assertThat(actual, CoreMatchers.is(expected));
     }
 
     @Issue("JENKINS-46084")
@@ -200,7 +201,7 @@ public class XmlUtilsTest {
         String absolutePath = "/app/Jenkins/home/workspace/testjob/pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "pom.xml";
-        Assert.assertThat(actual, CoreMatchers.is(expected));
+        assertThat(actual, CoreMatchers.is(expected));
     }
 
     @Issue("JENKINS-46084")
@@ -210,7 +211,7 @@ public class XmlUtilsTest {
         String absolutePath = "/storage/jenkins/jobs/Test-Pipeline/workspace/pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "pom.xml";
-        Assert.assertThat(actual, CoreMatchers.is(expected));
+        assertThat(actual, CoreMatchers.is(expected));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -218,7 +219,7 @@ public class XmlUtilsTest {
         String workspace = "C:\\path\\to\\spring-petclinic";
         String absolutePath = "C:\\different\\path\\to\\spring-petclinic\\pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
-        Assert.fail("should have thrown an IllegalArgumentException, not return " + actual);
+        fail("should have thrown an IllegalArgumentException, not return " + actual);
     }
 
     @Test
@@ -227,7 +228,7 @@ public class XmlUtilsTest {
         String absolutePath = "C:\\path\\to\\spring-petclinic\\pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "pom.xml";
-        Assert.assertThat(actual, CoreMatchers.is(expected));
+        assertThat(actual, CoreMatchers.is(expected));
     }
 
     @Test
@@ -236,7 +237,7 @@ public class XmlUtilsTest {
         String absolutePath = "C:\\Jenkins\\workspace\\maven-pipeline-plugin-test\\pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "pom.xml";
-        Assert.assertThat(actual, CoreMatchers.is(expected));
+        assertThat(actual, CoreMatchers.is(expected));
     }
 
     @Test
@@ -249,7 +250,7 @@ public class XmlUtilsTest {
         String absolutePath = "/private/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven/pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "pom.xml";
-        Assert.assertThat(actual, CoreMatchers.is(expected));
+        assertThat(actual, CoreMatchers.is(expected));
     }
 
     @Test
@@ -259,7 +260,7 @@ public class XmlUtilsTest {
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
         List<String> executedLifecyclePhases = XmlUtils.getExecutedLifecyclePhases(mavenSpyLogs);
         System.out.println(executedLifecyclePhases);
-        Assert.assertThat(executedLifecyclePhases, Matchers.contains("process-resources", "compile", "process-test-resources", "test-compile", "test", "package"));
+        assertThat(executedLifecyclePhases, Matchers.contains("process-resources", "compile", "process-test-resources", "test-compile", "test", "package"));
     }
 
 
@@ -269,11 +270,11 @@ public class XmlUtilsTest {
         in.getClass(); // check non null
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
         List<Element> artifactDeployedEvents = XmlUtils.getArtifactDeployedEvents(mavenSpyLogs);
-        Assert.assertThat(artifactDeployedEvents.size(), Matchers.is(3));
+        assertThat(artifactDeployedEvents.size(), Matchers.is(3));
 
         Element artifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, "/path/to/my-jar/target/my-jar-0.5-SNAPSHOT.jar");
         String repositoryUrl = XmlUtils.getUniqueChildElement(artifactDeployedEvent, "repository").getAttribute("url");
-        Assert.assertThat(repositoryUrl, Matchers.is("https://nexus.beescloud.com/content/repositories/snapshots/"));
+        assertThat(repositoryUrl, Matchers.is("https://nexus.beescloud.com/content/repositories/snapshots/"));
     }
 
     @Test
@@ -284,9 +285,9 @@ public class XmlUtilsTest {
 
         List<Element> executionEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogs, "org.apache.maven.plugins", "maven-deploy-plugin","deploy", "MojoSucceeded", "MojoFailed");
 
-        Assert.assertThat(executionEvents.size(), Matchers.is(1));
+        assertThat(executionEvents.size(), Matchers.is(1));
         Element deployExecutionEvent = executionEvents.get(0);
-        Assert.assertThat(deployExecutionEvent.getAttribute("type"), Matchers.is("MojoSucceeded"));
+        assertThat(deployExecutionEvent.getAttribute("type"), Matchers.is("MojoSucceeded"));
     }
 
     @Test
@@ -296,17 +297,17 @@ public class XmlUtilsTest {
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, false);
         System.out.println(generatedArtifacts);
-        Assert.assertThat(generatedArtifacts.size(), Matchers.is(2)); // a jar file and a pom file are generated
+        assertThat(generatedArtifacts.size(), Matchers.is(2)); // a jar file and a pom file are generated
 
         for (MavenArtifact mavenArtifact:generatedArtifacts) {
-            Assert.assertThat(mavenArtifact.getGroupId(), Matchers.is("com.example"));
-            Assert.assertThat(mavenArtifact.getArtifactId(), Matchers.is("my-jar"));
+            assertThat(mavenArtifact.getGroupId(), Matchers.is("com.example"));
+            assertThat(mavenArtifact.getArtifactId(), Matchers.is("my-jar"));
             if("pom".equals(mavenArtifact.getType())) {
-                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("pom"));
-                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
+                assertThat(mavenArtifact.getExtension(), Matchers.is("pom"));
+                assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
             } else if ("jar".equals(mavenArtifact.getType())) {
-                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("jar"));
-                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
+                assertThat(mavenArtifact.getExtension(), Matchers.is("jar"));
+                assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
             } else {
                 throw new AssertionFailedError("Unsupported type for " + mavenArtifact);
             }
@@ -319,20 +320,20 @@ public class XmlUtilsTest {
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, true);
         System.out.println(generatedArtifacts);
-        Assert.assertThat(generatedArtifacts.size(), Matchers.is(3)); // a jar file and a pom file are generated
+        assertThat(generatedArtifacts.size(), Matchers.is(3)); // a jar file and a pom file are generated
 
         for (MavenArtifact mavenArtifact:generatedArtifacts) {
-            Assert.assertThat(mavenArtifact.getGroupId(), Matchers.is("com.example"));
-            Assert.assertThat(mavenArtifact.getArtifactId(), Matchers.is("my-jar"));
+            assertThat(mavenArtifact.getGroupId(), Matchers.is("com.example"));
+            assertThat(mavenArtifact.getArtifactId(), Matchers.is("my-jar"));
             if("pom".equals(mavenArtifact.getType())) {
-                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("pom"));
-                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
+                assertThat(mavenArtifact.getExtension(), Matchers.is("pom"));
+                assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
             } else if ("jar".equals(mavenArtifact.getType())) {
-                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("jar"));
-                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
+                assertThat(mavenArtifact.getExtension(), Matchers.is("jar"));
+                assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
             } else if ("java-source".equals(mavenArtifact.getType())) {
-                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("jar"));
-                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.is("sources"));
+                assertThat(mavenArtifact.getExtension(), Matchers.is("jar"));
+                assertThat(mavenArtifact.getClassifier(), Matchers.is("sources"));
             } else {
                 throw new AssertionFailedError("Unsupported type for " + mavenArtifact);
             }
@@ -347,17 +348,17 @@ public class XmlUtilsTest {
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, true);
         System.out.println(generatedArtifacts);
-        Assert.assertThat(generatedArtifacts.size(), Matchers.is(2)); // pom artifact plus 1 attachment
+        assertThat(generatedArtifacts.size(), Matchers.is(2)); // pom artifact plus 1 attachment
 
         for (MavenArtifact mavenArtifact : generatedArtifacts) {
-            Assert.assertThat(mavenArtifact.getGroupId(), Matchers.is("com.example"));
-            Assert.assertThat(mavenArtifact.getArtifactId(), Matchers.is("my-jar"));
+            assertThat(mavenArtifact.getGroupId(), Matchers.is("com.example"));
+            assertThat(mavenArtifact.getArtifactId(), Matchers.is("my-jar"));
             if ("pom".equals(mavenArtifact.getType())) {
-                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("pom"));
-                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
+                assertThat(mavenArtifact.getExtension(), Matchers.is("pom"));
+                assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
             } else if ("ova".equals(mavenArtifact.getType())) {
-                Assert.assertThat(mavenArtifact.getExtension(), Matchers.is("ova"));
-                Assert.assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
+                assertThat(mavenArtifact.getExtension(), Matchers.is("ova"));
+                assertThat(mavenArtifact.getClassifier(), Matchers.isEmptyOrNullString());
             } else {
                 throw new AssertionFailedError("Unsupported type for " + mavenArtifact);
             }

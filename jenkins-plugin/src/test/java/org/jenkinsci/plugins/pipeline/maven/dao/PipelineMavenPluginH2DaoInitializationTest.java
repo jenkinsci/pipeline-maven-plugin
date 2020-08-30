@@ -27,7 +27,6 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -36,6 +35,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.annotation.Nonnull;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -95,7 +95,7 @@ public class PipelineMavenPluginH2DaoInitializationTest {
                 stmt.setLong(1, jenkinsMasterPrimaryKey);
                 try(ResultSet rst = stmt.executeQuery()) {
                     rst.next();
-                    Assert.assertThat(rst.getString("URL"), Matchers.is(""));
+                    assertThat(rst.getString("URL"), Matchers.is(""));
                 }
             }
         }
@@ -127,7 +127,7 @@ public class PipelineMavenPluginH2DaoInitializationTest {
                 stmt.setLong(1, jenkinsMasterPrimaryKey);
                 try(ResultSet rst = stmt.executeQuery()) {
                     rst.next();
-                    Assert.assertThat(rst.getString("URL"), Matchers.is("http://jenkins.mycompany.com"));
+                    assertThat(rst.getString("URL"), Matchers.is("http://jenkins.mycompany.com"));
                 }
             }
         }

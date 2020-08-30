@@ -45,9 +45,11 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.FileUtils;
 import org.hamcrest.CoreMatchers;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.FileMavenEventReporter;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.fail;
 
 public class JenkinsMavenEventSpyMTTest {
 
@@ -78,7 +80,7 @@ public class JenkinsMavenEventSpyMTTest {
         MavenXpp3Reader mavenXpp3Reader = new MavenXpp3Reader();
         InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/eventspy/pom.xml");
 
-        Assert.assertThat(in, CoreMatchers.notNullValue());
+        assertThat(in, CoreMatchers.notNullValue());
         Model model = mavenXpp3Reader.read(in);
         project = new MavenProject(model);
         project.setGroupId(model.getGroupId());
@@ -132,7 +134,7 @@ public class JenkinsMavenEventSpyMTTest {
             long finish = System.currentTimeMillis();
             if ((finish - start) > 2000L) { // 2 seconds is the limit
                 //ThreadDumps.threadDumpModern(System.out); //FIXME
-                Assert.fail("Threads taking too long to finish " + (finish - start) + "ms");
+                fail("Threads taking too long to finish " + (finish - start) + "ms");
             }
 
             if (c >= numThreads) {
@@ -154,7 +156,7 @@ public class JenkinsMavenEventSpyMTTest {
             File outFile = ((FileMavenEventReporter) spy.getReporter()).getFinalFile();
             System.out.println("Generated file: " + outFile);
             String actual = FileUtils.fileRead(outFile);
-            Assert.assertThat(actual, CoreMatchers.containsString("MavenExecutionRequest"));
+            assertThat(actual, CoreMatchers.containsString("MavenExecutionRequest"));
             validateXMLDocument(outFile);
         }
     }
@@ -201,7 +203,7 @@ public class JenkinsMavenEventSpyMTTest {
             long finish = System.currentTimeMillis();
             if ((finish - start) > 2000L) { // 2 seconds is the limit
                 //ThreadDumps.threadDumpModern(System.out); //FIXME
-                Assert.fail("Threads taking too long to finish " + (finish - start) + "ms");
+                fail("Threads taking too long to finish " + (finish - start) + "ms");
             }
 
             if (c >= numThreads) {
@@ -222,7 +224,7 @@ public class JenkinsMavenEventSpyMTTest {
         File outFile = ((FileMavenEventReporter) spy.getReporter()).getFinalFile();
         System.out.println("Generated file: " + outFile);
         String actual = FileUtils.fileRead(outFile);
-        Assert.assertThat(actual, CoreMatchers.containsString("MavenExecutionRequest"));
+        assertThat(actual, CoreMatchers.containsString("MavenExecutionRequest"));
         validateXMLDocument(outFile);
     }
 
@@ -241,7 +243,7 @@ public class JenkinsMavenEventSpyMTTest {
             documentBuilder.parse(document);
         } catch (Exception e) {
             e.printStackTrace();
-            Assert.fail("Failed to parse spylog: " + document + " error:" + e);
+            fail("Failed to parse spylog: " + document + " error:" + e);
         }
 
     }
