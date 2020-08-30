@@ -71,10 +71,7 @@ public class MavenDependency extends MavenArtifact {
         if (optional != other.optional)
             return false;
         if (scope == null) {
-            if (other.scope != null)
-                return false;
-        } else if (!scope.equals(other.scope))
-            return false;
-        return true;
+            return other.scope == null;
+        } else return scope.equals(other.scope);
     }
 }

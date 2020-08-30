@@ -140,9 +140,6 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
             if (job == null)
                 return null;
             Run run = job.getBuildByNumber(entry.getValue());
-            if (run == null) {
-                return null;
-            }
             return run;
         }).filter(Objects::nonNull).collect(Collectors.toList());
     }

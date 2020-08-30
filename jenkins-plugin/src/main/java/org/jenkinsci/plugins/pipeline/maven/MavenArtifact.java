@@ -211,12 +211,8 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
         } else if (!getType().equals(other.getType()))
             return false;
         if (getClassifier() == null) {
-            if (other.getClassifier() != null)
-                return false;
-        } else if (!getClassifier().equals(other.getClassifier()))
-            return false;
-
-        return true;
+            return other.getClassifier() == null;
+        } else return getClassifier().equals(other.getClassifier());
     }
 
     /**
