@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
@@ -96,7 +97,14 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
     }
 
     public synchronized Collection<Job> getDownstreamJobs() {
-        List<String> downstreamJobFullNames = GlobalPipelineMavenConfig.get().getDao().listDownstreamJobs(run.getParent().getFullName(), run.getNumber());
+        List<String> downstreamJobFullNames = GlobalPipelineMavenConfig
+                .get()
+                .getDao()
+                .listDownstreamJobsByArtifact(run.getParent().getFullName(), run.getNumber())
+                .values()
+                .stream()
+                .flatMap(Set::stream)
+                .collect(Collectors.toList());
         return downstreamJobFullNames.stream().map(jobFullName -> {
             if (jobFullName == null) {
                 return null;
