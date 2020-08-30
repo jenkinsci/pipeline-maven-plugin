@@ -559,9 +559,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         mavenInstallation = mavenInstallation.forNode(node, listener).forEnvironment(env);
         mavenInstallation.buildEnvVars(envOverride);
         console.println("[withMaven] using Maven installation '" + mavenInstallation.getName() + "'");
-        String mvnExecPath = mavenInstallation.getExecutable(launcher);
 
-        return mvnExecPath;
+        return mavenInstallation.getExecutable(launcher);
     }
 
     /**
