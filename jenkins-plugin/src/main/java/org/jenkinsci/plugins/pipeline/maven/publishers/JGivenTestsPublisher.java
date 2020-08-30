@@ -109,7 +109,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
             return;
         }
 
-        final JgivenReportGenerator generator = new JgivenReportGenerator(new ArrayList<ReportConfig>());
+        final JgivenReportGenerator generator = new JgivenReportGenerator(new ArrayList<>());
 
         try {
             listener.getLogger().println("[withMaven] jgivenPublisher - Running JGiven report generator");

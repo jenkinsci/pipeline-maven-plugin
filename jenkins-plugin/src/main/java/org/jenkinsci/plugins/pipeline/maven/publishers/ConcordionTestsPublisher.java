@@ -92,7 +92,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         final Run run = context.get(Run.class);
         final Launcher launcher = context.get(Launcher.class);
 
-        Set<String> concordionOutputDirPatterns = new HashSet<String>();
+        Set<String> concordionOutputDirPatterns = new HashSet<>();
         concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL, "MojoSucceeded", "MojoFailed")));
         concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL, "MojoSucceeded", "MojoFailed")));
 
@@ -103,7 +103,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
             return;
         }
 
-        List<FilePath> paths = new ArrayList<FilePath>();
+        List<FilePath> paths = new ArrayList<>();
         for (String pattern : concordionOutputDirPatterns) {
             paths.addAll(Arrays.asList(workspace.list(pattern)));
         }
@@ -129,7 +129,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
             return;
         }
 
-        final List<String> files = new ArrayList<String>();
+        final List<String> files = new ArrayList<>();
         for (final FilePath path : paths) {
             files.add(XmlUtils.getPathInWorkspace(path.getRemote(), workspace));
         }
@@ -151,7 +151,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
 
     @Nonnull
     private Collection<String> findConcordionOutputDirPatterns(@Nonnull List<Element> elements) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (Element element : elements) {
             Element envVars = XmlUtils.getUniqueChildElementOrNull(XmlUtils.getUniqueChildElement(element, "plugin"), "systemPropertyVariables");
             if (envVars != null) {
