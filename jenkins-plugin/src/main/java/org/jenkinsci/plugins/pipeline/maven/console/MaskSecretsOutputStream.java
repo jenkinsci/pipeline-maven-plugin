@@ -70,12 +70,7 @@ public class MaskSecretsOutputStream extends LineTransformationOutputStream {
         return regexp.toString();
     }
 
-    private static final Comparator<String> stringLengthComparator = new Comparator<String>() {
-        @Override
-        public int compare(String o1, String o2) {
-            return o2.length() - o1.length();
-        }
-    };
+    private static final Comparator<String> stringLengthComparator = (o1, o2) -> o2.length() - o1.length();
 
     @Override
     public void flush() throws IOException {
