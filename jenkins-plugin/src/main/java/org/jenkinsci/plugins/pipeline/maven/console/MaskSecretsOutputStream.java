@@ -56,7 +56,7 @@ public class MaskSecretsOutputStream extends LineTransformationOutputStream {
     @Nonnull
     public static String getPatternStringForSecrets(@Nonnull Collection<String> secrets) {
         List<String> sortedByLength =  new ArrayList<>(secrets);
-        Collections.sort(sortedByLength, stringLengthComparator);
+        sortedByLength.sort(stringLengthComparator);
         StringBuilder regexp = new StringBuilder();
 
         for (String secret : sortedByLength) {
