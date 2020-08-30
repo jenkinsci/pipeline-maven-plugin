@@ -6,6 +6,8 @@ import hudson.model.Result;
 import jenkins.branch.BranchSource;
 import jenkins.plugins.git.GitSCMSource;
 import jenkins.plugins.git.GitSampleRepoRule;
+import jenkins.plugins.git.traits.BranchDiscoveryTrait;
+import jenkins.scm.api.trait.SCMSourceTrait;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginJdbcDao;
@@ -141,7 +143,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         // TRIGGER maven-jar#1 to record that "build-maven-jar" generates this jar and install this maven jar in the local maven repo
         WorkflowMultiBranchProject mavenJarPipeline = jenkinsRule.createProject(WorkflowMultiBranchProject.class, "build-maven-jar");
         mavenJarPipeline.addTrigger(new WorkflowJobDependencyTrigger());
-        mavenJarPipeline.getSourcesList().add(new BranchSource(new GitSCMSource(null, gitRepoRule.toString(), "", "*", "", false)));
+        mavenJarPipeline.getSourcesList().add(new BranchSource(buildGitSCMSource(gitRepoRule.toString())));
         System.out.println("trigger maven-jar#1...");
         WorkflowJob mavenJarPipelineMasterPipeline = WorkflowMultibranchProjectTestsUtils.scheduleAndFindBranchProject(mavenJarPipeline, "master");
         assertEquals(1, mavenJarPipeline.getItems().size());
@@ -154,7 +156,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         // TRIGGER maven-war#1 to record that "build-maven-war" has a dependency on "build-maven-jar"
         WorkflowMultiBranchProject mavenWarPipeline = jenkinsRule.createProject(WorkflowMultiBranchProject.class, "build-maven-war");
         mavenWarPipeline.addTrigger(new WorkflowJobDependencyTrigger());
-        mavenWarPipeline.getSourcesList().add(new BranchSource(new GitSCMSource(null, downstreamArtifactRepoRule.toString(), "", "*", "", false)));
+        mavenWarPipeline.getSourcesList().add(new BranchSource(buildGitSCMSource(downstreamArtifactRepoRule.toString())));
         System.out.println("trigger maven-war#1...");
         WorkflowJob mavenWarPipelineMasterPipeline = WorkflowMultibranchProjectTestsUtils.scheduleAndFindBranchProject(mavenWarPipeline, "master");
         assertEquals(1, mavenWarPipeline.getItems().size());
@@ -328,5 +330,13 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         assertThat(mavenWarPipelineLastRun.getNumber(), is(mavenWarPipelineFirstRun.getNumber() + 1));
         Cause.UpstreamCause upstreamCause = mavenWarPipelineLastRun.getCause(Cause.UpstreamCause.class);
         assertThat(upstreamCause, notNullValue());
+    }
+
+    private GitSCMSource buildGitSCMSource(String remote) {
+        GitSCMSource gitSCMSource = new GitSCMSource(remote);
+        List<SCMSourceTrait> traits = new ArrayList();
+        traits.add(new BranchDiscoveryTrait());
+        gitSCMSource.setTraits(traits);
+        return gitSCMSource;
     }
 }
