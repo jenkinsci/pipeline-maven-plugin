@@ -620,8 +620,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactBasedOnParentProjectDependencies = listDownstreamJobsByArtifactBasedOnParentProjectDependencies(jobFullName, buildNumber);
         LOGGER.log(Level.FINER, "Got downstreamJobsByArtifactBasedOnParentProjectDependencies for job named {0} and build #{1}: {2}", new Object[]{jobFullName, buildNumber, downstreamJobsByArtifactBasedOnParentProjectDependencies});
 
-        Map<MavenArtifact, SortedSet<String>> results = new HashMap<>();
-        results.putAll(downstreamJobsByArtifactBasedOnMavenDependencies);
+        Map<MavenArtifact, SortedSet<String>> results = new HashMap<>(downstreamJobsByArtifactBasedOnMavenDependencies);
 
         for(Entry<MavenArtifact, SortedSet<String>> entry: downstreamJobsByArtifactBasedOnParentProjectDependencies.entrySet()) {
             MavenArtifact mavenArtifact = entry.getKey();
