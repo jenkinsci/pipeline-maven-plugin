@@ -34,7 +34,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
 
 import javax.annotation.concurrent.GuardedBy;
@@ -52,7 +52,7 @@ public class OutputStreamEventReporter implements MavenEventReporter {
     final XMLWriter xmlWriter;
 
     public OutputStreamEventReporter(OutputStream out) {
-        this(new OutputStreamWriter(out, StandardCharsets.UTF_8));
+        this(new OutputStreamWriter(out, Charset.forName("UTF-8")));
     }
 
     public OutputStreamEventReporter(Writer out) {
