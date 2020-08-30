@@ -68,7 +68,7 @@
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>maven-plugin</artifactId>
-      <version>3.1.2</version>
+      <version>3.7</version>
       <!--
       Discussed on https://github.com/jenkinsci/pipeline-maven-plugin/pull/48
       Keep the dependency optional
@@ -95,6 +95,41 @@
         <exclusion>
           <groupId>org.apache.maven.wagon</groupId>
           <artifactId>wagon-webdav-jackrabbit</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0 in depMgt) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-repository-metadata</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0 in depMgt) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-core</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0 in depMgt) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-model</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-artifact</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-model-builder</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0 in depMgt) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-compat</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0 in depMgt) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-embedder</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
