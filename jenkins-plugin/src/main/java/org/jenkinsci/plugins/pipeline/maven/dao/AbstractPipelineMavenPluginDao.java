@@ -37,9 +37,13 @@ import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -62,10 +66,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -400,7 +400,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     }
 
     protected Long getGeneratedPrimaryKey(PreparedStatement stmt, String column) throws SQLException {
-        Long jobPrimaryKey;
+        long jobPrimaryKey;
         try (ResultSet rst = stmt.getGeneratedKeys()) {
             if (rst.next()) {
                 jobPrimaryKey = rst.getLong(1);
@@ -483,7 +483,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 } else {
                     String sqlScript;
                     try {
-                        sqlScript = IOUtils.toString(sqlScriptInputStream);
+                        sqlScript = IOUtils.toString(sqlScriptInputStream, StandardCharsets.UTF_8);
                     } catch (IOException e) {
                         throw new RuntimeIoException("Exception reading " + sqlScriptPath, e);
                     }
@@ -619,8 +619,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactBasedOnParentProjectDependencies = listDownstreamJobsByArtifactBasedOnParentProjectDependencies(jobFullName, buildNumber);
         LOGGER.log(Level.FINER, "Got downstreamJobsByArtifactBasedOnParentProjectDependencies for job named {0} and build #{1}: {2}", new Object[]{jobFullName, buildNumber, downstreamJobsByArtifactBasedOnParentProjectDependencies});
 
-        Map<MavenArtifact, SortedSet<String>> results = new HashMap<>();
-        results.putAll(downstreamJobsByArtifactBasedOnMavenDependencies);
+        Map<MavenArtifact, SortedSet<String>> results = new HashMap<>(downstreamJobsByArtifactBasedOnMavenDependencies);
 
         for(Entry<MavenArtifact, SortedSet<String>> entry: downstreamJobsByArtifactBasedOnParentProjectDependencies.entrySet()) {
             MavenArtifact mavenArtifact = entry.getKey();
@@ -1130,7 +1129,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
 
         StringBuilder result = new StringBuilder(StringUtils.substringAfterLast(getClass().getName(), ".") + " - " + getDatabaseDescription());
         for (String prettyString : prettyStrings) {
-            result.append("\r\n\t" + prettyString);
+            result.append("\r\n\t").append(prettyString);
         }
         return result.toString();
     }

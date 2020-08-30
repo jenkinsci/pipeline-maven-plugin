@@ -1,8 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.trigger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
+import hudson.triggers.Trigger;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -15,7 +13,8 @@ import org.jvnet.hudson.test.RestartableJenkinsRule;
 
 import java.util.List;
 
-import hudson.triggers.Trigger;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class WorkflowJobDependencyTriggerTest {
 

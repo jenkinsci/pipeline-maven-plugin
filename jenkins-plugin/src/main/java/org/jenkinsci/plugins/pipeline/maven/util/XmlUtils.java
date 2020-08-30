@@ -37,6 +37,13 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -50,14 +57,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -76,7 +75,7 @@ public class XmlUtils {
         MavenDependency dependency = new MavenDependency();
         loadMavenArtifact(dependencyElt, dependency);
         dependency.setScope(dependencyElt.getAttribute("scope"));
-        dependency.optional = Boolean.valueOf(dependencyElt.getAttribute("optional"));
+        dependency.optional = Boolean.parseBoolean(dependencyElt.getAttribute("optional"));
 
         return dependency;
     }
@@ -89,7 +88,7 @@ public class XmlUtils {
         if (mavenArtifact.getBaseVersion() == null || mavenArtifact.getBaseVersion().isEmpty()) {
             mavenArtifact.setBaseVersion(mavenArtifact.getVersion());
         }
-        mavenArtifact.setSnapshot(Boolean.valueOf(artifactElt.getAttribute("snapshot")));
+        mavenArtifact.setSnapshot(Boolean.parseBoolean(artifactElt.getAttribute("snapshot")));
         mavenArtifact.setType(artifactElt.getAttribute("type"));
         if (mavenArtifact.getType() == null || mavenArtifact.getType().isEmpty()) {
             // workaround: sometimes we use "XmlUtils.newMavenArtifact()" on "project" elements, in this case, "packaging" is defined but "type" is not defined

@@ -25,7 +25,7 @@ THE SOFTWARE.
 Based on jenkins-core-2.46.3.jar!/hudson/model/Cause/UpstreamCause/description.jelly
 -->
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler">
     <!-- upstreamUrl added in 1.284, so handle missing value; also JENKINS-14816 (job/build may have been deleted) -->
     <span>
         <j:choose>

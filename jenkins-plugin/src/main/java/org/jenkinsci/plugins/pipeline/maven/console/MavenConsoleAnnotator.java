@@ -28,15 +28,15 @@ import hudson.tasks._maven.Maven3MojoNote;
 import hudson.tasks._maven.MavenErrorNote;
 import hudson.tasks._maven.MavenMojoNote;
 import hudson.tasks._maven.MavenWarningNote;
-import java.io.ByteArrayOutputStream;
+import jenkins.util.JenkinsJVM;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.stream.Stream;
-import jenkins.util.JenkinsJVM;
 
 // adapted from version in hudson.tasks._maven
 

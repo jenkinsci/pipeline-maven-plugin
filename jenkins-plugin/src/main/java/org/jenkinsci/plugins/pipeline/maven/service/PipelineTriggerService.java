@@ -15,7 +15,6 @@ import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
-import jenkins.security.QueueItemAuthenticatorConfiguration;
 import org.acegisecurity.AccessDeniedException;
 import org.acegisecurity.Authentication;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
@@ -26,6 +25,9 @@ import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,10 +44,6 @@ import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -118,7 +116,7 @@ public class PipelineTriggerService {
                     continue;
                 }
 
-                final WorkflowJob downstreamPipeline = Jenkins.getInstance().getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
+                final WorkflowJob downstreamPipeline = Jenkins.get().getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
                 if (downstreamPipeline == null || downstreamPipeline.getLastBuild() == null) {
                     if (logger.isLoggable(Level.FINE)) {
                         logger.log(Level.FINE, "Downstream pipeline " + downstreamPipelineFullName + " or downstream pipeline last build not found. Database synchronization issue or security restriction?");
@@ -134,7 +132,7 @@ public class PipelineTriggerService {
                 for (String transitiveUpstreamPipelineName : transitiveUpstreamPipelines.keySet()) {
                     // Skip if one of the downstream's upstream is already building or in queue
                     // Then it will get triggered anyway by that upstream, we don't need to trigger it again
-                    WorkflowJob transitiveUpstreamPipeline = Jenkins.getInstance().getItemByFullName(transitiveUpstreamPipelineName, WorkflowJob.class);
+                    WorkflowJob transitiveUpstreamPipeline = Jenkins.get().getItemByFullName(transitiveUpstreamPipelineName, WorkflowJob.class);
 
                     if (transitiveUpstreamPipeline == null) {
                         // security: not allowed to view this transitive upstream pipeline, continue to loop
@@ -175,11 +173,8 @@ public class PipelineTriggerService {
                 boolean downstreamVisibleByUpstreamBuildAuth = this.globalPipelineMavenConfig.getPipelineTriggerService().isDownstreamVisibleByUpstreamBuildAuth(downstreamPipeline);
 
                 if (downstreamVisibleByUpstreamBuildAuth) {
-                    Set<MavenArtifact> mavenArtifacts = jobsToTrigger.get(downstreamPipelineFullName);
-                    if (mavenArtifacts == null) {
-                        mavenArtifacts = new TreeSet<>();
-                        jobsToTrigger.put(downstreamPipelineFullName, mavenArtifacts);
-                    }
+                    Set<MavenArtifact> mavenArtifacts =
+                            jobsToTrigger.computeIfAbsent(downstreamPipelineFullName, k -> new TreeSet<>());
                     if(mavenArtifacts.contains(mavenArtifact)) {
                         // TODO display warning
                     } else {
@@ -197,7 +192,7 @@ public class PipelineTriggerService {
         triggerPipelinesLoop:
         for (Map.Entry<String, Set<MavenArtifact>> entry: jobsToTrigger.entrySet()) {
             String downstreamJobFullName = entry.getKey();
-            Job downstreamJob = Jenkins.getInstance().getItemByFullName(downstreamJobFullName, Job.class);
+            Job downstreamJob = Jenkins.get().getItemByFullName(downstreamJobFullName, Job.class);
             if (downstreamJob == null) {
                 logger.log(Level.INFO, "Illegal state: " + downstreamJobFullName + " not resolved");
                 continue;
@@ -217,7 +212,7 @@ public class PipelineTriggerService {
                 if (matchingMavenDependencies.isEmpty()) {
                     for (Map.Entry<String, Set<String>> omittedPipeline : omittedPipelineTriggersByPipelineFullname.entrySet()) {
                         if (omittedPipeline.getValue().contains(downstreamJobFullName)) {
-                            Job transitiveDownstreamJob = Jenkins.getInstance().getItemByFullName(entry.getKey(), Job.class);
+                            Job transitiveDownstreamJob = Jenkins.get().getItemByFullName(entry.getKey(), Job.class);
                             logger.log(Level.INFO,"[withMaven] downstreamPipelineTriggerRunListener - Skip triggering "
                                     + "downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + "because it will be triggered by transitive downstream " + transitiveDownstreamJob);
                             continue triggerPipelinesLoop; // don't trigger downstream pipeline
@@ -342,6 +337,6 @@ public class PipelineTriggerService {
 
     @CheckForNull
     <T extends Item> T getItemByFullName(String fullName, Class<T> type) throws AccessDeniedException {
-        return Jenkins.getInstance().getItemByFullName(fullName, type);
+        return Jenkins.get().getItemByFullName(fullName, type);
     }
 }

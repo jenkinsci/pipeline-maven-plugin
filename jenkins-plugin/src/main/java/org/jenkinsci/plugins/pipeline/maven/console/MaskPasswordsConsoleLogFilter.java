@@ -7,6 +7,7 @@ import hudson.console.ConsoleLogFilter;
 import hudson.model.Run;
 import hudson.util.Secret;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -17,8 +18,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import javax.annotation.Nonnull;
 
 /**
  * Similar to org.jenkinsci.plugins.credentialsbinding.impl.BindingStep.Filter

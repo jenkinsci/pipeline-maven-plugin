@@ -21,7 +21,7 @@ public class ExtendedToolInstallations {
         Maven.MavenInstallation mvn =  ToolInstallations.configureDefaultMaven("apache-maven-3.5.0", Maven.MavenInstallation.MAVEN_30);
 
         Maven.MavenInstallation maven350 = new Maven.MavenInstallation("apache-maven-3.5.0", mvn.getHome(), JenkinsRule.NO_PROPERTIES);
-        Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(maven350);
+        Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(maven350);
         return maven350;
     }
 
@@ -36,7 +36,7 @@ public class ExtendedToolInstallations {
         Maven.MavenInstallation mvn =  ToolInstallations.configureDefaultMaven("apache-maven-3.6.1", Maven.MavenInstallation.MAVEN_30);
 
         Maven.MavenInstallation maven361 = new Maven.MavenInstallation("apache-maven-3.6.1", mvn.getHome(), JenkinsRule.NO_PROPERTIES);
-        Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(maven361);
+        Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(maven361);
         return maven361;
     }
 }

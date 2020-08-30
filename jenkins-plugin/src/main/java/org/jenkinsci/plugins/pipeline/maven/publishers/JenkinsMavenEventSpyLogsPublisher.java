@@ -8,13 +8,12 @@ import jenkins.model.ArtifactManager;
 import jenkins.util.BuildListenerAdapter;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
-
-import javax.annotation.Nonnull;
 
 /**
  * Primarily for debugging purpose, archive the Maven build logs

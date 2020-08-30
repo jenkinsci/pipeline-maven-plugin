@@ -5,6 +5,8 @@ import hudson.model.Descriptor;
 import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,9 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -56,7 +55,7 @@ public enum MavenPublisherStrategy {
             Map<String, MavenPublisher> globallyConfiguredPublishersById = new HashMap<>();
             GlobalPipelineMavenConfig globalPipelineMavenConfig = GlobalPipelineMavenConfig.get();
 
-            List<MavenPublisher> globallyConfiguredPublishers = globalPipelineMavenConfig == null ? Collections.<MavenPublisher>emptyList() : globalPipelineMavenConfig.getPublisherOptions();
+            List<MavenPublisher> globallyConfiguredPublishers = globalPipelineMavenConfig == null ? Collections.emptyList() : globalPipelineMavenConfig.getPublisherOptions();
             if (globallyConfiguredPublishers == null) {
                 globallyConfiguredPublishers = Collections.emptyList();
             }
@@ -67,7 +66,7 @@ public enum MavenPublisherStrategy {
 
             // mavenPublisher.descriptor.id -> mavenPublisher
             Map<String, MavenPublisher> defaultPublishersById = new HashMap<>();
-            DescriptorExtensionList<MavenPublisher, Descriptor<MavenPublisher>> descriptorList = Jenkins.getInstance().getDescriptorList(MavenPublisher.class);
+            DescriptorExtensionList<MavenPublisher, Descriptor<MavenPublisher>> descriptorList = Jenkins.get().getDescriptorList(MavenPublisher.class);
             for (Descriptor<MavenPublisher> descriptor : descriptorList) {
                 try {
                     defaultPublishersById.put(descriptor.getId(), descriptor.clazz.newInstance());

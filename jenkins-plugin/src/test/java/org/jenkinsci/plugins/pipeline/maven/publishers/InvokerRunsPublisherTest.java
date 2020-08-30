@@ -5,18 +5,18 @@ import hudson.model.TaskListener;
 import hudson.util.StreamTaskListener;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
-import org.junit.Assert;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilderFactory;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -57,7 +57,7 @@ public class InvokerRunsPublisherTest {
                 invokerRunSucceededEvents.add(invokerRunEvent);
             }
         }
-        Assert.assertThat(invokerRunSucceededEvents.size(), Matchers.is(1));
+        assertThat(invokerRunSucceededEvents.size(), Matchers.is(1));
         Element invokerRunSucceedEvent = invokerRunSucceededEvents.get(0);
 
         Element projectElt = XmlUtils.getUniqueChildElement(invokerRunSucceedEvent, "project");
@@ -67,10 +67,10 @@ public class InvokerRunsPublisherTest {
         Element projectsDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "projectsDirectory");
 
         String reportsDirectory = invokerRunsPublisher.expandAndRelativize(reportsDirectoryElt, "reportsDirectory", invokerRunSucceedEvent, projectElt, workspace, listener);
-        Assert.assertThat(reportsDirectory, Matchers.is("target/invoker-reports"));
+        assertThat(reportsDirectory, Matchers.is("target/invoker-reports"));
         String projectsDirectory = invokerRunsPublisher.expandAndRelativize(projectsDirectoryElt, "projectsDirectory", invokerRunSucceedEvent, projectElt, workspace, listener);
-        Assert.assertThat(projectsDirectory, Matchers.is("src/it"));
+        assertThat(projectsDirectory, Matchers.is("src/it"));
         String cloneProjectsTo = invokerRunsPublisher.expandAndRelativize(cloneProjectsToElt, "cloneProjectsTo", invokerRunSucceedEvent, projectElt, workspace, listener);
-        Assert.assertThat(cloneProjectsTo, Matchers.is("target/it"));
+        assertThat(cloneProjectsTo, Matchers.is("target/it"));
     }
 }

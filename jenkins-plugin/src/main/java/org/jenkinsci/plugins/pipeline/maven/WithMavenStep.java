@@ -228,7 +228,7 @@ public class WithMavenStep extends Step {
         }
 
         private Maven.DescriptorImpl getMavenDescriptor() {
-            return Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class);
+            return Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class);
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
@@ -246,7 +246,7 @@ public class WithMavenStep extends Step {
         }
 
         private JDK.DescriptorImpl getJDKDescriptor() {
-            return Jenkins.getInstance().getDescriptorByType(JDK.DescriptorImpl.class);
+            return Jenkins.get().getDescriptorByType(JDK.DescriptorImpl.class);
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
@@ -308,7 +308,7 @@ public class WithMavenStep extends Step {
          * Return all the registered Maven publishers
          */
         public DescriptorExtensionList<MavenPublisher, MavenPublisher.DescriptorImpl> getOptionsDescriptors() {
-            return Jenkins.getInstance().getDescriptorList(MavenPublisher.class);
+            return Jenkins.get().getDescriptorList(MavenPublisher.class);
         }
 
     }

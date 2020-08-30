@@ -1,9 +1,8 @@
 package org.jenkinsci.plugins.pipeline.maven.util;
 
-import java.io.InputStream;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.InputStream;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>

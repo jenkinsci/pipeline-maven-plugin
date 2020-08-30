@@ -21,7 +21,7 @@ THE SOFTWARE.
 -->
 
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
 <f:section title="${%Pipeline Maven Configuration}">
       <f:optionalBlock title="${%Override global maven configuration}" field="override" inline="true">
         <f:dropdownDescriptorSelector title="${%Settings file}"  field="settings" default="${null}"/>

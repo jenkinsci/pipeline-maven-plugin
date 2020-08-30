@@ -1,9 +1,10 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -23,7 +24,7 @@ public class WithMavenStepExecution2Test {
                "--settings \"e:\\folder\\branches%%2Ftest\\workspace@tmp\\withMaven94865076\\settings.xml\" " +
                "--global-settings \"e:\\folder\\branches%%2Ftest\\workspace@tmp\\withMaven94865076\\globalSettings.xml\"";
         System.out.println("Expected escaped mavenConfig: " + expectedEscapedMavenConfig);
-        Assert.assertThat(actualEscapedMavenConfig, Matchers.is(expectedEscapedMavenConfig));
+        assertThat(actualEscapedMavenConfig, Matchers.is(expectedEscapedMavenConfig));
 
     }
 }
