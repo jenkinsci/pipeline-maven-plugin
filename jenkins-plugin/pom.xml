@@ -179,7 +179,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>htmlpublisher</artifactId>
-      <version>1.16</version>
+      <version>1.23</version>
       <scope>compile</scope>
       <optional>true</optional>
     </dependency>
