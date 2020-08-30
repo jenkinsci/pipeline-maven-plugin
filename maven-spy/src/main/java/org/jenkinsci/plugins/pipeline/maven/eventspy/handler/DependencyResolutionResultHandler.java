@@ -31,12 +31,8 @@ import org.eclipse.aether.graph.Dependency;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>

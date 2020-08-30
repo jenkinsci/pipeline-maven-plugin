@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.pipeline.maven.util;
 
 import com.google.common.base.Objects;
 import org.h2.api.ErrorCode;
-import org.h2.jdbcx.JdbcConnectionPool;
 
 import java.io.PrintStream;
 import java.sql.Connection;

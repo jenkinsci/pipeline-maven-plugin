@@ -15,7 +15,6 @@ import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
-import jenkins.security.QueueItemAuthenticatorConfiguration;
 import org.acegisecurity.AccessDeniedException;
 import org.acegisecurity.Authentication;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;

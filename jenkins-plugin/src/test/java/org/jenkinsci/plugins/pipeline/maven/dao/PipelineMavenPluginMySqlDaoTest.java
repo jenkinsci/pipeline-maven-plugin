@@ -24,7 +24,6 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import org.apache.commons.lang.StringUtils;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;

@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.db.migration.h2;
 
 import hudson.model.Cause;
-import hudson.model.Item;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;

@@ -27,7 +27,6 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 import com.google.common.base.Preconditions;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.apache.commons.lang.Validate;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 
 import java.io.IOException;

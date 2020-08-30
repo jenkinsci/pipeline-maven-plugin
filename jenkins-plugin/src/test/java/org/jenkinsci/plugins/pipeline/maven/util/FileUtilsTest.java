@@ -1,6 +1,5 @@
 package org.jenkinsci.plugins.pipeline.maven.util;
 
-import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;

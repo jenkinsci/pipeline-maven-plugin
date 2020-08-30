@@ -7,7 +7,6 @@ import jenkins.branch.BranchSource;
 import jenkins.plugins.git.GitSCMSource;
 import jenkins.plugins.git.GitSampleRepoRule;
 import org.hamcrest.Matchers;
-import org.jenkinsci.plugins.pipeline.maven.dao.AbstractPipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginJdbcDao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
