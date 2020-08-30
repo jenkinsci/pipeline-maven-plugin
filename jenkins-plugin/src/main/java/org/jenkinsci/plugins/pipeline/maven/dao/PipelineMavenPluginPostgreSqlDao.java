@@ -86,7 +86,7 @@ public class PipelineMavenPluginPostgreSqlDao extends AbstractPipelineMavenPlugi
 
     @Override
     protected Long getGeneratedPrimaryKey(PreparedStatement stmt, String column) throws SQLException {
-        Long jobPrimaryKey;
+        long jobPrimaryKey;
         try (ResultSet rst = stmt.getGeneratedKeys()) {
             if (rst.next()) {
                 jobPrimaryKey = rst.getLong(column);

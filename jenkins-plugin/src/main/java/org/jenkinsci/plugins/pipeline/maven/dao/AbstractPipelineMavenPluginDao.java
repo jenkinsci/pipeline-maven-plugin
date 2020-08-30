@@ -401,7 +401,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     }
 
     protected Long getGeneratedPrimaryKey(PreparedStatement stmt, String column) throws SQLException {
-        Long jobPrimaryKey;
+        long jobPrimaryKey;
         try (ResultSet rst = stmt.getGeneratedKeys()) {
             if (rst.next()) {
                 jobPrimaryKey = rst.getLong(1);
