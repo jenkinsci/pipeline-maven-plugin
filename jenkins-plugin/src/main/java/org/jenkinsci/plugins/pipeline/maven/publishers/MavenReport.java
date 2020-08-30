@@ -147,7 +147,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
     public synchronized Collection<MavenArtifact> getDeployedArtifacts() {
         return getGeneratedArtifacts()
                 .stream()
-                .filter(mavenArtifact -> mavenArtifact == null ? false : mavenArtifact.isDeployed())
+                .filter(mavenArtifact -> mavenArtifact != null && mavenArtifact.isDeployed())
                 .collect(Collectors.toList());
     }
 
