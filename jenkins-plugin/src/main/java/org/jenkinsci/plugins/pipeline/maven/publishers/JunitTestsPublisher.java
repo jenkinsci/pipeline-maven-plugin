@@ -277,7 +277,7 @@ public class JunitTestsPublisher extends MavenPublisher {
                 testResultsList.add(testResults);
             }
         }
-        String testResults = testResultsList.stream().collect(Collectors.joining(","));
+        String testResults = String.join(",", testResultsList);
         JUnitResultArchiver archiver = new JUnitResultArchiver(testResults);
 
         if (healthScaleFactor != null) {
