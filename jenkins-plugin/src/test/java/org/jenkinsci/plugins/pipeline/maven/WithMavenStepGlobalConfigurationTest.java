@@ -99,7 +99,7 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
             jenkinsRule.assertLogContains(message, build);
         } finally {
             logger.setLevel(level);
-            globalPipelineMavenConfig.setPublisherOptions((List<MavenPublisher>) null);
+            globalPipelineMavenConfig.setPublisherOptions(null);
         }
     }
 
@@ -160,7 +160,7 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
             jenkinsRule.assertLogContains("[withMaven] Skip '" + displayName + "' disabled by configuration", build);
         } finally {
             logger.setLevel(level);
-            globalPipelineMavenConfig.setPublisherOptions((List<MavenPublisher>) null);
+            globalPipelineMavenConfig.setPublisherOptions(null);
         }
     }
 
