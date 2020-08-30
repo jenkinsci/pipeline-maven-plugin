@@ -5,6 +5,8 @@ import hudson.model.Descriptor;
 import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,9 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>

@@ -34,6 +34,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
+import javax.annotation.Nonnull;
+import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Arrays;
@@ -42,10 +44,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
-import javax.sql.DataSource;
-
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.in;
 

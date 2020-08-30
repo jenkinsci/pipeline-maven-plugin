@@ -22,6 +22,8 @@ import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,9 +39,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 /**
  * Trigger downstream pipelines.

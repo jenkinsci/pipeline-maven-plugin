@@ -29,7 +29,7 @@ import org.jenkinsci.utils.process.CommandBuilder;
 import org.junit.Rule;
 import org.junit.Test;
 
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class JavaGitContainerTest {

@@ -2,11 +2,10 @@ package org.jenkinsci.plugins.pipeline.maven;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 
-import java.io.Serializable;
-import java.util.Objects;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>

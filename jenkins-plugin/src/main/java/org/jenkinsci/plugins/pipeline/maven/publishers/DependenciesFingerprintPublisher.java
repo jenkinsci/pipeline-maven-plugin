@@ -23,8 +23,6 @@
  */
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
-import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
-
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.FingerprintMap;
@@ -41,6 +39,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +49,7 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
+import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
 
 /**
  * Fingerprint the dependencies of the maven project.

@@ -24,19 +24,18 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
-import static org.jenkinsci.plugins.pipeline.maven.eventspy.JenkinsMavenEventSpy.DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME;
-
 import org.apache.maven.execution.ExecutionEvent;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import static org.jenkinsci.plugins.pipeline.maven.eventspy.JenkinsMavenEventSpy.DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME;
 
 /**
  * Handler to alter the <code>org.apache.maven.plugins:maven-invoker-plugin:run</code> goal :

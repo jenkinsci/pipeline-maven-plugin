@@ -1,8 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import java.util.Objects;
-
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>

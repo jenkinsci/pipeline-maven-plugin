@@ -24,19 +24,6 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy;
 
-import java.io.File;
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Vector;
-import java.util.concurrent.CyclicBarrier;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.model.Model;
@@ -47,6 +34,18 @@ import org.hamcrest.CoreMatchers;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.FileMavenEventReporter;
 import org.junit.Before;
 import org.junit.Test;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Vector;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;

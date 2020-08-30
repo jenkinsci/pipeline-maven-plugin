@@ -29,12 +29,12 @@ import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 import org.junit.Test;
 
+import javax.annotation.Nonnull;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import javax.annotation.Nonnull;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**

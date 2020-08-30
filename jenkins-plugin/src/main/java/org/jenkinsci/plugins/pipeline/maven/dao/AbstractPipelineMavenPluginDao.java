@@ -37,6 +37,9 @@ import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
@@ -63,10 +66,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>

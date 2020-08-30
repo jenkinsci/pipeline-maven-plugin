@@ -2,13 +2,12 @@ package org.jenkinsci.plugins.pipeline.maven.db.migration.mysql;
 
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 
+import javax.annotation.Nonnull;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.annotation.Nonnull;
 
 public class MigrationStep12 implements MigrationStep {
 

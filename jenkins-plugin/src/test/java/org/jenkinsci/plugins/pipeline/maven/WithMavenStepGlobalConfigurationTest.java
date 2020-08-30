@@ -35,7 +35,6 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

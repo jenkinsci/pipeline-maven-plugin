@@ -1,11 +1,18 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import hudson.util.StreamTaskListener;
 import org.hamcrest.CoreMatchers;
-import org.jenkinsci.plugins.pipeline.maven.publishers.*;
+import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JacocoReportPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
+import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -15,6 +22,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
