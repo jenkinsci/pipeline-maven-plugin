@@ -783,7 +783,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         // Iterate until we find an override or until we reach the top. We need it to be an item to be able to do
         // getParent, AbstractFolder which has the properties is also an Item
-        for (ItemGroup<?> group = job.getParent(); group != null && group instanceof Item && !(group instanceof Jenkins); group = ((Item) group).getParent()) {
+        for (ItemGroup<?> group = job.getParent(); group instanceof Item && !(group instanceof Jenkins); group = ((Item) group).getParent()) {
             if (group instanceof AbstractFolder) {
                 MavenConfigFolderOverrideProperty mavenConfigProperty = ((AbstractFolder<?>) group).getProperties().get(MavenConfigFolderOverrideProperty.class);
                 if (mavenConfigProperty != null && mavenConfigProperty.isOverride()) {
