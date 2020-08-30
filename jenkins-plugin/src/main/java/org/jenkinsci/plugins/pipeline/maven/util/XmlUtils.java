@@ -76,7 +76,7 @@ public class XmlUtils {
         MavenDependency dependency = new MavenDependency();
         loadMavenArtifact(dependencyElt, dependency);
         dependency.setScope(dependencyElt.getAttribute("scope"));
-        dependency.optional = Boolean.valueOf(dependencyElt.getAttribute("optional"));
+        dependency.optional = Boolean.parseBoolean(dependencyElt.getAttribute("optional"));
 
         return dependency;
     }
@@ -89,7 +89,7 @@ public class XmlUtils {
         if (mavenArtifact.getBaseVersion() == null || mavenArtifact.getBaseVersion().isEmpty()) {
             mavenArtifact.setBaseVersion(mavenArtifact.getVersion());
         }
-        mavenArtifact.setSnapshot(Boolean.valueOf(artifactElt.getAttribute("snapshot")));
+        mavenArtifact.setSnapshot(Boolean.parseBoolean(artifactElt.getAttribute("snapshot")));
         mavenArtifact.setType(artifactElt.getAttribute("type"));
         if (mavenArtifact.getType() == null || mavenArtifact.getType().isEmpty()) {
             // workaround: sometimes we use "XmlUtils.newMavenArtifact()" on "project" elements, in this case, "packaging" is defined but "type" is not defined
