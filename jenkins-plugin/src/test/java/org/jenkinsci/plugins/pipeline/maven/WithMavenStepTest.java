@@ -29,11 +29,9 @@ import com.cloudbees.plugins.credentials.domains.Domain;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.model.Fingerprint;
 import hudson.model.FingerprintMap;
-import hudson.model.Node;
 import hudson.model.Result;
 import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.slaves.DumbSlave;
-import hudson.slaves.NodeProperty;
 import hudson.slaves.RetentionStrategy;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
@@ -67,9 +65,9 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         SystemCredentialsProvider.getInstance().getDomainCredentialsMap()
                 .put(Domain.global(), Collections.singletonList(new UsernamePasswordCredentialsImpl(
                         CredentialsScope.GLOBAL, "test", null, "test", "test")));
-        DumbSlave agent = new DumbSlave("remote", "", "/home/test/slave", "1", Node.Mode.NORMAL, "",
-                new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), "test"),
-                RetentionStrategy.INSTANCE, Collections.<NodeProperty<?>>emptyList());
+        DumbSlave agent = new DumbSlave("remote","/home/test/slave",new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), "test"));
+        agent.setNumExecutors(1);
+        agent.setRetentionStrategy(RetentionStrategy.INSTANCE);
         jenkinsRule.jenkins.addNode(agent);
     }
 
