@@ -42,7 +42,6 @@ import htmlpublisher.HtmlPublisher;
 import htmlpublisher.HtmlPublisherTarget;
 import hudson.Extension;
 import hudson.FilePath;
-import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
@@ -90,7 +89,6 @@ public class ConcordionTestsPublisher extends MavenPublisher {
 
         final FilePath workspace = context.get(FilePath.class);
         final Run run = context.get(Run.class);
-        final Launcher launcher = context.get(Launcher.class);
 
         Set<String> concordionOutputDirPatterns = new HashSet<String>();
         concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL, "MojoSucceeded", "MojoFailed")));
@@ -141,8 +139,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
             listener.getLogger().println(
                     "[withMaven] concordionPublisher - Publishing HTML reports named \"" + target.getReportName()  +
                             "\" with the following files: " + target.getReportFiles());
-            HtmlPublisher.publishReports(run, workspace, launcher, listener, Arrays.asList(target),
-                    HtmlPublisher.class);
+            HtmlPublisher.publishReports(run, workspace, listener, Arrays.asList(target), HtmlPublisher.class);
         } catch (final Exception e) {
             listener.error("[withMaven] concordionPublisher - Silently ignore exception archiving Concordion reports: " + e);
             LOGGER.log(Level.WARNING, "Exception processing Concordion reports archiving", e);
