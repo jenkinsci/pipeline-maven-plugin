@@ -47,6 +47,7 @@ import javax.sql.DataSource;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.in;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -395,8 +396,8 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
             assertThat(generatedArtifact.getGroupId(), is("com.mycompany"));
             assertThat(generatedArtifact.getArtifactId(), is("core"));
             assertThat(generatedArtifact.getBaseVersion(), is("1.0-SNAPSHOT"));
-            assertThat(generatedArtifact.getType(), Matchers.isIn(Arrays.asList("war", "jar")));
-            assertThat(generatedArtifact.getExtension(), Matchers.isIn(Arrays.asList("war", "jar")));
+            assertThat(generatedArtifact.getType(), is(in(Arrays.asList("war", "jar"))));
+            assertThat(generatedArtifact.getExtension(), is(in(Arrays.asList("war", "jar"))));
         }
 
         SqlTestsUtils.dump("select * from JENKINS_BUILD LEFT OUTER JOIN JENKINS_JOB ON JENKINS_BUILD.JOB_ID = JENKINS_JOB.ID", ds, System.out);
