@@ -2,18 +2,16 @@ package org.jenkinsci.plugins.pipeline.maven.console;
 
 import hudson.console.LineTransformationOutputStream;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.annotation.Nonnull;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -56,7 +54,7 @@ public class MaskSecretsOutputStream extends LineTransformationOutputStream {
     @Nonnull
     public static String getPatternStringForSecrets(@Nonnull Collection<String> secrets) {
         List<String> sortedByLength =  new ArrayList<>(secrets);
-        Collections.sort(sortedByLength, stringLengthComparator);
+        sortedByLength.sort(stringLengthComparator);
         StringBuilder regexp = new StringBuilder();
 
         for (String secret : sortedByLength) {
@@ -70,12 +68,7 @@ public class MaskSecretsOutputStream extends LineTransformationOutputStream {
         return regexp.toString();
     }
 
-    private static final Comparator<String> stringLengthComparator = new Comparator<String>() {
-        @Override
-        public int compare(String o1, String o2) {
-            return o2.length() - o1.length();
-        }
-    };
+    private static final Comparator<String> stringLengthComparator = (o1, o2) -> o2.length() - o1.length();
 
     @Override
     public void flush() throws IOException {

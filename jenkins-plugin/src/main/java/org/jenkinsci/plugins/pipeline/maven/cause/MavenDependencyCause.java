@@ -3,9 +3,8 @@ package org.jenkinsci.plugins.pipeline.maven.cause;
 import hudson.model.Job;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
-import java.util.List;
-
 import javax.annotation.Nonnull;
+import java.util.List;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>

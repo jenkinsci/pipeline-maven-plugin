@@ -28,7 +28,6 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
-import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.plugins.findbugs.FindBugsPublisher;
 import org.jenkinsci.Symbol;
@@ -41,7 +40,6 @@ import org.w3c.dom.Element;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;

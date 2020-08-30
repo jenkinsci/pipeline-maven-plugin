@@ -16,12 +16,12 @@ public interface MigrationStep {
     class JenkinsDetails {
         @Nonnull
         public String getMasterLegacyInstanceId() {
-            return Jenkins.getInstance().getLegacyInstanceId();
+            return Jenkins.get().getLegacyInstanceId();
         }
 
         @Nonnull
         public String getMasterRootUrl(){
-            return Objects.toString(Jenkins.getInstance().getRootUrl(), "");
+            return Objects.toString(Jenkins.get().getRootUrl(), "");
         }
     }
 }

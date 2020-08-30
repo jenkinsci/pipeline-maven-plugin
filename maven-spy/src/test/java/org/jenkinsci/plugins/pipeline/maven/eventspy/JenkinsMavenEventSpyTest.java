@@ -36,7 +36,6 @@ import org.hamcrest.CoreMatchers;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.OutputStreamEventReporter;
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,6 +45,8 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -76,7 +77,7 @@ public class JenkinsMavenEventSpyTest {
         MavenXpp3Reader mavenXpp3Reader = new MavenXpp3Reader();
         InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/eventspy/pom.xml");
 
-        Assert.assertThat(in, CoreMatchers.notNullValue());
+        assertThat(in, CoreMatchers.notNullValue());
         Model model = mavenXpp3Reader.read(in);
         project = new MavenProject(model);
         project.setGroupId(model.getGroupId());
@@ -100,7 +101,7 @@ public class JenkinsMavenEventSpyTest {
 
         String actual = writer.toString();
         System.out.println(actual);
-        Assert.assertThat(actual, CoreMatchers.containsString("MavenExecutionRequest"));
+        assertThat(actual, CoreMatchers.containsString("MavenExecutionRequest"));
     }
 
     @Test
@@ -136,7 +137,7 @@ public class JenkinsMavenEventSpyTest {
 
         String actual = writer.toString();
         System.out.println(actual);
-        Assert.assertThat(actual, CoreMatchers.containsString("ProjectStarted"));
-        Assert.assertThat(actual, CoreMatchers.containsString("petclinic"));
+        assertThat(actual, CoreMatchers.containsString("ProjectStarted"));
+        assertThat(actual, CoreMatchers.containsString("petclinic"));
     }
 }

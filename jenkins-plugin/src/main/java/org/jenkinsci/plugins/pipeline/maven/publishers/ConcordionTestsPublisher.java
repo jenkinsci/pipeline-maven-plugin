@@ -18,6 +18,14 @@
 
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import htmlpublisher.HtmlPublisher;
+import htmlpublisher.HtmlPublisherTarget;
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.Run;
+import hudson.model.StreamBuildListener;
+import hudson.model.TaskListener;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
@@ -25,26 +33,18 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.annotation.Nonnull;
-
-import htmlpublisher.HtmlPublisher;
-import htmlpublisher.HtmlPublisherTarget;
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.model.Run;
-import hudson.model.StreamBuildListener;
-import hudson.model.TaskListener;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -90,7 +90,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         final FilePath workspace = context.get(FilePath.class);
         final Run run = context.get(Run.class);
 
-        Set<String> concordionOutputDirPatterns = new HashSet<String>();
+        Set<String> concordionOutputDirPatterns = new HashSet<>();
         concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL, "MojoSucceeded", "MojoFailed")));
         concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL, "MojoSucceeded", "MojoFailed")));
 
@@ -101,7 +101,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
             return;
         }
 
-        List<FilePath> paths = new ArrayList<FilePath>();
+        List<FilePath> paths = new ArrayList<>();
         for (String pattern : concordionOutputDirPatterns) {
             paths.addAll(Arrays.asList(workspace.list(pattern)));
         }
@@ -127,7 +127,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
             return;
         }
 
-        final List<String> files = new ArrayList<String>();
+        final List<String> files = new ArrayList<>();
         for (final FilePath path : paths) {
             files.add(XmlUtils.getPathInWorkspace(path.getRemote(), workspace));
         }
@@ -139,7 +139,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
             listener.getLogger().println(
                     "[withMaven] concordionPublisher - Publishing HTML reports named \"" + target.getReportName()  +
                             "\" with the following files: " + target.getReportFiles());
-            HtmlPublisher.publishReports(run, workspace, listener, Arrays.asList(target), HtmlPublisher.class);
+            HtmlPublisher.publishReports(run, workspace, listener, Collections.singletonList(target), HtmlPublisher.class);
         } catch (final Exception e) {
             listener.error("[withMaven] concordionPublisher - Silently ignore exception archiving Concordion reports: " + e);
             LOGGER.log(Level.WARNING, "Exception processing Concordion reports archiving", e);
@@ -148,7 +148,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
 
     @Nonnull
     private Collection<String> findConcordionOutputDirPatterns(@Nonnull List<Element> elements) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         for (Element element : elements) {
             Element envVars = XmlUtils.getUniqueChildElementOrNull(XmlUtils.getUniqueChildElement(element, "plugin"), "systemPropertyVariables");
             if (envVars != null) {

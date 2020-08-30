@@ -56,6 +56,10 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.verb.POST;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -74,11 +78,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -246,7 +245,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 String jdbcUrl, jdbcUserName, jdbcPassword;
                 if (StringUtils.isBlank(this.jdbcUrl)) {
                     // default embedded H2 database
-                    File databaseRootDir = new File(Jenkins.getInstance().getRootDir(), "jenkins-jobs");
+                    File databaseRootDir = new File(Jenkins.get().getRootDir(), "jenkins-jobs");
                     if (!databaseRootDir.exists()) {
                         boolean created = databaseRootDir.mkdirs();
                         if (!created) {
@@ -263,7 +262,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                         throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
 
                     UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
-                            CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.getInstance(),
+                            CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.get(),
                                     ACL.SYSTEM, Collections.EMPTY_LIST),
                             CredentialsMatchers.withId(this.jdbcCredentialsId));
                     if (jdbcCredentials == null) {
@@ -406,7 +405,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 .withMatching(
                         CredentialsMatchers.always(),
                         CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class,
-                                Jenkins.getInstance(),
+                                Jenkins.get(),
                                 ACL.SYSTEM,
                                 Collections.EMPTY_LIST));
     }
@@ -456,7 +455,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 }
             } else {
                 UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
-                        CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.getInstance(),
+                        CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.get(),
                                 ACL.SYSTEM, Collections.EMPTY_LIST),
                         CredentialsMatchers.withId(jdbcCredentialsId));
                 if (jdbcCredentials == null) {

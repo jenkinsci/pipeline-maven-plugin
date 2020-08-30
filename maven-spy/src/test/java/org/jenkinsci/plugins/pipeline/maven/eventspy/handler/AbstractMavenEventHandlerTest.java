@@ -1,28 +1,17 @@
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
 import org.apache.maven.model.Model;
-import org.apache.maven.model.Plugin;
-import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.project.DefaultProjectBuilder;
-import org.apache.maven.project.DefaultProjectBuildingRequest;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingResult;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.OutputStreamEventReporter;
-import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -63,6 +52,6 @@ public class AbstractMavenEventHandlerTest {
         };
         String actual = mavenEventHandler.getMavenFlattenPluginFlattenedPomFilename(mavenProject);
         // this unit test does not expand Maven variables
-        Assert.assertThat(actual, Matchers.is(expected));
+        assertThat(actual, Matchers.is(expected));
     }
 }

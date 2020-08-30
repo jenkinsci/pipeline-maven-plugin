@@ -2,11 +2,10 @@ package org.jenkinsci.plugins.pipeline.maven.cause;
 
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
-import java.util.List;
-import java.util.Objects;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>

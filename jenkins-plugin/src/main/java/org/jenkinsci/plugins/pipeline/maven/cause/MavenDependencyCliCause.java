@@ -4,7 +4,6 @@ import hudson.console.ModelHyperlinkNote;
 import hudson.model.TaskListener;
 import hudson.model.User;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyAbstractCause;
 
 import java.util.Arrays;
 import java.util.Collections;

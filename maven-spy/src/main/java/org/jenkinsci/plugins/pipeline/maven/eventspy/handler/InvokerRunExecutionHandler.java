@@ -27,11 +27,10 @@ package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 import org.apache.maven.execution.ExecutionEvent;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Arrays;
+import java.util.List;
 
 public class InvokerRunExecutionHandler extends AbstractExecutionHandler {
 

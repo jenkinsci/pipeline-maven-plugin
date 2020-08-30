@@ -30,15 +30,14 @@ import org.codehaus.plexus.util.xml.XmlWriterUtil;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomWriter;
 
+import javax.annotation.concurrent.GuardedBy;
+import javax.annotation.concurrent.ThreadSafe;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
+import java.nio.charset.Charset;
 import java.sql.Timestamp;
-
-import javax.annotation.concurrent.GuardedBy;
-import javax.annotation.concurrent.ThreadSafe;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -52,7 +51,7 @@ public class OutputStreamEventReporter implements MavenEventReporter {
     final XMLWriter xmlWriter;
 
     public OutputStreamEventReporter(OutputStream out) {
-        this(new OutputStreamWriter(out, StandardCharsets.UTF_8));
+        this(new OutputStreamWriter(out, Charset.forName("UTF-8")));
     }
 
     public OutputStreamEventReporter(Writer out) {

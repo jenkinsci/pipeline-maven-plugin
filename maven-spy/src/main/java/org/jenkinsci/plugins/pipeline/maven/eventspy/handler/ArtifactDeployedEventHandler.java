@@ -1,11 +1,11 @@
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositoryEvent;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class ArtifactDeployedEventHandler implements MavenEventHandler {
 

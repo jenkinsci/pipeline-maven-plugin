@@ -26,15 +26,14 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 
+import javax.annotation.Nonnull;
+import javax.sql.DataSource;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
-
-import javax.annotation.Nonnull;
-import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
