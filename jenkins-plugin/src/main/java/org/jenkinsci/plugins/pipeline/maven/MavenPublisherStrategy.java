@@ -67,7 +67,7 @@ public enum MavenPublisherStrategy {
 
             // mavenPublisher.descriptor.id -> mavenPublisher
             Map<String, MavenPublisher> defaultPublishersById = new HashMap<>();
-            DescriptorExtensionList<MavenPublisher, Descriptor<MavenPublisher>> descriptorList = Jenkins.getInstance().getDescriptorList(MavenPublisher.class);
+            DescriptorExtensionList<MavenPublisher, Descriptor<MavenPublisher>> descriptorList = Jenkins.get().getDescriptorList(MavenPublisher.class);
             for (Descriptor<MavenPublisher> descriptor : descriptorList) {
                 try {
                     defaultPublishersById.put(descriptor.getId(), descriptor.clazz.newInstance());

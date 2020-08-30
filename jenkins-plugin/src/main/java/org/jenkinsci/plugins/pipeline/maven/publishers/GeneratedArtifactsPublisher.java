@@ -124,7 +124,7 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
         }
 
         // FINGERPRINT GENERATED MAVEN ARTIFACT
-        FingerprintMap fingerprintMap = Jenkins.getInstance().getFingerprintMap();
+        FingerprintMap fingerprintMap = Jenkins.get().getFingerprintMap();
         for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
             String artifactPathInArchiveZone = artifactToFingerprint.getKey();
             String artifactMd5 = artifactToFingerprint.getValue();

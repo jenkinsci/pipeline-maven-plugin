@@ -54,7 +54,7 @@ public class MigrationStep11 implements MigrationStep {
                         long jenkinsMasterId = rst.getLong("jenkins_master_id");
 
                         try {
-                            WorkflowJob pipeline = Jenkins.getInstance().getItemByFullName(jobFullName, WorkflowJob.class);
+                            WorkflowJob pipeline = Jenkins.get().getItemByFullName(jobFullName, WorkflowJob.class);
                             if (pipeline == null) {
                                 continue;
                             }

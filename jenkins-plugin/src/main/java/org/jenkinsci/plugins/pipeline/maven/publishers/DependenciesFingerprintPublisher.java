@@ -177,7 +177,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
         LOGGER.log(Level.FINER, "Fingerprint {0}", artifactsToFingerPrint);
 
         // FINGERPRINT GENERATED MAVEN ARTIFACT
-        FingerprintMap fingerprintMap = Jenkins.getInstance().getFingerprintMap();
+        FingerprintMap fingerprintMap = Jenkins.get().getFingerprintMap();
         for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
             String artifactPathInFingerprintZone = artifactToFingerprint.getKey();
             String artifactMd5 = artifactToFingerprint.getValue();

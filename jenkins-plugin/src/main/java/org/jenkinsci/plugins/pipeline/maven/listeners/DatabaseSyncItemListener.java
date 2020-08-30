@@ -54,7 +54,7 @@ public class DatabaseSyncItemListener extends ItemListener {
 
         String oldFullName;
         ItemGroup parent = pipeline.getParent();
-        if (parent.equals(Jenkins.getInstance())) {
+        if (parent.equals(Jenkins.get())) {
             oldFullName = oldName;
         } else {
             oldFullName = parent.getFullName() + "/" + oldName;

@@ -178,7 +178,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         }
 
         listener.getLogger().println("[withMaven] Options: " + step.getOptions());
-        ExtensionList<MavenPublisher> availableMavenPublishers = Jenkins.getInstance().getExtensionList(MavenPublisher.class);
+        ExtensionList<MavenPublisher> availableMavenPublishers = Jenkins.get().getExtensionList(MavenPublisher.class);
         listener.getLogger().println("[withMaven] Available options: " + availableMavenPublishers.stream().map(publisher -> publisher.toString()).collect(Collectors.joining(",")));
 
         getComputer();
@@ -279,7 +279,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         console.println("[withMaven] using JDK installation " + jdkInstallationName);
 
-        JDK jdk = Jenkins.getInstance().getJDK(jdkInstallationName);
+        JDK jdk = Jenkins.get().getJDK(jdkInstallationName);
         if (jdk == null) {
             throw new AbortException("Could not find the JDK installation: " + jdkInstallationName + ". Make sure it is configured on the Global Tool Configuration page");
         }
@@ -1119,7 +1119,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @return maven installations on this instance
      */
     private static MavenInstallation[] getMavenInstallations() {
-        return Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class).getInstallations();
+        return Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).getInstallations();
     }
 
     /**
@@ -1135,7 +1135,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         }
 
         String node = null;
-        Jenkins j = Jenkins.getInstance();
+        Jenkins j = Jenkins.get();
 
         for (Computer c : j.getComputers()) {
             if (c.getChannel() == launcher.getChannel()) {
