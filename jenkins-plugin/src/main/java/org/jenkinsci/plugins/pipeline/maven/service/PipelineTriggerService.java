@@ -174,11 +174,8 @@ public class PipelineTriggerService {
                 boolean downstreamVisibleByUpstreamBuildAuth = this.globalPipelineMavenConfig.getPipelineTriggerService().isDownstreamVisibleByUpstreamBuildAuth(downstreamPipeline);
 
                 if (downstreamVisibleByUpstreamBuildAuth) {
-                    Set<MavenArtifact> mavenArtifacts = jobsToTrigger.get(downstreamPipelineFullName);
-                    if (mavenArtifacts == null) {
-                        mavenArtifacts = new TreeSet<>();
-                        jobsToTrigger.put(downstreamPipelineFullName, mavenArtifacts);
-                    }
+                    Set<MavenArtifact> mavenArtifacts =
+                            jobsToTrigger.computeIfAbsent(downstreamPipelineFullName, k -> new TreeSet<>());
                     if(mavenArtifacts.contains(mavenArtifact)) {
                         // TODO display warning
                     } else {
