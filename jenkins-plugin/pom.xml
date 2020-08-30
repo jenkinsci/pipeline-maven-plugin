@@ -271,7 +271,7 @@
     <dependency>
       <groupId>org.jvnet.hudson.plugins</groupId>
       <artifactId>tasks</artifactId>
-      <version>4.51</version>
+      <version>4.53</version>
       <optional>true</optional>
     </dependency>
     <dependency>
