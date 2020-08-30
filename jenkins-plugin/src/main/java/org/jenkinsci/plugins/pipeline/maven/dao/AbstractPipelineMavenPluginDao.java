@@ -1130,7 +1130,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
 
         StringBuilder result = new StringBuilder(StringUtils.substringAfterLast(getClass().getName(), ".") + " - " + getDatabaseDescription());
         for (String prettyString : prettyStrings) {
-            result.append("\r\n\t" + prettyString);
+            result.append("\r\n\t").append(prettyString);
         }
         return result.toString();
     }

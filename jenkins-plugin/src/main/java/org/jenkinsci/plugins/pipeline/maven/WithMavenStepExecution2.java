@@ -345,17 +345,17 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         if (StringUtils.isNotEmpty(settingsFilePath)) {
             // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
         	if (!isUnix) settingsFilePath=settingsFilePath.replace("%", "%%");
-            mavenConfig.append("--settings \"" + settingsFilePath + "\" ");
+            mavenConfig.append("--settings \"").append(settingsFilePath).append("\" ");
         }
         if (StringUtils.isNotEmpty(globalSettingsFilePath)) {
             // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
         	if (!isUnix) globalSettingsFilePath=globalSettingsFilePath.replace("%", "%%");
-            mavenConfig.append("--global-settings \"" + globalSettingsFilePath + "\" ");
+            mavenConfig.append("--global-settings \"").append(globalSettingsFilePath).append("\" ");
         }
         if (StringUtils.isNotEmpty(mavenLocalRepo)) {
             // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
         	if (!isUnix) mavenLocalRepo=mavenLocalRepo.replace("%", "%%");
-            mavenConfig.append("\"-Dmaven.repo.local=" + mavenLocalRepo + "\" ");
+            mavenConfig.append("\"-Dmaven.repo.local=").append(mavenLocalRepo).append("\" ");
         }
 
         envOverride.put("MAVEN_CONFIG", mavenConfig.toString());
@@ -466,10 +466,10 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             if (mavenHome == null) {
                 mavenHome = readFromProcess("printenv", M2_HOME);
                 if (StringUtils.isNotEmpty(mavenHome)) {
-                    consoleMessage.append(" with the environment variable M2_HOME=" + mavenHome);
+                    consoleMessage.append(" with the environment variable M2_HOME=").append(mavenHome);
                 }
             } else {
-                consoleMessage.append(" with the environment variable MAVEN_HOME=" + mavenHome);
+                consoleMessage.append(" with the environment variable MAVEN_HOME=").append(mavenHome);
             }
 
             if (mavenHome == null) {
@@ -488,10 +488,10 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             if (mavenHome == null) {
                 mavenHome = agentEnv.get(M2_HOME);
                 if (StringUtils.isNotEmpty(mavenHome)) {
-                    consoleMessage.append(" with the environment variable M2_HOME=" + mavenHome);
+                    consoleMessage.append(" with the environment variable M2_HOME=").append(mavenHome);
                 }
             } else {
-                consoleMessage.append(" with the environment variable MAVEN_HOME=" + mavenHome);
+                consoleMessage.append(" with the environment variable MAVEN_HOME=").append(mavenHome);
             }
             if (mavenHome == null) {
                 LOGGER.log(Level.FINE, "NO maven installation discovered on build agent through MAVEN_HOME and M2_HOME environment variables");
@@ -530,7 +530,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                             "and not found on the build agent");
                 }
             } else {
-                consoleMessage.append(" with executable " + mvnExecPath);
+                consoleMessage.append(" with executable ").append(mvnExecPath);
             }
         }
 
@@ -607,7 +607,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             String lineSep = "\n";
             script.append("#!/bin/sh -e").append(lineSep);
             script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
-            script.append("\"" + mvnExec.getRemote() + "\" " + mavenConfig + " \"$@\"").append(lineSep);
+            script.append("\"").append(mvnExec.getRemote()).append("\" ").append(mavenConfig).append(" \"$@\"").append(lineSep);
 
         } else { // Windows
             String lineSep = "\r\n";
@@ -615,7 +615,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
             // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
             mavenConfig = mavenConfig.replace("%", "%%");
-            script.append("\"" + mvnExec.getRemote() + "\" " + mavenConfig + " %*").append(lineSep);
+            script.append("\"").append(mvnExec.getRemote()).append("\" ").append(mavenConfig).append(" %*").append(lineSep);
         }
 
         LOGGER.log(Level.FINER, "Generated Maven wrapper script: \n{0}", script);
