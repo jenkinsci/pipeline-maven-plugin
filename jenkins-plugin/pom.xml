@@ -214,7 +214,7 @@
     <dependency>
       <groupId>org.jvnet.hudson.plugins</groupId>
       <artifactId>findbugs</artifactId>
-      <version>4.70</version>
+      <version>5.0.0</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
