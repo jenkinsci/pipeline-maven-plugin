@@ -31,6 +31,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -551,7 +552,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "	    </server>\n" +
                 "    </servers>\n" +
                 "</settings>\n";
-        FileUtils.writeStringToFile(mavenGlobalSettingsFile, mavenGlobalSettings);
+        FileUtils.writeStringToFile(mavenGlobalSettingsFile, mavenGlobalSettings, StandardCharsets.UTF_8);
 
 
         String pipelineScript = "node () {\n" +
@@ -793,7 +794,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "	    </server>\n" +
                 "    </servers>\n" +
                 "</settings>\n";
-        FileUtils.writeStringToFile(mavenSettingsFile, mavenSettings);
+        FileUtils.writeStringToFile(mavenSettingsFile, mavenSettings, StandardCharsets.UTF_8);
 
 
         String pipelineScript = "node () {\n" +

@@ -48,6 +48,7 @@ import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -77,7 +78,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     public void maven_build_on_remote_agent_with_settings_file_on_master_fails() throws Exception {
         File onMaster = new File(jenkinsRule.jenkins.getRootDir(), "onmaster");
         String secret = "secret content on master";
-        FileUtils.writeStringToFile(onMaster, secret);
+        FileUtils.writeStringToFile(onMaster, secret, StandardCharsets.UTF_8);
         String pipelineScript = "node('remote') {withMaven(mavenSettingsFilePath: '" + onMaster + "') {echo readFile(MVN_SETTINGS)}}";
 
         WorkflowJob p = jenkinsRule.createProject(WorkflowJob.class, "p");
