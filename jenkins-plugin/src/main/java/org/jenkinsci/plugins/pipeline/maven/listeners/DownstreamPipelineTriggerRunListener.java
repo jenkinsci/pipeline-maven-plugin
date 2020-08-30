@@ -112,7 +112,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                                 omittedPipelineTriggerCauses + ", invocation rejected.");
                     } else {
                         listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Triggering downstream pipeline " +  ModelHyperlinkNote.encodeTo(omittedPipeline) + " despite build result " +
-                                upstreamBuild.getResult() + " for the upstream causes: " + omittedPipelineTriggerCauses.stream().map(c -> c.getShortDescription()).collect(Collectors.joining(", ")));
+                                upstreamBuild.getResult() + " for the upstream causes: " + omittedPipelineTriggerCauses.stream().map(
+                                Cause::getShortDescription).collect(Collectors.joining(", ")));
                     }
                 }
             }

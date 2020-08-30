@@ -179,7 +179,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         listener.getLogger().println("[withMaven] Options: " + step.getOptions());
         ExtensionList<MavenPublisher> availableMavenPublishers = Jenkins.get().getExtensionList(MavenPublisher.class);
-        listener.getLogger().println("[withMaven] Available options: " + availableMavenPublishers.stream().map(publisher -> publisher.toString()).collect(Collectors.joining(",")));
+        listener.getLogger().println("[withMaven] Available options: " + availableMavenPublishers.stream().map(
+                MavenPublisher::toString).collect(Collectors.joining(",")));
 
         getComputer();
 

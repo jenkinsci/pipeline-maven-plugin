@@ -221,7 +221,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
                         input.getGroupId().equals("jenkins.mvn.test.bundle") &&
                         input.getArtifactId().equals("print-api") &&
                         input.getVersion().equals("0.0.1-SNAPSHOT"))
-                .map(input -> input.getType())
+                .map(MavenArtifact::getType)
                 .collect(Collectors.toList());
 
         assertThat(matchingArtifactTypes, Matchers.containsInAnyOrder("jar", "bundle", "pom"));
