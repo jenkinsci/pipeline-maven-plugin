@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -141,7 +142,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
             listener.getLogger().println(
                     "[withMaven] concordionPublisher - Publishing HTML reports named \"" + target.getReportName()  +
                             "\" with the following files: " + target.getReportFiles());
-            HtmlPublisher.publishReports(run, workspace, launcher, listener, Arrays.asList(target),
+            HtmlPublisher.publishReports(run, workspace, launcher, listener, Collections.singletonList(target),
                     HtmlPublisher.class);
         } catch (final Exception e) {
             listener.error("[withMaven] concordionPublisher - Silently ignore exception archiving Concordion reports: " + e);
