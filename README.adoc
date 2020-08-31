@@ -214,10 +214,10 @@ artifacts
 * Publish JUnit / Surefire reports (if the https://github.com/jenkinsci/junit-plugin[Jenkins JUnit
 Plugin] is
 installed)
-* image:https://wiki.jenkins.io/s/en_GB/8100/5084f018d64a97dc638ca9a178856f851ea353ff/_/images/icons/emoticons/warning.svg[(warning)] Deprecation notice! Publish Findbugs reports (if the https://github.com/jenkinsci/findbugs-plugin[Jenkins FindBugs
+* image:docs/images/warning.svg[(warning)] Deprecation notice! Publish Findbugs reports (if the https://github.com/jenkinsci/findbugs-plugin[Jenkins FindBugs
 Plugin]
 is installed)
-* image:https://wiki.jenkins.io/s/en_GB/8100/5084f018d64a97dc638ca9a178856f851ea353ff/_/images/icons/emoticons/warning.svg[(warning)] Deprecation notice! Publish a report of the tasks ("[.code]``FIXME``" and "[.code]``TODO``") found in the
+* image:docs/images/warning.svg[(warning)] Deprecation notice! Publish a report of the tasks ("[.code]``FIXME``" and "[.code]``TODO``") found in the
 java source code (if the https://wiki.jenkins-ci.org/display/JENKINS/Task+Scanner+Plugin[Jenkins Tasks Scanner
 Plugin]
 is installed)
