@@ -32,7 +32,7 @@ toc::[]
 
 The Pipeline Maven Plugin provides an *advanced set of features* for using https://maven.apache.org[Apache Maven] in https://www.jenkins.io/doc/book/pipeline/[Jenkins Pipelines].
 
-The `withMaven` step configures a maven environment to use within a pipeline job by calling `sh "mvn ..."` or `bat "mvn ..."`.
+The `withMaven` step configures a maven environment to use within a pipeline job by calling `sh "mvn ...` or `bat "mvn ...`.
 The selected maven installation is configured and prepended to the path.
 
 It provides <<features,various features>> to simplify the creation of your Pipeline scripts.
@@ -85,7 +85,7 @@ node{
 ----
 
 Within a node or a docker.image block, create a withMaven block to setup
-a with maven environment. The configured environment will be used when
+a `with maven` environment. The configured environment will be used when
 calling maven inside the block by using `sh mvn` or `bat mvn`. The
 following parameters can be used to configure maven:
 
@@ -98,7 +98,7 @@ pipeline job.
 auto-install is enabled, the JDK will be downloaded and made
 available for the pipeline job.
 * *Maven Settings*
- ** *Maven Settings Config* (`mavenSettingsConfig`): Select a
+** *Maven Settings Config* (`mavenSettingsConfig`): Select a
 Maven settings file *ID* from https://github.com/jenkinsci/config-file-provider-plugin[Config File Provider Plugin]
 allowing the replacement of server credentials and variable
 substitutions as configured in https://github.com/jenkinsci/config-file-provider-plugin[Config File Provider Plugin].
@@ -107,23 +107,21 @@ elements used to define values which configure Maven execution
 in various ways, like the `pom.xml`, but should not be bundled
 to any specific project, or distributed to an audience. See also
 http://maven.apache.org/settings.html[settings.xml] reference
-* {blank}
- ** *Maven Settings File Path* (`mavenSettingsFilePath`): Specify
+** *Maven Settings File Path* (`mavenSettingsFilePath`): Specify
 the path to a Maven `settings.xml` file on the build agent. The
 specified path can be absolute or relative to the workspace.
- ** If none of "mavenSettingsConfig" and "mavenSettingsFilePath" are
-defined, "withMaven(){}" will use the Maven settings defined in
+** If none of `mavenSettingsConfig` and `mavenSettingsFilePath` are
+defined, `withMaven(){}` will use the Maven settings defined in
 the Jenkins Global Tool Configuration if declared
-* **Maven Global Settings +
-**
- ** *Maven Global Settings Config* (`globalMavenSettingsConfig`):
+* **Maven Global Settings**
+** *Maven Global Settings Config* (`globalMavenSettingsConfig`):
 Select a Maven global settings file *ID* from https://github.com/jenkinsci/config-file-provider-plugin[Config File Provider Plugin].
- ** *Maven Global Settings File Path*
+** *Maven Global Settings File Path*
 (`globalMavenSettingsFilePath`): Specify the path to a Maven
 global `settings.xml` file on the build agent. The specified
 path can be absolute or relative to the workspace.
- ** If none of "globalMavenSettingsConfig" and
-"globalMavenSettingsFilePath" are defined, "withMaven(){}" will
+** If none of `globalMavenSettingsConfig` and
+`globalMavenSettingsFilePath` are defined, `withMaven(){}` will
 use the Maven global settings defined in the Jenkins Global Tool
 Configuration if declared
 * *Maven JVM Opts* (`mavenOpts`): Specify JVM specific options
@@ -177,16 +175,16 @@ allowing the replacement of variables and credentials.
 [#feature-sensible-default-maven-settings]
 === Sensible default Maven parameters
 
-The Maven parameters that are useful on a build server, "[.code]``--batch-mode``"
-("[.code]``-B``") and "[.code]``--show-version``" ("[.code]``-V``") are enable by default, no need
+The Maven parameters that are useful on a build server, `--batch-mode`
+(`-B`) and `--show-version` (`-V`) are enable by default, no need
 to add them in your mvn invocations.
 
 [#feature-maven-integration-global-settings]
 === Maven Settings Support
 
-The "``withMaven()"`` pipeline step will setup the Maven settings file and
+The `withMaven()` pipeline step will setup the Maven settings file and
 global settings file either explicitly using the attributes of the
-"withMaven(){}" step declaration or implicitly using the Maven Global
+`withMaven(){}` step declaration or implicitly using the Maven Global
 Settings and Settings files defined at the folder level or in the
 Jenkins Global Tools Configuration.
 
@@ -200,31 +198,33 @@ image:docs/images/default-maven-settings-defined-at-the-folder-level.png[]
 
 === Traceability of Maven builds
 
-The "``withMaven()"`` pipeline step will capture in the logs of the build
+The `withMaven()` pipeline step will capture in the logs of the build
 all the details of the execution:
 
 * Version of the JVM
- ** `"withMaven(){}"` step initialization:
-"[.code]``[withMaven] use JDK installation JDK8``"
- ** `"mvn"` executable invocation:
-"[.code]``Java version: 1.8.0_102, vendor: Oracle Corporation``""
+ ** `withMaven(){}` step initialization:
+`[withMaven] use JDK installation JDK8`
+ ** `mvn` executable invocation:
+`Java version: 1.8.0_102, vendor: Oracle Corporation`
 * Version of Maven
- ** `"withMaven(){}"` step initialization:
-"[.code]``[withMaven] use Maven installation 'M3'``""
- ** `"mvn"` executable invocation:
-"[.code]``Apache Maven 3.3.9 (bb52d8502b132ec0a5a3f4c09453c07478323dc5; 2015-11-10T16:41:47+00:00)``""
+ ** `withMaven(){}` step initialization:
+`[withMaven] use Maven installation 'M3'`
+ ** `mvn` executable invocation:
+`Apache Maven 3.3.9 (bb52d8502b132ec0a5a3f4c09453c07478323dc5; 2015-11-10T16:41:47+00:00)`
 * Name or path of the Maven settings.xml and Maven global settings.xml
 file.
- ** `"withMaven(){}"` step initialization:
-"[.code]``[withMaven] use Maven settings provided by the Jenkins Managed Configuration File 'maven-settings-for-supply-chain-build-job'``"
+ ** `withMaven(){}` step initialization:
+`[withMaven] use Maven settings provided by the Jenkins Managed Configuration File 'maven-settings-for-supply-chain-build-job'`
 * When using the Maven settings.xml and global settings.xml files
 provided by the https://github.com/jenkinsci/config-file-provider-plugin[Jenkins Config File Provider Plugin], +
 details of the Jenkins credentials injected in the Maven build.
- ** `"withMaven(){}"` step initialization:
-"``+[withMaven] use Maven settings.xml 'maven-settings-for-supply-chain-build-job' with Maven servers credentials provided by Jenkins (replaceAll: true): [mavenServerId: 'nexus.beescloud.com', jenkinsCredentials: 'beescloud-nexus-deployment-credentials', username: 'deployment', ...]+``"
+ ** `withMaven(){}` step initialization:
+----
+[withMaven] use Maven settings.xml 'maven-settings-for-supply-chain-build-job' with Maven servers credentials provided by Jenkins (replaceAll: true): [mavenServerId: 'nexus.beescloud.com', jenkinsCredentials: 'beescloud-nexus-deployment-credentials', username: 'deployment', ...]
+----
 
-Sample:
-
+.Sample
+----
  [withMaven] use JDK installation JDK8
  [withMaven] use Maven installation 'M3'
  [withMaven] use Maven settings provided by the Jenkins Managed Configuration File 'maven-settings-for-supply-chain-build-job'
@@ -242,42 +242,124 @@ Sample:
  Java home: /home/ubuntu/jenkins-home/tools/hudson.model.JDK/JDK8/jre
  Default locale: en_US, platform encoding: UTF-8
  OS name: "linux", version: "3.13.0-109-generic", arch: "amd64", family: "unix"
+----
 
 === Report Publishers
 
-Maven build executions inside the "``+withMaven(){...+``}" will be detected
+Maven build executions inside the `withMaven(){}` will be detected
 and Jenkins will transparently
 
 * Archive and fingerprint generated Maven artifacts and Maven attached
 artifacts
 * Publish JUnit / Surefire reports (if the https://github.com/jenkinsci/junit-plugin[Jenkins JUnit
-Plugin] is
-installed)
+Plugin] is installed)
 * Concordion test reports (since 3.0.0)
 
 [WARNING]
+.Deprecated publishers
 ====
-Deprecation notice! Publish Findbugs reports (if the https://github.com/jenkinsci/findbugs-plugin[Jenkins FindBugs Plugin] is installed)
+* Publish Findbugs reports (if the https://github.com/jenkinsci/findbugs-plugin[Jenkins FindBugs Plugin] is installed)
+* Publish a report of the tasks (`FIXME` and `TODO`) found in the java source code (if the https://plugins.jenkins.io/tasks/[Jenkins Tasks Scanner Plugin] is installed).
 ====
 
-[WARNING]
-====
-Deprecation notice! Publish a report of the tasks ("[.code]``FIXME``" and "[.code]``TODO``") found in the
-java source code (if the https://plugins.jenkins.io/tasks/[Jenkins Tasks Scanner Plugin] is installed).
-====
+TIP: In the future, deprecated publishers should be replaced by https://plugins.jenkins.io/warnings-ng/[Warnings Next Generation] implementations (See: https://issues.jenkins-ci.org/browse/JENKINS-57427[JENKINS-57427])
 
 NOTE: The detection of Maven builds require to use Maven 3.2+.
 
-. Jenkins Plugin to publish the reports on the Jenkins build page. If
-the plugin is not installed, then the MAven report is ignored.
-. Download https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/pipeline-maven/2.3.0-beta-1/pipeline-maven-2.3.0-beta-1.hpi[pipeline-maven-2.3.0-beta-1.hpi]
-.  Marker file to temporarily disable the feature for a specific Maven
-build. +
+[cols="a,a,a,a,a",options="header",]
+|===
+|Reporter
+|Description
+|Required Jenkins Plugin (1)
+|Configuration to disable the feature +
+Since v2.3.0 (2)
+|Marker file to disable the feature (3)
+
+|Generated Artifact
+|Archiving and the fingerprinting of the artifacts and attached artifacts generated by the Maven build (jar, sources jar, javadocs jar...)
+| +
+|`withMaven(options: [artifactsPublisher(disabled: true)],...)`
+|`.skip-archive-generated-artifacts`
+
+|Generated JUnit, Surefire and FailSafe reports
+|Publishing of the JUnit, Surefire and FailSafe reports generated by the Maven build
+|http://wiki.jenkins-ci.org/display/JENKINS/JUnit+Plugin[JUnit Plugin]
+|`withMaven(options: [junitPublisher(disabled: true)],...)`
+|`.skip-publish-junit-results`
+
+|Generated Findbugs reports
+|Publishing of the Findbugs reports generated by the Maven build
+|https://wiki.jenkins-ci.org/display/JENKINS/FindBugs+Plugin[FindBugs Plugin]
+|`withMaven(options: [findbugsPublisher(disabled: true)],...)`
+|`.skip-publish-findbugs-results`
+
+|Tasks scanner report
+|Publishing of a report of the "`FIXME`" and "`TODO`" tasks found in the java source code. The keywords can be configured.
+|https://wiki.jenkins-ci.org/display/JENKINS/Task+Scanner+Plugin[Jenkins Tasks Scanner Plugin]
+|`withMaven(options: [openTasksPublisher(disabled: true)],...)`
+|`.skip-task-scanner`
+
+|Dependencies Fingerprinting +
+(since 2.5.0)
+|Fingerprint the Maven dependencies. +
+By default only the snapshot dependencies of scope compile, runtime and provided are fingerprinted.
+| +
+|`withMaven(options: [dependenciesFingerprintPublisher(disabled: true)],...)`
+|`.skip-fingerprint-maven-dependencies`
+
+|http://concordion.org/[Concordion] test report +
+(since 3.0.0)
+|Publishing of the http://concordion.org/[Concordion] test reports. +
+Publish the Concordion reports generated by the maven-surefire-plugin:test and the maven-failsafe-plugin:integration-test goals and located in the folder described by the system property "concordion.output.dir" as documented in http://concordion.org/integrations/java/html/#maven[Concordion > Integration > Java > Maven]
+|https://wiki.jenkins.io/display/JENKINS/HTML+Publisher+Plugin[HTML Publisher Plugin]
+|`withMaven(options: [concordionPublisher(disabled: true)],...)`
+|`.skip-publish-concordion-results`
+
+|https://maven.apache.org/plugins/maven-invoker-plugin/[Maven Invoker Plugin] test reports
+|Publish test reports generated by the https://maven.apache.org/plugins/maven-invoker-plugin/[maven-invoker-plugin:run] goal
+|Maven Invoker Plugin
+|`withMaven(options: [invokerPublisher(disabled: true)],...)`
+|`.skip-publish-invoker-run`
+
+|JGiven reports
+|Publish http://jgiven.org/[JGiven] test reports
+|https://wiki.jenkins.io/display/JENKINS/JGiven+Plugin[JGiven Plugin]
+|`withMaven(options: [jgivenPublisher(disabled: true)],...)`
+|`.skip-publish-jgiven-results`
+
+|JaCoCo Code Coverage
+|Publish JaCoCo Code Coverage
+|https://wiki.jenkins.io/display/JENKINS/JaCoCo+Plugin[JaCoCo Plugin]
+|withMaven(options: [jacocoPublisher(disabled: true)],...)
+| +
+
+|Maven Linker Publisher
+|Publish the Maven report on the pipeline build GUI (list of dependencies, produced artifacts, downstream & upstream pipelines). +
+This publisher should be renamed "Maven Build Report Publisher". +
+A reason to disable this publisher is typically to not "pollute" the build screen with Maven invocations when Maven is used as an utility (e.g. invocations of "maven-help-plugin:3.2.0:evaluate"...)
+| +
+|`withMaven(options: [mavenLinkerPublisher(disabled: true)],...)`
+|`skip-maven-linker-publisher`
+
+|Pipeline Graph Publisher
+|Build the graph of dependencies between Jenkins pipelines and Maven artifacts in order to trigger downstream pipelines (when using the `snapshotDependencies` on downstream pipelines)
+| +
+|`withMaven(options: [pipelineGraphPublisher(disabled: true)],...)`
+|`.skip-pipeline-graph`
+|===
+
+(1) Jenkins Plugin to publish the reports on the Jenkins build
+page. If the plugin is not installed, then the MAven report is ignored.
+
+(2) Download https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/pipeline-maven/2.3.0-beta-1/pipeline-maven-2.3.0-beta-1.hpi[pipeline-maven-2.3.0-beta-1.hpi]
+
+(3) Marker file to temporarily disable the feature for a specific Maven build. +
 Typically used to disable a reporter for a specific build that would
 generate too much data for the default configuration of the reporter
 (e.g. too many generated artifacts...) or to workaround a bug in the
-"[.code]``withMaven``" waiting for a fix. These marker file must be located in
+"`withMaven`" waiting for a fix. These marker file must be located in
 the home directory of the build.
+
 
 ==== Implicit or Explicit activation of Publishers
 
@@ -287,10 +369,10 @@ It is possible to change the default activation of a publisher
 navigating to the "Global Tool Configuration" screen.
 
 It is possible to disable the default activation of publishers on a
-specific "``+withMaven(){...}+``" step using the
-"[.code]``publisherStrategy='EXPLICIT'``" attribute in the step
-"``+withMaven(publisherStrategy='EXPLICIT'){...}+``". The publishers can
-then be enabled explicitly in the "``+withMaven(){...}+``" step using the
+specific `withMaven(){...}` step using the
+`publisherStrategy='EXPLICIT'` attribute in the step
+`withMaven(publisherStrategy='EXPLICIT'){...}`. The publishers can
+then be enabled explicitly in the `withMaven(){...}` step using the
 "publishers" attribute
 
 === Default Configuration
@@ -321,31 +403,31 @@ upstream pipelines.
 
 [NOTE]
 ====
-* The upstream artifact must be generated in a "[.code]``withMaven(){}``" wrapping step to be detected by the triggering system
+* The upstream artifact must be generated in a `withMaven(){}` wrapping step to be detected by the triggering system
 * The downstream pipeline must have selected the build trigger "Build whenever a SNAPSHOT dependency is built"
- ** The build trigger can be defined at the pipeline level ("Build Triggers"), at the multibranch pipeline level ("Scan Repository Triggers") or at the GitHub Organization / Bitbucket Project level ("Scan Organizations Triggers")
+** The build trigger can be defined at the pipeline level ("Build Triggers"), at the multibranch pipeline level ("Scan Repository Triggers") or at the GitHub Organization / Bitbucket Project level ("Scan Organizations Triggers")
 * You have to manually trigger once the upstream pipeline and the downstream pipeline so that the link between the pipelines based on the SNAPSHOT dependency is established
-* The dependency graph is, for the moment, exclusively stored in an H2 embedded database ("[.code]``$JENKINS_HOME/jenkins-jobs/jenkins-jobs.mv.db``"). Support for an external H2 database and then for alternate databases (PostgreSQL) is on the roadmap (see https://github.com/jenkinsci/pipeline-maven-plugin/blob/pipeline-maven-3.0.0-beta-1/jenkins-plugin/src/main/java/org/jenkinsci/plugins/pipeline/maven/dao/PipelineMavenPluginH2Dao.java[PipelineMavenPluginH2Dao.java])
+* The dependency graph is, for the moment, exclusively stored in an H2 embedded database (`$JENKINS_HOME/jenkins-jobs/jenkins-jobs.mv.db`). Support for an external H2 database and then for alternate databases (PostgreSQL) is on the roadmap (see https://github.com/jenkinsci/pipeline-maven-plugin/blob/pipeline-maven-3.0.0-beta-1/jenkins-plugin/src/main/java/org/jenkinsci/plugins/pipeline/maven/dao/PipelineMavenPluginH2Dao.java[PipelineMavenPluginH2Dao.java])
 ====
 
-image:docs/images/image2017-8-7_12:38:11.png[]
-image:docs/images/image2017-8-7_15:22:4.png[]
+image:docs/images/trigger-downstream-1.png[]
+image:docs/images/trigger-downstream-2.png[]
 
-image:docs/images/image2017-8-7_15:19:41.png[Downstream Pipeline Trigger - Org Level Configuration]
+image:docs/images/trigger-downstream-3.png[Downstream Pipeline Trigger - Org Level Configuration]
 
 * Thresholds are applied to define on which type of maven build the
 downstream pipelines are triggered
- ** Threshold based on the status of the upstream pipeline
+** Threshold based on the status of the upstream pipeline
 ("success", "unstable", "failure", "no build", "aborted"). By
 default, only builds with a "success" result will trigger
 downstream builds.
-  *** image:docs/images/downstream-pipeline-trigger-threshold-build-result.png[]
- ** Threshold based on the https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html[Maven lifecycle
+*** image:docs/images/downstream-pipeline-trigger-threshold-build-result.png[]
+** Threshold based on the https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html[Maven lifecycle
 phase]
 reached in the Maven build of the upstream job ("package",
 "install", "deploy"). By default, only the maven builds who
 reach the "deploy" phase will trigger downstream builds.
-  *** image:docs/images/downstream-pipeline-trigger-threshold-lifecycle.png[]
+*** image:docs/images/downstream-pipeline-trigger-threshold-lifecycle.png[]
 
 === Linux, Windows and MacOSX support
 
@@ -484,16 +566,16 @@ been created (see screenshot above)
 
 == Known Limitations
 
-=== Maven and JDK installation not supported in `+docker.image('xxx').inside{...}+`
+=== Maven and JDK installation not supported in `docker.image('xxx').inside{...}`
 
 Maven and JDK installers do not work with
-"``+docker.image('xxx').inside{...}+``" as the docker step does not allow
+`docker.image('xxx').inside{...}` as the docker step does not allow
 the use of Tool Installer, the preinstalled Maven and JDK on the docker
 image will be auto-discovered and used.
 
-=== `withMaven()` not supported in "``+docker.image('xxx').inside{...}"+`` with old versions of the Docker engine
+=== `withMaven()` not supported in `docker.image('xxx').inside{...}` with old versions of the Docker engine
 
-`withMaven()` not supported in "``+docker.image('xxx').inside{...}+``" with
+`withMaven()` not supported in `docker.image('xxx').inside{...}` with
 old versions of the Docker engine such as Docker 1.13.1 on CentOS7.
 
 Any help to fix this bug is more than welcome.
