@@ -94,6 +94,7 @@
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <tagNameFormat>pipeline-maven-@{project.version}</tagNameFormat>
+                    <autoVersionSubmodules>true</autoVersionSubmodules>
                 </configuration>
             </plugin>
         </plugins>
