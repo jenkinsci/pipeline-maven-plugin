@@ -1,7 +1,8 @@
 [[pipeline-maven-plugin]]
 = Pipeline Maven Plugin
-:toc:
-:toc-placement!:
+:toc: macro
+:toc-title:
+
 ifdef::env-github[]
 :tip-caption: :bulb:
 :note-caption: :information_source:
@@ -15,8 +16,6 @@ link:https://github.com/jenkinsci/pipeline-maven-plugin/graphs/contributors[imag
 link:https://plugins.jenkins.io/pipeline-maven/[image:https://img.shields.io/jenkins/plugin/i/pipeline-maven.svg?color=blue&label=installations[Jenkins Plugin Installs]]
 link:https://plugins.jenkins.io/pipeline-maven/[image:https://img.shields.io/jenkins/plugin/v/pipeline-maven.svg[Plugin]]
 link:https://github.com/jenkinsci/pipeline-maven-plugin/releases/latest[image:https://img.shields.io/github/release/jenkinsci/pipeline-maven-plugin.svg?label=changelog[GitHub release]]
-
-toc::[]
 
 This plugin provides maven integration with Pipeline through the `withMaven` step. Configures maven environment to use within a pipeline job by calling `sh mvn` or `bat mvn`.
 
@@ -34,6 +33,8 @@ Older versions of this plugin may not be safe to use. Please review the followin
 * https://jenkins.io/security/advisory/2020-08-12/#SECURITY-1794%20(2)[CSRF vulnerability and missing permission check allow capturing credentials]
 * https://jenkins.io/security/advisory/2020-08-12/#SECURITY-1794%20(1)[Missing permission check allows enumerating credentials IDs]
 ====
+
+toc::[]
 
 == Usage
 
