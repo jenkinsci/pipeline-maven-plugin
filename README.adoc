@@ -60,30 +60,19 @@ configured on the Global Jenkins configuration or on the Global Tool
 Configuration page if using Jenkins > 2.0. When auto-install is
 enabled, maven will be downloaded and made available for the
 pipeline job.
-
-&nbsp;
-
 * *JDK* (`jdk`): Allows the selection of a JDK installation. If
 auto-install is enabled, the JDK will be downloaded and made
 available for the pipeline job.
-
-&nbsp;
-
 * *Maven Settings*
  ** *Maven Settings Config* (`mavenSettingsConfig`): Select a
-Maven settings file *ID* from https://wiki.jenkins-ci.org/display/JENKINS/Config+File+Provider+Plugin[Config File Provider
-Plugin]
+Maven settings file *ID* from https://github.com/jenkinsci/config-file-provider-plugin[Config File Provider Plugin]
 allowing the replacement of server credentials and variable
-substitutions as configured in https://wiki.jenkins-ci.org/display/JENKINS/Config+File+Provider+Plugin[Config File Provider
-Plugin].
+substitutions as configured in https://github.com/jenkinsci/config-file-provider-plugin[Config File Provider Plugin].
 The settings element in the `settings.xml` file contains
 elements used to define values which configure Maven execution
 in various ways, like the `pom.xml`, but should not be bundled
 to any specific project, or distributed to an audience. See also
 http://maven.apache.org/settings.html[settings.xml] reference
-
-&nbsp;
-
 * {blank}
  ** *Maven Settings File Path* (`mavenSettingsFilePath`): Specify
 the path to a Maven `settings.xml` file on the build agent. The
@@ -91,15 +80,10 @@ specified path can be absolute or relative to the workspace.
  ** If none of "mavenSettingsConfig" and "mavenSettingsFilePath" are
 defined, "withMaven(){}" will use the Maven settings defined in
 the Jenkins Global Tool Configuration if declared
-
-&nbsp;
-
 * **Maven Global Settings +
 **
  ** *Maven Global Settings Config* (`globalMavenSettingsConfig`):
-Select a Maven global settings file *ID* from https://wiki.jenkins-ci.org/display/JENKINS/Config+File+Provider+Plugin[Config File
-Provider
-Plugin].
+Select a Maven global settings file *ID* from https://github.com/jenkinsci/config-file-provider-plugin[Config File Provider Plugin].
  ** *Maven Global Settings File Path*
 (`globalMavenSettingsFilePath`): Specify the path to a Maven
 global `settings.xml` file on the build agent. The specified
@@ -108,18 +92,11 @@ path can be absolute or relative to the workspace.
 "globalMavenSettingsFilePath" are defined, "withMaven(){}" will
 use the Maven global settings defined in the Jenkins Global Tool
 Configuration if declared
-
-&nbsp;
-
 * *Maven JVM Opts* (`mavenOpts`): Specify JVM specific options
 needed when launching Maven as an external process, these are not
-maven specific options. See: https://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html#CBBIJCHG[Java
-Options] +
+maven specific options. See: https://docs.oracle.com/javase/8/docs/technotes/tools/windows/java.html#CBBIJCHG[Java Options] +
 Shell-like environment variable expansions work in this field, by
 using the `${VARIABLE`} syntax.
-
-&nbsp;
-
 * *Maven Local Repository* (`mavenLocalRepo`): Specify a custom
 local repository path. Shell-like environment variable expansions
 work with this field, by using the `${VARIABLE`} syntax. Normally,
@@ -143,7 +120,7 @@ If specified as a relative path then this value will be resolved
 against the workspace root and not the current working directory. +
 ie. `$WORKSPACE/.repository` if `.repository` value is specified.
 
-image:https://wiki.jenkins.io/s/en_GB/8100/5084f018d64a97dc638ca9a178856f851ea353ff/_/images/icons/emoticons/information.svg[(info)]
+image:docs/images/information.svg[(info)]
 `mavenSettingsConfig` and `globalMavenSettingsConfig` use the *ID*,
 not the *name*, of the Maven settings file (resp Maven Global Settings
 file).
@@ -160,9 +137,8 @@ installations page.
 * *mavenLocalRepo:* a local repository folder is specified to avoid
 shared repositories
 * *mavenSettingsConfig:* specifies an specific settings.xml
-configuration from https://wiki.jenkins-ci.org/display/JENKINS/Config+File+Provider+Plugin[Config File Provider
-Plugin]
-plugin, allowing the replacement of variables and credentials.
+configuration from https://github.com/jenkinsci/config-file-provider-plugin[Config File Provider Plugin],
+allowing the replacement of variables and credentials.
 
 == Features
 
@@ -185,8 +161,8 @@ of pipeline authors hiding the "boilerplate" to declare the credentials
 of the Git, Nexus, Artifactory... servers and all the needed proxies,
 mirrors...
 
-image:https://wiki.jenkins.io/download/attachments/99451377/global-tools-configuration-maven-settings.png?version=1&modificationDate=1559251721000&api=v2[]
-image:https://wiki.jenkins.io/download/attachments/99451377/default-maven-settings-defined-at-the-folder-level.png?version=1&modificationDate=1517238678000&api=v2[]
+image:docs/images/global-tools-configuration-maven-settings.png[]
+image:docs/images/default-maven-settings-defined-at-the-folder-level.png[]
 
 === Traceability of Maven builds
 
@@ -208,8 +184,7 @@ file.
  ** `"withMaven(){}"` step initialization:
 "[.code]``[withMaven] use Maven settings provided by the Jenkins Managed Configuration File 'maven-settings-for-supply-chain-build-job'``"
 * When using the Maven settings.xml and global settings.xml files
-provided by the https://wiki.jenkins-ci.org/display/JENKINS/Config+File+Provider+Plugin[Jenkins Config File Provider
-Plugin], +
+provided by the https://github.com/jenkinsci/config-file-provider-plugin[Jenkins Config File Provider Plugin], +
 details of the Jenkins credentials injected in the Maven build.
  ** `"withMaven(){}"` step initialization:
 "``+[withMaven] use Maven settings.xml 'maven-settings-for-supply-chain-build-job' with Maven servers credentials provided by Jenkins (replaceAll: true): [mavenServerId: 'nexus.beescloud.com', jenkinsCredentials: 'beescloud-nexus-deployment-credentials', username: 'deployment', ...]+``"
@@ -241,10 +216,10 @@ and Jenkins will transparently
 
 * Archive and fingerprint generated Maven artifacts and Maven attached
 artifacts
-* Publish JUnit / Surefire reports (if the http://wiki.jenkins-ci.org/display/JENKINS/JUnit+Plugin[Jenkins JUnit
+* Publish JUnit / Surefire reports (if the https://github.com/jenkinsci/junit-plugin[Jenkins JUnit
 Plugin] is
 installed)
-* image:https://wiki.jenkins.io/s/en_GB/8100/5084f018d64a97dc638ca9a178856f851ea353ff/_/images/icons/emoticons/warning.svg[(warning)] Deprecation notice! Publish Findbugs reports (if the http://wiki.jenkins-ci.org/display/JENKINS/FindBugs+Plugin[Jenkins FindBugs
+* image:https://wiki.jenkins.io/s/en_GB/8100/5084f018d64a97dc638ca9a178856f851ea353ff/_/images/icons/emoticons/warning.svg[(warning)] Deprecation notice! Publish Findbugs reports (if the https://github.com/jenkinsci/findbugs-plugin[Jenkins FindBugs
 Plugin]
 is installed)
 * image:https://wiki.jenkins.io/s/en_GB/8100/5084f018d64a97dc638ca9a178856f851ea353ff/_/images/icons/emoticons/warning.svg[(warning)] Deprecation notice! Publish a report of the tasks ("[.code]``FIXME``" and "[.code]``TODO``") found in the
@@ -253,7 +228,7 @@ Plugin]
 is installed)
 * Concordion test reports (since 3.0.0)
 
-image:https://wiki.jenkins.io/s/en_GB/8100/5084f018d64a97dc638ca9a178856f851ea353ff/_/images/icons/emoticons/information.svg[(info)]
+image:docs/images/information.svg[(info)]
 The detection of Maven builds require to use Maven 3.2+.
 
 . Jenkins Plugin to publish the reports on the Jenkins build page. If
@@ -292,7 +267,7 @@ In the "Global Tool Configuration" screen
 * Maven settings and Maven global settings
 * Publishers settings: enable/disable publishers...
 
-image::https://wiki.jenkins.io/download/attachments/99451377/pipeline-maven-plugin-global-tools-configuration.png?version=1&modificationDate=1497192264000&api=v2[]
+image::docs/images/pipeline-maven-plugin-global-tools-configuration.png[]
 
 ==== Folder Level Configuration
 
@@ -300,14 +275,14 @@ In the Folder "configuration" screen
 
 * Maven settings and Maven global settings
 
-image::https://wiki.jenkins.io/download/attachments/99451377/pipeline-maven-folder-level-configuration.png?version=1&modificationDate=1520335158000&api=v2[]
+image:docs/images/pipeline-maven-folder-level-configuration.png[]
 
 === Trigger downstream pipeline when a snapshot is built (since 3.0.0)
 
 Trigger downstream pipeline that depend on Maven artifact generated by
 upstream pipelines.
 
-image:https://wiki.jenkins.io/s/en_GB/8100/5084f018d64a97dc638ca9a178856f851ea353ff/_/images/icons/emoticons/information.svg[(info)] Notes
+image:docs/images/information.svg[(info)] Notes
 
 * The upstream artifact must be generated in a "[.code]``withMaven(){}``"
 wrapping step to be detected by the triggering system
@@ -327,11 +302,10 @@ external H2 database and then for alternate databases (PostgreSQL)
 is on the roadmap
 (see https://github.com/jenkinsci/pipeline-maven-plugin/blob/pipeline-maven-3.0.0-beta-1/jenkins-plugin/src/main/java/org/jenkinsci/plugins/pipeline/maven/dao/PipelineMavenPluginH2Dao.java[PipelineMavenPluginH2Dao.java])
 
-image:https://wiki.jenkins.io/download/attachments/99451377/image2017-8-7%2012%3A38%3A11.png?version=1&modificationDate=1502102295000&api=v2[]
-image:https://wiki.jenkins.io/download/attachments/99451377/image2017-8-7%2015%3A22%3A4.png?version=1&modificationDate=1502112126000&api=v2[]
+image:docs/images/image2017-8-7_12:38:11.png[]
+image:docs/images/image2017-8-7_15:22:4.png[]
 
-image::https://wiki.jenkins.io/download/attachments/99451377/image2017-8-7%2015%3A19%3A41.png?version=1&modificationDate=1502111983000&api=v2[Downstream Pipeline Trigger - Org Level
-Configuration]
+image:docs/images/image2017-8-7_15:19:41.png[Downstream Pipeline Trigger - Org Level Configuration]
 
 * Thresholds are applied to define on which type of maven build the
 downstream pipelines are triggered
@@ -339,13 +313,13 @@ downstream pipelines are triggered
 ("success", "unstable", "failure", "no build", "aborted"). By
 default, only builds with a "success" result will trigger
 downstream builds.
-  *** image::https://wiki.jenkins.io/download/attachments/99451377/downstream-pipeline-trigger-threshold-build-result.png?version=1&modificationDate=1507148539000&api=v2[]
+  *** image:docs/images/downstream-pipeline-trigger-threshold-build-result.png[]
  ** Threshold based on the https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html[Maven lifecycle
 phase]
 reached in the Maven build of the upstream job ("package",
 "install", "deploy"). By default, only the maven builds who
 reach the "deploy" phase will trigger downstream builds.
-  *** image::https://wiki.jenkins.io/download/attachments/99451377/downstream-pipeline-trigger-threshold-lifecycle.png?version=1&modificationDate=1507148537000&api=v2[]
+  *** image:docs/images/downstream-pipeline-trigger-threshold-lifecycle.png[]
 
 === Linux, Windows and MacOSX support
 
@@ -417,7 +391,7 @@ database
 to "Credentials" on the left menu
  ** Navigate to "Manage Jenkins / Global Tools Configuration" and go
 to the "Pipeline Maven Configuration"
- ** image::https://wiki.jenkins.io/download/attachments/99451377/pipeline-maven-plugin-configuration-1.png?version=2&modificationDate=1546455091000&api=v2[]
+ ** image:docs/images/pipeline-maven-plugin-configuration-1.png[]
  ** In the Database configuration section, define the following
   *** JDBC URL: url of the database, e.g.
 "jdbc:mysql://mysql.example.com/jenkins"
@@ -433,7 +407,7 @@ button.
  ** Click on "Validate Database Configuration" button to verify that
 the connection is successful
  ** Click on "Save"
- ** image::https://wiki.jenkins.io/download/attachments/99451377/pipeline-maven-plugin-configuration-2.png?version=2&modificationDate=1546456028000&api=v2[]
+ ** image:docs/images/pipeline-maven-plugin-configuration-2.png[]
 
 === Using a PostgreSQL Database (since 3.7.0)
 
@@ -450,8 +424,8 @@ Configuration steps to use a PostgreSQL:
 with permissions for Data Manipulation Language actions (DML) and
 Data Definition Language (DDL) actions
  ** Tested with PostgreSQL 10.6 and 11.3
-* Install the Jenkins the "https://wiki.jenkins.io/display/JENKINS/PostgreSQL+API+Plugin[PostgreSQL
-API]"
+* Install the Jenkins the https://github.com/jenkinsci/postgresql-api-plugin[PostgreSQL
+API]
 plugin
  ** Navigate to "Manage Jenkins / Manage Plugins / Available",
 select the "PostgreSQL API" plugin and click on "Download now
@@ -462,7 +436,7 @@ database
 navigating to "Credentials" on the left menu
  ** Navigate to "Manage Jenkins / Global Tools Configuration" and go
 to the "Pipeline Maven Configuration"
- ** image::https://wiki.jenkins.io/download/attachments/99451377/pipeline-maven-plugin-configuration-postgresql.png?version=1&modificationDate=1559138107000&api=v2[]
+ ** image:docs/images/pipeline-maven-plugin-configuration-postgresql.png[]
  ** In the Database configuration section, define the following
   *** JDBC URL: url of the database, e.g.
 "jdbc:postgresql://postgresql.example.com:5432/jenkins"
