@@ -17,25 +17,43 @@ link:https://plugins.jenkins.io/pipeline-maven/[image:https://img.shields.io/jen
 link:https://plugins.jenkins.io/pipeline-maven/[image:https://img.shields.io/jenkins/plugin/v/pipeline-maven.svg[Plugin]]
 link:https://github.com/jenkinsci/pipeline-maven-plugin/releases/latest[image:https://img.shields.io/github/release/jenkinsci/pipeline-maven-plugin.svg?label=changelog[GitHub release]]
 
-This plugin provides maven integration with Pipeline through the `withMaven` step. Configures maven environment to use within a pipeline job by calling `sh mvn` or `bat mvn`.
+[.float-group]
+--
+[.text-center]
+image:docs/images/jenkins.png[Jenkins logo,height=64,role=center,float=left,align="center"]
+image:docs/images/plus.png[plus,height=32,float=left,align="center"]
+image:docs/images/maven-owl.png[Maven Owl logo,height=64,float=left,align="center"]
+--
 
-The selected maven installation will be configured and prepended to the path.
+toc::[]
 
-See the https://plugins.jenkins.io/pipeline-maven/[Plugin Site] for release
-information and documentation.
+[#introduction]
+== Introduction
+
+The Pipeline Maven Plugin provides an *advanced set of features* for using https://maven.apache.org[Apache Maven] in https://www.jenkins.io/doc/book/pipeline/[Jenkins Pipelines].
+
+The `withMaven` step configures a maven environment to use within a pipeline job by calling `sh "mvn ..."` or `bat "mvn ..."`.
+The selected maven installation is configured and prepended to the path.
+
+It provides <<features,various features>> to simplify the creation of your Pipeline scripts.
+It uses some <<feature-sensible-default-maven-settings,sensible default Apache Maven settings>> for a CI usage (batch-mode, ...) and automatically configures the Jenkins reports by following the Apache Maven standards.
+
+This plugin also allows transitioning smoothly from the legacy https://plugins.jenkins.io/maven-plugin/[Maven Integration] job type by allowing to reuse <<#feature-maven-integration-global-settings,its global settings>> and by re-implementing the most popular features like the automatic triggering of downstream jobs based on SNAPSHOTs dependencies.
 
 [WARNING]
 .Security issues
 ====
-Older versions of this plugin may not be safe to use. Please review the following warnings before using an older version:
+
+Older versions of this plugin may not be safe to use.
+Please review the following warnings before using an older version:
+
 * https://jenkins.io/security/advisory/2017-03-09/[Arbitrary files from Jenkins master available in Pipeline by using the withMaven step]
 * https://jenkins.io/security/advisory/2019-05-31/#SECURITY-1409[XML External Entity processing vulnerability]
 * https://jenkins.io/security/advisory/2020-08-12/#SECURITY-1794%20(2)[CSRF vulnerability and missing permission check allow capturing credentials]
 * https://jenkins.io/security/advisory/2020-08-12/#SECURITY-1794%20(1)[Missing permission check allows enumerating credentials IDs]
 ====
 
-toc::[]
-
+[#usage]
 == Usage
 
 An example pipeline script using the pipeline Maven plugin:
@@ -153,14 +171,17 @@ shared repositories
 configuration from https://github.com/jenkinsci/config-file-provider-plugin[Config File Provider Plugin],
 allowing the replacement of variables and credentials.
 
+[#features]
 == Features
 
+[#feature-sensible-default-maven-settings]
 === Sensible default Maven parameters
 
 The Maven parameters that are useful on a build server, "[.code]``--batch-mode``"
 ("[.code]``-B``") and "[.code]``--show-version``" ("[.code]``-V``") are enable by default, no need
 to add them in your mvn invocations.
 
+[#feature-maven-integration-global-settings]
 === Maven Settings Support
 
 The "``withMaven()"`` pipeline step will setup the Maven settings file and
