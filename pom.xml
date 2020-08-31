@@ -41,7 +41,7 @@
         This plugin provides maven integration with Pipeline by providing a withMaven step. Configures maven environment to use within a pipeline job by calling sh mvn or bat mvn.
         The selected maven installation will be configured and prepended to the path.
     </description>
-    <url>https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Maven+Plugin</url>
+    <url>https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/README.adoc</url>
     <licenses>
         <license>
             <name>The MIT license</name>
