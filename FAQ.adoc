@@ -1,4 +1,5 @@
 = FAQ
+:toc:
 
 == How to use the Pipeline Maven Plugin with Docker? (since version 3.0.3)
 
@@ -108,8 +109,7 @@ With the Jenkins Pipeline Maven Plugin, this message looks like:
 
  [WARNING] Picked up JAVA_TOOL_OPTIONS: -Dmaven.ext.class.path="/path/to/workspace/...@tmp/withMaven.../pipeline-maven-spy.jar" -Dorg.jenkinsci.plugins.pipeline.maven.reportsFolder="/path/to/workspace/...@tmp"
 
-image:https://wiki.jenkins.io/s/en_GB/8100/5084f018d64a97dc638ca9a178856f851ea353ff/_/images/icons/emoticons/information.svg[(info)] It
-is not possible to disable this warning message
+NOTE: It is not possible to disable this warning message.
 
 == My downstream pipelines don't get triggered even if I use "Build whenever a SNAPSHOT dependency is built"
 
