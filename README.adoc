@@ -507,3 +507,7 @@ Maven and JDK installers do not work with
 Any help to fix this bug is more than welcome.
 
 https://issues.jenkins-ci.org/browse/JENKINS-40484[JENKINS-40484] - Getting issue details... STATUS
+
+[#faq]
+== Frequently Asked Questions
+See https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/FAQ.adoc[FAQ]
