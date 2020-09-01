@@ -29,10 +29,13 @@ The Pipeline Maven Plugin provides an *advanced set of features* for using https
 The `withMaven` step configures a maven environment to use within a pipeline job by calling `sh "mvn ...` or `bat "mvn ...`.
 The selected maven installation is configured and prepended to the path.
 
-It provides <<features,various features>> to simplify the creation of your Pipeline scripts.
-It uses some <<feature-sensible-default-maven-settings,sensible default Apache Maven settings>> for a CI usage (batch-mode, ...) and automatically configures the Jenkins reports by following the Apache Maven standards.
+It provides **several <<features>> to simplify** the creation of your Pipeline scripts and ensure the **<<feature-traceability>>**.
 
-This plugin also allows transitioning smoothly from the legacy https://plugins.jenkins.io/maven-plugin/[Maven Integration] job type by allowing to reuse <<#feature-maven-integration-global-settings,its global settings>> and by re-implementing the most popular features like the automatic triggering of downstream jobs based on SNAPSHOTs dependencies.
+It uses some **<<feature-sensible-default-maven-settings>>** for a CI usage (batch-mode, ...) and **automatically configures the Jenkins <<feature-publishers>>** (Artifacts, JUnit, ...).
+
+The **<<feature-default-configuration>> can be defined globally or at the folder level** to keep your pipeline code as short as possible while using the expected configuration (Maven settings.xml file...) globally or locally.
+
+This plugin allows transitioning smoothly from the legacy https://plugins.jenkins.io/maven-plugin/[Maven Integration] job type by allowing to reuse **<<feature-maven-integration-global-settings>>** and by proposing the **<<feature-trigger-downstream>>**.
 
 [WARNING]
 .Security issues
