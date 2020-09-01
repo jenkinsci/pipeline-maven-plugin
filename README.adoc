@@ -72,9 +72,8 @@ Release notes are recorded in https://github.com/jenkinsci/pipeline-maven-plugin
 
 The Pipeline Maven Plugin works with Linux, Windows and MacOSX build agents.
 
-*Simple Maven build on a Linux agent.*
-
-[source,syntaxhighlighter-pre]
+.Simple Maven build on a Linux agent.
+[source,groovy]
 ----
 node {
   stage ('Build') {
@@ -126,9 +125,8 @@ IMPORTANT: `mavenSettingsConfig` and `globalMavenSettingsConfig` use the *ID*, n
 
 TIP: The Pipeline Syntax snippet code generator can be used to assist on generating the withMaven step parameters!
 
-*More complex Maven build on a Windows agent.*
-
-[source,syntaxhighlighter-pre]
+.More complex Maven build on a Windows agent.
+[source,groovy]
 ----
 node ("windows") {
   stage ('Build') {
@@ -137,14 +135,14 @@ node ("windows") {
 
     withMaven(
         // Maven installation declared in the Jenkins "Global Tool Configuration"
-        maven: 'maven-3', <1>
+        maven: 'maven-3', // <1>
         // Use `$WORKSPACE/.repository` for local repository folder to avoid shared repositories
-        mavenLocalRepo: '.repository', <2>
+        mavenLocalRepo: '.repository', // <2>
         // Maven settings.xml file defined with the Jenkins Config File Provider Plugin
         // We recommend to define Maven settings.xml globally at the folder level using
         // navigating to the folder configuration in the section "Pipeline Maven Configuration / Override global Maven configuration"
         // or globally to the entire master navigating to  "Manage Jenkins / Global Tools Configuration"
-        mavenSettingsConfig: 'my-maven-settings' <3>
+        mavenSettingsConfig: 'my-maven-settings' // <3>
     ) {
 
       // Run the maven build
@@ -159,7 +157,7 @@ In the above example the following parameters are used to configure Maven:
 
 <1> *maven:* 'maven-3' Maven Installation will be used, this installation has to be declared in the Global Jenkins configuration or Tool installations page.
 <2> *mavenLocalRepo:* a local repository folder is specified to avoid shared repositories
-<3> *mavenSettingsConfig:* specifies an specific settings.xml configuration from https://plugins.jenkins.io/config-file-provider/[Config File Provider Plugin], allowing the replacement of variables and credentials.
+<3> *mavenSettingsConfig:* specifies a specific settings.xml configuration from https://plugins.jenkins.io/config-file-provider/[Config File Provider Plugin], allowing the replacement of variables and credentials.
 
 [#features]
 == Features
@@ -186,41 +184,34 @@ The `withMaven()` pipeline step will capture in the logs of the build all the de
 
 * Version of the JVM
 ** `withMaven(){}` step initialization:
-[source,syntaxhighlighter-pre]
 ----
 [withMaven] use JDK installation JDK8
 ----
 ** `mvn` executable invocation:
-[source,syntaxhighlighter-pre]
 ----
 Java version: 1.8.0_102, vendor: Oracle Corporation
 ----
 * Version of Maven
 ** `withMaven(){}` step initialization:
-[source,syntaxhighlighter-pre]
 ----
 [withMaven] use Maven installation 'M3'
 ----
 ** `mvn` executable invocation:
-[source,syntaxhighlighter-pre]
 ----
 Apache Maven 3.3.9 (bb52d8502b132ec0a5a3f4c09453c07478323dc5; 2015-11-10T16:41:47+00:00)
 ----
 * Name or path of the Maven settings.xml and Maven global settings.xml file.
 ** `withMaven(){}` step initialization:
-[source,syntaxhighlighter-pre]
 ----
 [withMaven] use Maven settings provided by the Jenkins Managed Configuration File 'maven-settings-for-supply-chain-build-job'
 ----
 * When using the Maven settings.xml and global settings.xml files provided by the https://plugins.jenkins.io/config-file-provider/[Jenkins Config File Provider Plugin], details of the Jenkins credentials injected in the Maven build.
 ** `withMaven(){}` step initialization:
-[source,syntaxhighlighter-pre]
 ----
 [withMaven] use Maven settings.xml 'maven-settings-for-supply-chain-build-job' with Maven servers credentials provided by Jenkins (replaceAll: true): [mavenServerId: 'nexus.beescloud.com', jenkinsCredentials: 'beescloud-nexus-deployment-credentials', username: 'deployment', ...]
 ----
 
 .Sample
-[source,syntaxhighlighter-pre]
 ----
  [withMaven] use JDK installation JDK8
  [withMaven] use Maven installation 'M3'
@@ -355,7 +346,7 @@ These markers file must be located in the home directory of the build.
 
 By default, all the publishers are enabled by default.
 
-It is possible to change the default activation of a publisher navigating to the "Global Tool Configuration" screen.
+It is possible to change the default activation of a publisher navigating to the `Global Tool Configuration` screen.
 
 It is possible to disable the default activation of publishers on a specific `withMaven(){...}` step using the `publisherStrategy='EXPLICIT'` attribute in the step `withMaven(publisherStrategy='EXPLICIT'){...}`.
 The publishers can then be enabled explicitly in the `withMaven(){...}` step using the "publishers" attribute.
@@ -367,7 +358,7 @@ Default Maven settings can be defined globally and at the folder level.
 
 ==== Global Default Configuration
 
-In the "Global Tool Configuration" screen
+In the `Global Tool Configuration` screen
 
 * Maven settings and Maven global settings
 * Publishers settings: enable/disable publishers...
@@ -376,7 +367,7 @@ image::docs/images/pipeline-maven-plugin-global-tools-configuration.png[]
 
 ==== Folder Level Configuration
 
-In the Folder "configuration" screen
+In the Folder `configuration` screen
 
 * Maven settings and Maven global settings
 
@@ -392,8 +383,8 @@ Trigger downstream pipeline that depend on Maven artifact generated by upstream 
 [NOTE]
 ====
 * The upstream artifact must be generated in a `withMaven(){}` wrapping step to be detected by the triggering system
-* The downstream pipeline must have selected the build trigger "Build whenever a SNAPSHOT dependency is built"
-** The build trigger can be defined at the pipeline level ("Build Triggers"), at the multibranch pipeline level ("Scan Repository Triggers") or at the GitHub Organization / Bitbucket Project level ("Scan Organizations Triggers")
+* The downstream pipeline must have selected the build trigger `Build whenever a SNAPSHOT dependency is built`
+** The build trigger can be defined at the pipeline level (`Build Triggers`), at the multibranch pipeline level (`Scan Repository Triggers`) or at the GitHub Organization / Bitbucket Project level (`Scan Organizations Triggers`)
 * You have to manually trigger once the upstream pipeline, and the downstream pipeline so that the link between the pipelines based on the SNAPSHOT dependency is established
 * The dependency graph is, for the moment, exclusively stored in an H2 embedded database (`$JENKINS_HOME/jenkins-jobs/jenkins-jobs.mv.db`).
 Support for an external H2 database and then for alternate databases (PostgreSQL) is on the roadmap (see https://github.com/jenkinsci/pipeline-maven-plugin/blob/pipeline-maven-3.0.0-beta-1/jenkins-plugin/src/main/java/org/jenkinsci/plugins/pipeline/maven/dao/PipelineMavenPluginH2Dao.java[PipelineMavenPluginH2Dao.java])
@@ -405,11 +396,11 @@ image:docs/images/trigger-downstream-2.png[]
 image:docs/images/trigger-downstream-3.png[Downstream Pipeline Trigger - Org Level Configuration]
 
 * Thresholds are applied to define on which type of maven build the downstream pipelines are triggered
-** Threshold based on the status of the upstream pipeline ("success", "unstable", "failure", "no build", "aborted").
-By default, only builds with a "success" result will trigger downstream builds.
+** Threshold based on the status of the upstream pipeline (`success`, `unstable`, `failure`, `no build`, `aborted`).
+By default, only builds with a `success` result will trigger downstream builds.
 image:docs/images/downstream-pipeline-trigger-threshold-build-result.png[]
-** Threshold based on the https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html[Maven lifecycle phase] reached in the Maven build of the upstream job ("package", "install", "deploy").
-By default, only the maven builds who reach the "deploy" phase will trigger downstream builds.
+** Threshold based on the https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html[Maven lifecycle phase] reached in the Maven build of the upstream job (`package`, `install`, `deploy`).
+By default, only the maven builds who reach the `deploy` phase will trigger downstream builds.
 image:docs/images/downstream-pipeline-trigger-threshold-lifecycle.png[]
 
 [#feature-mvnw]
@@ -419,12 +410,11 @@ NOTE: Available since version 3.0.3
 
 The Pipeline Maven Plugin works with https://github.com/takari/maven-wrapper[Takari's Maven wrapper] 'mvnw'.
 
-[source,syntaxhighlighter-pre]
+[source,groovy]
 ----
-withMaven(...) {
+withMaven() {
    sh "./mvnw clean deploy"
 }
-...
 ----
 
 == Adding more Maven Reporters
@@ -436,7 +426,6 @@ We want to quickly add reporters for CheckStyle, Jacoco...
 
 [#db-setup]
 == Database Setup
-
 
 [#db-setup-mysql]
 === Using a MySQL Database
@@ -451,20 +440,20 @@ Configuration steps to use a MySQL:
 
 * Create an empty MySQL database with a dedicated MySQL user with permissions for Data Manipulation Language actions (DML) and Data Definition Language (DDL) actions
 ** Tested with MySQL 8.0, with MariaDB 10.2 and 10.3 and with Amazon Aurora MySQL 5.6
-* Install the Jenkins "MySQL Database" plugin
-** Navigate to "Manage Jenkins / Manage Plugins / Available", select the "MySQL Database" plugin and click on "Download now and install after restart"
+* Install the Jenkins `MySQL Database` plugin
+** Navigate to `Manage Jenkins / Manage Plugins / Available`, select the `MySQL Database` plugin and click on `Download now and install after restart`
 *  Configure the Pipeline Maven Plugin to use the created MySQL database
-** Create Jenkins credentials for the MySQL connection navigating to "Credentials" on the left menu
-** Navigate to "Manage Jenkins / Global Tools Configuration" and go to the "Pipeline Maven Configuration"
-** image:docs/images/pipeline-maven-plugin-configuration-1.png[]
+** Create Jenkins credentials for the MySQL connection navigating to `Credentials` on the left menu
+** Navigate to `Manage Jenkins / Global Tools Configuration` and go to the `Pipeline Maven Configuration`
+image:docs/images/pipeline-maven-plugin-configuration-1.png[]
 ** In the Database configuration section, define the following.
-*** JDBC URL: url of the database, e.g. "jdbc:mysql://mysql.example.com/jenkins"
+*** JDBC URL: url of the database, e.g. `jdbc:mysql://mysql.example.com/jenkins`
 *** JDBC Credentials: select the credentials of the MySQL database.
 *** The https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration[parameters recommended by the Hikari Connection Pool team] are used by default for the MySQL connections and for the datasource (max pool size:10, server side prepared statements cache with 250 entries...).
-To overwrite these defaults, click on the "Advanced Database Configuration" button.
-** Click on "Validate Database Configuration" button to verify that the connection is successful.
-** Click on "Save".
-** image:docs/images/pipeline-maven-plugin-configuration-2.png[]
+To overwrite these defaults, click on the `Advanced Database Configuration` button.
+** Click on `Validate Database Configuration` button to verify that the connection is successful.
+** Click on `Save`.
+image:docs/images/pipeline-maven-plugin-configuration-2.png[]
 
 
 [#db-setup-postgresql]
@@ -481,19 +470,19 @@ Configuration steps to use a PostgreSQL:
 * Create an empty PostgreSQL database with a dedicated PostgreSQL user with permissions for Data Manipulation Language actions (DML) and Data Definition Language (DDL) actions
 ** Tested with PostgreSQL 10.6 and 11.3
 * Install the Jenkins the https://plugins.jenkins.io/postgresql-api/[PostgreSQL API] plugin
-** Navigate to "Manage Jenkins / Manage Plugins / Available", select the "PostgreSQL API" plugin and click on "Download now and install after restart".
+** Navigate to `Manage Jenkins / Manage Plugins / Available`, select the `PostgreSQL API` plugin and click on `Download now and install after restart`.
 *  Configure the Pipeline Maven Plugin to use the created PostgreSQL database
-** Create Jenkins credentials for the PostgreSQL connection navigating to "Credentials" on the left menu
-** Navigate to "Manage Jenkins / Global Tools Configuration" and go to the "Pipeline Maven Configuration"
+** Create Jenkins credentials for the PostgreSQL connection navigating to `Credentials` on the left menu
+** Navigate to `Manage Jenkins / Global Tools Configuration` and go to the `Pipeline Maven Configuration`
 image:docs/images/pipeline-maven-plugin-configuration-postgresql.png[]
 ** In the Database configuration section, define the following
-*** JDBC URL: url of the database, e.g. "jdbc:postgresql://postgresql.example.com:5432/jenkins"
+*** JDBC URL: url of the database, e.g. `jdbc:postgresql://postgresql.example.com:5432/jenkins
 *** JDBC Credentials: select the credentials of the PostgreSQL database
 *** The underlying datasource, https://github.com/brettwooldridge/HikariCP[HikariCP], comes with sensible default configuration values (see https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby[here]).
-To overwrite these defaults, click on the "Advanced Database Configuration" button.
-** Click on "Validate Database Configuration" button to verify that the connection is successful.
-** Click on "Save".
-** Navigate to "Manage Jenkins / Global Tools Configuration" and go to the "Pipeline Maven Configuration" to verify that the database connection is successful, and the database tables have been created (see screenshot above).
+To overwrite these defaults, click on the `Advanced Database Configuration` button.
+** Click on `Validate Database Configuration` button to verify that the connection is successful.
+** Click on `Save`.
+** Navigate to `Manage Jenkins / Global Tools Configuration` and go to the `Pipeline Maven Configuration` to verify that the database connection is successful, and the database tables have been created (see screenshot above).
 
 
 [#known-limitation]
