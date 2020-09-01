@@ -1,29 +1,39 @@
-= FAQ
-:toc:
+[[pipeline-maven-plugin-faq]]
+= Pipeline Maven Plugin FAQ
+:toc: macro
+:toc-title:
+ifdef::env-github[]
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
 
-== How to use the Pipeline Maven Plugin with Docker? (since version 3.0.3)
+Frequently Asked Questions about the Pipeline Maven Plugin
 
-Since the version 1.14 of the Docker Pipeline plugin, "withMaven"
-requires to
+toc::[]
 
-* Either prepend the '[.code]``MVN_CMD_DIR``' environment variable to the
-'[.code]``PATH``' environment variable in every '[.code]``sh``' step that invokes
-'[.code]``mvn``' (e.g.
-"``sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy'`` ").
-* Or use Takari's Maven Wrapper (e.g. "sh './mvnw clean deploy'")
+== How to use the Pipeline Maven Plugin with Docker?
 
-If omitted, the Maven settings file and Mven global settings file will
-not be injected in the Maven execution.
+NOTE: Since version 3.0.3
 
-=== Using "[.code]``withMaven``" with "``+docker.image(...).inside{...}+``" and a Jenkins Scripted Pipeline
+Since the version 1.14 of the Docker Pipeline plugin, `withMaven` requires to
 
-*Prepending MVN_CMD_DIR to PATH*
+* Either prepend the `MVN_CMD_DIR` environment variable to the `PATH` environment variable in every `sh` step that invokes `mvn` (e.g. `sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy`).
+* Or use Takari's Maven Wrapper (e.g. `sh './mvnw clean deploy'`)
 
-[source,syntaxhighlighter-pre]
+If omitted, the Maven settings file and Mven global settings file will not be injected in the Maven execution.
+
+=== Using `withMaven` with `docker.image(...).inside{...}` and a Jenkins Scripted Pipeline
+
+**Prepending MVN_CMD_DIR to PATH**
+
+[source,groovy]
 ----
 node("linux-agent-running-docker") { // Linux agent with the Docker daemon
     docker.image('maven').inside { // Docker image with Maven installed
-        withMaven(...) {
+        withMaven() {
             git "https://github.com/cyrille-leclerc/my-jar.git"
             sh "export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy" // 'mvn' command: need to add the $MVN_CMD_DIR to $PATH
         }
@@ -33,11 +43,11 @@ node("linux-agent-running-docker") { // Linux agent with the Docker daemon
 
 **Using Takari's Maven Wrapper mvnw**
 
-[source,syntaxhighlighter-pre]
+[source,groovy]
 ----
 node("linux-agent-running-docker") { // Linux agent with the Docker daemon
     docker.image('openjdk:8-jdk').inside { // Docker image with Java installed
-        withMaven(...) {
+        withMaven() {
             git "https://github.com/cyrille-leclerc/my-jar.git"
             sh "./mvnw clean deploy" // 'mvnw' command (e.g. "./mvnw deploy")
         }
@@ -45,34 +55,30 @@ node("linux-agent-running-docker") { // Linux agent with the Docker daemon
 }
 ----
 
-=== Using "[.code]``withMaven``" with "``+docker.image(...).inside{...}+``" to a Jenkins Declarative Pipeline
+=== Using `withMaven` with `docker.image(...).inside{...}` to a Jenkins Declarative Pipeline
 
-TODO provide a sample with Jenkins Declarative Pipeline
+NOTE: TODO: provide a sample with Jenkins Declarative Pipeline
 
 === Sample message displayed in the build logs when using withMaven in a Docker Pipeline execution environment
 
-Warning message displayed in the logs when invoking withMaven within
-Docker Pipeline:
+The warning message displayed in the logs when invoking `withMaven` within Docker Pipeline:
 
+----
  [withMaven] WARNING: "withMaven(){...}" step running within "docker.image('image').inside {...}". Since the Docker Pipeline Plugin version 1.14, you MUST:
  [withMaven] * Either prepend the 'MVN_CMD_DIR' environment variable to the 'PATH' environment variable in every 'sh' step that invokes 'mvn' (e.g. "sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy' ").
  [withMaven] * Or use Takari's Maven Wrapper (e.g. "sh './mvnw clean deploy'")
  [withMaven] See Pipeline Maven Plugin FAQ.
+----
 
 == How to disable the Maven Event Spy injected by the Pipeline Maven Plugin in Maven builds?
 
-It may be convenient to temporarily disable the Maven Event Spy of the
-Jenkins Pipeline Maven plugin, for example for troubleshooting purpose.
+It may be convenient to temporarily disable the Maven Event Spy of the Jenkins Pipeline Maven plugin, for example for troubleshooting purpose.
 
-You can disable the Maven Event Spy of the Jenkins Pipeline Maven plugin
-(making it no-op) doing one of the following:
+You can disable the Maven Event Spy of the Jenkins Pipeline Maven plugin (making it no-op) doing one of the following:
 
-* Setting the environment variable "[.code]``JENKINS_MAVEN_AGENT_DISABLED``" to
-"[.code]``true``" in the job execution
-
-[source,syntaxhighlighter-pre]
+* Setting the environment variable `JENKINS_MAVEN_AGENT_DISABLED` to `true` in the job execution
+[source,groovy]
 ----
-...
 withMaven() {
    sh """
 export JENKINS_MAVEN_AGENT_DISABLED=true
@@ -80,86 +86,72 @@ mvn package
 """
 }
 ----
-
-[source,syntaxhighlighter-pre]
+or using `withEnv`
+[source,groovy]
 ----
-...
 withEnv(['JENKINS_MAVEN_AGENT_DISABLED=true']) {
    sh "mvn package"
 }
 ----
 
-* Adding the system property
-"[.code]``-Dorg.jenkinsci.plugins.pipeline.maven.eventspy.JenkinsMavenEventSpy.disabled=true``"
-to the invocation of the mvn build
+* Adding the system property `-Dorg.jenkinsci.plugins.pipeline.maven.eventspy.JenkinsMavenEventSpy.disabled=true` to the invocation of the mvn build
 
-== Why do I see messages "``+[WARNING] Picked up JAVA_TOOL_OPTIONS...+``" in the build logs?
+== Why do I see messages `[WARNING] Picked up JAVA_TOOL_OPTIONS...` in the build logs?
 
-The Jenkins Pipeline Maven Plugin uses the "[.code]``JAVA_TOOL_OPTIONS``"
-environment variable to pass options to subsequent Maven builds such as
-the actual release build when invoking
-"[.code]``mvn release:prepare release:perform``". The plugins passes the
-properties "[.code]``-Dmaven.ext.class.path``" and
-"[.code]``-Dorg.jenkinsci.plugins.pipeline.maven.reportsFolder``".
+The Jenkins Pipeline Maven Plugin uses the `JAVA_TOOL_OPTIONS` environment variable to pass options to subsequent Maven builds such as the actual release build when invoking `mvn release:prepare release:perform`.
+The plugin passes the properties `-Dmaven.ext.class.path` and `-Dorg.jenkinsci.plugins.pipeline.maven.reportsFolder`.
 
-When using the "[.code]``JAVA_TOOL_OPTIONS``", the JVM outputs a message during
-its initialization.
+When using the `JAVA_TOOL_OPTIONS`, the JVM outputs a message during its initialization.
 
 With the Jenkins Pipeline Maven Plugin, this message looks like:
 
+----
  [WARNING] Picked up JAVA_TOOL_OPTIONS: -Dmaven.ext.class.path="/path/to/workspace/...@tmp/withMaven.../pipeline-maven-spy.jar" -Dorg.jenkinsci.plugins.pipeline.maven.reportsFolder="/path/to/workspace/...@tmp"
+----
 
 NOTE: It is not possible to disable this warning message.
 
-== My downstream pipelines don't get triggered even if I use "Build whenever a SNAPSHOT dependency is built"
+== My downstream pipelines don't get triggered even if I use "Build whenever a SNAPSHOT dependency is built"!
 
-A common reason why downstream pipelines don't get triggered when using
-"Build whenever a SNAPSHOT dependency is built" is that the upstream
-pipeline is using "mvn install" when the Jenkins Pipeline Maven
-integration is configured to trigger pipelines on "mvn deploy".
+A common reason why downstream pipelines don't get triggered when using "Build whenever a SNAPSHOT dependency is built" is that the upstream pipeline is using "mvn install" when the Jenkins Pipeline Maven integration is configured to trigger pipelines on "mvn deploy".
 
-To configure the Jenkins Pipeline Maven integration to trigger
-downstream pipelines on "mvn install":
+To configure the Jenkins Pipeline Maven integration to trigger downstream pipelines on "mvn install":
 
 * Either change the default configuration:
- ** Navigate to "Manage Jenkins / Global Tools Configuration"
- ** Click on "Add Publisher" and select "Pipeline Graph Publisher"
- ** In the section "Downstream Pipeline Triggers", change the the
-"Maven lifecycle threshold" from "deploy" to "install"
+** Navigate to "Manage Jenkins / Global Tools Configuration"
+** Click on "Add Publisher" and select "Pipeline Graph Publisher"
+** In the section "Downstream Pipeline Triggers", change the "Maven lifecycle threshold" from "deploy" to "install"
 
-image:https://wiki.jenkins.io/download/attachments/99451377/pipeline-graph-publisher-maven-lifecycle.png?version=3&modificationDate=1558992519000&api=v2[]
+image:docs/images/pipeline-graph-publisher-maven-lifecycle.png[]
 
 * Or in the script of the upstream pipeline, configure
-"``+withMaven(options: [pipelineGraphPublisher(lifecycleThreshold: 'install')]) {...}+``"
 
-== How can I troubleshoot problems of trigger of downstream pipelines
+[source,groovy]
+----
+withMaven(options: [pipelineGraphPublisher(lifecycleThreshold: 'install')]) {
+/* sh/bat ...*/
+}
+----
 
-* The Pipeline Maven Plugin uses the Jenkins log levels (see
-https://wiki.jenkins.io/display/JENKINS/Logging#Logging-LogsinJenkins[here])
-to output additional troubleshooting information in the pipeline
-build logs (the "Console Output" menu of the build)
-* To output additional troubleshooting information about the  trigger
-of downstream pipelines, enable in "Manage Jenkins / System Log"
-(docs
-https://wiki.jenkins.io/display/JENKINS/Logging#Logging-LogsinJenkins[here])
-the following loggers at a level FINE or FINER or more:
- ** org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher
- ** org.jenkinsci.plugins.pipeline.maven.listeners.DownstreamPipelineTriggerRunListener
-* Re run the pipeline that is supposed to trigger downstream
-pipelines.
-* Look at the pipeline build logs ("Console Output" menu), ensure that
-the build is completed and that the following message is displayed
-in the logs: "[withMaven] downstreamPipelineTriggerRunListener -
-completed in XXX ms". Troubleshooting details are added
+== How can I troubleshoot problems of trigger of downstream pipelines?
 
-== How do I capture the log file generated by the Jenkins Maven Event Spy
+* The Pipeline Maven Plugin uses the Jenkins log levels (see https://www.jenkins.io/doc/book/system-administration/viewing-logs/#logs-in-jenkins[here]) to output additional troubleshooting information in the pipeline build logs (the "Console Output" menu of the build).
+* To output additional troubleshooting information about the  trigger of downstream pipelines, enable in "Manage Jenkins / System Log" (docs https://www.jenkins.io/doc/book/system-administration/viewing-logs/#logs-in-jenkins[here]) the following loggers at a level FINE or FINER or more:
+** `org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher`
+** `org.jenkinsci.plugins.pipeline.maven.listeners.DownstreamPipelineTriggerRunListener`
+* Re run the pipeline that is supposed to trigger downstream pipelines.
+* Look at the pipeline build logs ("Console Output" menu), ensure that the build is completed and that the following message is displayed in the logs:
+----
+[withMaven] downstreamPipelineTriggerRunListener - completed in XXX ms
+----
+Troubleshooting details are added
 
-You can archive the XML log file generated by the Jenkins Maven Event
-Spy creating the marker file ".archive-jenkins-maven-event-spy-logs".
+== How do I capture the log file generated by the Jenkins Maven Event Spy?
 
-Sample:
+You can archive the XML log file generated by the Jenkins Maven Event Spy creating the marker file `.archive-jenkins-maven-event-spy-logs`.
 
-[source,syntaxhighlighter-pre]
+.Sample
+[source,groovy]
 ----
 withMaven() {
     sh "mvn package"
@@ -167,14 +159,11 @@ withMaven() {
 } // will discover the marker file ".archive-jenkins-maven-event-spy-log" and will archive the maven event spy log file maven-spy-....log
 ----
 
-== How do I check the Maven settings in use by my build
+== How do I check the Maven settings in use by my build?
 
-You can dump the effective Maven settings of your pipeline using the
-Maven Help plugin and the
-"http://maven.apache.org/plugins/maven-help-plugin/effective-settings-mojo.html[help:effective-settings]"
-goal
+You can dump the effective Maven settings of your pipeline using the Maven Help plugin and the http://maven.apache.org/plugins/maven-help-plugin/effective-settings-mojo.html[help:effective-settings] goal
 
-[source,syntaxhighlighter-pre]
+[source,groovy]
 ----
 withMaven(){
    mvn help:effective-settings
@@ -183,55 +172,35 @@ withMaven(){
 
 == How can I reduce the footprint of the database of the Jenkins Pipeline Maven Plugin?
 
-The Jenkins pipeline Maven plugin uses a database to trigger downstream
-pipelines when a snapshot is built.
+The Jenkins pipeline Maven plugin uses a database to trigger downstream pipelines when a snapshot is built.
 
-For production grade deployments, a MySQL database is needed instead of
-the embedded H2 database. My SQL 5.6+, Amazon Aurora MySQL and MariaDB
-10.2+ have been successfully tested.
+For production grade deployments, a MySQL database is needed instead of the embedded H2 database. My SQL 5.6+, Amazon Aurora MySQL and MariaDB 10.2+ have been successfully tested.
 
-To reduce the usage of the database, disable the "Pipeline Graph
-Publisher" navigating to "Manage Jenkins / Global Tool Configuration /
-Pipeline Maven Configuration" then clicking on "Add Publisher Options",
-selecting "Pipeline Graph Publisher" and checking the "disabled"
-checkbox.
+To reduce the usage of the database, disable the `Pipeline Graph Publisher` navigating to `Manage Jenkins / Global Tool Configuration / Pipeline Maven Configuration then clicking on `Add Publisher Options`, selecting `Pipeline Graph Publisher` and checking the `disabled` checkbox.
 
-image:https://wiki.jenkins.io/download/attachments/99451377/pipeline-maven-plugin-configuration-disabled-pipeline-graph-publisher.png?version=1&modificationDate=1546457421000&api=v2[]
+image:docs/images/pipeline-maven-plugin-configuration-disabled-pipeline-graph-publisher.png[]
 
-== Why do I see messages "[withMaven] One or multiple Maven executions have been ignored..." in the build logs?
+== Why do I see messages [withMaven] One or multiple Maven executions have been ignored..."` in the build logs?
 
-The message "[withMaven] One or multiple Maven executions have been
-ignored by the Jenkins Pipeline Maven Plugin because they have been
-interrupted before completion..." because one or several Maven execution
-(e.g. "[.code]``mvn deploy``") have been interrupted before they could gracefully
-complete.
+The message
+----
+[withMaven] One or multiple Maven executions have been ignored by the Jenkins Pipeline Maven Plugin because they have been interrupted before completion...
+----
+is displayed because one or several Maven execution (e.g. `mvn deploy`) have been interrupted before they could gracefully complete.
 
-The event "[.code]``org.apache.maven.eventspy.EventSpy#close()``" has not been
-invoked on the Maven event spies.
+The event `org.apache.maven.eventspy.EventSpy#close()` has not been invoked on the Maven event spies.
 
-This interruption usually happens because the mvn process has been
-killed by the Operating System, typically for memory constraints in
-Docker or cgroups environments. Another cause is a "[.code]``kill -9``" during
-the build.
+This interruption usually happens because the mvn process has been killed by the Operating System, typically for memory constraints in Docker or cgroups environments. Another cause is a `kill -9` during the build.
 
-== Why do I see messages "javax.xml.parsers.FactoryConfigurationError: Provider for class javax.xml.parsers.DocumentBuilderFactory cannot be created"
+== Why do I see messages `javax.xml.parsers.FactoryConfigurationError: Provider for class javax.xml.parsers.DocumentBuilderFactory cannot be created` ?
 
-This error is caused by the installation of another plugin that pulls an
-outdated version of Apache Xerces. That pulls a version of Apache Xerces
-that is not compatible with the version of the JVM. Typically, Xerces
-2.6 will not be compatible with a JDK 8 due to changes in the JAXP API
-(sample: https://issues.jenkins-ci.org/browse/JENKINS-47486[JENKINS-47486] -
-Getting issue details... STATUS ).
+This error is caused by the installation of another plugin that pulls an outdated version of Apache Xerces. That pulls a version of Apache Xerces that is not compatible with the version of the JVM. Typically, Xerces 2.6 will not be compatible with a JDK 8 due to changes in the JAXP API (sample: https://issues.jenkins-ci.org/browse/JENKINS-47486[JENKINS-47486]).
 
-The solution is to get this plugin updated so that it uses a more recent
-of Xerces that would be compatible with the JDK.
+The solution is to get this plugin updated so that it uses a more recent of Xerces that would be compatible with the JDK.
 
-To identify the plugin that is pulling an outdated version of a JAXP
-implementation (typically Xerces), navigate to the Jenkins Script
-Console ("Manage Jenkins" then "Script Console") and execute the
-following groovy script:
+To identify the plugin that is pulling an outdated version of a JAXP implementation (typically Xerces), navigate to the Jenkins Script Console (`Manage Jenkins` then `Script Console`) and execute the following groovy script:
 
-[source,syntaxhighlighter-pre]
+[source,groovy]
 ----
 String className = "org.apache.xerces.jaxp.DocumentBuilderFactoryImpl"
 
@@ -253,23 +222,18 @@ if (codeSource == null) {
 }
 ----
 
-The output message will show from which plugin the XercesParser is
-loaded. Sample with a plugin "my_plugin" that would load an outdated
-2.6.2 version of Xerces:
+The output message will show from which plugin the XercesParser is loaded. Sample with a plugin "my_plugin" that would load an outdated 2.6.2 version of Xerces:
 
  class org.apache.xerces.jaxp.DocumentBuilderFactoryImpl -> file:/var/lib/jenkins/plugins/my_plugin/WEB-INF/lib/xercesImpl-2.6.2.jar
 
-== How to use Maven build data in generated emails
+== How to use Maven build data in generated emails?
 
-It is possible to use informations generated by Maven pipelines in
-emails generated by the https://github.com/jenkinsci/email-ext-plugin.git[Jenkins Email Ext
-Plugin].
+It is possible to use information generated by Maven pipelines in emails generated by the https://plugins.jenkins.io/email-ext/[Jenkins Email Ext Plugin].
 
 See https://groups.google.com/forum/#!topic/jenkinsci-users/sPAYLh1W1cM
 
-*Sample Pipeline code to expose artifact details in emails*
-
-[source,syntaxhighlighter-pre]
+.Sample Pipeline code to expose artifact details in emails
+[source,groovy]
 ----
 env.DEPLOYEDARTIFACTS = getDeployedArtifacts()
 
@@ -293,9 +257,8 @@ def getDeployedArtifacts() {
 
 In EXT-MAIL-STANDARD-TEMPLATE
 
-*Sample mail template using Maven build details*
-
-[source,syntaxhighlighter-pre]
+.Sample mail template using Maven build details
+[source,html]
 ----
     <br />
     <!-- MAVEN ARTIFACTS -->
