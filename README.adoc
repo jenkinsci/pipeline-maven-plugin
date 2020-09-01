@@ -25,11 +25,6 @@ image:docs/images/plus.png[plus,height=32,float=left,align="center"]
 image:docs/images/maven-owl.png[Maven Owl logo,height=64,float=left,align="center"]
 --
 
-toc::[]
-
-[#introduction]
-== Introduction
-
 The Pipeline Maven Plugin provides an *advanced set of features* for using https://maven.apache.org[Apache Maven] in https://www.jenkins.io/doc/book/pipeline/[Jenkins Pipelines].
 
 The `withMaven` step configures a maven environment to use within a pipeline job by calling `sh "mvn ...` or `bat "mvn ...`.
@@ -52,6 +47,8 @@ Please review the following warnings before using an older version:
 * https://jenkins.io/security/advisory/2020-08-12/#SECURITY-1794%20(2)[CSRF vulnerability and missing permission check allow capturing credentials]
 * https://jenkins.io/security/advisory/2020-08-12/#SECURITY-1794%20(1)[Missing permission check allows enumerating credentials IDs]
 ====
+
+toc::[]
 
 [#usage]
 == Usage
