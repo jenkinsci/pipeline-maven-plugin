@@ -50,6 +50,13 @@ Please review the following warnings before using an older version:
 
 toc::[]
 
+[#installation]
+== Installation
+
+The plugin can be found under the name `Pipeline Maven Integration Plugin` in the https://updates.jenkins.io/#default-update-site[Default Update Site].
+
+**For tests purposes only**, pre-releases (beta) versions are available in the https://updates.jenkins.io/#experimental-plugin-site[Experimental Plugin Site] and development versions (incremental releases) are archived on every successful build on https://ci.jenkins.io/job/Plugins/job/pipeline-maven-plugin/[our CI environment].
+
 [#usage]
 == Usage
 
