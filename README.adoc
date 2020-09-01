@@ -57,6 +57,11 @@ The plugin can be found under the name `Pipeline Maven Integration Plugin` in th
 
 **For tests purposes only**, pre-releases (beta) versions are available in the https://updates.jenkins.io/#experimental-plugin-site[Experimental Plugin Site] and development versions (incremental releases) are archived on every successful build on https://ci.jenkins.io/job/Plugins/job/pipeline-maven-plugin/[our CI environment].
 
+[#changelog]
+== Changelog
+
+Release notes are recorded in https://github.com/jenkinsci/pipeline-maven-plugin/releases[GitHub Releases].
+
 [#usage]
 == Usage
 
