@@ -67,37 +67,29 @@ Release notes are recorded in https://github.com/jenkinsci/pipeline-maven-plugin
 [#usage]
 == Usage
 
-An example pipeline script using the pipeline Maven plugin:
+The Pipeline Maven Plugin works with Linux, Windows and MacOSX build agents.
 
-*Maven build on a Linux agent*
+*Simple Maven build on a Linux agent.*
 
 [source,syntaxhighlighter-pre]
 ----
-node{
+node {
   stage ('Build') {
-
     git url: 'https://github.com/cyrille-leclerc/multi-module-maven-project'
-
-    withMaven(
-        // Maven installation declared in the Jenkins "Global Tool Configuration"
-        maven: 'maven-3',
-        // Maven settings.xml file defined with the Jenkins Config File Provider Plugin
-        // We recommend to define Maven settings.xml globally at the folder level using
-        // navigating to the folder configuration in the section "Pipeline Maven Configuration / Override global Maven configuration"
-        // or globally to the entire master navigating to  "Manage Jenkins / Global Tools Configuration"
-        mavenSettingsConfig: 'my-maven-settings') {
-
-      // Run the maven build
+    withMaven {
       sh "mvn clean verify"
-
-    } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe & FindBugs & SpotBugs reports...
+    } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe reports and FindBugs reports
   }
 }
 ----
 
-Within a node or a docker.image block, create a withMaven block to setup a `with maven` environment.
+It can be supports various parameters to fine-tune its behavior.
+
+Within a node or a docker.image block, create a withMaven block to set up a `with maven` environment.
+
 The configured environment will be used when calling maven inside the block by using `sh mvn` or `bat mvn`.
-The following parameters can be used to configure maven:
+
+The following parameters can be used to configure Maven:
 
 * *Maven* (`maven`): Allow the selection of a Maven installation configured on the Global Jenkins configuration or on the Global Tool Configuration page if using Jenkins > 2.0. When auto-install is enabled, maven will be downloaded and made available for the pipeline job.
 * *JDK* (`jdk`): Allows the selection of a JDK installation.
@@ -105,7 +97,7 @@ If auto-install is enabled, the JDK will be downloaded and made available for th
 * *Maven Settings*
 ** *Maven Settings Config* (`mavenSettingsConfig`): Select a
 Maven settings file *ID* from https://github.com/jenkinsci/config-file-provider-plugin[Config File Provider Plugin] allowing the replacement of server credentials and variable substitutions as configured in https://github.com/jenkinsci/config-file-provider-plugin[Config File Provider Plugin].
-The settings element in the `settings.xml` file contains elements used to define values which configure Maven execution in various ways, like the `pom.xml`, but should not be bundled to any specific project, or distributed to an audience. See alsohttp://maven.apache.org/settings.html[settings.xml] reference
+The settings' element in the `settings.xml` file contains elements used to define values which configure Maven execution in various ways, like the `pom.xml`, but should not be bundled to any specific project, or distributed to an audience. See also http://maven.apache.org/settings.html[settings.xml] reference
 ** *Maven Settings File Path* (`mavenSettingsFilePath`): Specify the path to a Maven `settings.xml` file on the build agent.
 The specified path can be absolute or relative to the workspace.
 ** If none of `mavenSettingsConfig` and `mavenSettingsFilePath` are defined, `withMaven(){}` will use the Maven settings defined in the Jenkins Global Tool Configuration if declared
@@ -121,21 +113,50 @@ Shell-like environment variable expansions work with this field, by using the `$
 Normally, Jenkins uses the local Maven repository as determined by Maven, by default `~/.m2/repository` and can be overridden by `<localRepository>` in `~/.m2/settings.xml` (see Configuring your Local Repository)) +
 This normally means that all the jobs that are executed on the same node shares a single Maven repository.
 The upside of this is that you can save the disk space, the downside is that the repository is not multi process safe and having multiple builds run concurrently can corrupt it.
-Additionally builds could interfere with each other by sharing incorrect or partially built artifacts.
+Additionally, builds could interfere with each other by sharing incorrect or partially built artifacts.
 For example, you might end up having builds incorrectly succeed, just because your have all the dependencies in your local repository, despite that fact that none of the repositories in POM might have them. +
-By using this option, Jenkins will tell Maven to use a custom path for the build as the local Maven repository by using`-Dmaven.repo.local` +
+By using this option, Jenkins will tell Maven to use a custom path for the build as the local Maven repository by using `-Dmaven.repo.local` +
 If specified as a relative path then this value will be resolved against the workspace root and not the current working directory. +
 ie. `$WORKSPACE/.repository` if `.repository` value is specified.
 
-NOTE: `mavenSettingsConfig` and `globalMavenSettingsConfig` use the *ID*, not the *name*, of the Maven settings file (resp Maven Global Settings file).
+IMPORTANT: `mavenSettingsConfig` and `globalMavenSettingsConfig` use the *ID*, not the *name*, of the Maven settings file (resp Maven Global Settings file).
 
-_The Pipeline Syntax snippet code generator can be used to assist on generating the withMaven step parameters_
+TIP: The Pipeline Syntax snippet code generator can be used to assist on generating the withMaven step parameters!
 
-In the above example the following parameters are use to configure maven:
+*More complex Maven build on a Windows agent.*
 
-* *maven:* 'M3' Maven Installation will be used, this installation has to be declared in the Global Jenkins configuration or Tool installations page.
-* *mavenLocalRepo:* a local repository folder is specified to avoid shared repositories
-* *mavenSettingsConfig:* specifies an specific settings.xml configuration from https://github.com/jenkinsci/config-file-provider-plugin[Config File Provider Plugin], allowing the replacement of variables and credentials.
+[source,syntaxhighlighter-pre]
+----
+node ("windows") {
+  stage ('Build') {
+
+    git url: 'https://github.com/cyrille-leclerc/multi-module-maven-project'
+
+    withMaven(
+        // Maven installation declared in the Jenkins "Global Tool Configuration"
+        maven: 'maven-3', <1>
+        // Use `$WORKSPACE/.repository` for local repository folder to avoid shared repositories
+        mavenLocalRepo: '.repository', <2>
+        // Maven settings.xml file defined with the Jenkins Config File Provider Plugin
+        // We recommend to define Maven settings.xml globally at the folder level using
+        // navigating to the folder configuration in the section "Pipeline Maven Configuration / Override global Maven configuration"
+        // or globally to the entire master navigating to  "Manage Jenkins / Global Tools Configuration"
+        mavenSettingsConfig: 'my-maven-settings' <3>
+    ) {
+
+      // Run the maven build
+      sh "mvn clean verify"
+
+    } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe & FindBugs & SpotBugs reports...
+  }
+}
+----
+
+In the above example the following parameters are used to configure Maven:
+
+<1> *maven:* 'maven-3' Maven Installation will be used, this installation has to be declared in the Global Jenkins configuration or Tool installations page.
+<2> *mavenLocalRepo:* a local repository folder is specified to avoid shared repositories
+<3> *mavenSettingsConfig:* specifies an specific settings.xml configuration from https://plugins.jenkins.io/config-file-provider/[Config File Provider Plugin], allowing the replacement of variables and credentials.
 
 [#features]
 == Features
