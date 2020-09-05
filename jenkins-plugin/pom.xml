@@ -65,6 +65,10 @@
     <tag>${scmTag}</tag>
   </scm>
 
+  <properties>
+    <hpi.pluginChangelogUrl>https://github.com/jenkinsci/pipeline-maven-plugin/releases</hpi.pluginChangelogUrl>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
