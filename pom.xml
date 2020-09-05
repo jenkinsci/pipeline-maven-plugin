@@ -33,7 +33,7 @@
     </parent>
 
     <artifactId>pipeline-maven-parent</artifactId>
-    <version>3.9.0</version>
+    <version>${revision}${changelist}</version>
     <packaging>pom</packaging>
 
     <name>Pipeline Maven Integration Plugin Parent</name>
@@ -69,7 +69,7 @@
     </developers>
 
     <properties>
-        <revision>3.9.0</revision>
+        <revision>3.10.0</revision>
         <changelist>-SNAPSHOT</changelist>
         <jenkins.version>2.204.6</jenkins.version>
         <java.level>8</java.level>
@@ -80,7 +80,7 @@
         <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
         <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
-        <tag>pipeline-maven-3.9.0</tag>
+        <tag>${scmTag}</tag>
     </scm>
 
     <modules>
