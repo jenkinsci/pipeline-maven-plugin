@@ -39,6 +39,7 @@
         Maven Spy injected with "-Dmaven.ext.class.path" to generatesMaven execution reports that are consumed by the
         Jenkins Pipeline withMaven(){} step.
     </description>
+    <url>https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/README.adoc</url>
 
     <developers>
         <developer>

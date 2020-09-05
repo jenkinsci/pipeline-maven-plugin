@@ -40,6 +40,7 @@
     This plugin provides integration with Pipeline, configures maven environment to use within a pipeline job by calling sh mvn or bat mvn.
     The selected maven installation will be configured and prepended to the path.
   </description>
+  <url>https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/README.adoc</url>
 
   <developers>
     <developer>
