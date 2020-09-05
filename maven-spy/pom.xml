@@ -59,9 +59,9 @@
     </developers>
 
     <scm>
-        <url>https://github.com/jenkinsci/pipeline-maven-plugin/maven-spy</url>
-      <tag>HEAD</tag>
-  </scm>
+        <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
+        <tag>${scmTag}</tag>
+    </scm>
 
     <dependencies>
         <dependency>

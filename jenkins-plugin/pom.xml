@@ -60,8 +60,8 @@
   </developers>
 
   <scm>
-    <url>https://github.com/jenkinsci/pipeline-maven-plugin/jenkins-plugin</url>
-    <tag>HEAD</tag>
+    <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
+    <tag>${scmTag}</tag>
   </scm>
 
   <dependencies>
