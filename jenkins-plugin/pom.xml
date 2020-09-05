@@ -29,12 +29,12 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>pipeline-maven-parent</artifactId>
-    <version>3.9.1</version>
+    <version>${revision}${changelist}</version>
   </parent>
 
   <artifactId>pipeline-maven</artifactId>
   <packaging>hpi</packaging>
-  <version>3.9.1</version>
+  <version>${revision}${changelist}</version>
   <name>Pipeline Maven Integration Plugin</name>
   <description>
     This plugin provides integration with Pipeline, configures maven environment to use within a pipeline job by calling sh mvn or bat mvn.
@@ -61,7 +61,7 @@
 
   <scm>
     <url>https://github.com/jenkinsci/pipeline-maven-plugin/jenkins-plugin</url>
-    <tag>pipeline-maven-3.9.1</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <dependencies>
