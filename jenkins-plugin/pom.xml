@@ -395,6 +395,12 @@
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
+
+     <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <dependencyManagement>
     <dependencies>
