@@ -55,10 +55,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -68,14 +70,17 @@ public class JunitTestsPublisher extends MavenPublisher {
     private static final String APACHE_GROUP_ID = "org.apache.maven.plugins";
     private static final String TYCHO_GROUP_ID = "org.eclipse.tycho";
     private static final String KARMA_GROUP_ID = "com.kelveden";
+    private static final String FRONTEND_GROUP_ID = "com.github.eirslett";
     private static final String SUREFIRE_ID = "maven-surefire-plugin";
     private static final String FAILSAFE_ID = "maven-failsafe-plugin";
     private static final String TYCHO_ID = "tycho-surefire-plugin";
     private static final String KARMA_ID = "maven-karma-plugin";
+    private static final String FRONTEND_ID = "frontend-maven-plugin";
     private static final String SUREFIRE_GOAL = "test";
     private static final String FAILSAFE_GOAL = "integration-test";
     private static final String TYCHO_GOAL = "test";
     private static final String KARMA_GOAL = "start";
+    private static final String FRONTEND_GOAL = "karma";
 
     private static final long serialVersionUID = 1L;
 
@@ -205,16 +210,16 @@ public class JunitTestsPublisher extends MavenPublisher {
         List<Element> failSafeTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, APACHE_GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL, "MojoSucceeded", "MojoFailed");
         List<Element> tychoTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, TYCHO_GROUP_ID, TYCHO_ID, TYCHO_GOAL, "MojoSucceeded", "MojoFailed");
         List<Element> karmaTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, KARMA_GROUP_ID, KARMA_ID, KARMA_GOAL, "MojoSucceeded", "MojoFailed");
+        List<Element> frontendTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, FRONTEND_GROUP_ID, FRONTEND_ID, FRONTEND_GOAL, "MojoSucceeded", "MojoFailed");
 
-
-
-        executeReporter(context, listener, sureFireTestEvents, APACHE_GROUP_ID + ":" + SUREFIRE_ID + ":" + SUREFIRE_GOAL);
-        executeReporter(context, listener, failSafeTestEvents, APACHE_GROUP_ID + ":" + FAILSAFE_ID + ":" + FAILSAFE_GOAL);
-        executeReporter(context, listener, tychoTestEvents, APACHE_GROUP_ID + ":" + TYCHO_ID + ":" + TYCHO_GOAL);
-        executeReporter(context, listener, karmaTestEvents, KARMA_GROUP_ID + ":" + KARMA_ID + ":" + KARMA_GOAL);
+        executeReporter(context, listener, sureFireTestEvents, APACHE_GROUP_ID + ":" + SUREFIRE_ID + ":" + SUREFIRE_GOAL, "reportsDirectory");
+        executeReporter(context, listener, failSafeTestEvents, APACHE_GROUP_ID + ":" + FAILSAFE_ID + ":" + FAILSAFE_GOAL, "reportsDirectory");
+        executeReporter(context, listener, tychoTestEvents, APACHE_GROUP_ID + ":" + TYCHO_ID + ":" + TYCHO_GOAL, "reportsDirectory");
+        executeReporter(context, listener, karmaTestEvents, KARMA_GROUP_ID + ":" + KARMA_ID + ":" + KARMA_GOAL, "reportsDirectory");
+        executeReporter(context, listener, frontendTestEvents, FRONTEND_GROUP_ID + ":" + FRONTEND_ID + ":" + FRONTEND_GOAL, "environmentVariables", "REPORTS_DIRECTORY");
     }
 
-    private void executeReporter(StepContext context, TaskListener listener, List<Element> testEvents, String goal) throws IOException, InterruptedException {
+    private void executeReporter(StepContext context, TaskListener listener, List<Element> testEvents, String goal, String... reportsDirElementNames) throws IOException, InterruptedException {
         FilePath workspace = context.get(FilePath.class);
         final String fileSeparatorOnAgent = XmlUtils.getFileSeparatorOnRemote(workspace);
 
@@ -232,14 +237,14 @@ public class JunitTestsPublisher extends MavenPublisher {
 
         for (Element testEvent : testEvents) {
             Element pluginElt = XmlUtils.getUniqueChildElement(testEvent, "plugin");
-            Element reportsDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "reportsDirectory");
+            Element reportsDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, reportsDirElementNames);
             Element projectElt = XmlUtils.getUniqueChildElement(testEvent, "project");
             MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
 
             MavenSpyLogProcessor.PluginInvocation pluginInvocation = XmlUtils.newPluginInvocation(pluginElt);
 
             if (reportsDirectoryElt == null) {
-                listener.getLogger().println("[withMaven] No <reportsDirectory> element found for <plugin> in " + XmlUtils.toString(testEvent));
+                listener.getLogger().println("[withMaven] No <" + Arrays.stream(reportsDirElementNames).collect(Collectors.joining(".")) + "> element found for <plugin> in " + XmlUtils.toString(testEvent));
                 continue;
             }
             String reportsDirectory = reportsDirectoryElt.getTextContent().trim();

@@ -1,0 +1,51 @@
+<mavenExecution _time="2020-09-16 20:16:38.091">
+  <context _time="2020-09-16 20:16:38.097">
+    <systemProperties/>
+    <versionProperties/>
+    <workingDirectory/>
+    <userProperties/>
+    <plexus/>
+  </context>
+<ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2020-09-16 20:17:41.686">
+    <project baseDir="/tmp" file="/tmp/pom.xml" groupId="some.groupid" name="Some project" artifactId="anArtifactId" packaging="pom" version="1.0.0-SNAPSHOT">
+      <build sourceDirectory="/tmp/src/main/java" directory="/tmp/target"/>
+    </project>
+    <plugin executionId="karma" goal="karma" lifecyclePhase="test" groupId="com.github.eirslett" artifactId="frontend-maven-plugin" version="1.10.0">
+      <environmentVariables>
+        <REPORTS_DIRECTORY>./target/karma-reports</REPORTS_DIRECTORY>
+      </environmentVariables>
+      <installDirectory>target</installDirectory>
+      <karmaConfPath>/tmp/karma.ci.conf.js</karmaConfPath>
+      <project>${project}</project>
+      <repositorySystemSession>${repositorySystemSession}</repositorySystemSession>
+      <skip>${skip.karma}</skip>
+      <skipTests>${skipTests}</skipTests>
+      <testFailureIgnore>${maven.test.failure.ignore}</testFailureIgnore>
+      <workingDirectory>${workingDirectory}</workingDirectory>
+      <execution>${mojoExecution}</execution>
+    </plugin>
+  </ExecutionEvent>
+<ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2020-09-16 20:17:44.567">
+    <project baseDir="/tmp" file="/tmp/pom.xml" groupId="some.groupid" name="Some project" artifactId="anArtifactId" packaging="pom" version="1.0.0-SNAPSHOT">
+      <build sourceDirectory="/tmp/src/main/java" directory="/tmp/target"/>
+    </project>
+    <plugin executionId="karma" goal="karma" lifecyclePhase="test" groupId="com.github.eirslett" artifactId="frontend-maven-plugin" version="1.10.0">
+      <environmentVariables>
+        <REPORTS_DIRECTORY>./target/karma-reports</REPORTS_DIRECTORY>
+      </environmentVariables>
+      <installDirectory>target</installDirectory>
+      <karmaConfPath>/tmp/karma.ci.conf.js</karmaConfPath>
+      <project>${project}</project>
+      <repositorySystemSession>${repositorySystemSession}</repositorySystemSession>
+      <skip>${skip.karma}</skip>
+      <skipTests>${skipTests}</skipTests>
+      <testFailureIgnore>${maven.test.failure.ignore}</testFailureIgnore>
+      <workingDirectory>${workingDirectory}</workingDirectory>
+      <execution>${mojoExecution}</execution>
+    </plugin>
+  </ExecutionEvent>
+<!-- 2020-09-16 20:18:03.854 - close:                                       -->
+<!-- ignored:[org.apache.maven.settings.building.DefaultSettingsBuildingResult], -->
+<!-- blackListed: []                                                        -->
+
+</mavenExecution>
