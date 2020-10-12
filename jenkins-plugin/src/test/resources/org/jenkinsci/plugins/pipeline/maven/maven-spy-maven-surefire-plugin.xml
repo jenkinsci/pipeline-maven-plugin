@@ -1,0 +1,102 @@
+<mavenExecution _time="2020-10-01 21:55:46.235">
+  <context _time="2020-10-01 21:55:46.26">
+    <systemProperties/>
+    <versionProperties/>
+    <workingDirectory/>
+    <userProperties/>
+    <plexus/>
+  </context>
+<ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2020-10-01 21:56:03.569">
+    <project baseDir="/tmp" file="/tmp/pom.xml" groupId="some.groupid" name="Some project" artifactId="anArtifactId" packaging="pom" version="1.0.0-SNAPSHOT">
+      <build sourceDirectory="/tmp/src/main/java" directory="/tmp/target"/>
+    </project>
+    <plugin executionId="default-test" goal="test" lifecyclePhase="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="3.0.0-M5">
+      <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
+      <argLine>${argLine}</argLine>
+      <basedir>${basedir}</basedir>
+      <childDelegation>${childDelegation}</childDelegation>
+      <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+      <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
+      <debugForkedProcess>${maven.surefire.debug}</debugForkedProcess>
+      <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
+      <disableXmlReport>${disableXmlReport}</disableXmlReport>
+      <enableAssertions>${enableAssertions}</enableAssertions>
+      <enableProcessChecker>${surefire.enableProcessChecker}</enableProcessChecker>
+      <encoding>${surefire.encoding}</encoding>
+      <excludedEnvironmentVariables>${surefire.excludedEnvironmentVariables}</excludedEnvironmentVariables>
+      <excludedGroups>${excludedGroups}</excludedGroups>
+      <excludesFile>${surefire.excludesFile}</excludesFile>
+      <failIfNoSpecifiedTests>${surefire.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
+      <failIfNoTests>${failIfNoTests}</failIfNoTests>
+      <forkCount>${forkCount}</forkCount>
+      <forkMode>${forkMode}</forkMode>
+      <forkNode>${surefire.forkNode}</forkNode>
+      <forkedProcessExitTimeoutInSeconds>${surefire.exitTimeout}</forkedProcessExitTimeoutInSeconds>
+      <forkedProcessTimeoutInSeconds>${surefire.timeout}</forkedProcessTimeoutInSeconds>
+      <groups>${groups}</groups>
+      <includesFile>${surefire.includesFile}</includesFile>
+      <junitArtifactName>${junitArtifactName}</junitArtifactName>
+      <jvm>${jvm}</jvm>
+      <localRepository>${localRepository}</localRepository>
+      <objectFactory>${objectFactory}</objectFactory>
+      <parallel>${parallel}</parallel>
+      <parallelMavenExecution>${session.parallel}</parallelMavenExecution>
+      <parallelOptimized>${parallelOptimized}</parallelOptimized>
+      <parallelTestsTimeoutForcedInSeconds>${surefire.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
+      <parallelTestsTimeoutInSeconds>${surefire.parallel.timeout}</parallelTestsTimeoutInSeconds>
+      <perCoreThreadCount>${perCoreThreadCount}</perCoreThreadCount>
+      <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
+      <pluginDescriptor>${plugin}</pluginDescriptor>
+      <printSummary>${surefire.printSummary}</printSummary>
+      <project>${project}</project>
+      <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
+      <projectBuildDirectory>${project.build.directory}</projectBuildDirectory>
+      <projectRemoteRepositories>${project.remoteArtifactRepositories}</projectRemoteRepositories>
+      <redirectTestOutputToFile>true</redirectTestOutputToFile>
+      <remoteRepositories>${project.pluginArtifactRepositories}</remoteRepositories>
+      <reportFormat>${surefire.reportFormat}</reportFormat>
+      <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
+      <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+      <rerunFailingTestsCount>${surefire.rerunFailingTestsCount}</rerunFailingTestsCount>
+      <reuseForks>${reuseForks}</reuseForks>
+      <runOrder>${surefire.runOrder}</runOrder>
+      <session>${session}</session>
+      <shutdown>${surefire.shutdown}</shutdown>
+      <skip>${maven.test.skip}</skip>
+      <skipAfterFailureCount>${surefire.skipAfterFailureCount}</skipAfterFailureCount>
+      <skipExec>${maven.test.skip.exec}</skipExec>
+      <skipTests>${skipTests}</skipTests>
+      <suiteXmlFiles>${surefire.suiteXmlFiles}</suiteXmlFiles>
+      <systemPropertiesFile>${surefire.systemPropertiesFile}</systemPropertiesFile>
+      <tempDir>${tempDir}</tempDir>
+      <test>${test}</test>
+      <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
+      <testFailureIgnore>${maven.test.failure.ignore}</testFailureIgnore>
+      <testNGArtifactName>${testNGArtifactName}</testNGArtifactName>
+      <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+      <threadCount>${threadCount}</threadCount>
+      <threadCountClasses>${threadCountClasses}</threadCountClasses>
+      <threadCountMethods>${threadCountMethods}</threadCountMethods>
+      <threadCountSuites>${threadCountSuites}</threadCountSuites>
+      <trimStackTrace>${trimStackTrace}</trimStackTrace>
+      <useFile>${surefire.useFile}</useFile>
+      <useManifestOnlyJar>${surefire.useManifestOnlyJar}</useManifestOnlyJar>
+      <useModulePath>${surefire.useModulePath}</useModulePath>
+      <useSystemClassLoader>${surefire.useSystemClassLoader}</useSystemClassLoader>
+      <useUnlimitedThreads>${useUnlimitedThreads}</useUnlimitedThreads>
+      <workingDirectory>${basedir}</workingDirectory>
+    </plugin>
+  </ExecutionEvent>
+<ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2020-10-01 21:56:06.067">
+    <project baseDir="/tmp" file="/tmp/pom.xml" groupId="some.groupid" name="Some project" artifactId="anArtifactId" packaging="pom" version="1.0.0-SNAPSHOT">
+      <build sourceDirectory="/tmp/src/main/java" directory="./target"/>
+    </project>
+    <plugin executionId="default-test" goal="test" lifecyclePhase="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="3.0.0-M5">
+      <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+    </plugin>
+  </ExecutionEvent>
+<!-- 2020-10-01 21:56:10.035 - close:                                       -->
+<!-- ignored:[org.apache.maven.settings.building.DefaultSettingsBuildingResult], -->
+<!-- blackListed: []                                                        -->
+
+</mavenExecution>

@@ -1,0 +1,102 @@
+<mavenExecution _time="2020-10-01 21:55:46.235">
+  <context _time="2020-10-01 21:55:46.26">
+    <systemProperties/>
+    <versionProperties/>
+    <workingDirectory/>
+    <userProperties/>
+    <plexus/>
+  </context>
+<ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2020-10-01 21:56:03.569">
+    <project baseDir="/tmp" file="/tmp/pom.xml" groupId="some.groupid" name="Some project" artifactId="anArtifactId" packaging="pom" version="1.0.0-SNAPSHOT">
+      <build sourceDirectory="/tmp/src/main/java" directory="/tmp/target"/>
+    </project>
+    <plugin executionId="default-test" goal="integration-test" lifecyclePhase="integration-test" groupId="org.apache.maven.plugins" artifactId="maven-failsafe-plugin" version="3.0.0-M5">
+      <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
+      <argLine>${argLine}</argLine>
+      <basedir>${basedir}</basedir>
+      <childDelegation>${childDelegation}</childDelegation>
+      <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+      <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
+      <debugForkedProcess>${maven.failsafe.debug}</debugForkedProcess>
+      <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
+      <disableXmlReport>${disableXmlReport}</disableXmlReport>
+      <enableAssertions>${enableAssertions}</enableAssertions>
+      <enableProcessChecker>${failsafe.enableProcessChecker}</enableProcessChecker>
+      <encoding>${failsafe.encoding}</encoding>
+      <excludedEnvironmentVariables>${failsafe.excludedEnvironmentVariables}</excludedEnvironmentVariables>
+      <excludedGroups>${excludedGroups}</excludedGroups>
+      <excludesFile>${failsafe.excludesFile}</excludesFile>
+      <failIfNoSpecifiedTests>${failsafe.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
+      <failIfNoTests>${failIfNoTests}</failIfNoTests>
+      <forkCount>${forkCount}</forkCount>
+      <forkMode>${forkMode}</forkMode>
+      <forkNode>${failsafe.forkNode}</forkNode>
+      <forkedProcessExitTimeoutInSeconds>${failsafe.exitTimeout}</forkedProcessExitTimeoutInSeconds>
+      <forkedProcessTimeoutInSeconds>${failsafe.timeout}</forkedProcessTimeoutInSeconds>
+      <groups>${groups}</groups>
+      <includesFile>${failsafe.includesFile}</includesFile>
+      <junitArtifactName>${junitArtifactName}</junitArtifactName>
+      <jvm>${jvm}</jvm>
+      <localRepository>${localRepository}</localRepository>
+      <objectFactory>${objectFactory}</objectFactory>
+      <parallel>${parallel}</parallel>
+      <parallelMavenExecution>${session.parallel}</parallelMavenExecution>
+      <parallelOptimized>${parallelOptimized}</parallelOptimized>
+      <parallelTestsTimeoutForcedInSeconds>${failsafe.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
+      <parallelTestsTimeoutInSeconds>${failsafe.parallel.timeout}</parallelTestsTimeoutInSeconds>
+      <perCoreThreadCount>${perCoreThreadCount}</perCoreThreadCount>
+      <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
+      <pluginDescriptor>${plugin}</pluginDescriptor>
+      <printSummary>${failsafe.printSummary}</printSummary>
+      <project>${project}</project>
+      <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
+      <projectBuildDirectory>${project.build.directory}</projectBuildDirectory>
+      <projectRemoteRepositories>${project.remoteArtifactRepositories}</projectRemoteRepositories>
+      <redirectTestOutputToFile>true</redirectTestOutputToFile>
+      <remoteRepositories>${project.pluginArtifactRepositories}</remoteRepositories>
+      <reportFormat>${failsafe.reportFormat}</reportFormat>
+      <reportNameSuffix>${failsafe.reportNameSuffix}</reportNameSuffix>
+      <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
+      <rerunFailingTestsCount>${failsafe.rerunFailingTestsCount}</rerunFailingTestsCount>
+      <reuseForks>${reuseForks}</reuseForks>
+      <runOrder>${failsafe.runOrder}</runOrder>
+      <session>${session}</session>
+      <shutdown>${failsafe.shutdown}</shutdown>
+      <skip>${maven.test.skip}</skip>
+      <skipAfterFailureCount>${failsafe.skipAfterFailureCount}</skipAfterFailureCount>
+      <skipExec>${maven.test.skip.exec}</skipExec>
+      <skipTests>${skipTests}</skipTests>
+      <suiteXmlFiles>${failsafe.suiteXmlFiles}</suiteXmlFiles>
+      <systemPropertiesFile>${failsafe.systemPropertiesFile}</systemPropertiesFile>
+      <tempDir>${tempDir}</tempDir>
+      <test>${test}</test>
+      <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
+      <testFailureIgnore>${maven.test.failure.ignore}</testFailureIgnore>
+      <testNGArtifactName>${testNGArtifactName}</testNGArtifactName>
+      <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+      <threadCount>${threadCount}</threadCount>
+      <threadCountClasses>${threadCountClasses}</threadCountClasses>
+      <threadCountMethods>${threadCountMethods}</threadCountMethods>
+      <threadCountSuites>${threadCountSuites}</threadCountSuites>
+      <trimStackTrace>${trimStackTrace}</trimStackTrace>
+      <useFile>${failsafe.useFile}</useFile>
+      <useManifestOnlyJar>${failsafe.useManifestOnlyJar}</useManifestOnlyJar>
+      <useModulePath>${failsafe.useModulePath}</useModulePath>
+      <useSystemClassLoader>${failsafe.useSystemClassLoader}</useSystemClassLoader>
+      <useUnlimitedThreads>${useUnlimitedThreads}</useUnlimitedThreads>
+      <workingDirectory>${basedir}</workingDirectory>
+    </plugin>
+  </ExecutionEvent>
+<ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2020-10-01 21:56:06.067">
+    <project baseDir="/tmp" file="/tmp/pom.xml" groupId="some.groupid" name="Some project" artifactId="anArtifactId" packaging="pom" version="1.0.0-SNAPSHOT">
+      <build sourceDirectory="/tmp/src/main/java" directory="./target"/>
+    </project>
+    <plugin executionId="default-test" goal="integration-test" lifecyclePhase="integration-test" groupId="org.apache.maven.plugins" artifactId="maven-failsafe-plugin" version="3.0.0-M5">
+      <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
+    </plugin>
+  </ExecutionEvent>
+<!-- 2020-10-01 21:56:10.035 - close:                                       -->
+<!-- ignored:[org.apache.maven.settings.building.DefaultSettingsBuildingResult], -->
+<!-- blackListed: []                                                        -->
+
+</mavenExecution>
