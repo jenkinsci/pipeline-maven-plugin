@@ -407,7 +407,7 @@
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
         <artifactId>bom-2.204.x</artifactId>
-        <version>12</version>
+        <version>18</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
