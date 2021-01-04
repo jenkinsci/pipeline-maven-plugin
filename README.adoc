@@ -107,6 +107,7 @@ For example, you might end up having builds incorrectly succeed, just because yo
 By using this option, Jenkins will tell Maven to use a custom path for the build as the local Maven repository by using `-Dmaven.repo.local` +
 If specified as a relative path then this value will be resolved against the workspace root and not the current working directory. +
 ie. `$WORKSPACE/.repository` if `.repository` value is specified.
+* *Maven Traceability* (`traceability`): adds additional output to the maven wrapper script. Maven is executed with parameter `--show-version` and the start of the wrapper script is indicated by `----- withMaven Wrapper script -----`. Defaults to `true`.
 
 IMPORTANT: `mavenSettingsConfig` and `globalMavenSettingsConfig` use the *ID*, not the *name*, of the Maven settings file (resp Maven Global Settings file).
 

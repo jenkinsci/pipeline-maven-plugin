@@ -223,11 +223,11 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * Detects if this step is running inside <code>docker.image()</code> or <code>container()</code>
      * <p>
      * This has the following implications:
-     * <li>Tool intallers do no work, as they install in the host, see:
+     * <li>Tool installers do no work, as they install in the host, see:
      * https://issues.jenkins-ci.org/browse/JENKINS-36159
      * <li>Environment variables do not apply because they belong either to the master or the agent, but not to the
      * container running the <code>sh</code> command for maven This is due to the fact that <code>docker.image()</code> all it
-     * does is decorate the launcher and excute the command with a <code>docker run</code> which means that the inherited
+     * does is decorate the launcher and execute the command with a <code>docker run</code> which means that the inherited
      * environment from the OS will be totally different eg: MAVEN_HOME, JAVA_HOME, PATH, etc.
      * <li>Kubernetes' <code>container()</code> support is still in early stages, and environment variables might not be
      * completely configured, depending on the version of the Jenkins Kubernetes plugin.
@@ -340,7 +340,9 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
         StringBuilder mavenConfig = new StringBuilder();
         mavenConfig.append("--batch-mode ");
-        mavenConfig.append("--show-version ");
+        if (step.isTraceability()) {
+            mavenConfig.append("--show-version ");
+        }
         if (StringUtils.isNotEmpty(settingsFilePath)) {
             // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
         	if (!isUnix) settingsFilePath=settingsFilePath.replace("%", "%%");
@@ -605,13 +607,17 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         if (isUnix) { // Linux, Unix, MacOSX
             String lineSep = "\n";
             script.append("#!/bin/sh -e").append(lineSep);
-            script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
+            if (step.isTraceability()) {
+                script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
+            }
             script.append("\"").append(mvnExec.getRemote()).append("\" ").append(mavenConfig).append(" \"$@\"").append(lineSep);
 
         } else { // Windows
             String lineSep = "\r\n";
             script.append("@echo off").append(lineSep);
-            script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
+            if (step.isTraceability()) {
+                script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
+            }
             // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
             mavenConfig = mavenConfig.replace("%", "%%");
             script.append("\"").append(mvnExec.getRemote()).append("\" ").append(mavenConfig).append(" %*").append(lineSep);
@@ -717,7 +723,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         StringBuilder mavenSettingsLog=new StringBuilder();
 
         if (overrideProperty != null && overrideProperty.getSettings() != null) {
-            // Settings overriden by a folder property
+            // Settings overridden by a folder property
             if(LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("[withMaven] using overriden Maven settings by folder '").append(overrideProperty.getOwner().getDisplayName()).append("'. ");
             }
