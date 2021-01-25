@@ -73,7 +73,7 @@
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>maven-plugin</artifactId>
-      <version>3.7</version>
+      <version>3.9</version>
       <!--
       Discussed on https://github.com/jenkinsci/pipeline-maven-plugin/pull/48
       Keep the dependency optional
