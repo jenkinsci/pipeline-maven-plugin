@@ -127,6 +127,8 @@ public class JacocoReportPublisher extends MavenPublisher {
         Launcher launcher = context.get(Launcher.class);
 
         List<Element> jacocoPrepareAgentEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, "org.jacoco", "jacoco-maven-plugin", "prepare-agent", "MojoSucceeded", "MojoFailed");
+        List<Element> jacocoPrepareAgentEvents2 = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, "org.jacoco", "jacoco-maven-plugin", "prepare-agent-integration", "MojoSucceeded", "MojoFailed");
+        jacocoPrepareAgentEvents.addAll(jacocoPrepareAgentEvents2); // add integration tests agents
 
         if (jacocoPrepareAgentEvents.isEmpty()) {
             LOGGER.log(Level.FINE, "No org.jacoco:jacoco-maven-plugin:prepare-agent execution found");
