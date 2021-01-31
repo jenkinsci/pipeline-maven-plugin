@@ -684,7 +684,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
             WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
             jenkinsRule.assertLogContains(
-                "[withMaven] using overriden Maven global settings by folder 'folder'. Config File Provider maven global settings file 'maven-global-config-test-folder'",
+                "[withMaven] using overridden Maven global settings by folder 'folder'. Config File Provider maven global settings file 'maven-global-config-test-folder'",
                 build);
             jenkinsRule.assertLogContains("<id>id-global-settings-test-from-config-file-provider-on-a-folder</id>", build);
         } finally {
@@ -921,7 +921,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             WorkflowJob pipeline = folder.createProject(WorkflowJob.class, "build-on-master-with-maven-settings-defined-in-jenkins-global-config-with-config-file-provider");
             pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
             WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
-            jenkinsRule.assertLogContains("[withMaven] using overriden Maven settings by folder 'folder'. Config File Provider maven settings file 'maven-config-test-folder'",
+            jenkinsRule.assertLogContains("[withMaven] using overridden Maven settings by folder 'folder'. Config File Provider maven settings file 'maven-config-test-folder'",
                 build);
             jenkinsRule.assertLogContains("<id>id-settings-test-through-config-file-provider-on-a-folder</id>", build);
         } finally {
