@@ -168,6 +168,7 @@ public class JacocoReportPublisher extends MavenPublisher {
             String destFile = destFileElt.getTextContent().trim();
             if (destFile.equals("${jacoco.destFile}")) {
                 destFile = "${project.build.directory}/jacoco.exec";
+                if ("prepare-agent-integration".equals(pluginInvocation.goal)) destFile = "${project.build.directory}/jacoco-it.exec";
                 String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
                 if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
                     listener.getLogger().println("[withMaven] '${project.build.directory}' found for <project> in " + XmlUtils.toString(jacocoPrepareAgentEvent));
