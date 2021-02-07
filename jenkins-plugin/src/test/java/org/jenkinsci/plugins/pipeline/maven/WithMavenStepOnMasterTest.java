@@ -207,7 +207,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         List<TestResultAction> testResultActions = build.getActions(TestResultAction.class);
         assertThat(testResultActions.size(), is(1));
         TestResultAction testResultAction = testResultActions.get(0);
-        assertThat(testResultAction.getTotalCount(), is(1));
+        assertThat(testResultAction.getTotalCount(), is(2));
         assertThat(testResultAction.getFailCount(), is(0));
 
         List<JacocoBuildAction> jacocoBuildActions = build.getActions(JacocoBuildAction.class);
