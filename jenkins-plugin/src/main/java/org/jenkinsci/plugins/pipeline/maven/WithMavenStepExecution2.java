@@ -75,6 +75,7 @@ import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
 import org.jenkinsci.plugins.pipeline.maven.console.MaskPasswordsConsoleLogFilter;
 import org.jenkinsci.plugins.pipeline.maven.console.MavenColorizerConsoleLogFilter;
 import org.jenkinsci.plugins.pipeline.maven.util.FileUtils;
+import org.jenkinsci.plugins.pipeline.maven.util.TaskListenerTraceWrapper;
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
 import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
@@ -89,7 +90,6 @@ import javax.annotation.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.ArrayList;
@@ -140,7 +140,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      */
     private boolean withContainer;
 
-    private transient PrintStream console;
+    private transient TaskListenerTraceWrapper console;
 
     WithMavenStepExecution2(StepContext context, WithMavenStep step) throws Exception {
         super(context);
@@ -160,7 +160,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
     protected boolean doStart() throws Exception {
         envOverride = new EnvVars();
-        console = listener.getLogger();
+        console = new TaskListenerTraceWrapper(listener, step.isTraceability());
 
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.log(Level.FINE, "Maven: {0}", step.getMaven());
@@ -176,9 +176,9 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             LOGGER.log(Level.FINE, "ws: {0}", ws.getRemote()); // JENKINS-47804
         }
 
-        listener.getLogger().println("[withMaven] Options: " + step.getOptions());
+        console.trace("[withMaven] Options: " + step.getOptions());
         ExtensionList<MavenPublisher> availableMavenPublishers = Jenkins.get().getExtensionList(MavenPublisher.class);
-        listener.getLogger().println("[withMaven] Available options: " + availableMavenPublishers.stream().map(
+        console.trace("[withMaven] Available options: " + availableMavenPublishers.stream().map(
                 MavenPublisher::toString).collect(Collectors.joining(",")));
 
         getComputer();
@@ -186,9 +186,9 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         withContainer = detectWithContainer();
 
         if (withContainer) {
-            listener.getLogger().print("[withMaven] IMPORTANT \"withMaven(){...}\" step running within a Docker container. See " );
-            listener.hyperlink("https://github.com/jenkinsci/pipeline-maven-plugin/FAQ.adoc", "Pipeline Maven Plugin FAQ");
-            listener.getLogger().println(" in case of problem.");
+            console.trace("[withMaven] IMPORTANT \"withMaven(){...}\" step running within a Docker container. See " );
+            console.traceHyperlink("https://github.com/jenkinsci/pipeline-maven-plugin/FAQ.adoc", "Pipeline Maven Plugin FAQ");
+            console.trace(" in case of problem.");
         }
 
         setupJDK();
@@ -223,11 +223,11 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * Detects if this step is running inside <code>docker.image()</code> or <code>container()</code>
      * <p>
      * This has the following implications:
-     * <li>Tool intallers do no work, as they install in the host, see:
+     * <li>Tool installers do no work, as they install in the host, see:
      * https://issues.jenkins-ci.org/browse/JENKINS-36159
      * <li>Environment variables do not apply because they belong either to the master or the agent, but not to the
      * container running the <code>sh</code> command for maven This is due to the fact that <code>docker.image()</code> all it
-     * does is decorate the launcher and excute the command with a <code>docker run</code> which means that the inherited
+     * does is decorate the launcher and execute the command with a <code>docker run</code> which means that the inherited
      * environment from the OS will be totally different eg: MAVEN_HOME, JAVA_HOME, PATH, etc.
      * <li>Kubernetes' <code>container()</code> support is still in early stages, and environment variables might not be
      * completely configured, depending on the version of the Jenkins Kubernetes plugin.
@@ -264,7 +264,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
     private void setupJDK() throws AbortException, IOException, InterruptedException {
         String jdkInstallationName = step.getJdk();
         if (StringUtils.isEmpty(jdkInstallationName)) {
-            console.println("[withMaven] using JDK installation provided by the build agent");
+            console.trace("[withMaven] using JDK installation provided by the build agent");
             return;
         }
 
@@ -277,7 +277,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             return;
         }
 
-        console.println("[withMaven] using JDK installation " + jdkInstallationName);
+        console.trace("[withMaven] using JDK installation " + jdkInstallationName);
 
         JDK jdk = Jenkins.get().getJDK(jdkInstallationName);
         if (jdk == null) {
@@ -340,7 +340,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
         StringBuilder mavenConfig = new StringBuilder();
         mavenConfig.append("--batch-mode ");
-        mavenConfig.append("--show-version ");
+        ifTraceabilityEnabled(() -> mavenConfig.append("--show-version "));
         if (StringUtils.isNotEmpty(settingsFilePath)) {
             // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
         	if (!isUnix) settingsFilePath=settingsFilePath.replace("%", "%%");
@@ -533,7 +533,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             }
         }
 
-        console.println(consoleMessage.toString());
+        console.trace(consoleMessage.toString());
 
         LOGGER.log(Level.FINE, "Found exec for maven on: {0}", mvnExecPath);
         return mvnExecPath;
@@ -558,7 +558,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         }
         mavenInstallation = mavenInstallation.forNode(node, listener).forEnvironment(env);
         mavenInstallation.buildEnvVars(envOverride);
-        console.println("[withMaven] using Maven installation '" + mavenInstallation.getName() + "'");
+        console.trace("[withMaven] using Maven installation '" + mavenInstallation.getName() + "'");
 
         return mavenInstallation.getExecutable(launcher);
     }
@@ -605,13 +605,13 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         if (isUnix) { // Linux, Unix, MacOSX
             String lineSep = "\n";
             script.append("#!/bin/sh -e").append(lineSep);
-            script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
+            ifTraceabilityEnabled(() -> script.append("echo ----- withMaven Wrapper script -----").append(lineSep));
             script.append("\"").append(mvnExec.getRemote()).append("\" ").append(mavenConfig).append(" \"$@\"").append(lineSep);
 
         } else { // Windows
             String lineSep = "\r\n";
             script.append("@echo off").append(lineSep);
-            script.append("echo ----- withMaven Wrapper script -----").append(lineSep);
+            ifTraceabilityEnabled(() -> script.append("echo ----- withMaven Wrapper script -----").append(lineSep));
             // JENKINS-57324 escape '%' as '%%'. See https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
             mavenConfig = mavenConfig.replace("%", "%%");
             script.append("\"").append(mvnExec.getRemote()).append("\" ").append(mavenConfig).append(" %*").append(lineSep);
@@ -685,7 +685,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         // Settings from Config File Provider
         if (StringUtils.isNotEmpty(step.getMavenSettingsConfig())) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                console.format("[withMaven] using Maven settings provided by the Jenkins Managed Configuration File '%s' %n", step.getMavenSettingsConfig());
+                console.formatTrace("[withMaven] using Maven settings provided by the Jenkins Managed Configuration File '%s' %n", step.getMavenSettingsConfig());
             }
             settingsFromConfig(step.getMavenSettingsConfig(), settingsDest, credentials);
             envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
@@ -700,7 +700,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             if ((settings = ws.child(settingsPath)).exists()) {
                 // settings file residing on the agent
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    console.format("[withMaven] using Maven settings provided on the build agent '%s' %n", settingsPath);
+                    console.formatTrace("[withMaven] using Maven settings provided on the build agent '%s' %n", settingsPath);
                     LOGGER.log(Level.FINE, "Copying maven settings file from build agent {0} to {1}", new Object[] { settings, settingsDest });
                 }
                 settings.copyTo(settingsDest);
@@ -717,9 +717,9 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         StringBuilder mavenSettingsLog=new StringBuilder();
 
         if (overrideProperty != null && overrideProperty.getSettings() != null) {
-            // Settings overriden by a folder property
+            // Settings overridden by a folder property
             if(LOGGER.isLoggable(Level.FINE)) {
-                mavenSettingsLog.append("[withMaven] using overriden Maven settings by folder '").append(overrideProperty.getOwner().getDisplayName()).append("'. ");
+                mavenSettingsLog.append("[withMaven] using overridden Maven settings by folder '").append(overrideProperty.getOwner().getDisplayName()).append("'. ");
             }
             settingsProvider = overrideProperty.getSettings();
         } else {
@@ -734,7 +734,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             MvnSettingsProvider mvnSettingsProvider = (MvnSettingsProvider) settingsProvider;
             if (LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("Config File Provider maven settings file '").append(mvnSettingsProvider.getSettingsConfigId()).append("'");
-                console.println(mavenSettingsLog);
+                console.trace(mavenSettingsLog);
             }
             settingsFromConfig(mvnSettingsProvider.getSettingsConfigId(), settingsDest, credentials);
             envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
@@ -770,7 +770,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                 console.println(mavenSettingsLog);
             }
         } else {
-            console.println("[withMaven] Ignore unsupported Maven SettingsProvider " + settingsProvider);
+            console.trace("[withMaven] Ignore unsupported Maven SettingsProvider " + settingsProvider);
         }
 
         return null;
@@ -810,7 +810,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         // Global settings from Config File Provider
         if (StringUtils.isNotEmpty(step.getGlobalMavenSettingsConfig())) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                console.format("[withMaven] using Maven global settings provided by the Jenkins Managed Configuration File '%s' %n", step.getGlobalMavenSettingsConfig());
+                console.formatTrace("[withMaven] using Maven global settings provided by the Jenkins Managed Configuration File '%s' %n", step.getGlobalMavenSettingsConfig());
             }
             globalSettingsFromConfig(step.getGlobalMavenSettingsConfig(), settingsDest, credentials);
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
@@ -824,7 +824,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             if ((settings = ws.child(settingsPath)).exists()) {
                 // Global settings file residing on the agent
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    console.format("[withMaven] using Maven global settings provided on the build agent '%s' %n", settingsPath);
+                    console.formatTrace("[withMaven] using Maven global settings provided on the build agent '%s' %n", settingsPath);
                     LOGGER.log(Level.FINE, "Copying maven global settings file from build agent {0} to {1}", new Object[] { settings, settingsDest });
                 }
                 settings.copyTo(settingsDest);
@@ -847,9 +847,9 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             // Settings provided by the global maven configuration
             globalSettingsProvider = GlobalMavenConfig.get().getGlobalSettingsProvider();
         } else {
-            // Settings overriden by a folder property
+            // Settings overridden by a folder property
             if (LOGGER.isLoggable(Level.FINE)) {
-                mavenSettingsLog.append("[withMaven] using overriden Maven global settings by folder '").append(overrideProperty.getOwner().getDisplayName()).append("'. ");
+                mavenSettingsLog.append("[withMaven] using overridden Maven global settings by folder '").append(overrideProperty.getOwner().getDisplayName()).append("'. ");
             }
             globalSettingsProvider = overrideProperty.getGlobalSettings();
         }
@@ -862,7 +862,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             globalSettingsFromConfig(mvnGlobalSettingsProvider.getSettingsConfigId(), settingsDest, credentials);
             envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
             if (LOGGER.isLoggable(Level.FINE)) {
-                console.println(mavenSettingsLog);
+                console.trace(mavenSettingsLog);
             }
             return settingsDest.getRemote();
         } else if (globalSettingsProvider instanceof FilePathGlobalSettingsProvider) {
@@ -897,7 +897,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                 console.println(mavenSettingsLog);
             }
         } else {
-            console.println("[withMaven] Ignore unsupported Maven GlobalSettingsProvider " + globalSettingsProvider);
+            console.trace("[withMaven] Ignore unsupported Maven GlobalSettingsProvider " + globalSettingsProvider);
         }
 
         return null;
@@ -937,14 +937,14 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             if (resolvedCredentialsByMavenServerId.isEmpty()) {
                 mavenSettingsFileContent = mavenSettingsConfig.content;
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    console.println("[withMaven] using Maven settings.xml '" + mavenSettingsConfig.id + "' with NO Maven servers credentials provided by Jenkins");
+                    console.trace("[withMaven] using Maven settings.xml '" + mavenSettingsConfig.id + "' with NO Maven servers credentials provided by Jenkins");
                 }
             } else {
                 credentials.addAll(resolvedCredentialsByMavenServerId.values());
                 List<String> tempFiles = new ArrayList<>();
                 mavenSettingsFileContent = CredentialsHelper.fillAuthentication(mavenSettingsConfig.content, mavenSettingsConfig.isReplaceAll, resolvedCredentialsByMavenServerId, tempBinDir, tempFiles);
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    console.println("[withMaven] using Maven settings.xml '" + mavenSettingsConfig.id + "' with Maven servers credentials provided by Jenkins " +
+                    console.trace("[withMaven] using Maven settings.xml '" + mavenSettingsConfig.id + "' with Maven servers credentials provided by Jenkins " +
                             "(replaceAll: " + mavenSettingsConfig.isReplaceAll + "): " +
                             resolvedCredentialsByMavenServerId.entrySet().stream().map(new MavenServerToCredentialsMappingToStringFunction()).sorted().collect(Collectors.joining(", ")));
                 }
@@ -990,14 +990,14 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             String mavenGlobalSettingsFileContent;
             if (resolvedCredentialsByMavenServerId.isEmpty()) {
                 mavenGlobalSettingsFileContent = mavenGlobalSettingsConfig.content;
-                console.println("[withMaven] using Maven global settings.xml '" + mavenGlobalSettingsConfig.id + "' with NO Maven servers credentials provided by Jenkins");
+                console.trace("[withMaven] using Maven global settings.xml '" + mavenGlobalSettingsConfig.id + "' with NO Maven servers credentials provided by Jenkins");
 
             } else {
                 credentials.addAll(resolvedCredentialsByMavenServerId.values());
 
                 List<String> tempFiles = new ArrayList<>();
                 mavenGlobalSettingsFileContent = CredentialsHelper.fillAuthentication(mavenGlobalSettingsConfig.content, mavenGlobalSettingsConfig.isReplaceAll, resolvedCredentialsByMavenServerId, tempBinDir, tempFiles);
-                console.println("[withMaven] using Maven global settings.xml '" + mavenGlobalSettingsConfig.id + "' with Maven servers credentials provided by Jenkins " +
+                console.trace("[withMaven] using Maven global settings.xml '" + mavenGlobalSettingsConfig.id + "' with Maven servers credentials provided by Jenkins " +
                         "(replaceAll: " + mavenGlobalSettingsConfig.isReplaceAll + "): " +
                         resolvedCredentialsByMavenServerId.entrySet().stream().map(new MavenServerToCredentialsMappingToStringFunction()).sorted().collect(Collectors.joining(", ")));
 
@@ -1048,6 +1048,12 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                     unresolvedServerCredentialsMappings.stream().map(new ServerCredentialMappingToStringFunction()).collect(Collectors.joining(", ")));
         }
         return mavenServerIdToCredentials;
+    }
+
+    private void ifTraceabilityEnabled(Runnable runnable) {
+        if (step.isTraceability()) {
+            runnable.run();
+        }
     }
 
     /**

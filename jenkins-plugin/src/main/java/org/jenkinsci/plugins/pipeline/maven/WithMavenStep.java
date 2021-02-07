@@ -78,6 +78,7 @@ public class WithMavenStep extends Step {
     private String mavenLocalRepo = "";
     private List<MavenPublisher> options = new ArrayList<>();
     private MavenPublisherStrategy publisherStrategy = MavenPublisherStrategy.IMPLICIT;
+    private boolean traceability = true;
 
     @DataBoundConstructor
     public WithMavenStep() {
@@ -171,6 +172,15 @@ public class WithMavenStep extends Step {
     @DataBoundSetter
     public void setPublisherStrategy(MavenPublisherStrategy publisherStrategy) {
         this.publisherStrategy = publisherStrategy;
+    }
+
+    public boolean isTraceability() {
+        return traceability;
+    }
+
+    @DataBoundSetter
+    public void setTraceability(final boolean traceability) {
+        this.traceability = traceability;
     }
 
     public List<MavenPublisher> getOptions() {

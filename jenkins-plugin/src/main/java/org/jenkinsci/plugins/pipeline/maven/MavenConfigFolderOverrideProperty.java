@@ -29,7 +29,7 @@ public class MavenConfigFolderOverrideProperty extends AbstractFolderProperty<Ab
     private GlobalSettingsProvider globalSettings;
 
     /**
-     * Defines if the instance level configuration should be overriden by this folder one
+     * Defines if the instance level configuration should be overridden by this folder one
      */
     private boolean override;
 
