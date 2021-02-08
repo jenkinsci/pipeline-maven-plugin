@@ -81,6 +81,12 @@
       <optional>true</optional>
       <exclusions>
         <exclusion>
+          <!-- Require upper bound dependencies error for org.jenkins-ci.plugins:junit:1.29 -->
+          <!-- The maven-plugin depends on a version higher than the one in the BOM -->
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+        <exclusion>
           <!-- Require upper bound dependencies error for com.google.inject:guice:4.0-beta paths to dependency are:...-->
           <groupId>com.google.inject</groupId>
           <artifactId>guice</artifactId>
