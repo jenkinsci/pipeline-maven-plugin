@@ -131,7 +131,7 @@ public class JacocoReportPublisher extends MavenPublisher {
         jacocoPrepareAgentEvents.addAll(jacocoPrepareAgentIntegrationEvents); // add prepare-agent-integration goals
 
         if (jacocoPrepareAgentEvents.isEmpty()) {
-            LOGGER.log(Level.FINE, "No org.jacoco:jacoco-maven-plugin:prepare-agent execution found");
+            LOGGER.log(Level.FINE, "No org.jacoco:jacoco-maven-plugin:prepare-agent[-integration] execution found");
             return;
         }
 
@@ -140,7 +140,7 @@ public class JacocoReportPublisher extends MavenPublisher {
         } catch (ClassNotFoundException e) {
             listener.getLogger().print("[withMaven] Jenkins ");
             listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/JaCoCo+Plugin", "JaCoCo Plugin");
-            listener.getLogger().println(" not found, don't display org.jacoco:jacoco-maven-plugin:findbugs results in pipeline screen.");
+            listener.getLogger().println(" not found, don't display org.jacoco:jacoco-maven-plugin:prepare-agent[-integration] results in pipeline screen.");
             return;
         }
 
