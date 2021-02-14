@@ -17,13 +17,7 @@
 
 name: GitHub CI
 
-on:
-  push:
-    branches:
-    - master
-  pull_request:
-    branches:
-    - master
+on: [push, pull_request]
 
 jobs:
   build:
