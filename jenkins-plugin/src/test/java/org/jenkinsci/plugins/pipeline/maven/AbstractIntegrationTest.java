@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import hudson.tasks.Maven;
+import jenkins.model.Jenkins;
 import jenkins.mvn.DefaultGlobalSettingsProvider;
 import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
@@ -11,8 +12,8 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.jvnet.hudson.test.BuildWatcher;
-import org.jvnet.hudson.test.ExtendedToolInstallations;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.ToolInstallations;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -35,9 +36,12 @@ public abstract class AbstractIntegrationTest {
 
     @Before
     public void setup() throws Exception {
-        Maven.MavenInstallation maven3 = ExtendedToolInstallations.configureMaven35();
 
-        mavenInstallationName = maven3.getName();
+        Maven.MavenInstallation mvn = ToolInstallations.configureDefaultMaven( "apache-maven-3.6.3", Maven.MavenInstallation.MAVEN_30);
+
+        Maven.MavenInstallation m3 = new Maven.MavenInstallation( "apache-maven-3.6.3", mvn.getHome(), JenkinsRule.NO_PROPERTIES);
+        Jenkins.get().getDescriptorByType( Maven.DescriptorImpl.class).setInstallations( m3);
+        mavenInstallationName = mvn.getName();
 
         GlobalMavenConfig globalMavenConfig = jenkinsRule.get(GlobalMavenConfig.class);
         globalMavenConfig.setGlobalSettingsProvider(new DefaultGlobalSettingsProvider());

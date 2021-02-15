@@ -356,7 +356,6 @@
       <version>2.2</version>
       <scope>test</scope>
     </dependency>
-
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>scm-api</artifactId>
@@ -499,12 +498,9 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <!--
-                  download deprecated see org.jvnet.hudson.test.ExtendedToolInstallations.configureMaven35
-                  -->
                   <groupId>org.apache.maven</groupId>
                   <artifactId>apache-maven</artifactId>
-                  <version>3.5.0</version>
+                  <version>3.6.3</version>
                   <type>zip</type>
                   <classifier>bin</classifier>
                   <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
