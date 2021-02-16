@@ -12,11 +12,11 @@
 
     <DefaultSettingsBuildingRequest class="org.apache.maven.settings.building.DefaultSettingsBuildingRequest" _time="2017-05-06 13:30:31.194">
         <userSettingsFile>C:\Users\IEUser\.m2\settings.xml</userSettingsFile>
-        <globalSettings>C:\apps\apache-maven-3.5.0\bin\..\conf\settings.xml</globalSettings>
+        <globalSettings>C:\apps\apache-maven-3.6.3\bin\..\conf\settings.xml</globalSettings>
     </DefaultSettingsBuildingRequest>
     <MavenExecutionRequest class="org.apache.maven.execution.DefaultMavenExecutionRequest" _time="2017-05-06 13:30:31.397">
         <pom>C:\path\to\spring-petclinic\pom.xml</pom>
-        <globalSettingsFile>C:\apps\apache-maven-3.5.0\bin\..\conf\settings.xml</globalSettingsFile>
+        <globalSettingsFile>C:\apps\apache-maven-3.6.3\bin\..\conf\settings.xml</globalSettingsFile>
         <userSettingsFile>C:\Users\IEUser\.m2\settings.xml</userSettingsFile>
         <baseDirectory>C:\path\to\spring-petclinic</baseDirectory>
     </MavenExecutionRequest>
