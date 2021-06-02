@@ -135,7 +135,7 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     }
 
     @Override
-    public void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
+    public void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, boolean successfull, long startTimeInMillis, long durationInMillis) {
         LOGGER.log(Level.INFO, "updateBuildOnCompletion({0}, {1}, result: {2}, startTime): {3}, duration: {4}",
                 new Object[]{jobFullName, buildNumber, buildResultOrdinal, startTimeInMillis, durationInMillis});
     }
