@@ -18,6 +18,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
 import javax.annotation.Nonnull;
@@ -38,6 +39,11 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
     private static final Logger LOGGER = Logger.getLogger(GeneratedArtifactsPublisher.class.getName());
 
     private static final long serialVersionUID = 1L;
+
+    private boolean archiveFiles = true;
+
+    private boolean fingerprintFiles = true;
+
 
     @DataBoundConstructor
     public GeneratedArtifactsPublisher() {
@@ -96,8 +102,10 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                         // the subsequent call to digest could test the existence but we don't want to prematurely optimize performances
                         listener.getLogger().println("[withMaven] artifactsPublisher - Archive artifact " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone);
                         artifactsToArchive.put(artifactPathInArchiveZone, artifactPathInWorkspace);
-                        String artifactDigest = artifactFilePath.digest();
-                        artifactsToFingerPrint.put(artifactPathInArchiveZone, artifactDigest);
+                        if (fingerprintFiles) {
+                          String artifactDigest = artifactFilePath.digest();
+                          artifactsToFingerPrint.put(artifactPathInArchiveZone, artifactDigest);
+                        }
                     } else {
                         listener.getLogger().println("[withMaven] artifactsPublisher - FAILURE to archive " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone + ", file not found in workspace " + workspace);
                     }
@@ -114,28 +122,32 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
 
         // ARCHIVE GENERATED MAVEN ARTIFACT
         // see org.jenkinsci.plugins.workflow.steps.ArtifactArchiverStepExecution#run
-        try {
-            artifactManager.archive(workspace, launcher, new BuildListenerAdapter(listener), artifactsToArchive);
-        } catch (IOException e) {
-            throw new IOException("Exception archiving " + artifactsToArchive, e);
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Exception archiving " + artifactsToArchive, e);
+        if (archiveFiles) {
+          try {
+              artifactManager.archive(workspace, launcher, new BuildListenerAdapter(listener), artifactsToArchive);
+          } catch (IOException e) {
+              throw new IOException("Exception archiving " + artifactsToArchive, e);
+          } catch (RuntimeException e) {
+              throw new RuntimeException("Exception archiving " + artifactsToArchive, e);
+          }
         }
 
         // FINGERPRINT GENERATED MAVEN ARTIFACT
-        FingerprintMap fingerprintMap = Jenkins.get().getFingerprintMap();
-        for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
-            String artifactPathInArchiveZone = artifactToFingerprint.getKey();
-            String artifactMd5 = artifactToFingerprint.getValue();
-            fingerprintMap.getOrCreate(run, artifactPathInArchiveZone, artifactMd5).addFor(run);
-        }
+        if (fingerprintFiles) {
+          FingerprintMap fingerprintMap = Jenkins.get().getFingerprintMap();
+          for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
+              String artifactPathInArchiveZone = artifactToFingerprint.getKey();
+              String artifactMd5 = artifactToFingerprint.getValue();
+              fingerprintMap.getOrCreate(run, artifactPathInArchiveZone, artifactMd5).addFor(run);
+          }
 
-        // add action
-        Fingerprinter.FingerprintAction fingerprintAction = run.getAction(Fingerprinter.FingerprintAction.class);
-        if (fingerprintAction == null) {
-            run.addAction(new Fingerprinter.FingerprintAction(run, artifactsToFingerPrint));
-        } else {
-            fingerprintAction.add(artifactsToFingerPrint);
+          // add action
+          Fingerprinter.FingerprintAction fingerprintAction = run.getAction(Fingerprinter.FingerprintAction.class);
+          if (fingerprintAction == null) {
+              run.addAction(new Fingerprinter.FingerprintAction(run, artifactsToFingerPrint));
+          } else {
+              fingerprintAction.add(artifactsToFingerPrint);
+          }
         }
     }
 
@@ -158,5 +170,23 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
         public String getSkipFileName() {
             return ".skip-archive-generated-artifacts";
         }
+    }
+
+    public boolean getFingerprintFiles() {
+        return fingerprintFiles;
+    }
+
+    @DataBoundSetter
+    public void setFingerprintFiles(boolean fingerprintFiles) {
+        this.fingerprintFiles = fingerprintFiles;
+    }
+
+    public boolean getArchiveFiles() {
+        return archiveFiles;
+    }
+
+    @DataBoundSetter
+    public void setArchiveFiles(boolean archiveFiles) {
+        this.archiveFiles = archiveFiles;
     }
 }
