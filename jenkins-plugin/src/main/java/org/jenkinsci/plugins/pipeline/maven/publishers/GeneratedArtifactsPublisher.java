@@ -1,5 +1,26 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
+import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.w3c.dom.Element;
+
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -11,25 +32,6 @@ import hudson.tasks.Fingerprinter;
 import jenkins.model.ArtifactManager;
 import jenkins.model.Jenkins;
 import jenkins.util.BuildListenerAdapter;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
-import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
-import org.jenkinsci.plugins.workflow.steps.StepContext;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
-import org.w3c.dom.Element;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -40,9 +42,9 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
 
     private static final long serialVersionUID = 1L;
 
-    private boolean archiveFiles = true;
+    private boolean archiveFilesDisabled = false;
 
-    private boolean fingerprintFiles = true;
+    private boolean fingerprintFilesDisabled = false;
 
 
     @DataBoundConstructor
@@ -102,7 +104,7 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                         // the subsequent call to digest could test the existence but we don't want to prematurely optimize performances
                         listener.getLogger().println("[withMaven] artifactsPublisher - Archive artifact " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone);
                         artifactsToArchive.put(artifactPathInArchiveZone, artifactPathInWorkspace);
-                        if (fingerprintFiles) {
+                        if (!fingerprintFilesDisabled) {
                           String artifactDigest = artifactFilePath.digest();
                           artifactsToFingerPrint.put(artifactPathInArchiveZone, artifactDigest);
                         }
@@ -122,7 +124,7 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
 
         // ARCHIVE GENERATED MAVEN ARTIFACT
         // see org.jenkinsci.plugins.workflow.steps.ArtifactArchiverStepExecution#run
-        if (archiveFiles) {
+        if (!archiveFilesDisabled) {
           try {
               artifactManager.archive(workspace, launcher, new BuildListenerAdapter(listener), artifactsToArchive);
           } catch (IOException e) {
@@ -133,7 +135,7 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
         }
 
         // FINGERPRINT GENERATED MAVEN ARTIFACT
-        if (fingerprintFiles) {
+        if (!fingerprintFilesDisabled) {
           FingerprintMap fingerprintMap = Jenkins.get().getFingerprintMap();
           for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
               String artifactPathInArchiveZone = artifactToFingerprint.getKey();
@@ -172,21 +174,21 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
         }
     }
 
-    public boolean getFingerprintFiles() {
-        return fingerprintFiles;
+    public boolean isFingerprintFilesDisabled() {
+        return fingerprintFilesDisabled;
     }
 
     @DataBoundSetter
-    public void setFingerprintFiles(boolean fingerprintFiles) {
-        this.fingerprintFiles = fingerprintFiles;
+    public void setFingerprintFilesDisabled(boolean fingerprintFilesDisabled) {
+        this.fingerprintFilesDisabled = fingerprintFilesDisabled;
     }
 
-    public boolean getArchiveFiles() {
-        return archiveFiles;
+    public boolean isArchiveFilesDisabled() {
+        return archiveFilesDisabled;
     }
 
     @DataBoundSetter
-    public void setArchiveFiles(boolean archiveFiles) {
-        this.archiveFiles = archiveFiles;
+    public void setArchiveFilesDisabled(boolean archiveFilesDisabled) {
+        this.archiveFilesDisabled = archiveFilesDisabled;
     }
 }

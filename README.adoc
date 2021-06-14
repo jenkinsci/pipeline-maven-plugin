@@ -277,7 +277,9 @@ Except the Frontend one, all these plugins publish a `reportsDirectory` property
     </plugin>
 ```
 |https://plugins.jenkins.io/junit/[Jenkins JUnit Plugin]
-|`withMaven(options: [junitPublisher(disabled: true)],...)`
+|`withMaven(options: [junitPublisher(disabled: true)],...)` +
+Since 3.11.0 more fine granular options: +
+`withMaven(options: [junitPublisher(fingerprintFilesDisabled: true, archiveFilesDisabled: true)],...)`
 |`.skip-publish-junit-results`
 
 |Generated Findbugs reports
