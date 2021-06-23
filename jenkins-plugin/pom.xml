@@ -136,6 +136,14 @@
           <groupId>org.apache.maven</groupId>
           <artifactId>maven-embedder</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.protobuf</groupId>
+          <artifactId>protobuf-java</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -211,6 +219,11 @@
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials-binding</artifactId>
+      <version>1.26-rc457.6dc28f0f8735</version> <!-- TODO https://github.com/jenkinsci/credentials-binding-plugin/pull/139 -->
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>junit</artifactId>
       <scope>compile</scope>
       <optional>true</optional>
@@ -253,6 +266,10 @@
           <groupId>org.apache.maven.doxia</groupId>
           <artifactId>doxia-sink-api</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -272,6 +289,10 @@
         <exclusion>
           <groupId>org.jenkins-ci</groupId>
           <artifactId>SECURITY-144-compat</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -344,6 +365,12 @@
       <artifactId>docker-fixtures</artifactId>
       <version>1.10</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -390,8 +417,8 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.204.x</artifactId>
-        <version>18</version>
+        <artifactId>bom-2.235.x</artifactId>
+        <version>876.vc43b4c6423b6</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
