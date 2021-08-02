@@ -31,6 +31,7 @@ import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import hudson.Extension;
+import hudson.init.Terminator;
 import hudson.model.Result;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
@@ -582,6 +583,19 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
             return FormValidation.error(e, "Failed to test JDBC connection '" + jdbcUrl + "'");
         } catch (ClassNotFoundException e) {
             return FormValidation.error(e, "Failed to load JDBC driver '" + driverClass + "' for JDBC connection '" + jdbcUrl + "'");
+        }
+
+    }
+    
+    @Terminator
+    public void closeDatasource() {
+        PipelineMavenPluginDao dao = this.dao;
+        if (dao instanceof Closeable) {
+            try {
+                ((Closeable) dao).close();
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Exception shutting down the DAO", e);
+            }
         }
 
     }

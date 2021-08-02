@@ -29,6 +29,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,6 +40,9 @@ import java.util.logging.Level;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
+
+    private boolean requiredShutdown = false;
+
     public PipelineMavenPluginH2Dao(@Nonnull DataSource ds) {
         super(ds);
     }
@@ -46,6 +50,7 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
     public PipelineMavenPluginH2Dao(@Nonnull File rootDir) {
         this(JdbcConnectionPool.create("jdbc:h2:file:" + new File(rootDir, "jenkins-jobs").getAbsolutePath() + ";" +
                 "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE", "sa", "sa"));
+        requiredShutdown = true;
     }
 
     @Override
@@ -88,5 +93,19 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
             LOGGER.log(Level.INFO, "Exception counting rows", e);
             return false;
         }
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (requiredShutdown) {
+            try (Connection con = getDataSource().getConnection()) {
+                try (Statement stmt = con.createStatement()) {
+                    stmt.execute("SHUTDOWN");
+                }
+            } catch (SQLException e) {
+                LOGGER.log(Level.WARNING, "Failed to cleanly close the database", e);
+            }
+        }
+        super.close();
     }
 }
