@@ -41,8 +41,6 @@ import java.util.logging.Level;
  */
 public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
 
-    private boolean requiredShutdown = false;
-
     public PipelineMavenPluginH2Dao(@Nonnull DataSource ds) {
         super(ds);
     }
@@ -50,7 +48,6 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
     public PipelineMavenPluginH2Dao(@Nonnull File rootDir) {
         this(JdbcConnectionPool.create("jdbc:h2:file:" + new File(rootDir, "jenkins-jobs").getAbsolutePath() + ";" +
                 "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE", "sa", "sa"));
-        requiredShutdown = true;
     }
 
     @Override
@@ -97,14 +94,31 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
 
     @Override
     public void close() throws IOException {
-        if (requiredShutdown) {
+        LOGGER.log(Level.INFO, "Termination of the DAO Requested");
+        boolean requireShutdown = false;
+        try (Connection conn = getDataSource().getConnection()) {
+            String url = conn.getMetaData().getURL();
+            // if we are using a file based URL - so the DB needs to be closed.
+            requireShutdown = url.startsWith("jdbc:h2:file:");
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Failed to determin if the DB needs to be shutdown.", e);
+        }
+        if (requireShutdown) {
+            LOGGER.log(Level.FINE, "Termination of the DAO Requested and shutdown is required");
             try (Connection con = getDataSource().getConnection()) {
                 try (Statement stmt = con.createStatement()) {
                     stmt.execute("SHUTDOWN");
                 }
             } catch (SQLException e) {
-                LOGGER.log(Level.WARNING, "Failed to cleanly close the database", e);
+                if (e.getErrorCode() == 90121) { 
+                    // DATABASE_CALLED_AT_SHUTDOWN (the JVM shutdown hooks are running already :-o )
+                    LOGGER.log(Level.FINE, "Failed to close the database as it is already closed", e);
+                } else {
+                    LOGGER.log(Level.WARNING, "Failed to cleanly close the database", e);
+                }
             }
+        } else {
+            LOGGER.log(Level.FINE, "Termination of the DAO Requested not required, as requireShutdown is false");
         }
         super.close();
     }
