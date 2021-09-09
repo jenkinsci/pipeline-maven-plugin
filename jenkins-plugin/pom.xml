@@ -417,7 +417,7 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.235.x</artifactId>
+        <artifactId>bom-2.289.x</artifactId>
         <version>876.vc43b4c6423b6</version>
         <scope>import</scope>
         <type>pom</type>
