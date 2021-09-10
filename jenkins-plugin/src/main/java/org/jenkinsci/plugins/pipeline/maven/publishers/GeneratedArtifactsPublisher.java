@@ -1,5 +1,26 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.annotation.Nonnull;
+
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
+import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.w3c.dom.Element;
+
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -11,24 +32,6 @@ import hudson.tasks.Fingerprinter;
 import jenkins.model.ArtifactManager;
 import jenkins.model.Jenkins;
 import jenkins.util.BuildListenerAdapter;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
-import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
-import org.jenkinsci.plugins.workflow.steps.StepContext;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.w3c.dom.Element;
-
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -38,6 +41,11 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
     private static final Logger LOGGER = Logger.getLogger(GeneratedArtifactsPublisher.class.getName());
 
     private static final long serialVersionUID = 1L;
+
+    private boolean archiveFilesDisabled = false;
+
+    private boolean fingerprintFilesDisabled = false;
+
 
     @DataBoundConstructor
     public GeneratedArtifactsPublisher() {
@@ -96,8 +104,10 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                         // the subsequent call to digest could test the existence but we don't want to prematurely optimize performances
                         listener.getLogger().println("[withMaven] artifactsPublisher - Archive artifact " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone);
                         artifactsToArchive.put(artifactPathInArchiveZone, artifactPathInWorkspace);
-                        String artifactDigest = artifactFilePath.digest();
-                        artifactsToFingerPrint.put(artifactPathInArchiveZone, artifactDigest);
+                        if (!fingerprintFilesDisabled) {
+                          String artifactDigest = artifactFilePath.digest();
+                          artifactsToFingerPrint.put(artifactPathInArchiveZone, artifactDigest);
+                        }
                     } else {
                         listener.getLogger().println("[withMaven] artifactsPublisher - FAILURE to archive " + artifactPathInWorkspace + " under " + artifactPathInArchiveZone + ", file not found in workspace " + workspace);
                     }
@@ -114,28 +124,32 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
 
         // ARCHIVE GENERATED MAVEN ARTIFACT
         // see org.jenkinsci.plugins.workflow.steps.ArtifactArchiverStepExecution#run
-        try {
-            artifactManager.archive(workspace, launcher, new BuildListenerAdapter(listener), artifactsToArchive);
-        } catch (IOException e) {
-            throw new IOException("Exception archiving " + artifactsToArchive, e);
-        } catch (RuntimeException e) {
-            throw new RuntimeException("Exception archiving " + artifactsToArchive, e);
+        if (!archiveFilesDisabled) {
+          try {
+              artifactManager.archive(workspace, launcher, new BuildListenerAdapter(listener), artifactsToArchive);
+          } catch (IOException e) {
+              throw new IOException("Exception archiving " + artifactsToArchive, e);
+          } catch (RuntimeException e) {
+              throw new RuntimeException("Exception archiving " + artifactsToArchive, e);
+          }
         }
 
         // FINGERPRINT GENERATED MAVEN ARTIFACT
-        FingerprintMap fingerprintMap = Jenkins.get().getFingerprintMap();
-        for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
-            String artifactPathInArchiveZone = artifactToFingerprint.getKey();
-            String artifactMd5 = artifactToFingerprint.getValue();
-            fingerprintMap.getOrCreate(run, artifactPathInArchiveZone, artifactMd5).addFor(run);
-        }
+        if (!fingerprintFilesDisabled) {
+          FingerprintMap fingerprintMap = Jenkins.get().getFingerprintMap();
+          for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
+              String artifactPathInArchiveZone = artifactToFingerprint.getKey();
+              String artifactMd5 = artifactToFingerprint.getValue();
+              fingerprintMap.getOrCreate(run, artifactPathInArchiveZone, artifactMd5).addFor(run);
+          }
 
-        // add action
-        Fingerprinter.FingerprintAction fingerprintAction = run.getAction(Fingerprinter.FingerprintAction.class);
-        if (fingerprintAction == null) {
-            run.addAction(new Fingerprinter.FingerprintAction(run, artifactsToFingerPrint));
-        } else {
-            fingerprintAction.add(artifactsToFingerPrint);
+          // add action
+          Fingerprinter.FingerprintAction fingerprintAction = run.getAction(Fingerprinter.FingerprintAction.class);
+          if (fingerprintAction == null) {
+              run.addAction(new Fingerprinter.FingerprintAction(run, artifactsToFingerPrint));
+          } else {
+              fingerprintAction.add(artifactsToFingerPrint);
+          }
         }
     }
 
@@ -158,5 +172,23 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
         public String getSkipFileName() {
             return ".skip-archive-generated-artifacts";
         }
+    }
+
+    public boolean isFingerprintFilesDisabled() {
+        return fingerprintFilesDisabled;
+    }
+
+    @DataBoundSetter
+    public void setFingerprintFilesDisabled(boolean fingerprintFilesDisabled) {
+        this.fingerprintFilesDisabled = fingerprintFilesDisabled;
+    }
+
+    public boolean isArchiveFilesDisabled() {
+        return archiveFilesDisabled;
+    }
+
+    @DataBoundSetter
+    public void setArchiveFilesDisabled(boolean archiveFilesDisabled) {
+        this.archiveFilesDisabled = archiveFilesDisabled;
     }
 }

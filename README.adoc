@@ -333,6 +333,10 @@ Since v2.3.0
 
 |Generated Artifact
 |`withMaven(options: [artifactsPublisher(disabled: true)],...)`
+
+Since 3.11.0 more fine granular options: +
+`withMaven(options: [artifactsPublisher(fingerprintFilesDisabled: true, archiveFilesDisabled: true)],...)`
+
 |`.skip-archive-generated-artifacts`
 
 |Generated JUnit reports
