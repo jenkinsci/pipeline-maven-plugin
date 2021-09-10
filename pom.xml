@@ -84,7 +84,7 @@
     <properties>
         <revision>3.11.0</revision>
         <changelist>-SNAPSHOT</changelist>
-        <jenkins.version>2.235.5</jenkins.version>
+        <jenkins.version>2.277.1</jenkins.version>
         <java.level>8</java.level>
     </properties>
 
