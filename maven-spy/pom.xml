@@ -23,7 +23,7 @@
  ~ THE SOFTWARE.
  -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -34,6 +34,7 @@
 
     <artifactId>pipeline-maven-spy</artifactId>
     <packaging>jar</packaging>
+
     <name>Maven Spy for the Pipeline Maven Integration Plugin</name>
     <description>
         Maven Spy injected with "-Dmaven.ext.class.path" to generatesMaven execution reports that are consumed by the
@@ -100,6 +101,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
