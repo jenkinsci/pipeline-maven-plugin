@@ -31,6 +31,7 @@ import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import hudson.Extension;
+import hudson.init.Terminator;
 import hudson.model.Result;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
@@ -88,7 +89,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
     private final static Logger LOGGER = Logger.getLogger(GlobalPipelineMavenConfig.class.getName());
 
-    private transient PipelineMavenPluginDao dao;
+    private transient volatile PipelineMavenPluginDao dao;
 
     private transient PipelineTriggerService pipelineTriggerService;
 
@@ -240,12 +241,18 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
     @Nonnull
     public synchronized PipelineMavenPluginDao getDao() {
+        Jenkins j = Jenkins.getInstanceOrNull();
+        if (j == null) {
+            throw new IllegalStateException("Request to get DAO whilst Jenkins is shutting down or starting up");
+        } else if (j.isTerminating()) {
+            throw new IllegalStateException("Request to get DAO whilst Jenkins is terminating");
+        }
         if (dao == null) {
             try {
                 String jdbcUrl, jdbcUserName, jdbcPassword;
                 if (StringUtils.isBlank(this.jdbcUrl)) {
                     // default embedded H2 database
-                    File databaseRootDir = new File(Jenkins.get().getRootDir(), "jenkins-jobs");
+                    File databaseRootDir = new File(j.getRootDir(), "jenkins-jobs");
                     if (!databaseRootDir.exists()) {
                         boolean created = databaseRootDir.mkdirs();
                         if (!created) {
@@ -262,7 +269,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                         throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
 
                     UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
-                            CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.get(),
+                            CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, j,
                                     ACL.SYSTEM, Collections.EMPTY_LIST),
                             CredentialsMatchers.withId(this.jdbcCredentialsId));
                     if (jdbcCredentials == null) {
@@ -584,5 +591,17 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
             return FormValidation.error(e, "Failed to load JDBC driver '" + driverClass + "' for JDBC connection '" + jdbcUrl + "'");
         }
 
+    }
+    
+    @Terminator
+    public synchronized void closeDatasource() {
+        PipelineMavenPluginDao dao = this.dao;
+        if (dao instanceof Closeable) {
+            try {
+                ((Closeable) dao).close();
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Exception closing the DAO", e);
+            }
+        }
     }
 }
