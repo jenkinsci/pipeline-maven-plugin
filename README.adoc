@@ -258,6 +258,7 @@ Since v2.3.0
 
 |Generated JUnit reports
 |Publishing of the JUnit reports generated from the http://maven.apache.org/surefire/maven-surefire-plugin/[Surefire], https://maven.apache.org/surefire/maven-failsafe-plugin/[FailSafe], https://www.eclipse.org/tycho/[Tycho], https://github.com/karma-runner/maven-karma-plugin[Karma] or https://github.com/eirslett/frontend-maven-plugin[Frontend] plugins during the Maven build.
+Additionally, if https://plugins.jenkins.io/junit-attachments/[JUnit Attachments] or https://plugins.jenkins.io/flaky-test-handler/[Flaky Test Handler] are installed, JUnits reports will be processed by these plugins.
 Except the Frontend one, all these plugins publish a `reportsDirectory` property which can be used to find and import JUnit compatible reports. The Frontend plugin has another behaviour, so for detection to work, you have to set a `REPORTS_DIRECTORY` environment variable to the plugin (and reuse it in your Karma configuration, to be consistent) :
 ```
    <plugin>
