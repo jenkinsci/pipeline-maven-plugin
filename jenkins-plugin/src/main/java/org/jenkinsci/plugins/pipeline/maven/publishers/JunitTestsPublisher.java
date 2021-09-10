@@ -56,7 +56,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -291,26 +290,48 @@ public class JunitTestsPublisher extends MavenPublisher {
         // even if "org.apache.maven.plugins:maven-surefire-plugin@test" succeeds, it maybe with "-DskipTests" and thus not have any test results.
         archiver.setAllowEmptyResults(true);
 
+        List<TestDataPublisher> testDataPublishers = new ArrayList<>();
+
         if (Boolean.TRUE.equals(this.ignoreAttachments)) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger().println("[withMaven] junitPublisher - Ignore junit test attachments");
             }
         } else {
-            String className = "hudson.plugins.junitattachments.AttachmentPublisher";
+            String attachmentsPublisherClassName = "hudson.plugins.junitattachments.AttachmentPublisher";
             try {
-                TestDataPublisher attachmentPublisher =  (TestDataPublisher) Class.forName(className).newInstance();
+                TestDataPublisher attachmentPublisher =  (TestDataPublisher) Class.forName(attachmentsPublisherClassName).newInstance();
                 if (LOGGER.isLoggable(Level.FINE)) {
                     listener.getLogger().println("[withMaven] junitPublisher - Publish junit test attachments...");
                 }
-                archiver.setTestDataPublishers(Collections.singletonList(attachmentPublisher));
+                testDataPublishers.add(attachmentPublisher);
             } catch(ClassNotFoundException e){
                 listener.getLogger().print("[withMaven] junitPublisher - Jenkins ");
-                listener.hyperlink("https://wiki.jenkins-ci.org/display/JENKINS/JUnit+Attachments+Plugin", "JUnit Attachments Plugin");
-                listener.getLogger().print(" not found, can't publish test attachments.");
+                listener.hyperlink("https://plugins.jenkins.io/junit-attachments", "JUnit Attachments Plugin");
+                listener.getLogger().println(" not found, can't publish test attachments.");
             } catch (IllegalAccessException|InstantiationException e) {
-                PrintWriter err = listener.error("[withMaven] junitPublisher - Failure to publish test attachments, exception instantiating '" + className + "'");
+                PrintWriter err = listener.error("[withMaven] junitPublisher - Failure to publish test attachments, exception instantiating '" + attachmentsPublisherClassName + "'");
                 e.printStackTrace(err);
             }
+        }
+
+        String flakyTestDataPublisherClassName = "com.google.jenkins.flakyTestHandler.plugin.JUnitFlakyTestDataPublisher";
+        try {
+            TestDataPublisher flakyTestPublisher =  (TestDataPublisher) Class.forName(flakyTestDataPublisherClassName).newInstance();
+            if (LOGGER.isLoggable(Level.FINE)) {
+                listener.getLogger().println("[withMaven] junitPublisher - Publish JUnit flaky tests reports...");
+            }
+            testDataPublishers.add(flakyTestPublisher);
+        } catch(ClassNotFoundException e){
+            listener.getLogger().print("[withMaven] junitPublisher - Jenkins ");
+            listener.hyperlink("https://plugins.jenkins.io/flaky-test-handler", "JUnit Flaky Test Handler Plugin");
+            listener.getLogger().println(" not found, can't publish JUnit flaky tests reports.");
+        } catch (IllegalAccessException|InstantiationException e) {
+            PrintWriter err = listener.error("[withMaven] junitPublisher - Failure to publish flaky test reports, exception instantiating '" + flakyTestDataPublisherClassName + "'");
+            e.printStackTrace(err);
+        }
+
+        if (!testDataPublishers.isEmpty()) {
+            archiver.setTestDataPublishers(testDataPublishers);
         }
 
         try {
