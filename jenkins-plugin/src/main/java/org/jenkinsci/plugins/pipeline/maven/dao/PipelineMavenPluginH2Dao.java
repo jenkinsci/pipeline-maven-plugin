@@ -29,6 +29,7 @@ import org.h2.jdbcx.JdbcConnectionPool;
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -39,6 +40,7 @@ import java.util.logging.Level;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
+
     public PipelineMavenPluginH2Dao(@Nonnull DataSource ds) {
         super(ds);
     }
@@ -88,5 +90,36 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
             LOGGER.log(Level.INFO, "Exception counting rows", e);
             return false;
         }
+    }
+
+    @Override
+    public void close() throws IOException {
+        LOGGER.log(Level.INFO, "Termination of the DAO Requested");
+        boolean requireShutdown = false;
+        try (Connection conn = getDataSource().getConnection()) {
+            String url = conn.getMetaData().getURL();
+            // if we are using a file based URL - so the DB needs to be closed.
+            requireShutdown = url.startsWith("jdbc:h2:file:");
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Failed to determin if the DB needs to be shutdown.", e);
+        }
+        if (requireShutdown) {
+            LOGGER.log(Level.FINE, "Termination of the DAO Requested and shutdown is required");
+            try (Connection con = getDataSource().getConnection()) {
+                try (Statement stmt = con.createStatement()) {
+                    stmt.execute("SHUTDOWN");
+                }
+            } catch (SQLException e) {
+                if (e.getErrorCode() == 90121) { 
+                    // DATABASE_CALLED_AT_SHUTDOWN (the JVM shutdown hooks are running already :-o )
+                    LOGGER.log(Level.FINE, "Failed to close the database as it is already closed", e);
+                } else {
+                    LOGGER.log(Level.WARNING, "Failed to cleanly close the database", e);
+                }
+            }
+        } else {
+            LOGGER.log(Level.FINE, "Termination of the DAO Requested not required, as requireShutdown is false");
+        }
+        super.close();
     }
 }
