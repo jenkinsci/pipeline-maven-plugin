@@ -564,8 +564,12 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                             }
                         }
                         switch (metaData.getDatabaseMajorVersion()) {
+                            case 13:
+                            case 12:
                             case 11:
                             case 10:
+                            case 9:
+                            case 8:
                                 // OK
                                 break;
                             default:
