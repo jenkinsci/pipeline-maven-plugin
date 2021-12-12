@@ -59,10 +59,10 @@ public class WithMavenStepGlobalToolTest extends AbstractIntegrationTest {
     private static final String SSH_CREDENTIALS_ID = "test";
     private static final String AGENT_NAME = "remote";
     private static final String MAVEN_GLOBAL_TOOL_NAME = "maven";
-    private static final String MAVEN_HOME_BASE_PATH = "/home/test/slave";
+    private static final String SLAVE_BASE_PATH = "/home/test/slave";
 
     @Rule
-    public DockerRule<NonMavenJavaContainer> slaveRule = new DockerRule<>(NonMavenJavaContainer.class);
+    public DockerRule<NonMavenJavaContainer> nonMavenJavaContainerRule = new DockerRule<>(NonMavenJavaContainer.class);
 
     @Before
     public void setup() throws Exception {
@@ -74,7 +74,7 @@ public class WithMavenStepGlobalToolTest extends AbstractIntegrationTest {
 
     @Test
     public void testMavenNotInstalledInDockerImage() throws Exception {
-        assertThat(slaveRule.get().popen(new CommandBuilder("mvn", "--version")).asText(), containsString("sh: 1: mvn: not found"));
+        assertThat(nonMavenJavaContainerRule.get().popen(new CommandBuilder("mvn", "--version")).asText(), containsString("sh: 1: mvn: not found"));
     }
 
     @Test
@@ -116,11 +116,11 @@ public class WithMavenStepGlobalToolTest extends AbstractIntegrationTest {
 
         WorkflowRun run = jenkinsRule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0));
         jenkinsRule.assertLogContains("Apache Maven " + getLatestMavenVersion(), run);
-        jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=" + MAVEN_HOME_BASE_PATH, run);
+        jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=" + SLAVE_BASE_PATH, run);
     }
 
     private void registerNonMavenAgent() throws Exception {
-        SshdContainer slaveContainer = slaveRule.get();
+        SshdContainer slaveContainer = nonMavenJavaContainerRule.get();
         addTestSshCredentials();
         registerAgentForSlaveContainer(slaveContainer);
     }
@@ -136,7 +136,7 @@ public class WithMavenStepGlobalToolTest extends AbstractIntegrationTest {
     private void registerAgentForSlaveContainer(SshdContainer slaveContainer) throws Exception {
         SSHLauncher sshLauncher = new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), SSH_CREDENTIALS_ID);
 
-        DumbSlave agent = new DumbSlave(AGENT_NAME, MAVEN_HOME_BASE_PATH, sshLauncher);
+        DumbSlave agent = new DumbSlave(AGENT_NAME, SLAVE_BASE_PATH, sshLauncher);
         agent.setNumExecutors(1);
         agent.setRetentionStrategy(RetentionStrategy.INSTANCE);
 
