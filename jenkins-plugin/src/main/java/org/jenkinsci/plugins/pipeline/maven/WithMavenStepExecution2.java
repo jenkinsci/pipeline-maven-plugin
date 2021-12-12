@@ -481,11 +481,10 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         } else {
             // if not on docker we can use the computer environment
             LOGGER.fine("Using computer environment...");
-            EnvVars agentEnv = getComputer().getEnvironment();
-            LOGGER.log(Level.FINE, "Agent env: {0}", agentEnv);
-            String mavenHome = agentEnv.get(MAVEN_HOME);
+            LOGGER.log(Level.FINE, "Agent env: {0}", env);
+            String mavenHome = env.get(MAVEN_HOME);
             if (mavenHome == null) {
-                mavenHome = agentEnv.get(M2_HOME);
+                mavenHome = env.get(M2_HOME);
                 if (StringUtils.isNotEmpty(mavenHome)) {
                     consoleMessage.append(" with the environment variable M2_HOME=").append(mavenHome);
                 }
