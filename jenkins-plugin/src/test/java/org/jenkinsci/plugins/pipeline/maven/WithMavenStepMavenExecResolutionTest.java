@@ -36,6 +36,8 @@ import hudson.slaves.RetentionStrategy;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
 import hudson.tools.InstallSourceProperty;
+import org.jenkinsci.plugins.pipeline.maven.docker.JavaGitContainer;
+import org.jenkinsci.plugins.pipeline.maven.docker.MavenWithMavenHomeJavaContainer;
 import org.jenkinsci.plugins.pipeline.maven.docker.NonMavenJavaContainer;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -43,7 +45,6 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.test.acceptance.docker.DockerRule;
 import org.jenkinsci.test.acceptance.docker.fixtures.SshdContainer;
 import org.jenkinsci.utils.process.CommandBuilder;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -54,7 +55,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @Issue("JENKINS-43651")
-public class WithMavenStepGlobalToolTest extends AbstractIntegrationTest {
+public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTest {
 
     private static final String SSH_CREDENTIALS_ID = "test";
     private static final String AGENT_NAME = "remote";
@@ -62,24 +63,25 @@ public class WithMavenStepGlobalToolTest extends AbstractIntegrationTest {
     private static final String SLAVE_BASE_PATH = "/home/test/slave";
 
     @Rule
-    public DockerRule<NonMavenJavaContainer> nonMavenJavaContainerRule = new DockerRule<>(NonMavenJavaContainer.class);
+    public DockerRule<NonMavenJavaContainer> nonMavenContainerRule = new DockerRule<>(NonMavenJavaContainer.class);
 
-    @Before
-    public void setup() throws Exception {
-        super.setup();
+    @Rule
+    public DockerRule<JavaGitContainer> mavenWithoutMavenHomeContainerRule = new DockerRule<>(JavaGitContainer.class);
 
-        registerNonMavenAgent();
-        registerLatestMavenVersionAsGlobalTool();
-    }
+    @Rule
+    public DockerRule<MavenWithMavenHomeJavaContainer> mavenWithMavenHomeContainerRule = new DockerRule<>(MavenWithMavenHomeJavaContainer.class);
 
     @Test
     public void testMavenNotInstalledInDockerImage() throws Exception {
-        assertThat(nonMavenJavaContainerRule.get().popen(new CommandBuilder("mvn", "--version")).asText(), containsString("sh: 1: mvn: not found"));
+        assertThat(nonMavenContainerRule.get().popen(new CommandBuilder("mvn", "--version")).asText(), containsString("sh: 1: mvn: not found"));
     }
 
     @Test
     public void testMavenGlobalToolRecognizedInScriptedPipeline() throws Exception {
-        assertMavenGlobalToolRecognized("" +
+        registerAgentForContainer(nonMavenContainerRule.get());
+        String version = registerLatestMavenVersionAsGlobalTool();
+
+        WorkflowRun run = runPipeline("" +
                 "node('" + AGENT_NAME + "') {\n" +
                 "  def mavenHome = tool '" + MAVEN_GLOBAL_TOOL_NAME + "'\n" +
                 "  withEnv([\"MAVEN_HOME=${mavenHome}\"]) {\n" +
@@ -88,11 +90,17 @@ public class WithMavenStepGlobalToolTest extends AbstractIntegrationTest {
                 "    }\n" +
                 "  }\n" +
                 "}");
+
+        jenkinsRule.assertLogContains("Apache Maven " + version, run);
+        jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/home/test/slave", run);
     }
 
     @Test
     public void testMavenGlobalToolRecognizedInDeclarativePipeline() throws Exception {
-        assertMavenGlobalToolRecognized("" +
+        registerAgentForContainer(nonMavenContainerRule.get());
+        String version = registerLatestMavenVersionAsGlobalTool();
+
+        WorkflowRun run = runPipeline("" +
                 "pipeline {\n" +
                 "  agent { label '" + AGENT_NAME + "' }\n" +
                 "  tools {\n" +
@@ -108,19 +116,50 @@ public class WithMavenStepGlobalToolTest extends AbstractIntegrationTest {
                 "    }\n" +
                 "  }\n" +
                 "}");
+
+        jenkinsRule.assertLogContains("Apache Maven " + version, run);
+        jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/home/test/slave", run);
     }
 
-    private void assertMavenGlobalToolRecognized(String pipelineScript) throws Exception {
+    @Test
+    public void testPreInstalledMavenRecognizedWithoutMavenHome() throws Exception {
+        registerAgentForContainer(mavenWithoutMavenHomeContainerRule.get());
+
+        WorkflowRun run = runPipeline("" +
+                "node('" + AGENT_NAME + "') {\n" +
+                "  withMaven() {\n" +
+                "    sh \"mvn --version\"\n" +
+                "  }\n" +
+                "}");
+
+        jenkinsRule.assertLogContains("Apache Maven 3.6.0", run);
+        jenkinsRule.assertLogContains("using Maven installation provided by the build agent with executable /usr/bin/mvn", run);
+    }
+
+    @Test
+    public void testPreInstalledMavenRecognizedWithMavenHome() throws Exception {
+        registerAgentForContainer(mavenWithMavenHomeContainerRule.get());
+
+        WorkflowRun run = runPipeline("" +
+                "node('" + AGENT_NAME + "') {\n" +
+                "  sh 'echo $MAVEN_HOME'\n" +
+                "  withMaven() {\n" +
+                "    sh \"mvn --version\"\n" +
+                "  }\n" +
+                "}");
+
+        jenkinsRule.assertLogContains("Apache Maven 3.6.0", run);
+        jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/usr/share/maven", run);
+    }
+
+    private WorkflowRun runPipeline(String pipelineScript) throws Exception {
         WorkflowJob p = jenkinsRule.createProject(WorkflowJob.class, "project");
         p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
 
-        WorkflowRun run = jenkinsRule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0));
-        jenkinsRule.assertLogContains("Apache Maven " + getLatestMavenVersion(), run);
-        jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=" + SLAVE_BASE_PATH, run);
+        return jenkinsRule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0));
     }
 
-    private void registerNonMavenAgent() throws Exception {
-        SshdContainer slaveContainer = nonMavenJavaContainerRule.get();
+    private void registerAgentForContainer(SshdContainer slaveContainer) throws Exception {
         addTestSshCredentials();
         registerAgentForSlaveContainer(slaveContainer);
     }
@@ -143,11 +182,13 @@ public class WithMavenStepGlobalToolTest extends AbstractIntegrationTest {
         jenkinsRule.jenkins.addNode(agent);
     }
 
-    private void registerLatestMavenVersionAsGlobalTool() throws Exception {
+    private String registerLatestMavenVersionAsGlobalTool() throws Exception {
         updateAvailableMavenVersions();
         String latestMavenVersion = getLatestMavenVersion();
 
         registerMavenVersionAsGlobalTool(latestMavenVersion);
+
+        return latestMavenVersion;
     }
 
     private void updateAvailableMavenVersions() throws Exception {

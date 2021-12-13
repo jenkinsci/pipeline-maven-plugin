@@ -37,7 +37,6 @@ import hudson.slaves.RetentionStrategy;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.docker.JavaGitContainer;
-import org.jenkinsci.plugins.pipeline.maven.docker.MavenWithMavenHomeJavaContainer;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -59,13 +58,9 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     private static final String AGENT_NAME = "remote";
     private static final String SLAVE_BASE_PATH = "/home/test/slave";
     private static final String COMMONS_LANG3_FINGERPRINT = "780b5a8b72eebe6d0dbff1c11b5658fa";
-    private static final String MAVEN_VERSION_INFO = "Apache Maven 3.6.0";
 
     @Rule
     public DockerRule<JavaGitContainer> javaGitContainerRule = new DockerRule<>(JavaGitContainer.class);
-
-    @Rule
-    public DockerRule<MavenWithMavenHomeJavaContainer> mavenWithMavenHomeJavaContainerRule = new DockerRule<>(MavenWithMavenHomeJavaContainer.class);
 
     @Issue("SECURITY-441")
     @Test
@@ -100,35 +95,6 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
                 "}");
 
         assertFingerprintDoesNotExist(COMMONS_LANG3_FINGERPRINT);
-    }
-
-    @Test
-    public void testPreInstalledMavenRecognizedWithoutMavenHome() throws Exception {
-        registerAgentForContainer(javaGitContainerRule.get());
-        WorkflowRun run = runPipeline(Result.SUCCESS, "" +
-                "node('" + AGENT_NAME + "') {\n" +
-                "  withMaven() {\n" +
-                "    sh \"mvn --version\"\n" +
-                "  }\n" +
-                "}");
-
-        jenkinsRule.assertLogContains(MAVEN_VERSION_INFO, run);
-        jenkinsRule.assertLogContains("using Maven installation provided by the build agent with executable /usr/bin/mvn", run);
-    }
-
-    @Test
-    public void testPreInstalledMavenRecognizedWithMavenHome() throws Exception {
-        registerAgentForContainer(mavenWithMavenHomeJavaContainerRule.get());
-        WorkflowRun run = runPipeline(Result.SUCCESS, "" +
-                "node('" + AGENT_NAME + "') {\n" +
-                "  sh 'echo $MAVEN_HOME'\n" +
-                "  withMaven() {\n" +
-                "    sh \"mvn --version\"\n" +
-                "  }\n" +
-                "}");
-
-        jenkinsRule.assertLogContains(MAVEN_VERSION_INFO, run);
-        jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/usr/share/maven", run);
     }
 
     private WorkflowRun runPipeline(Result expectedResult, String pipelineScript) throws Exception {
