@@ -23,6 +23,7 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
+import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.Domain;
@@ -40,7 +41,7 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.test.acceptance.docker.DockerRule;
-import org.junit.Before;
+import org.jenkinsci.test.acceptance.docker.fixtures.SshdContainer;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
@@ -53,55 +54,83 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class WithMavenStepTest extends AbstractIntegrationTest {
 
+    private static final String SSH_CREDENTIALS_ID = "test";
+    private static final String AGENT_NAME = "remote";
+    private static final String SLAVE_BASE_PATH = "/home/test/slave";
+    private static final String COMMONS_LANG3_FINGERPRINT = "780b5a8b72eebe6d0dbff1c11b5658fa";
+
     @Rule
-    public DockerRule<JavaGitContainer> slaveRule = new DockerRule<>(JavaGitContainer.class);
-
-    @Before
-    public void setup() throws Exception {
-        super.setup();
-
-        JavaGitContainer slaveContainer = slaveRule.get();
-
-        SystemCredentialsProvider.getInstance().getDomainCredentialsMap()
-                .put(Domain.global(), Collections.singletonList(new UsernamePasswordCredentialsImpl(
-                        CredentialsScope.GLOBAL, "test", null, "test", "test")));
-        DumbSlave agent = new DumbSlave("remote","/home/test/slave",new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), "test"));
-        agent.setNumExecutors(1);
-        agent.setRetentionStrategy(RetentionStrategy.INSTANCE);
-        jenkinsRule.jenkins.addNode(agent);
-    }
+    public DockerRule<JavaGitContainer> javaGitContainerRule = new DockerRule<>(JavaGitContainer.class);
 
     @Issue("SECURITY-441")
     @Test
-    public void maven_build_on_remote_agent_with_settings_file_on_master_fails() throws Exception {
+    public void testMavenBuildOnRemoteAgentWithSettingsFileOnMasterFails() throws Exception {
+        registerAgentForContainer(javaGitContainerRule.get());
+
         File onMaster = new File(jenkinsRule.jenkins.getRootDir(), "onmaster");
         String secret = "secret content on master";
         FileUtils.writeStringToFile(onMaster, secret, StandardCharsets.UTF_8);
-        String pipelineScript = "node('remote') {withMaven(mavenSettingsFilePath: '" + onMaster + "') {echo readFile(MVN_SETTINGS)}}";
 
-        WorkflowJob p = jenkinsRule.createProject(WorkflowJob.class, "p");
-        p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-        WorkflowRun b = jenkinsRule.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0));
-        jenkinsRule.assertLogNotContains(secret, b);
+        WorkflowRun run = runPipeline(Result.FAILURE, "" +
+                "node('remote') {\n" +
+                "  withMaven(mavenSettingsFilePath: '" + onMaster + "') {\n" +
+                "    echo readFile(MVN_SETTINGS)\n" +
+                "  }\n" +
+                "}");
+
+        jenkinsRule.assertLogNotContains(secret, run);
     }
 
     @Test
-    public void disable_all_publishers() throws Exception {
+    public void testDisableAllPublishers() throws Exception {
+        registerAgentForContainer(javaGitContainerRule.get());
+        loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
 
-        loadMonoDependencyMavenProjectInGitRepo( this.gitRepoRule );
+        runPipeline(Result.SUCCESS, "" +
+                "node('master') {\n" +
+                "  git($/" + gitRepoRule.toString() + "/$)\n" +
+                "  withMaven(publisherStrategy: 'EXPLICIT') {\n" +
+                "    sh 'mvn package'\n" +
+                "  }\n" +
+                "}");
 
-        String pipelineScript = "node('master') {\n" + "    git($/" + gitRepoRule.toString() + "/$)\n"
-                + "    withMaven(publisherStrategy: 'EXPLICIT') {\n"
-                + "        sh 'mvn package'\n"
-                + "    }\n"
-                + "}";
-
-        String commonsLang3version35Md5 = "780b5a8b72eebe6d0dbff1c11b5658fa";
-        WorkflowJob firstPipeline = jenkinsRule.createProject(WorkflowJob.class, "disable-all-publishers");
-        firstPipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-        jenkinsRule.assertBuildStatus(Result.SUCCESS, firstPipeline.scheduleBuild2(0));
-        FingerprintMap fingerprintMap = jenkinsRule.jenkins.getFingerprintMap();
-        Fingerprint fingerprint = fingerprintMap.get(commonsLang3version35Md5);
-        assertThat( fingerprint, Matchers.nullValue() );
+        assertFingerprintDoesNotExist(COMMONS_LANG3_FINGERPRINT);
     }
+
+    private WorkflowRun runPipeline(Result expectedResult, String pipelineScript) throws Exception {
+        WorkflowJob p = jenkinsRule.createProject(WorkflowJob.class, "project");
+        p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+
+        return jenkinsRule.assertBuildStatus(expectedResult, p.scheduleBuild2(0));
+    }
+
+    private void assertFingerprintDoesNotExist(String fingerprintAsString) throws Exception {
+        FingerprintMap fingerprintMap = jenkinsRule.jenkins.getFingerprintMap();
+        Fingerprint fingerprint = fingerprintMap.get(fingerprintAsString);
+        assertThat(fingerprint, Matchers.nullValue());
+    }
+
+    private void registerAgentForContainer(SshdContainer container) throws Exception {
+        addTestSshCredentials();
+        registerAgentForSlaveContainer(container);
+    }
+
+    private void addTestSshCredentials() {
+        Credentials credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, SSH_CREDENTIALS_ID, null, "test", "test");
+
+        SystemCredentialsProvider.getInstance()
+                .getDomainCredentialsMap()
+                .put(Domain.global(), Collections.singletonList(credentials));
+    }
+
+    private void registerAgentForSlaveContainer(SshdContainer slaveContainer) throws Exception {
+        SSHLauncher sshLauncher = new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), SSH_CREDENTIALS_ID);
+
+        DumbSlave agent = new DumbSlave(AGENT_NAME, SLAVE_BASE_PATH, sshLauncher);
+        agent.setNumExecutors(1);
+        agent.setRetentionStrategy(RetentionStrategy.INSTANCE);
+
+        jenkinsRule.jenkins.addNode(agent);
+    }
+
 }
