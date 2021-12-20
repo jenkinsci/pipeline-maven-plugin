@@ -617,42 +617,30 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.updateBuildOnCompletion("my-downstream-pipeline-3", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-4", 1);
-        dao.recordDependency("my-downstream-pipeline-4", 1, "com.mycompany", "upstream-1", "1.0-SNAPSHOT", "whatever", "compile", false, "aClassifier");
+        dao.recordDependency("my-downstream-pipeline-4", 1, "com.mycompany", "upstream-1", "1.0-SNAPSHOT", "anotherType", "compile", false, "aClassifier");
         dao.updateBuildOnCompletion("my-downstream-pipeline-4", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
 
-        {
-            MavenArtifact expectedMavenArtifact = new MavenArtifact();
-            expectedMavenArtifact.setGroupId("com.mycompany");
-            expectedMavenArtifact.setArtifactId("upstream-1");
-            expectedMavenArtifact.setVersion("1.0-SNAPSHOT");
-            expectedMavenArtifact.setBaseVersion("1.0-SNAPSHOT");
-            expectedMavenArtifact.setExtension("jar");
+        Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 1);
+        System.out.println(downstreamJobsByArtifactForBuild1);
 
-            Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactForBuild1 = dao.listDownstreamJobsByArtifact("my-upstream-pipeline-1", 1);
-            System.out.println(downstreamJobsByArtifactForBuild1);
+        assertThat(downstreamJobsByArtifactForBuild1.size(), is(2));
 
-            assertThat(downstreamJobsByArtifactForBuild1.size(), is(4));
+        MavenArtifact expectedMavenArtifact = new MavenArtifact();
+        expectedMavenArtifact.setGroupId("com.mycompany");
+        expectedMavenArtifact.setArtifactId("upstream-1");
+        expectedMavenArtifact.setVersion("1.0-SNAPSHOT");
+        expectedMavenArtifact.setBaseVersion("1.0-SNAPSHOT");
+        expectedMavenArtifact.setExtension("jar");
 
-            expectedMavenArtifact.setType("aType");
-            expectedMavenArtifact.setClassifier(null);
-            SortedSet<String> actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
-            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+        expectedMavenArtifact.setType("aType");
+        expectedMavenArtifact.setClassifier(null);
+        SortedSet<String> actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
+        assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
 
-            expectedMavenArtifact.setType("aType");
-            expectedMavenArtifact.setClassifier("whatever");
-            actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
-            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-2"));
-
-            expectedMavenArtifact.setType("whatever");
-            expectedMavenArtifact.setClassifier(null);
-            actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
-            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-3"));
-
-            expectedMavenArtifact.setType("whatever");
-            expectedMavenArtifact.setClassifier("aClassifier");
-            actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
-            assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-4"));
-        }
+        expectedMavenArtifact.setType("anotherType");
+        expectedMavenArtifact.setClassifier("aClassifier");
+        actualJobs = downstreamJobsByArtifactForBuild1.get(expectedMavenArtifact);
+        assertThat(actualJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-4"));
     }
 
     @Test
@@ -713,7 +701,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "dependency-1", "1.0-SNAPSHOT", "jar", "compile", false, null);
         dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 2222, 22);
 
-        SortedSet<String> downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-20180318.225603-3", "1.0-SNAPSHOT",  "jar");
+        SortedSet<String> downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-20180318.225603-3", "1.0-SNAPSHOT", "jar");
         System.out.println(downstreamJobs);
         assertThat(downstreamJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1", "my-downstream-pipeline-2"));
     }
@@ -728,18 +716,18 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "dependency-1", "1.0-SNAPSHOT", "anotherType", "compile", false, "aClassifier");
         dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 2222, 22);
 
-        SortedSet<String> downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-20180318.225603-3", "1.0-SNAPSHOT",  "aType");
+        SortedSet<String> downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-20180318.225603-3", "1.0-SNAPSHOT", "aType");
         System.out.println(downstreamJobs);
         assertThat(downstreamJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
 
-        downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-20180318.225603-3", "1.0-SNAPSHOT",  "aType", "whatever");
-        assertThat(downstreamJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+        downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-20180318.225603-3", "1.0-SNAPSHOT", "aType", "whatever");
+        assertThat(downstreamJobs, Matchers.empty());
 
-        downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-20180318.225603-3", "1.0-SNAPSHOT",  "whatever");
-        assertThat(downstreamJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
+        downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-20180318.225603-3", "1.0-SNAPSHOT", "whatever");
+        assertThat(downstreamJobs, Matchers.empty());
 
-        downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-20180318.225603-3", "1.0-SNAPSHOT",  "whatever", "aClassifier");
-        assertThat(downstreamJobs, Matchers.containsInAnyOrder("my-downstream-pipeline-1", "my-downstream-pipeline-2"));
+        downstreamJobs = dao.listDownstreamJobs("com.mycompany", "dependency-1", "1.0-20180318.225603-3", "1.0-SNAPSHOT", "whatever", "aClassifier");
+        assertThat(downstreamJobs, Matchers.empty());
     }
 
     @Deprecated
@@ -747,7 +735,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
     public void listDownstreamJobs_upstream_pom_triggers_downstream_pipelines() {
 
         dao.getOrCreateBuildPrimaryKey("my-upstream-pom-pipeline-1", 1);
-        dao.recordGeneratedArtifact("my-upstream-pom-pipeline-1", 1, "com.mycompany.pom", "parent-pom", "1.0-SNAPSHOT","pom", "1.0-SNAPSHOT", null, false, "pom", null);
+        dao.recordGeneratedArtifact("my-upstream-pom-pipeline-1", 1, "com.mycompany.pom", "parent-pom", "1.0-SNAPSHOT", "pom", "1.0-SNAPSHOT", null, false, "pom", null);
         dao.updateBuildOnCompletion("my-upstream-pom-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 2);
@@ -767,7 +755,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
     public void listDownstreamJobsbyArtifact_upstream_pom_triggers_downstream_pipelines() {
 
         dao.getOrCreateBuildPrimaryKey("my-upstream-pom-pipeline-1", 1);
-        dao.recordGeneratedArtifact("my-upstream-pom-pipeline-1", 1, "com.mycompany.pom", "parent-pom", "1.0-SNAPSHOT","pom", "1.0-SNAPSHOT", null, false, "pom", null);
+        dao.recordGeneratedArtifact("my-upstream-pom-pipeline-1", 1, "com.mycompany.pom", "parent-pom", "1.0-SNAPSHOT", "pom", "1.0-SNAPSHOT", null, false, "pom", null);
         dao.updateBuildOnCompletion("my-upstream-pom-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 1111, 5);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 2);
@@ -1007,16 +995,16 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-20170808.155524-63", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "service", "1.0-20170808.155524-64", "war", "1.0-SNAPSHOT", null, false, "war", null);
-        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
         dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
-        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-70, 22);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 70, 22);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 1);
         dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
-        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-50, 22);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 50, 22);
 
 
         List<String> downstreamPipelinesForBuild1 = dao.listDownstreamJobs("my-upstream-pipeline-1", 1);
@@ -1026,15 +1014,15 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 2);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "core", "1.1-20170808.155524-65", "jar", "1.1-SNAPSHOT", null, false, "jar", null);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "service", "1.1-20170808.155524-66", "war", "1.1-SNAPSHOT", null, false, "war", null);
-        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis()-20, 9);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 20, 9);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 2);
         dao.recordDependency("my-downstream-pipeline-1", 2, "com.mycompany", "core", "1.1-SNAPSHOT", "jar", "compile", false, null);
-        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis()-20, 9);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 20, 9);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 2);
         dao.recordDependency("my-downstream-pipeline-2", 2, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
-        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 2, Result.SUCCESS.ordinal, System.currentTimeMillis()-20, 9);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 20, 9);
 
         List<String> downstreamPipelinesForBuild2 = dao.listDownstreamJobs("my-upstream-pipeline-1", 2);
         assertThat(downstreamPipelinesForBuild2, Matchers.containsInAnyOrder("my-downstream-pipeline-1"));
@@ -1046,15 +1034,15 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-20170808.155524-63", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "service", "1.0-20170808.155524-64", "war", "1.0-SNAPSHOT", null, false, "war", null);
-        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
         dao.recordDependency("my-downstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
-        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-70, 22);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 70, 22);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 1);
         dao.recordDependency("my-downstream-pipeline-2", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
-        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-50, 22);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 50, 22);
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
@@ -1076,15 +1064,15 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 2);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "core", "1.1-20170808.155524-65", "jar", "1.1-SNAPSHOT", null, false, "jar", null);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "service", "1.1-20170808.155524-66", "war", "1.1-SNAPSHOT", null, false, "war", null);
-        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis()-20, 9);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 20, 9);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 2);
         dao.recordDependency("my-downstream-pipeline-1", 2, "com.mycompany", "core", "1.1-SNAPSHOT", "jar", "compile", false, null);
-        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis()-20, 9);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 20, 9);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 2);
         dao.recordDependency("my-downstream-pipeline-2", 2, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
-        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 2, Result.SUCCESS.ordinal, System.currentTimeMillis()-20, 9);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 20, 9);
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
@@ -1111,7 +1099,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
 
         dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-20170808.155524-63", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         List<MavenArtifact> generatedArtifacts = dao.getGeneratedArtifacts("my-upstream-pipeline-1", 1);
         System.out.println("GeneratedArtifacts " + generatedArtifacts.stream().map(mavenArtifact -> mavenArtifact.getId() + ", version: " + mavenArtifact.getVersion() + ", baseVersion: " + mavenArtifact.getBaseVersion()).collect(Collectors.joining(", ")));
@@ -1129,7 +1117,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
 
         dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         List<MavenArtifact> generatedArtifacts = dao.getGeneratedArtifacts("my-upstream-pipeline-1", 1);
         System.out.println("GeneratedArtifacts " + generatedArtifacts.stream().map(mavenArtifact -> mavenArtifact.getId() + ", version: " + mavenArtifact.getVersion() + ", baseVersion: " + mavenArtifact.getBaseVersion()).collect(Collectors.joining(", ")));
@@ -1150,7 +1138,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
 
         dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", null, "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         List<MavenArtifact> generatedArtifacts = dao.getGeneratedArtifacts("my-upstream-pipeline-1", 1);
         System.out.println("GeneratedArtifacts " + generatedArtifacts.stream().map(mavenArtifact -> mavenArtifact.getId() + ", version: " + mavenArtifact.getVersion() + ", baseVersion: " + mavenArtifact.getBaseVersion()).collect(Collectors.joining(", ")));
@@ -1168,15 +1156,15 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
 
         dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 1);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "parent-pom", "1.0-20170808.155524-63", "pom", "1.0-SNAPSHOT", null, false, "pom", null);
-        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 1);
         dao.recordParentProject("my-downstream-pipeline-1", 1, "com.mycompany", "parent-pom", "1.0-SNAPSHOT", false);
-        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-70, 22);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 70, 22);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 1);
         dao.recordParentProject("my-downstream-pipeline-2", 1, "com.mycompany", "parent-pom", "1.0-SNAPSHOT", false);
-        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-50, 22);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 50, 22);
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
@@ -1197,15 +1185,15 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
 
         dao.getOrCreateBuildPrimaryKey("my-upstream-pipeline-1", 2);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 2, "com.mycompany", "parent-pom", "1.1-20170808.155524-65", "pom", "1.1-SNAPSHOT", null, false, "pom", null);
-        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis()-20, 9);
+        dao.updateBuildOnCompletion("my-upstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 20, 9);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-1", 2);
         dao.recordParentProject("my-downstream-pipeline-1", 2, "com.mycompany", "parent-pom", "1.1-SNAPSHOT", false);
-        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis()-20, 9);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-1", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 20, 9);
 
         dao.getOrCreateBuildPrimaryKey("my-downstream-pipeline-2", 2);
         dao.recordParentProject("my-downstream-pipeline-2", 2, "com.mycompany", "parent-pom", "1.0-SNAPSHOT", false);
-        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 2, Result.SUCCESS.ordinal, System.currentTimeMillis()-20, 9);
+        dao.updateBuildOnCompletion("my-downstream-pipeline-2", 2, Result.SUCCESS.ordinal, System.currentTimeMillis() - 20, 9);
 
         {
             MavenArtifact expectedMavenArtifact = new MavenArtifact();
@@ -1231,12 +1219,12 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
 
         dao.getOrCreateBuildPrimaryKey("pipeline-framework", 1);
         dao.recordGeneratedArtifact("pipeline-framework", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("pipeline-core", 1);
         dao.recordDependency("pipeline-core", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "compile", false, null);
         dao.recordGeneratedArtifact("pipeline-core", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("pipeline-core", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-core", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         SqlTestsUtils.dump("select * from JOB_DEPENDENCIES", this.ds, System.out);
         SqlTestsUtils.dump("select * from JOB_GENERATED_ARTIFACTS", this.ds, System.out);
@@ -1252,23 +1240,27 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.getOrCreateBuildPrimaryKey("pipeline-framework", 1);
         dao.recordGeneratedArtifact("pipeline-framework", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "aType", "1.0-SNAPSHOT", null, false, "jar", null);
         dao.recordGeneratedArtifact("pipeline-framework", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "anotherType", "1.0-SNAPSHOT", null, false, "jar", "aClassifier");
-        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("pipeline-core1", 1);
         dao.recordDependency("pipeline-core1", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "aType", "compile", false, null);
-        dao.updateBuildOnCompletion("pipeline-core1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-core1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("pipeline-core2", 1);
         dao.recordDependency("pipeline-core2", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "aType", "compile", false, "whatever");
-        dao.updateBuildOnCompletion("pipeline-core2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-core2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("pipeline-core3", 1);
         dao.recordDependency("pipeline-core3", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "whatever", "compile", false, null);
-        dao.updateBuildOnCompletion("pipeline-core3", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-core3", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("pipeline-core4", 1);
         dao.recordDependency("pipeline-core4", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "whatever", "compile", false, "aClassifier");
-        dao.updateBuildOnCompletion("pipeline-core4", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-core4", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
+
+        dao.getOrCreateBuildPrimaryKey("pipeline-core5", 1);
+        dao.recordDependency("pipeline-core5", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "anotherType", "compile", false, "aClassifier");
+        dao.updateBuildOnCompletion("pipeline-core5", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         SqlTestsUtils.dump("select * from JOB_DEPENDENCIES", this.ds, System.out);
         SqlTestsUtils.dump("select * from JOB_GENERATED_ARTIFACTS", this.ds, System.out);
@@ -1278,13 +1270,16 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         assertThat(upstreamPipelinesForBuild1.keySet(), Matchers.containsInAnyOrder("pipeline-framework"));
 
         Map<String, Integer> upstreamPipelinesForBuild2 = dao.listUpstreamPipelinesBasedOnMavenDependencies("pipeline-core2", 1);
-        assertThat(upstreamPipelinesForBuild2.keySet(), Matchers.containsInAnyOrder("pipeline-framework"));
+        assertThat(upstreamPipelinesForBuild2.keySet(), Matchers.empty());
 
         Map<String, Integer> upstreamPipelinesForBuild3 = dao.listUpstreamPipelinesBasedOnMavenDependencies("pipeline-core3", 1);
-        assertThat(upstreamPipelinesForBuild3.keySet(), Matchers.containsInAnyOrder("pipeline-framework"));
+        assertThat(upstreamPipelinesForBuild3.keySet(), Matchers.empty());
 
         Map<String, Integer> upstreamPipelinesForBuild4 = dao.listUpstreamPipelinesBasedOnMavenDependencies("pipeline-core4", 1);
-        assertThat(upstreamPipelinesForBuild4.keySet(), Matchers.containsInAnyOrder("pipeline-framework"));
+        assertThat(upstreamPipelinesForBuild4.keySet(), Matchers.empty());
+
+        Map<String, Integer> upstreamPipelinesForBuild5 = dao.listUpstreamPipelinesBasedOnMavenDependencies("pipeline-core5", 1);
+        assertThat(upstreamPipelinesForBuild5.keySet(), Matchers.containsInAnyOrder("pipeline-framework"));
     }
 
     @Test
@@ -1292,13 +1287,13 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
 
         dao.getOrCreateBuildPrimaryKey("pipeline-parent-pom", 1);
         dao.recordGeneratedArtifact("pipeline-parent-pom", 1, "com.mycompany", "company-parent-pom", "1.0-SNAPSHOT", "pom", "1.0-SNAPSHOT", null, false, "pom", null);
-        dao.updateBuildOnCompletion("pipeline-parent-pom", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-parent-pom", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("pipeline-core", 1);
         dao.recordParentProject("pipeline-core", 1, "com.mycompany", "company-parent-pom", "1.0-SNAPSHOT", false);
         dao.recordDependency("pipeline-core", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "compile", false, null);
         dao.recordGeneratedArtifact("pipeline-core", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("pipeline-core", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-core", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         SqlTestsUtils.dump("select * from JOB_DEPENDENCIES", this.ds, System.out);
         SqlTestsUtils.dump("select * from JOB_GENERATED_ARTIFACTS", this.ds, System.out);
@@ -1314,18 +1309,18 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
 
         dao.getOrCreateBuildPrimaryKey("pipeline-framework", 1);
         dao.recordGeneratedArtifact("pipeline-framework", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("pipeline-core", 1);
         dao.recordDependency("pipeline-core", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "compile", false, null);
         dao.recordGeneratedArtifact("pipeline-core", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("pipeline-core", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-core", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("pipeline-service", 1);
         dao.recordDependency("pipeline-service", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "compile", false, null);
         dao.recordDependency("pipeline-service", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
         dao.recordGeneratedArtifact("pipeline-service", 1, "com.mycompany", "service", "1.0-SNAPSHOT", "war", "1.0-SNAPSHOT", null, false, "war", null);
-        dao.updateBuildOnCompletion("pipeline-service", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 22);
+        dao.updateBuildOnCompletion("pipeline-service", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 22);
 
 
         SqlTestsUtils.dump("select * from JOB_DEPENDENCIES", this.ds, System.out);
@@ -1339,63 +1334,23 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
     public void list_transitive_upstream_jobs_with_classifier() {
 
         dao.getOrCreateBuildPrimaryKey("pipeline-framework", 1);
-        dao.recordGeneratedArtifact("pipeline-framework", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "aType", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.recordGeneratedArtifact("pipeline-framework", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "anotherType", "1.0-SNAPSHOT", null, false, "jar", "aClassifier");
-        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.recordGeneratedArtifact("pipeline-framework", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "aType", "1.0-SNAPSHOT", null, false, "jar", "aClassifier");
+        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("pipeline-core1", 1);
-        dao.recordDependency("pipeline-core1", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "aType", "compile", false, null);
-        dao.recordGeneratedArtifact("pipeline-core1", 1, "com.mycompany", "core1", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("pipeline-core1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
-
-        dao.getOrCreateBuildPrimaryKey("pipeline-core2", 1);
-        dao.recordDependency("pipeline-core2", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "aType", "compile", false, "whatever");
-        dao.recordGeneratedArtifact("pipeline-core2", 1, "com.mycompany", "core2", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("pipeline-core2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
-
-        dao.getOrCreateBuildPrimaryKey("pipeline-core3", 1);
-        dao.recordDependency("pipeline-core3", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "whatever", "compile", false, null);
-        dao.recordGeneratedArtifact("pipeline-core3", 1, "com.mycompany", "core3", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("pipeline-core3", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
-
-        dao.getOrCreateBuildPrimaryKey("pipeline-core4", 1);
-        dao.recordDependency("pipeline-core4", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "whatever", "compile", false, "aClassifier");
-        dao.recordGeneratedArtifact("pipeline-core4", 1, "com.mycompany", "core4", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("pipeline-core4", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.recordDependency("pipeline-core1", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "aType", "compile", false, "aClassifier");
+        dao.recordGeneratedArtifact("pipeline-core1", 1, "com.mycompany", "core1", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", "aClassifier");
+        dao.updateBuildOnCompletion("pipeline-core1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("pipeline-service1", 1);
-        dao.recordDependency("pipeline-service1", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "aType", "compile", false, null);
-        dao.recordDependency("pipeline-service1", 1, "com.mycompany", "core1", "1.0-SNAPSHOT", "jar", "compile", false, null);
-        dao.recordGeneratedArtifact("pipeline-service1", 1, "com.mycompany", "service", "1.0-SNAPSHOT", "war", "1.0-SNAPSHOT", null, false, "war", null);
-        dao.updateBuildOnCompletion("pipeline-service1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 22);
-
-        dao.getOrCreateBuildPrimaryKey("pipeline-service2", 1);
-        dao.recordDependency("pipeline-service2", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "aType", "compile", false, "whatever");
-        dao.recordDependency("pipeline-service2", 1, "com.mycompany", "core2", "1.0-SNAPSHOT", "jar", "compile", false, null);
-        dao.recordGeneratedArtifact("pipeline-service2", 1, "com.mycompany", "service", "1.0-SNAPSHOT", "war", "1.0-SNAPSHOT", null, false, "war", null);
-        dao.updateBuildOnCompletion("pipeline-service2", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 22);
-
-        dao.getOrCreateBuildPrimaryKey("pipeline-service3", 1);
-        dao.recordDependency("pipeline-service3", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "whatever", "compile", false, null);
-        dao.recordDependency("pipeline-service3", 1, "com.mycompany", "core3", "1.0-SNAPSHOT", "jar", "compile", false, null);
-        dao.recordGeneratedArtifact("pipeline-service3", 1, "com.mycompany", "service", "1.0-SNAPSHOT", "war", "1.0-SNAPSHOT", null, false, "war", null);
-        dao.updateBuildOnCompletion("pipeline-service3", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 22);
-
-        dao.getOrCreateBuildPrimaryKey("pipeline-service4", 1);
-        dao.recordDependency("pipeline-service4", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "whatever", "compile", false, "aClassifier");
-        dao.recordDependency("pipeline-service4", 1, "com.mycompany", "core4", "1.0-SNAPSHOT", "jar", "compile", false, null);
-        dao.recordGeneratedArtifact("pipeline-service4", 1, "com.mycompany", "service", "1.0-SNAPSHOT", "war", "1.0-SNAPSHOT", null, false, "war", null);
-        dao.updateBuildOnCompletion("pipeline-service4", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 22);
-
+        dao.recordDependency("pipeline-service1", 1, "com.mycompany", "core1", "1.0-SNAPSHOT", "jar", "compile", false, "aClassifier");
+        dao.updateBuildOnCompletion("pipeline-service1", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 22);
 
         SqlTestsUtils.dump("select * from JOB_DEPENDENCIES", this.ds, System.out);
         SqlTestsUtils.dump("select * from JOB_GENERATED_ARTIFACTS", this.ds, System.out);
         SqlTestsUtils.dump("select * from JENKINS_JOB", this.ds, System.out);
 
         assertThat(dao.listTransitiveUpstreamJobs("pipeline-service1", 1).keySet(), Matchers.containsInAnyOrder("pipeline-framework", "pipeline-core1"));
-        assertThat(dao.listTransitiveUpstreamJobs("pipeline-service2", 1).keySet(), Matchers.containsInAnyOrder("pipeline-framework", "pipeline-core2"));
-        assertThat(dao.listTransitiveUpstreamJobs("pipeline-service3", 1).keySet(), Matchers.containsInAnyOrder("pipeline-framework", "pipeline-core3"));
-        assertThat(dao.listTransitiveUpstreamJobs("pipeline-service4", 1).keySet(), Matchers.containsInAnyOrder("pipeline-framework", "pipeline-core4"));
     }
 
     @Deprecated
@@ -1404,12 +1359,12 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
 
         dao.getOrCreateBuildPrimaryKey("pipeline-framework", 1);
         dao.recordGeneratedArtifact("pipeline-framework", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("pipeline-core", 1);
         dao.recordDependency("pipeline-core", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "compile", false, null);
         dao.recordGeneratedArtifact("pipeline-core", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("pipeline-core", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-core", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         {
             List<String> downstreamJobs = dao.listDownstreamJobs("pipeline-framework", 1);
@@ -1419,7 +1374,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
 
         // pipeline-core#2 fails before dependencies have been tracked
         dao.getOrCreateBuildPrimaryKey("pipeline-core", 2);
-        dao.updateBuildOnCompletion("pipeline-core", 2, Result.FAILURE.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-core", 2, Result.FAILURE.ordinal, System.currentTimeMillis() - 100, 11);
 
         SqlTestsUtils.dump("select * from JENKINS_JOB", this.ds, System.out);
         SqlTestsUtils.dump("select * from JOB_GENERATED_ARTIFACTS", this.ds, System.out);
@@ -1437,12 +1392,12 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.getOrCreateBuildPrimaryKey("pipeline-framework", 1);
         dao.recordGeneratedArtifact("pipeline-framework", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
         dao.recordGeneratedArtifact("pipeline-framework", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", "sources");
-        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-framework", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         dao.getOrCreateBuildPrimaryKey("pipeline-core", 1);
         dao.recordDependency("pipeline-core", 1, "com.mycompany", "framework", "1.0-SNAPSHOT", "jar", "compile", false, null);
         dao.recordGeneratedArtifact("pipeline-core", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
-        dao.updateBuildOnCompletion("pipeline-core", 1, Result.SUCCESS.ordinal, System.currentTimeMillis()-100, 11);
+        dao.updateBuildOnCompletion("pipeline-core", 1, Result.SUCCESS.ordinal, System.currentTimeMillis() - 100, 11);
 
         MavenArtifact expectedMavenArtifact = new MavenArtifact();
         expectedMavenArtifact.setGroupId("com.mycompany");

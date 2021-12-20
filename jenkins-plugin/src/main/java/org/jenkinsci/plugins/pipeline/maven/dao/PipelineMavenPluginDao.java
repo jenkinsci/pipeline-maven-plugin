@@ -33,6 +33,7 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
@@ -40,7 +41,7 @@ import java.util.SortedSet;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public interface PipelineMavenPluginDao {
+public interface PipelineMavenPluginDao extends Closeable {
 
     /**
      * Record a Maven dependency of a build.
