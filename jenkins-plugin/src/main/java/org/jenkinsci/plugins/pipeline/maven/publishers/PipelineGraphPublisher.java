@@ -215,13 +215,6 @@ public class PipelineGraphPublisher extends MavenPublisher {
             dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
                     artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getBaseVersion(),
                     artifact.getRepositoryUrl(), skipDownstreamPipelines, artifact.getExtension(), artifact.getClassifier());
-            if (("bundle".equals(artifact.getType()) || "nbm".equals(artifact.getType())) && "jar".equals(artifact.getExtension())) {
-                // JENKINS-47069 org.apache.felix:maven-bundle-plugin:bundle uses the type "bundle" for "jar" files
-                // record artifact as both "bundle" and "jar"
-                dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
-                        artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), "jar", artifact.getBaseVersion(),
-                        null, skipDownstreamPipelines, artifact.getExtension(), artifact.getClassifier());
-            }
         }
     }
 

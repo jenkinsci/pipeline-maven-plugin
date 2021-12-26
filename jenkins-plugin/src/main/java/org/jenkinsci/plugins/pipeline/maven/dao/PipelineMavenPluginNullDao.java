@@ -28,6 +28,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -149,4 +150,10 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     public boolean isEnoughProductionGradeForTheWorkload() {
         return true;
     }
+
+    @Override
+    public void close() throws IOException {
+        // no op
+    }
+
 }

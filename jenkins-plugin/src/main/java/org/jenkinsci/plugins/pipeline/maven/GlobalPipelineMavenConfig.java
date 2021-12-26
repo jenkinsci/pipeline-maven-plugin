@@ -44,9 +44,10 @@ import jenkins.tools.ToolConfigurationCategory;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.dao.CustomTypePipelineMavenPluginDaoDecorator;
+import org.jenkinsci.plugins.pipeline.maven.dao.MonitoringPipelineMavenPluginDaoDecorator;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
-import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginMonitoringDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginMySqlDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginPostgreSqlDao;
@@ -177,15 +178,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     @DataBoundSetter
     public synchronized void setJdbcUrl(String jdbcUrl) {
         if (!Objects.equals(jdbcUrl, this.jdbcUrl)) {
-            PipelineMavenPluginDao daoToClose = this.dao;
-            this.dao = null;
-            if (daoToClose instanceof Closeable) {
-                try {
-                    ((Closeable) daoToClose).close();
-                } catch (IOException e) {
-                    LOGGER.log(Level.WARNING, "Exception closing the previous DAO", e);
-                }
-            }
+            closeDatasource();
         }
         this.jdbcUrl = jdbcUrl;
     }
@@ -201,32 +194,18 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     @DataBoundSetter
     public synchronized void setProperties(String properties) {
         if (!Objects.equals(properties, this.properties)) {
-            PipelineMavenPluginDao daoToClose = this.dao;
-            this.dao = null;
-            if (daoToClose instanceof Closeable) {
-                try {
-                    ((Closeable) daoToClose).close();
-                } catch (IOException e) {
-                    LOGGER.log(Level.WARNING, "Exception closing the previous DAO", e);
-                }
-            }
+            closeDatasource();
         }
+
         this.properties = properties;
     }
 
     @DataBoundSetter
     public synchronized void setJdbcCredentialsId(String jdbcCredentialsId) {
         if (!Objects.equals(jdbcCredentialsId, this.jdbcCredentialsId)) {
-            PipelineMavenPluginDao daoToClose = this.dao;
-            this.dao = null;
-            if (daoToClose instanceof Closeable) {
-                try {
-                    ((Closeable) daoToClose).close();
-                } catch (IOException e) {
-                    LOGGER.log(Level.WARNING, "Exception closing the previous DAO", e);
-                }
-            }
+            closeDatasource();
         }
+
         this.jdbcCredentialsId = jdbcCredentialsId;
     }
 
@@ -357,7 +336,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
                 }
                 try {
-                    dao = new PipelineMavenPluginMonitoringDao(daoClass.getConstructor(DataSource.class).newInstance(ds));
+                    dao = new MonitoringPipelineMavenPluginDaoDecorator(new CustomTypePipelineMavenPluginDaoDecorator(daoClass.getConstructor(DataSource.class).newInstance(ds)));
                 } catch (Exception e) {
                     throw new SQLException(
                             "Exception connecting to '" + this.jdbcUrl + "' with credentials '" + this.jdbcCredentialsId + "' (" +
@@ -596,15 +575,16 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         }
 
     }
-    
+
     @Terminator
     public synchronized void closeDatasource() {
-        PipelineMavenPluginDao dao = this.dao;
-        if (dao instanceof Closeable) {
+        if (dao != null) {
             try {
-                ((Closeable) dao).close();
+                dao.close();
             } catch (IOException e) {
                 LOGGER.log(Level.WARNING, "Exception closing the DAO", e);
+            } finally {
+                dao = null;
             }
         }
     }
