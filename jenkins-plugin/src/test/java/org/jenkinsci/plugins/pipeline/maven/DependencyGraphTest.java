@@ -283,9 +283,6 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
 
     }
 
-    /**
-     * NBM dependencies
-     */
     @Test
     public void verify_nbm_downstream_simple_pipeline_trigger() throws Exception {
         System.out.println("gitRepoRule: " + gitRepoRule);
@@ -293,13 +290,13 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
         loadNbmBaseMavenProjectInGitRepo(this.downstreamArtifactRepoRule);
 
-        String mavenJarPipelineScript = "node('master') {\n"
+        String mavenNbmDependencyPipelineScript = "node('master') {\n"
                 + "    git($/" + gitRepoRule.toString() + "/$)\n"
                 + "    withMaven() {\n"
                 + "        sh 'mvn install'\n"
                 + "    }\n"
                 + "}";
-        String mavenWarPipelineScript = "node('master') {\n"
+        String mavenNbmBasePipelineScript = "node('master') {\n"
                 + "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n"
                 + "    withMaven() {\n"
                 + "        sh 'mvn install'\n"
@@ -307,29 +304,76 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
                 + "}";
 
         WorkflowJob mavenNbmDependency = jenkinsRule.createProject(WorkflowJob.class, "build-nbm-dependency");
-        mavenNbmDependency.setDefinition(new CpsFlowDefinition(mavenJarPipelineScript, true));
+        mavenNbmDependency.setDefinition(new CpsFlowDefinition(mavenNbmDependencyPipelineScript, true));
         mavenNbmDependency.addTrigger(new WorkflowJobDependencyTrigger());
 
-        WorkflowRun mavenJarPipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenNbmDependency.scheduleBuild2(0));
+        WorkflowRun mavenNbmDependencyPipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenNbmDependency.scheduleBuild2(0));
         // TODO check in DB that the generated artifact is recorded
 
         WorkflowJob mavenNbmBasePipeline = jenkinsRule.createProject(WorkflowJob.class, "build-nbm-base");
-        mavenNbmBasePipeline.setDefinition(new CpsFlowDefinition(mavenWarPipelineScript, true));
+        mavenNbmBasePipeline.setDefinition(new CpsFlowDefinition(mavenNbmBasePipelineScript, true));
         mavenNbmBasePipeline.addTrigger(new WorkflowJobDependencyTrigger());
-        WorkflowRun mavenWarPipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenNbmBasePipeline.scheduleBuild2(0));
+        WorkflowRun mavenNbmBasePipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenNbmBasePipeline.scheduleBuild2(0));
         // TODO check in DB that the dependency on the war project is recorded
-        System.out.println("build-nbm-dependencyFirstRun: " + mavenWarPipelineFirstRun);
+        System.out.println("build-nbm-dependencyFirstRun: " + mavenNbmBasePipelineFirstRun);
 
-        WorkflowRun mavenJarPipelineSecondRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenNbmDependency.scheduleBuild2(0));
+        WorkflowRun mavenNbmDependencyPipelineSecondRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenNbmDependency.scheduleBuild2(0));
 
         jenkinsRule.waitUntilNoActivity();
 
-        WorkflowRun mavenWarPipelineLastRun = mavenNbmBasePipeline.getLastBuild();
+        WorkflowRun mavenNbmBasePipelineLastRun = mavenNbmBasePipeline.getLastBuild();
 
-        System.out.println("build-nbm-baseLastBuild: " + mavenWarPipelineLastRun + " caused by " + mavenWarPipelineLastRun.getCauses());
+        System.out.println("build-nbm-baseLastBuild: " + mavenNbmBasePipelineLastRun + " caused by " + mavenNbmBasePipelineLastRun.getCauses());
 
-        assertThat(mavenWarPipelineLastRun.getNumber(), is(mavenWarPipelineFirstRun.getNumber() + 1));
-        Cause.UpstreamCause upstreamCause = mavenWarPipelineLastRun.getCause(Cause.UpstreamCause.class);
+        assertThat(mavenNbmBasePipelineLastRun.getNumber(), is(mavenNbmBasePipelineFirstRun.getNumber() + 1));
+        Cause.UpstreamCause upstreamCause = mavenNbmBasePipelineLastRun.getCause(Cause.UpstreamCause.class);
+        assertThat(upstreamCause, notNullValue());
+    }
+
+    @Test
+    public void verify_docker_downstream_simple_pipeline_trigger() throws Exception {
+        System.out.println("gitRepoRule: " + gitRepoRule);
+        loadDockerDependencyMavenJarProjectInGitRepo(this.gitRepoRule);
+        System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
+        loadDockerBaseMavenProjectInGitRepo(this.downstreamArtifactRepoRule);
+
+        String mavenDockerDependencyPipelineScript = "node('master') {\n"
+                + "    git($/" + gitRepoRule.toString() + "/$)\n"
+                + "    withMaven() {\n"
+                + "        sh 'mvn install'\n"
+                + "    }\n"
+                + "}";
+        String mavenDockerBasePipelineScript = "node('master') {\n"
+                + "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n"
+                + "    withMaven() {\n"
+                + "        sh 'mvn install'\n"
+                + "    }\n"
+                + "}";
+
+        WorkflowJob mavenDockerDependency = jenkinsRule.createProject(WorkflowJob.class, "build-docker-dependency");
+        mavenDockerDependency.setDefinition(new CpsFlowDefinition(mavenDockerDependencyPipelineScript, true));
+        mavenDockerDependency.addTrigger(new WorkflowJobDependencyTrigger());
+
+        WorkflowRun mavenDockerDependencyPipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenDockerDependency.scheduleBuild2(0));
+        // TODO check in DB that the generated artifact is recorded
+
+        WorkflowJob mavenDockerBasePipeline = jenkinsRule.createProject(WorkflowJob.class, "build-docker-base");
+        mavenDockerBasePipeline.setDefinition(new CpsFlowDefinition(mavenDockerBasePipelineScript, true));
+        mavenDockerBasePipeline.addTrigger(new WorkflowJobDependencyTrigger());
+        WorkflowRun mavenDockerBasePipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenDockerBasePipeline.scheduleBuild2(0));
+        // TODO check in DB that the dependency on the war project is recorded
+        System.out.println("build-docker-dependencyFirstRun: " + mavenDockerBasePipelineFirstRun);
+
+        WorkflowRun mavenDockerDependencyPipelineSecondRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenDockerDependency.scheduleBuild2(0));
+
+        jenkinsRule.waitUntilNoActivity();
+
+        WorkflowRun mavenDockerBasePipelineLastRun = mavenDockerBasePipeline.getLastBuild();
+
+        System.out.println("build-docker-baseLastBuild: " + mavenDockerBasePipelineLastRun + " caused by " + mavenDockerBasePipelineLastRun.getCauses());
+
+        assertThat(mavenDockerBasePipelineLastRun.getNumber(), is(mavenDockerBasePipelineFirstRun.getNumber() + 1));
+        Cause.UpstreamCause upstreamCause = mavenDockerBasePipelineLastRun.getCause(Cause.UpstreamCause.class);
         assertThat(upstreamCause, notNullValue());
     }
 
