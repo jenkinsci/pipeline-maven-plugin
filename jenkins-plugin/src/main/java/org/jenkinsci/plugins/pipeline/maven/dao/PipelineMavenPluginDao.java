@@ -252,10 +252,11 @@ public interface PipelineMavenPluginDao {
      * @param jobFullName see {@link Item#getFullName()}
      * @param buildNumber see {@link Run#getNumber()}
      * @param buildResultOrdinal see {@link hudson.model.Result#ordinal}
+     * @param successfull indicate that the buidl was successfull {@see org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig#getTriggerDownstreamBuildsResultsCriteria}
      * @param startTimeInMillis see {@link Run#getStartTimeInMillis()}
      * @param durationInMillis see {@link Run#getDuration()}
      */
-    void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis);
+    void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, boolean successfull, long startTimeInMillis, long durationInMillis);
 
     /**
      * Indicates if the underlying database is production grade enough for the workload.

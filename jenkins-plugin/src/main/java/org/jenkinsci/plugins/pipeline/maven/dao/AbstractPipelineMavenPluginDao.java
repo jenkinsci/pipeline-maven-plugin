@@ -1143,8 +1143,12 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         }
     }
 
+    void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
+        updateBuildOnCompletion(jobFullName, buildNumber, buildResultOrdinal,  Result.SUCCESS.ordinal == buildResultOrdinal, 0, 0);
+    }
+    
     @Override
-    public void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
+    public void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, boolean triggerDownstream, long startTimeInMillis, long durationInMillis) {
         LOGGER.log(Level.FINE, "updateBuildOnCompletion({0}, {1}, result: {2}, startTime): {3}, duration: {4}",
                 new Object[]{jobFullName, buildNumber, buildResultOrdinal, startTimeInMillis, durationInMillis});
         long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
@@ -1165,7 +1169,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 }
             }
 
-            if (Result.SUCCESS.ordinal == buildResultOrdinal) {
+            if (triggerDownstream) {
                 try (PreparedStatement stmt = cnn.prepareStatement("UPDATE JENKINS_JOB set LAST_BUILD_NUMBER = ?, LAST_SUCCESSFUL_BUILD_NUMBER = ? where FULL_NAME = ? and JENKINS_MASTER_ID = ?")) {
                     stmt.setInt(1, buildNumber);
                     stmt.setInt(2, buildNumber);
