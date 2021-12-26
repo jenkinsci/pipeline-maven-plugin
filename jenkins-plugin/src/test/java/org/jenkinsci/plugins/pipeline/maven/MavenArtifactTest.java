@@ -1,8 +1,9 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -23,8 +24,8 @@ public class MavenArtifactTest {
         actualMavenArtifact.setVersion("1.0-SNAPSHOT");
         actualMavenArtifact.setType("jar");
 
-        Assert.assertThat(actualMavenArtifact.hashCode(), Matchers.is(expectedMavenArtifact.hashCode()));
-        Assert.assertThat(actualMavenArtifact, Matchers.is(expectedMavenArtifact));
+        assertThat(actualMavenArtifact.hashCode(), Matchers.is(expectedMavenArtifact.hashCode()));
+        assertThat(actualMavenArtifact, Matchers.is(expectedMavenArtifact));
 
 
     }

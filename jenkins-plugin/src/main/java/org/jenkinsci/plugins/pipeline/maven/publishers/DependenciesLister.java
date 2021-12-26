@@ -6,12 +6,11 @@ import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.w3c.dom.Element;
 
+import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.annotation.Nonnull;
 
 /**
  * List dependencies from the spy log.

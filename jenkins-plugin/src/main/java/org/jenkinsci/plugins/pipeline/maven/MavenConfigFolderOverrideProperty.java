@@ -4,19 +4,12 @@ import com.cloudbees.hudson.plugins.folder.AbstractFolder;
 import com.cloudbees.hudson.plugins.folder.AbstractFolderProperty;
 import com.cloudbees.hudson.plugins.folder.AbstractFolderPropertyDescriptor;
 import hudson.Extension;
-import hudson.model.Descriptor;
-import hudson.util.CopyOnWriteList;
-import jenkins.mvn.GlobalMavenConfig;
 import jenkins.mvn.GlobalSettingsProvider;
 import jenkins.mvn.SettingsProvider;
-import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-import org.kohsuke.stapler.Stapler;
-import org.kohsuke.stapler.StaplerRequest;
 
 import javax.annotation.Nonnull;
-import java.util.List;
 
 /**
  * Provides a way to override maven configuration at a folder level
@@ -36,7 +29,7 @@ public class MavenConfigFolderOverrideProperty extends AbstractFolderProperty<Ab
     private GlobalSettingsProvider globalSettings;
 
     /**
-     * Defines if the instance level configuration should be overriden by this folder one
+     * Defines if the instance level configuration should be overridden by this folder one
      */
     private boolean override;
 

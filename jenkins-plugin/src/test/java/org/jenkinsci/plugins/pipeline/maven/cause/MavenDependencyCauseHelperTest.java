@@ -2,12 +2,13 @@ package org.jenkinsci.plugins.pipeline.maven.cause;
 
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -21,7 +22,7 @@ public class MavenDependencyCauseHelperTest {
 
         List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause( new MavenDependencyTestCause(firstArtifact) , new MavenDependencyTestCause(secondArtifact));
 
-        Assert.assertThat(matchingArtifacts.isEmpty(), Matchers.is(true));
+        assertThat(matchingArtifacts.isEmpty(), Matchers.is(true));
     }
 
     @Test
@@ -31,7 +32,7 @@ public class MavenDependencyCauseHelperTest {
 
         List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause( new MavenDependencyTestCause(firstArtifact) , new MavenDependencyTestCause(secondArtifact));
 
-        Assert.assertThat(! matchingArtifacts.isEmpty(), Matchers.is(false));
+        assertThat(! matchingArtifacts.isEmpty(), Matchers.is(false));
     }
 
     @Test
@@ -43,7 +44,7 @@ public class MavenDependencyCauseHelperTest {
 
         List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause( new MavenDependencyTestCause(firstArtifact) , new MavenDependencyTestCause(secondArtifact));
 
-        Assert.assertThat(matchingArtifacts.isEmpty(), Matchers.is(false));
+        assertThat(matchingArtifacts.isEmpty(), Matchers.is(false));
     }
 
     @Test
@@ -55,7 +56,7 @@ public class MavenDependencyCauseHelperTest {
 
         List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause( new MavenDependencyTestCause(firstArtifact) , new MavenDependencyTestCause(secondArtifact));
 
-        Assert.assertThat(! matchingArtifacts.isEmpty(), Matchers.is(false));
+        assertThat(! matchingArtifacts.isEmpty(), Matchers.is(false));
     }
 
     @Test
@@ -66,7 +67,7 @@ public class MavenDependencyCauseHelperTest {
 
         List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause( new MavenDependencyTestCause(firstArtifact) , new MavenDependencyTestCause(secondArtifact));
 
-        Assert.assertThat(! matchingArtifacts.isEmpty(), Matchers.is(false));
+        assertThat(! matchingArtifacts.isEmpty(), Matchers.is(false));
     }
 
     @Test
@@ -82,7 +83,7 @@ public class MavenDependencyCauseHelperTest {
 
         List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause( new MavenDependencyTestCause(firstArtifact, firstArtifactSources) , new MavenDependencyTestCause(secondArtifact));
 
-        Assert.assertThat(matchingArtifacts.isEmpty(), Matchers.is(false));
+        assertThat(matchingArtifacts.isEmpty(), Matchers.is(false));
     }
 
     @Test
@@ -98,7 +99,7 @@ public class MavenDependencyCauseHelperTest {
 
         List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause( new MavenDependencyTestCause(firstArtifact) , new MavenDependencyTestCause(secondArtifact, secondArtifactSources));
 
-        Assert.assertThat(matchingArtifacts.isEmpty(), Matchers.is(false));
+        assertThat(matchingArtifacts.isEmpty(), Matchers.is(false));
     }
 
 
@@ -119,7 +120,7 @@ public class MavenDependencyCauseHelperTest {
 
         List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause( new MavenDependencyTestCause(firstArtifact, firstArtifactSources, secondArtifact) , new MavenDependencyTestCause(sameAsFirstArtifact));
 
-        Assert.assertThat(matchingArtifacts.isEmpty(), Matchers.is(false));
+        assertThat(matchingArtifacts.isEmpty(), Matchers.is(false));
     }
 
     @Test
@@ -139,7 +140,7 @@ public class MavenDependencyCauseHelperTest {
 
         List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause( new MavenDependencyTestCause(firstArtifact) , new MavenDependencyTestCause(sameAsFirstArtifact, sameAsFirstArtifactSources, secondArtifact));
 
-        Assert.assertThat(matchingArtifacts.isEmpty(), Matchers.is(false));
+        assertThat(matchingArtifacts.isEmpty(), Matchers.is(false));
     }
 
     static class MavenDependencyTestCause extends MavenDependencyAbstractCause {

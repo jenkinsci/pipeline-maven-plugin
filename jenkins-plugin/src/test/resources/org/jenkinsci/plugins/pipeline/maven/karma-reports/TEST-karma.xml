@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<testsuite name="HeadlessChrome 85.0.4182 (Linux 0.0.0)" package="" timestamp="2020-09-16T20:17:44" id="0" hostname="aHost" tests="37" errors="0" failures="0" time="0.362">
+  <properties>
+    <property name="browser.fullName" value="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/85.0.4182.0 Safari/537.36"/>
+  </properties>
+  <testcase name="class1 test test1" time="0.015" classname="class1 test"/>
+  <testcase name="class1 test test2" time="0.008" classname="class1 test"/>
+  <testcase name="class2 test test1" time="0.007" classname="class2 test"/>
+  <system-out>
+  </system-out>
+  <system-err/>
+</testsuite>

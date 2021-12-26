@@ -36,15 +36,15 @@ import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import java.util.regex.Pattern;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -54,6 +54,12 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     protected final MavenEventReporter reporter;
+
+    /**
+     * Regex pattern to extract ANSI escape sequences
+     */
+    private static final Pattern ANSI_PATTERN = Pattern.compile("\\x1b\\[[0-9;]*m");
+
 
     protected AbstractMavenEventHandler(MavenEventReporter reporter) {
         this.reporter = reporter;
@@ -66,10 +72,8 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         Class<E> clazz = (Class<E>) type;
         if (clazz.isAssignableFrom(event.getClass())) {
             return _handle((E) event);
-        } else {
-            // print("event " + event + " not handled by " + toString());
-            return false;
         }
+        return false;
     }
 
     private Type getSupportedType() {
@@ -183,8 +187,6 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
                             if (flattenedPomFilename != null) {
                                 return flattenedPomFilename.getValue();
                             }
-                        } else {
-                            // unexpected configuration type
                         }
                     }
                 }
@@ -194,16 +196,19 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
                     if (flattenedPomFilename != null) {
                         return flattenedPomFilename.getValue();
                     }
-                } else {
-                    // unexpected configuration type
                 }
-            } else {
-
             }
         }
         return null;
     }
 
+    private static String removeAnsiColor(String input) {
+    	if (input!=null) {
+    		input = ANSI_PATTERN.matcher(input).replaceAll("");
+    	}
+    	return input;
+    }
+    
     public Xpp3Dom newElement(@Nonnull String name, @Nullable Throwable t) {
         Xpp3Dom rootElt = new Xpp3Dom(name);
         if (t == null) {
@@ -213,13 +218,13 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
 
         Xpp3Dom messageElt = new Xpp3Dom("message");
         rootElt.addChild(messageElt);
-        messageElt.setValue(t.getMessage());
+        messageElt.setValue(removeAnsiColor(t.getMessage()));
 
         Xpp3Dom stackTraceElt = new Xpp3Dom("stackTrace");
         rootElt.addChild(stackTraceElt);
         StringWriter stackTrace = new StringWriter();
         t.printStackTrace(new PrintWriter(stackTrace, true));
-        stackTraceElt.setValue(stackTrace.toString());
+        stackTraceElt.setValue(removeAnsiColor(stackTrace.toString()));
         return rootElt;
     }
 

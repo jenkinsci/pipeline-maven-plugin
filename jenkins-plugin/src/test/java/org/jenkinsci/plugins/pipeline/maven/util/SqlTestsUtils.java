@@ -2,8 +2,9 @@ package org.jenkinsci.plugins.pipeline.maven.util;
 
 import com.google.common.base.Objects;
 import org.h2.api.ErrorCode;
-import org.h2.jdbcx.JdbcConnectionPool;
 
+import javax.annotation.Nonnull;
+import javax.sql.DataSource;
 import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,9 +12,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-
-import javax.annotation.Nonnull;
-import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>

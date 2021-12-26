@@ -6,7 +6,6 @@ import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.sql.DataSource;
-
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.List;

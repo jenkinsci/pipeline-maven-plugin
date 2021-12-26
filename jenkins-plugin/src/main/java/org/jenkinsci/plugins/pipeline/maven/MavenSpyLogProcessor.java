@@ -35,6 +35,11 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
+import javax.annotation.Nonnull;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -47,12 +52,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -204,7 +203,7 @@ public class MavenSpyLogProcessor implements Serializable {
             listener.getLogger().print("[withMaven] One or multiple Maven executions have been ignored by the " +
                     "Jenkins Pipeline Maven Plugin because they have been interrupted before completion " +
                     "(" + mavenSpyLogsInterruptedList.length + "). See ");
-            listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/Pipeline+Maven+Plugin#PipelineMavenPlugin-mavenExecutionInterrupted", "Pipeline Maven Plugin FAQ");
+            listener.hyperlink("https://github.com/jenkinsci/pipeline-maven-plugin/FAQ.adoc", "Pipeline Maven Plugin FAQ");
             listener.getLogger().println(" for more details.");
             if (LOGGER.isLoggable(Level.FINE)) {
                 for (FilePath mavenSpyLogsInterruptedLogs : mavenSpyLogsInterruptedList) {

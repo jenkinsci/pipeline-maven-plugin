@@ -23,7 +23,7 @@
  ~ THE SOFTWARE.
  -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -33,14 +33,15 @@
   </parent>
 
   <artifactId>pipeline-maven</artifactId>
-  <packaging>hpi</packaging>
   <version>${revision}${changelist}</version>
+  <packaging>hpi</packaging>
+
   <name>Pipeline Maven Integration Plugin</name>
   <description>
     This plugin provides integration with Pipeline, configures maven environment to use within a pipeline job by calling sh mvn or bat mvn.
     The selected maven installation will be configured and prepended to the path.
   </description>
-  <url>https://wiki.jenkins-ci.org/display/JENKINS/Pipeline+Maven+Plugin</url>
+  <url>https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/README.adoc</url>
 
   <developers>
     <developer>
@@ -53,379 +54,38 @@
       <name>Alvaro Lobato</name>
       <email>alobato@cloudbees.com</email>
     </developer>
+    <developer>
+      <id>aheritier</id>
+      <name>Arnaud Héritier</name>
+      <email>aheritier@apache.org</email>
+    </developer>
   </developers>
 
+  <scm>
+    <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
+    <tag>${scmTag}</tag>
+  </scm>
+
   <properties>
-    <scm-api-plugin.version>2.2.8</scm-api-plugin.version>
-    <git-plugin.version>3.9.2</git-plugin.version>
-    <!--
-    stick to junit 1.20 clarifying the impact of the introduction of the dependencies
-    workflow-step-api or workflow-api-->
-    <junit-plugin.version>1.26.1</junit-plugin.version>
-    <asm.version>5.2</asm.version>
-    <workflow-support-plugin.version>2.22</workflow-support-plugin.version>
+    <hpi.pluginChangelogUrl>https://github.com/jenkinsci/pipeline-maven-plugin/releases</hpi.pluginChangelogUrl>
   </properties>
-  <dependencies>
-    <dependency>
-      <groupId>org.jenkins-ci.main</groupId>
-      <artifactId>maven-plugin</artifactId>
-      <version>3.1.2</version>
-      <!--
-      Discussed on https://github.com/jenkinsci/pipeline-maven-plugin/pull/48
-      Keep the dependency optional
-      -->
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <!-- Require upper bound dependencies error for com.google.inject:guice:4.0-beta paths to dependency are:...-->
-          <groupId>com.google.inject</groupId>
-          <artifactId>guice</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>commons-net</groupId>
-          <artifactId>commons-net</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>apache-httpcomponents-client-4-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.doxia</groupId>
-          <artifactId>doxia-sink-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.wagon</groupId>
-          <artifactId>wagon-webdav-jackrabbit</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>postgresql-api</artifactId>
-      <version>42.2.5</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>mysql-api</artifactId>
-      <version>8.0.16</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>com.zaxxer</groupId>
-      <artifactId>HikariCP</artifactId>
-      <version>3.4.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-job</artifactId>
-      <version>2.29</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-multibranch</artifactId>
-      <version>2.20</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>pipeline-build-step</artifactId>
-      <version>2.7</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>branch-api</artifactId>
-      <version>2.0.20.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-step-api</artifactId>
-      <!--
-      TODO when there is enough adoption of workflow-step-api with https://github.com/jenkinsci/workflow-step-api-plugin/pull/38
-      Replace org.jenkinsci.plugins.pipeline.maven.fix.jenkins49337.GeneralNonBlockingStepExecution by org.jenkinsci.plugins.workflow.steps.GeneralNonBlockingStepExecution;
-      -->
-      <version>2.16</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-api</artifactId>
-      <version>2.34</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>config-file-provider</artifactId>
-      <version>3.5</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>credentials</artifactId>
-      <version>2.1.19</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>cloudbees-folder</artifactId>
-      <version>6.6</version>
-    </dependency>
-    <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>h2-api</artifactId>
-      <version>1.4.199</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>script-security</artifactId>
-      <version>1.54.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit-plugin.version}</version>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-    <!--
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit-plugin.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    -->
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>junit-attachments</artifactId>
-      <version>1.4.2</version>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>htmlpublisher</artifactId>
-      <version>1.16</version>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>jgiven</artifactId>
-      <version>0.15.1</version>
-      <scope>compile</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>maven-invoker-plugin</artifactId>
-      <version>2.4</version>
-      <scope>compile</scope>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.maven.doxia</groupId>
-          <artifactId>doxia-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.doxia</groupId>
-          <artifactId>doxia-site-renderer</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.doxia</groupId>
-          <artifactId>doxia-sink-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jvnet.hudson.plugins</groupId>
-      <artifactId>findbugs</artifactId>
-      <version>4.70</version>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jvnet.hudson.plugins.findbugs</groupId>
-          <artifactId>library</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jenkins-ci</groupId>
-          <artifactId>SECURITY-144-compat</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jvnet.hudson.plugins</groupId>
-      <artifactId>tasks</artifactId>
-      <version>4.51</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>jacoco</artifactId>
-      <version>3.0.3</version>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>asm</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>asm-analysis</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>asm-commons</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.ow2.asm</groupId>
-          <artifactId>asm-tree</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpcore</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
 
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-cps</artifactId>
-      <version>2.61.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-durable-task-step</artifactId>
-      <version>2.26</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-basic-steps</artifactId>
-      <version>2.12</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-support</artifactId>
-      <version>${workflow-support-plugin.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-support</artifactId>
-      <version>${workflow-support-plugin.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>structs</artifactId>
-      <version>1.17</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-scm-step</artifactId>
-      <version>2.7</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>pipeline-stage-step</artifactId>
-      <version>2.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <!--
-      AbstractHealthAwarePublisher depends on hudson.plugins.analysis.core.HealthAwarePublisher that depends on hudson.matrix.MatrixAggregatable
-      -->
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>matrix-project</artifactId>
-      <version>1.14</version>
-      <optional>true</optional>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jenkins-ci.test</groupId>
-      <artifactId>docker-fixtures</artifactId>
-      <version>1.8</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>ssh-slaves</artifactId>
-      <version>1.29.4</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.main</groupId>
-      <artifactId>jenkins-test-harness-tools</artifactId>
-      <version>2.0</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>scm-api</artifactId>
-      <version>${scm-api-plugin.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>git</artifactId>
-      <version>${git-plugin.version}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpclient</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>git</artifactId>
-      <version>${git-plugin.version}</version>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-  </dependencies>
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>mailer</artifactId>
-        <version>1.21</version>
+        <groupId>io.jenkins.tools.bom</groupId>
+        <artifactId>bom-2.289.x</artifactId>
+        <version>1008.vb9e22885c9cf</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
-      <dependency>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>scm-api</artifactId>
-        <version>${scm-api-plugin.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>ssh-credentials</artifactId>
-        <version>1.14</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>apache-httpcomponents-client-4-api</artifactId>
-        <version>4.5.5-3.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.ant</groupId>
-        <artifactId>ant</artifactId>
-        <version>1.9.2</version>
-      </dependency>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- Fix RequireUpperBoundDeps dependencies -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-embedder</artifactId>
         <version>3.5.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-classworlds</artifactId>
-        <version>2.5.2</version>
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
@@ -443,8 +103,7 @@
         <artifactId>maven-model</artifactId>
         <version>3.5.0</version>
       </dependency>
-      <dependency>
-        <!--
+      <dependency><!--
         for org.jenkins-ci.plugins:maven-invoker-plugin and org.jenkins-ci.main:maven-plugin
         -->
         <groupId>org.apache.maven</groupId>
@@ -464,158 +123,406 @@
       <dependency>
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-shared-utils</artifactId>
-        <version>3.2.1</version>
+        <version>3.3.4</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>3.1.0</version>
+        <version>3.4.1</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.aether</groupId>
-        <artifactId>aether-api</artifactId>
-        <version>1.1.0</version>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.8.9</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.aether</groupId>
-        <artifactId>aether-impl</artifactId>
-        <version>1.1.0</version>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-all</artifactId>
+        <version>2.4.21</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.aether</groupId>
-        <artifactId>aether-spi</artifactId>
-        <version>1.1.0</version>
+        <groupId>com.google.code.findbugs</groupId>
+        <artifactId>annotations</artifactId>
+        <version>3.0.1</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.aether</groupId>
-        <artifactId>aether-util</artifactId>
-        <version>1.1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-provider-api</artifactId>
-        <version>3.1.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-component-annotations</artifactId>
-        <version>1.7.1</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.inject</groupId>
-        <artifactId>guice</artifactId>
-        <version>4.0</version>
-      </dependency>
-      <dependency>
-        <groupId>com.jcraft</groupId>
-        <artifactId>jsch</artifactId>
-        <version>0.1.54</version>
-      </dependency>
-      <!--
-      <dependency>
-        <groupId>org.apache.maven.doxia</groupId>
-        <artifactId>doxia-sink-api</artifactId>
-        <version>1.7</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.doxia</groupId>
-        <artifactId>doxia-core</artifactId>
-        <version>1.7</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.doxia</groupId>
-        <artifactId>doxia-site-renderer</artifactId>
-        <version>1.7</version>
-      </dependency>
-      -->
-      <dependency>
-        <groupId>xerces</groupId>
-        <artifactId>xercesImpl</artifactId>
-        <version>2.11.0</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-beanutils</groupId>
-        <artifactId>commons-beanutils</artifactId>
-        <version>1.8.3</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>2.5</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jvnet.localizer</groupId>
-        <artifactId>localizer</artifactId>
-        <version>1.24</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-fileupload</groupId>
-        <artifactId>commons-fileupload</artifactId>
-        <version>1.3.3</version>
-      </dependency>
-      <dependency>
-        <groupId>com.jcraft</groupId>
-        <artifactId>jzlib</artifactId>
-        <version>1.1.3-kohsuke-1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-container-default</artifactId>
-        <version>1.0-alpha-30</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.doxia</groupId>
-        <artifactId>doxia-logging-api</artifactId>
-        <version>1.4</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.doxia</groupId>
-        <artifactId>doxia-site-renderer</artifactId>
-        <version>1.2</version>
-      </dependency>
-      <dependency>
-        <groupId>org.kohsuke.stapler</groupId>
-        <artifactId>stapler</artifactId>
-        <version>1.256</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>3.8.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jenkins-ci</groupId>
-        <artifactId>annotation-indexer</artifactId>
-        <version>1.12</version>
-      </dependency>
-      <dependency>
-        <groupId>org.ow2.asm</groupId>
-        <artifactId>asm</artifactId>
-        <version>${asm.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.ow2.asm</groupId>
-        <artifactId>asm-analysis</artifactId>
-        <version>${asm.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.ow2.asm</groupId>
-        <artifactId>asm-commons</artifactId>
-        <version>${asm.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.ow2.asm</groupId>
-        <artifactId>asm-tree</artifactId>
-        <version>${asm.version}</version>
+        <groupId>org.fusesource.jansi</groupId>
+        <artifactId>jansi</artifactId>
+        <version>2.4.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.jenkins-ci.main</groupId>
+      <artifactId>maven-plugin</artifactId>
+      <version>3.15.1</version>
+      <exclusions>
+        <exclusion><!-- Require upper bound dependencies error for com.google.inject:guice:4.0-beta paths to dependency are:...-->
+          <groupId>com.google.inject</groupId>
+          <artifactId>guice</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>commons-net</groupId>
+          <artifactId>commons-net</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>apache-httpcomponents-client-4-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven.doxia</groupId>
+          <artifactId>doxia-sink-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven.wagon</groupId>
+          <artifactId>wagon-webdav-jackrabbit</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0 in depMgt) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-repository-metadata</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0 in depMgt) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-core</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0 in depMgt) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-model</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-artifact</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-model-builder</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0 in depMgt) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-compat</artifactId>
+        </exclusion>
+        <!-- Require upper bound dependencies error (3.5.4 > 3.5.0 in depMgt) -->
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-embedder</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.protobuf</groupId>
+          <artifactId>protobuf-java</artifactId>
+        </exclusion>
+      </exclusions>
+      <!--
+      Discussed on https://github.com/jenkinsci/pipeline-maven-plugin/pull/48
+      Keep the dependency optional
+      -->
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>postgresql-api</artifactId>
+      <version>42.2.5</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>mysql-api</artifactId>
+      <version>8.0.16</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+      <version>4.0.2</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-job</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-multibranch</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>pipeline-build-step</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>branch-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-step-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>config-file-provider</artifactId>
+      <version>3.8.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>cloudbees-folder</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>h2-api</artifactId>
+      <version>1.4.199</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>script-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials-binding</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>junit</artifactId>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>junit-attachments</artifactId>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>flaky-test-handler</artifactId>
+      <version>1.2.0</version>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>htmlpublisher</artifactId>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>jgiven</artifactId>
+      <version>0.15.1</version>
+      <scope>compile</scope>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>maven-invoker-plugin</artifactId>
+      <version>2.4</version>
+      <scope>compile</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.maven.doxia</groupId>
+          <artifactId>doxia-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven.doxia</groupId>
+          <artifactId>doxia-site-renderer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven.doxia</groupId>
+          <artifactId>doxia-sink-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+        </exclusion>
+      </exclusions>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson.plugins</groupId>
+      <artifactId>findbugs</artifactId>
+      <version>5.0.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>asm</groupId>
+          <artifactId>asm</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jvnet.hudson.plugins.findbugs</groupId>
+          <artifactId>library</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jenkins-ci</groupId>
+          <artifactId>SECURITY-144-compat</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+        </exclusion>
+      </exclusions>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson.plugins</groupId>
+      <artifactId>tasks</artifactId>
+      <version>4.53</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>jacoco</artifactId>
+      <version>3.3.0</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpcore</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.ow2.asm</groupId>
+          <artifactId>asm</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.ow2.asm</groupId>
+          <artifactId>asm-commons</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.ow2.asm</groupId>
+          <artifactId>asm-tree</artifactId>
+        </exclusion>
+      </exclusions>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-cps</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkinsci.plugins</groupId>
+      <artifactId>pipeline-model-definition</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-durable-task-step</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-basic-steps</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-support</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-support</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-scm-step</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>pipeline-stage-step</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency><!--
+      AbstractHealthAwarePublisher depends on hudson.plugins.analysis.core.HealthAwarePublisher that depends on hudson.matrix.MatrixAggregatable
+      -->
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>matrix-project</artifactId>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jenkins-ci.test</groupId>
+      <artifactId>docker-fixtures</artifactId>
+      <version>1.11</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.fasterxml.jackson.core</groupId>
+          <artifactId>jackson-databind</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>ssh-slaves</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.main</groupId>
+      <artifactId>jenkins-test-harness-tools</artifactId>
+      <version>2.2</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>scm-api</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>git</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>git</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+
+     <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.0.2</version>
         <executions>
           <execution>
             <id>copy-maven-spy-jar</id>
@@ -645,12 +552,9 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <!--
-                  download deprecated see org.jvnet.hudson.test.ExtendedToolInstallations.configureMaven35
-                  -->
                   <groupId>org.apache.maven</groupId>
                   <artifactId>apache-maven</artifactId>
-                  <version>3.5.0</version>
+                  <version>3.6.3</version>
                   <type>zip</type>
                   <classifier>bin</classifier>
                   <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>

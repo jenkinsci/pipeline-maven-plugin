@@ -26,6 +26,8 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import org.postgresql.util.PSQLState;
 
+import javax.annotation.Nonnull;
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -33,9 +35,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
-
-import javax.annotation.Nonnull;
-import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -86,7 +85,7 @@ public class PipelineMavenPluginPostgreSqlDao extends AbstractPipelineMavenPlugi
 
     @Override
     protected Long getGeneratedPrimaryKey(PreparedStatement stmt, String column) throws SQLException {
-        Long jobPrimaryKey;
+        long jobPrimaryKey;
         try (ResultSet rst = stmt.getGeneratedKeys()) {
             if (rst.next()) {
                 jobPrimaryKey = rst.getLong(column);

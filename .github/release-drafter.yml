@@ -1,0 +1,5 @@
+# https://github.com/jenkinsci/.github/blob/master/.github/release-drafter.adoc
+_extends: .github
+name-template: pipeline-maven-$NEXT_MINOR_VERSION
+tag-template: pipeline-maven-$NEXT_MINOR_VERSION
+version-template: $MAJOR.$MINOR.$PATCH

@@ -7,6 +7,7 @@ import hudson.console.ConsoleLogFilter;
 import hudson.model.Run;
 import hudson.util.Secret;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -17,12 +18,9 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
-import javax.annotation.Nonnull;
+import org.jenkinsci.plugins.credentialsbinding.masking.SecretPatterns;
 
 /**
- * Similar to org.jenkinsci.plugins.credentialsbinding.impl.BindingStep.Filter
- *
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class MaskPasswordsConsoleLogFilter extends ConsoleLogFilter implements Serializable {
@@ -33,14 +31,13 @@ public class MaskPasswordsConsoleLogFilter extends ConsoleLogFilter implements S
     private final String charsetName;
 
     public MaskPasswordsConsoleLogFilter(@Nonnull Collection<String> secrets, @Nonnull String charsetName) {
-        this.secretsAsRegexp = Secret.fromString(MaskSecretsOutputStream.getPatternStringForSecrets(secrets));
+        this.secretsAsRegexp = Secret.fromString(SecretPatterns.getAggregateSecretPattern(secrets).toString());
         this.charsetName = charsetName;
     }
 
     @Override
     public OutputStream decorateLogger(Run build, final OutputStream logger) throws IOException, InterruptedException {
-        final Pattern p = Pattern.compile(secretsAsRegexp.getPlainText());
-        return new MaskSecretsOutputStream(p, logger, Charset.forName(this.charsetName));
+        return new SecretPatterns.MaskingOutputStream(logger, () -> Pattern.compile(secretsAsRegexp.getPlainText()), charsetName);
     }
 
     @Nonnull

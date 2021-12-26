@@ -24,20 +24,6 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-
-import java.io.File;
-import java.util.Collection;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.Map;
-
-
 import com.cloudbees.hudson.plugins.folder.Folder;
 import hudson.model.Fingerprint;
 import hudson.model.Result;
@@ -49,11 +35,12 @@ import jenkins.mvn.FilePathGlobalSettingsProvider;
 import jenkins.mvn.FilePathSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import org.apache.commons.io.FileUtils;
+import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.configfiles.GlobalConfigFiles;
 import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
+import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnGlobalSettingsProvider;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnSettingsProvider;
-import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
@@ -61,12 +48,24 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.jenkinsci.Symbol;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 
 
@@ -97,7 +96,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         String pipelineScript = "node('master') {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                "    withMaven(maven: 'apache-maven-3.5.0') {\n" +
+                "    withMaven(maven: 'apache-maven-3.6.3') {\n" +
                 "        sh 'mvn package'\n" +
                 "    }\n" +
                 "}";
@@ -107,7 +106,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
         // verify provided Maven is used
-        jenkinsRule.assertLogContains("using Maven installation 'apache-maven-3.5.0'", build);
+        jenkinsRule.assertLogContains("using Maven installation 'apache-maven-3.6.3'", build);
 
         // verify .pom is archived and fingerprinted
         // "[withMaven] Archive ... under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.pom"
@@ -184,15 +183,6 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         assertThat(tasksResultAction.getProjectActions().size(), is(1));
     }
 
-    /**
-     *
-     * <pre>
-     * ERROR: [withMaven] jacocoPublisher - Silently ignore exception archiving JaCoCo results:
-     * java.io.IOException: While reading class directory: /var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/j h8464991534006021463/jobs/jar-with-jacoco/builds/1/jacoco/classes
-     * </pre>
-     * @throws Exception
-     */
-    @Ignore("IOException: While reading class directory: .../jacoco/classes")
     @Test
     public void maven_build_jar_with_jacoco_succeeds() throws Exception {
         loadMavenJarWithJacocoInGitRepo(this.gitRepoRule);
@@ -217,7 +207,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         List<TestResultAction> testResultActions = build.getActions(TestResultAction.class);
         assertThat(testResultActions.size(), is(1));
         TestResultAction testResultAction = testResultActions.get(0);
-        assertThat(testResultAction.getTotalCount(), is(1));
+        assertThat(testResultAction.getTotalCount(), is(2));
         assertThat(testResultAction.getFailCount(), is(0));
 
         List<JacocoBuildAction> jacocoBuildActions = build.getActions(JacocoBuildAction.class);
@@ -551,7 +541,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "	    </server>\n" +
                 "    </servers>\n" +
                 "</settings>\n";
-        FileUtils.writeStringToFile(mavenGlobalSettingsFile, mavenGlobalSettings);
+        FileUtils.writeStringToFile(mavenGlobalSettingsFile, mavenGlobalSettings, StandardCharsets.UTF_8);
 
 
         String pipelineScript = "node () {\n" +
@@ -567,7 +557,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "    <packaging>pom</packaging>\n" +
                 "</project>'''\n" +
                 "\n" +
-                "    withMaven(maven: 'apache-maven-3.5.0') {\n" +
+                "    withMaven(maven: 'apache-maven-3.6.3') {\n" +
                 "        sh 'mvn help:effective-settings'\n" +
                 "    }\n" +
                 "}\n";
@@ -614,7 +604,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "    <packaging>pom</packaging>\n" +
                 "</project>'''\n" +
                 "\n" +
-                "    withMaven(maven: 'apache-maven-3.5.0') {\n" +
+                "    withMaven(maven: 'apache-maven-3.6.3') {\n" +
                 "        sh 'mvn help:effective-settings'\n" +
                 "    }\n" +
                 "}\n";
@@ -665,7 +655,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "    <packaging>pom</packaging>\n" +
                 "</project>'''\n" +
                 "\n" +
-                "    withMaven(maven: 'apache-maven-3.5.0') {\n" +
+                "    withMaven(maven: 'apache-maven-3.6.3') {\n" +
                 "        sh 'mvn help:effective-settings'\n" +
                 "    }\n" +
                 "}\n";
@@ -684,7 +674,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
             WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
             jenkinsRule.assertLogContains(
-                "[withMaven] using overriden Maven global settings by folder 'folder'. Config File Provider maven global settings file 'maven-global-config-test-folder'",
+                "[withMaven] using overridden Maven global settings by folder 'folder'. Config File Provider maven global settings file 'maven-global-config-test-folder'",
                 build);
             jenkinsRule.assertLogContains("<id>id-global-settings-test-from-config-file-provider-on-a-folder</id>", build);
         } finally {
@@ -721,7 +711,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "    <packaging>pom</packaging>\n" +
                 "</project>'''\n" +
                 "\n" +
-                "    withMaven(maven: 'apache-maven-3.5.0', globalMavenSettingsFilePath: 'maven-global-settings.xml') {\n" +
+                "    withMaven(maven: 'apache-maven-3.6.3', globalMavenSettingsFilePath: 'maven-global-settings.xml') {\n" +
                 "        sh 'mvn help:effective-settings'\n" +
                 "    }\n" +
                 "}\n";
@@ -765,7 +755,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "    <packaging>pom</packaging>\n" +
                 "</project>'''\n" +
                 "\n" +
-                "    withMaven(maven: 'apache-maven-3.5.0', mavenSettingsFilePath: 'maven-settings.xml') {\n" +
+                "    withMaven(maven: 'apache-maven-3.6.3', mavenSettingsFilePath: 'maven-settings.xml') {\n" +
                 "        sh 'env && mvn help:effective-settings'\n" +
                 "    }\n" +
                 "}\n";
@@ -793,7 +783,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "	    </server>\n" +
                 "    </servers>\n" +
                 "</settings>\n";
-        FileUtils.writeStringToFile(mavenSettingsFile, mavenSettings);
+        FileUtils.writeStringToFile(mavenSettingsFile, mavenSettings, StandardCharsets.UTF_8);
 
 
         String pipelineScript = "node () {\n" +
@@ -809,7 +799,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "    <packaging>pom</packaging>\n" +
                 "</project>'''\n" +
                 "\n" +
-                "    withMaven(maven: 'apache-maven-3.5.0') {\n" +
+                "    withMaven(maven: 'apache-maven-3.6.3') {\n" +
                 "        sh 'mvn help:effective-settings'\n" +
                 "    }\n" +
                 "}\n";
@@ -856,7 +846,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "    <packaging>pom</packaging>\n" +
                 "</project>'''\n" +
                 "\n" +
-                "    withMaven(maven: 'apache-maven-3.5.0') {\n" +
+                "    withMaven(maven: 'apache-maven-3.6.3') {\n" +
                 "        sh 'mvn help:effective-settings'\n" +
                 "    }\n" +
                 "}\n";
@@ -903,7 +893,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "    <packaging>pom</packaging>\n" +
                 "</project>'''\n" +
                 "\n" +
-                "    withMaven(maven: 'apache-maven-3.5.0') {\n" +
+                "    withMaven(maven: 'apache-maven-3.6.3') {\n" +
                 "        sh 'mvn help:effective-settings'\n" +
                 "    }\n" +
                 "}\n";
@@ -921,7 +911,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             WorkflowJob pipeline = folder.createProject(WorkflowJob.class, "build-on-master-with-maven-settings-defined-in-jenkins-global-config-with-config-file-provider");
             pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
             WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
-            jenkinsRule.assertLogContains("[withMaven] using overriden Maven settings by folder 'folder'. Config File Provider maven settings file 'maven-config-test-folder'",
+            jenkinsRule.assertLogContains("[withMaven] using overridden Maven settings by folder 'folder'. Config File Provider maven settings file 'maven-config-test-folder'",
                 build);
             jenkinsRule.assertLogContains("<id>id-settings-test-through-config-file-provider-on-a-folder</id>", build);
         } finally {
@@ -959,7 +949,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "    <packaging>pom</packaging>\n" +
                 "</project>'''\n" +
                 "\n" +
-                "    withMaven(maven: 'apache-maven-3.5.0', mavenSettingsConfig: 'maven-config-test-from-pipeline-attribute') {\n" +
+                "    withMaven(maven: 'apache-maven-3.6.3', mavenSettingsConfig: 'maven-config-test-from-pipeline-attribute') {\n" +
                 "        sh 'mvn help:effective-settings'\n" +
                 "    }\n" +
                 "}\n";

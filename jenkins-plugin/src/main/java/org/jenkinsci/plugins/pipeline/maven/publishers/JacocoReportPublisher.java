@@ -39,6 +39,7 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -47,8 +48,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -128,9 +127,11 @@ public class JacocoReportPublisher extends MavenPublisher {
         Launcher launcher = context.get(Launcher.class);
 
         List<Element> jacocoPrepareAgentEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, "org.jacoco", "jacoco-maven-plugin", "prepare-agent", "MojoSucceeded", "MojoFailed");
+        List<Element> jacocoPrepareAgentIntegrationEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, "org.jacoco", "jacoco-maven-plugin", "prepare-agent-integration", "MojoSucceeded", "MojoFailed");
+        jacocoPrepareAgentEvents.addAll(jacocoPrepareAgentIntegrationEvents); // add prepare-agent-integration goals
 
         if (jacocoPrepareAgentEvents.isEmpty()) {
-            LOGGER.log(Level.FINE, "No org.jacoco:jacoco-maven-plugin:prepare-agent execution found");
+            LOGGER.log(Level.FINE, "No org.jacoco:jacoco-maven-plugin:prepare-agent[-integration] execution found");
             return;
         }
 
@@ -139,7 +140,7 @@ public class JacocoReportPublisher extends MavenPublisher {
         } catch (ClassNotFoundException e) {
             listener.getLogger().print("[withMaven] Jenkins ");
             listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/JaCoCo+Plugin", "JaCoCo Plugin");
-            listener.getLogger().println(" not found, don't display org.jacoco:jacoco-maven-plugin:findbugs results in pipeline screen.");
+            listener.getLogger().println(" not found, don't display org.jacoco:jacoco-maven-plugin:prepare-agent[-integration] results in pipeline screen.");
             return;
         }
 
@@ -167,6 +168,7 @@ public class JacocoReportPublisher extends MavenPublisher {
             String destFile = destFileElt.getTextContent().trim();
             if (destFile.equals("${jacoco.destFile}")) {
                 destFile = "${project.build.directory}/jacoco.exec";
+                if ("prepare-agent-integration".equals(pluginInvocation.goal)) destFile = "${project.build.directory}/jacoco-it.exec";
                 String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
                 if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
                     listener.getLogger().println("[withMaven] '${project.build.directory}' found for <project> in " + XmlUtils.toString(jacocoPrepareAgentEvent));

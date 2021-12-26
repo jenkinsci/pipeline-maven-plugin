@@ -18,17 +18,21 @@
 
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
-import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
-
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.Run;
+import hudson.model.StreamBuildListener;
+import hudson.model.TaskListener;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.jgiven.JgivenReportGenerator;
-import org.jenkinsci.plugins.jgiven.JgivenReportGenerator.ReportConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -36,14 +40,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
-
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.Run;
-import hudson.model.StreamBuildListener;
-import hudson.model.TaskListener;
+import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -109,7 +106,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
             return;
         }
 
-        final JgivenReportGenerator generator = new JgivenReportGenerator(new ArrayList<ReportConfig>());
+        final JgivenReportGenerator generator = new JgivenReportGenerator(new ArrayList<>());
 
         try {
             listener.getLogger().println("[withMaven] jgivenPublisher - Running JGiven report generator");

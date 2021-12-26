@@ -31,6 +31,7 @@ import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import hudson.Extension;
+import hudson.init.Terminator;
 import hudson.model.Result;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
@@ -54,7 +55,12 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.verb.POST;
 
+import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -74,11 +80,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.sql.DataSource;
-
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
@@ -88,7 +89,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
     private final static Logger LOGGER = Logger.getLogger(GlobalPipelineMavenConfig.class.getName());
 
-    private transient PipelineMavenPluginDao dao;
+    private transient volatile PipelineMavenPluginDao dao;
 
     private transient PipelineTriggerService pipelineTriggerService;
 
@@ -240,12 +241,18 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
     @Nonnull
     public synchronized PipelineMavenPluginDao getDao() {
+        Jenkins j = Jenkins.getInstanceOrNull();
+        if (j == null) {
+            throw new IllegalStateException("Request to get DAO whilst Jenkins is shutting down or starting up");
+        } else if (j.isTerminating()) {
+            throw new IllegalStateException("Request to get DAO whilst Jenkins is terminating");
+        }
         if (dao == null) {
             try {
                 String jdbcUrl, jdbcUserName, jdbcPassword;
                 if (StringUtils.isBlank(this.jdbcUrl)) {
                     // default embedded H2 database
-                    File databaseRootDir = new File(Jenkins.getInstance().getRootDir(), "jenkins-jobs");
+                    File databaseRootDir = new File(j.getRootDir(), "jenkins-jobs");
                     if (!databaseRootDir.exists()) {
                         boolean created = databaseRootDir.mkdirs();
                         if (!created) {
@@ -262,7 +269,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                         throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
 
                     UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
-                            CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.getInstance(),
+                            CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, j,
                                     ACL.SYSTEM, Collections.EMPTY_LIST),
                             CredentialsMatchers.withId(this.jdbcCredentialsId));
                     if (jdbcCredentials == null) {
@@ -397,6 +404,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     }
 
     public ListBoxModel doFillJdbcCredentialsIdItems() {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
         // use deprecated "withMatching" because, even after 20 mins of research,
         // I didn't understand how to use the new "recommended" API
         return new StandardListBoxModel()
@@ -404,14 +412,17 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 .withMatching(
                         CredentialsMatchers.always(),
                         CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class,
-                                Jenkins.getInstance(),
+                                Jenkins.get(),
                                 ACL.SYSTEM,
                                 Collections.EMPTY_LIST));
     }
+
+    @POST
     public FormValidation doValidateJdbcConnection(
                                      @QueryParameter String jdbcUrl,
                                      @QueryParameter String properties,
                                      @QueryParameter String jdbcCredentialsId) {
+        Jenkins.get().checkPermission(Jenkins.ADMINISTER);
         if (StringUtils.isBlank(jdbcUrl)) {
             return FormValidation.ok("OK");
         }
@@ -451,7 +462,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 }
             } else {
                 UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
-                        CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.getInstance(),
+                        CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.get(),
                                 ACL.SYSTEM, Collections.EMPTY_LIST),
                         CredentialsMatchers.withId(jdbcCredentialsId));
                 if (jdbcCredentials == null) {
@@ -553,8 +564,12 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                             }
                         }
                         switch (metaData.getDatabaseMajorVersion()) {
+                            case 13:
+                            case 12:
                             case 11:
                             case 10:
+                            case 9:
+                            case 8:
                                 // OK
                                 break;
                             default:
@@ -580,5 +595,17 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
             return FormValidation.error(e, "Failed to load JDBC driver '" + driverClass + "' for JDBC connection '" + jdbcUrl + "'");
         }
 
+    }
+    
+    @Terminator
+    public synchronized void closeDatasource() {
+        PipelineMavenPluginDao dao = this.dao;
+        if (dao instanceof Closeable) {
+            try {
+                ((Closeable) dao).close();
+            } catch (IOException e) {
+                LOGGER.log(Level.WARNING, "Exception closing the DAO", e);
+            }
+        }
     }
 }

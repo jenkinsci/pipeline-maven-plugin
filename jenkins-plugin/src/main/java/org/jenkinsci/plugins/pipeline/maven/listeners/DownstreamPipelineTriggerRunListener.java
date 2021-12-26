@@ -22,6 +22,8 @@ import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,9 +39,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-import javax.inject.Inject;
 
 /**
  * Trigger downstream pipelines.
@@ -78,7 +77,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 }
             } else {
                 for(Map.Entry<String, List<MavenDependencyCause>> entry: omittedPipelineFullNamesAndCauses.entrySet()) {
-                    Job omittedPipeline = Jenkins.getInstance().getItemByFullName(entry.getKey(), Job.class);
+                    Job omittedPipeline = Jenkins.get().getItemByFullName(entry.getKey(), Job.class);
                     if (omittedPipeline == null) {
                         listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Illegal state: " + entry.getKey() + " not resolved");
                         continue;
@@ -112,7 +111,8 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                                 omittedPipelineTriggerCauses + ", invocation rejected.");
                     } else {
                         listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Triggering downstream pipeline " +  ModelHyperlinkNote.encodeTo(omittedPipeline) + " despite build result " +
-                                upstreamBuild.getResult() + " for the upstream causes: " + omittedPipelineTriggerCauses.stream().map(c -> c.getShortDescription()).collect(Collectors.joining(", ")));
+                                upstreamBuild.getResult() + " for the upstream causes: " + omittedPipelineTriggerCauses.stream().map(
+                                Cause::getShortDescription).collect(Collectors.joining(", ")));
                     }
                 }
             }
@@ -164,7 +164,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                     continue;
                 }
 
-                final WorkflowJob downstreamPipeline = Jenkins.getInstance().getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
+                final WorkflowJob downstreamPipeline = Jenkins.get().getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
                 if (downstreamPipeline == null || downstreamPipeline.getLastBuild() == null) {
                     LOGGER.log(Level.FINE, "Downstream pipeline {0} or downstream pipeline last build not found from upstream build {1}. Database synchronization issue or security restriction?",
                             new Object[]{downstreamPipelineFullName, upstreamBuild.getFullDisplayName(), Jenkins.getAuthentication()});
@@ -206,7 +206,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 for (String transitiveUpstreamPipelineName : transitiveUpstreamPipelines.keySet()) {
                     // Skip if one of the downstream's upstream is already building or in queue
                     // Then it will get triggered anyway by that upstream, we don't need to trigger it again
-                    WorkflowJob transitiveUpstreamPipeline = Jenkins.getInstance().getItemByFullName(transitiveUpstreamPipelineName, WorkflowJob.class);
+                    WorkflowJob transitiveUpstreamPipeline = Jenkins.get().getItemByFullName(transitiveUpstreamPipelineName, WorkflowJob.class);
 
                     if (transitiveUpstreamPipeline == null) {
                         // security: not allowed to view this transitive upstream pipeline, continue to loop
@@ -273,7 +273,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
 		triggerPipelinesLoop:
         for (Map.Entry<String, Set<MavenArtifact>> entry: jobsToTrigger.entrySet()) {
             String downstreamJobFullName = entry.getKey();
-            Job downstreamJob = Jenkins.getInstance().getItemByFullName(downstreamJobFullName, Job.class);
+            Job downstreamJob = Jenkins.get().getItemByFullName(downstreamJobFullName, Job.class);
             if (downstreamJob == null) {
                 listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Illegal state: " + downstreamJobFullName + " not resolved");
                 continue;
@@ -292,7 +292,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 if (matchingMavenDependencies.isEmpty()) {
                     for (Map.Entry<String, Set<String>> omittedPipeline : omittedPipelineTriggersByPipelineFullname.entrySet()) {
                         if (omittedPipeline.getValue().contains(downstreamJobFullName)) {
-                            Job transitiveDownstreamJob = Jenkins.getInstance().getItemByFullName(entry.getKey(), Job.class);
+                            Job transitiveDownstreamJob = Jenkins.get().getItemByFullName(entry.getKey(), Job.class);
                             listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering "
                                     + "downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + "because it will be triggered by transitive downstream " + ModelHyperlinkNote.encodeTo(transitiveDownstreamJob));
                             continue triggerPipelinesLoop; // don't trigger downstream pipeline

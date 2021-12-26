@@ -23,8 +23,8 @@ THE SOFTWARE.
 -->
 
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout"
-         xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core"
+         xmlns:f="/lib/form">
 
     <f:entry title="${%Maven}" field="maven">
         <f:select/>
@@ -51,6 +51,10 @@ THE SOFTWARE.
 
     <f:entry title="${%Maven JVM Opts}" field="mavenOpts">
         <f:textbox/>
+    </f:entry>
+
+    <f:entry title="${%Maven Traceability}" field="traceability">
+        <f:checkbox default="true"/>
     </f:entry>
 
     <f:entry title="${%Maven Local Repository}" field="mavenLocalRepo">

@@ -13,7 +13,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
 
-import static java.nio.file.FileVisitResult.*;
+import static java.nio.file.FileVisitResult.CONTINUE;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
