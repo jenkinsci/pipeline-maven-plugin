@@ -27,22 +27,20 @@ package org.jenkinsci.plugins.pipeline.maven.eventspy.reporter;
 import org.apache.maven.eventspy.EventSpy;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import javax.annotation.concurrent.ThreadSafe;
-
 /**
  * WARNING: implementations of {@link MavenEventReporter} MUST be thread safe.
  *
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-@ThreadSafe
 public interface MavenEventReporter {
     void print(Object message);
 
     void print(Xpp3Dom element);
 
     /**
-     * Close the reporter at the end of the Maven execution.
-     * No call to {@link #print(Object)} or {@link #print(Xpp3Dom)} will be made after the invocation of this method.
+     * Close the reporter at the end of the Maven execution. No call to
+     * {@link #print(Object)} or {@link #print(Xpp3Dom)} will be made after the
+     * invocation of this method.
      *
      * @see EventSpy#close()
      */

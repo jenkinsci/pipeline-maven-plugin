@@ -103,6 +103,11 @@
         <artifactId>maven-model</artifactId>
         <version>3.5.0</version>
       </dependency>
+      <dependency>
+        <groupId>org.jenkins-ci</groupId>
+        <artifactId>annotation-indexer</artifactId>
+        <version>1.15</version>
+      </dependency>
       <dependency><!--
         for org.jenkins-ci.plugins:maven-invoker-plugin and org.jenkins-ci.main:maven-plugin
         -->
@@ -238,6 +243,12 @@
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>mysql-api</artifactId>
       <version>8.0.16</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.protobuf</groupId>
+          <artifactId>protobuf-java</artifactId>
+        </exclusion>
+      </exclusions>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -480,6 +491,12 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ssh-slaves</artifactId>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.protobuf</groupId>
+          <artifactId>protobuf-java</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>

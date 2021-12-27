@@ -24,26 +24,29 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
+import static org.jenkinsci.plugins.pipeline.maven.eventspy.JenkinsMavenEventSpy.DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.execution.ExecutionEvent;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.jenkinsci.plugins.pipeline.maven.eventspy.JenkinsMavenEventSpy.DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
- * Handler to alter the <code>org.apache.maven.plugins:maven-invoker-plugin:run</code> goal :
- * it will append the <code>JENKINS_MAVEN_AGENT_DISABLED</code> (set to <code>true</code>) to
- * the environment.
+ * Handler to alter the
+ * <code>org.apache.maven.plugins:maven-invoker-plugin:run</code> goal : it will
+ * append the <code>JENKINS_MAVEN_AGENT_DISABLED</code> (set to
+ * <code>true</code>) to the environment.
  * <p>
- * Thus our spy will not run during Invoker integration tests, to avoid recording integration
- * tests artifacts and dependencies.
+ * Thus our spy will not run during Invoker integration tests, to avoid
+ * recording integration tests artifacts and dependencies.
+ *
  * @author <a href="mailto:benoit.guerin1@free.fr">Benoit Guérin</a>
  *
  */
@@ -67,7 +70,7 @@ public class InvokerStartExecutionHandler extends AbstractExecutionHandler {
         return "org.apache.maven.plugins:maven-invoker-plugin:run";
     }
 
-    @Nonnull
+    @NonNull
     @Override
     protected List<String> getConfigurationParametersToReport(final ExecutionEvent executionEvent) {
         return new ArrayList<String>();
@@ -86,7 +89,8 @@ public class InvokerStartExecutionHandler extends AbstractExecutionHandler {
             env = new Xpp3Dom("environmentVariables");
             executionEvent.getMojoExecution().getConfiguration().addChild(env);
         }
-        // Finally, adding our environment variable to disable our spy during the integration tests runs
+        // Finally, adding our environment variable to disable our spy during the
+        // integration tests runs
         Xpp3Dom disableSpy = new Xpp3Dom(DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME);
         disableSpy.setValue("true");
         env.addChild(disableSpy);

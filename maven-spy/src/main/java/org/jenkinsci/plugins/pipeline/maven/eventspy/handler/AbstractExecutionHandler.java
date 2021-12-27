@@ -24,24 +24,25 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
+import java.util.List;
+
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.plugin.MojoExecution;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler<ExecutionEvent> {
-    protected AbstractExecutionHandler(@Nonnull MavenEventReporter reporter) {
+    protected AbstractExecutionHandler(@NonNull MavenEventReporter reporter) {
         super(reporter);
     }
 
-    public boolean handle(@Nonnull Object event) {
+    public boolean handle(@NonNull Object event) {
         if (!(event instanceof ExecutionEvent)) {
             return false;
         }
@@ -74,7 +75,7 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
     }
 
     @Override
-    public boolean _handle(@Nonnull ExecutionEvent executionEvent) {
+    public boolean _handle(@NonNull ExecutionEvent executionEvent) {
         List<String> configurationParameters = getConfigurationParametersToReport(executionEvent);
 
         Xpp3Dom root = new Xpp3Dom("ExecutionEvent");
@@ -123,11 +124,11 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
         return true;
     }
 
-    protected void addDetails(@Nonnull ExecutionEvent executionEvent, @Nonnull Xpp3Dom root) {
+    protected void addDetails(@NonNull ExecutionEvent executionEvent, @NonNull Xpp3Dom root) {
 
     }
 
-    @Nonnull
+    @NonNull
     protected abstract List<String> getConfigurationParametersToReport(ExecutionEvent executionEvent);
 
     /**
@@ -153,13 +154,13 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
     }
 
     @Nullable
-    protected String getMojoConfigurationValue(@Nonnull MojoExecution execution, @Nonnull String elementName) {
+    protected String getMojoConfigurationValue(@NonNull MojoExecution execution, @NonNull String elementName) {
         Xpp3Dom element = execution.getConfiguration().getChild(elementName);
         return element == null ? null : element.getValue() == null ? element.getAttribute("default-value") : element.getValue();
     }
 
     @Nullable
-    protected Xpp3Dom fullClone(@Nonnull String elementName, @Nullable Xpp3Dom element) {
+    protected Xpp3Dom fullClone(@NonNull String elementName, @Nullable Xpp3Dom element) {
         if (element == null) {
             return null;
         }

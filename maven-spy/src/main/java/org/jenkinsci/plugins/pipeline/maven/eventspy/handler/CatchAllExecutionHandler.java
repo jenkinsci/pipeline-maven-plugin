@@ -24,27 +24,28 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.plugin.MojoExecution;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class CatchAllExecutionHandler extends AbstractExecutionHandler {
 
-    public CatchAllExecutionHandler(@Nonnull MavenEventReporter reporter) {
+    public CatchAllExecutionHandler(@NonNull MavenEventReporter reporter) {
         super(reporter);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     protected List<String> getConfigurationParametersToReport(ExecutionEvent executionEvent) {
 
