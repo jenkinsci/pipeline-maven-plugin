@@ -171,13 +171,6 @@ public class FindbugsAnalysisPublisher extends AbstractHealthAwarePublisher {
         Run run = context.get(Run.class);
         Launcher launcher = context.get(Launcher.class);
 
-
-         List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, "org.codehaus.mojo", "findbugs-maven-plugin", "findbugs", "MojoSucceeded", "MojoFailed");
-
-        if (findbugsEvents.isEmpty()) {
-            LOGGER.log(Level.FINE, "No org.codehaus.mojo:findbugs-maven-plugin:findbugs execution found");
-            return;
-        }
         try {
             Class.forName("hudson.plugins.findbugs.FindBugsPublisher");
         } catch (ClassNotFoundException e) {
@@ -187,6 +180,12 @@ public class FindbugsAnalysisPublisher extends AbstractHealthAwarePublisher {
             return;
         }
 
+        List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, "org.codehaus.mojo", "findbugs-maven-plugin", "findbugs", "MojoSucceeded", "MojoFailed");
+
+        if (findbugsEvents.isEmpty()) {
+            LOGGER.log(Level.FINE, "No org.codehaus.mojo:findbugs-maven-plugin:findbugs execution found");
+            return;
+        }
 
         for (Element findBugsTestEvent : findbugsEvents) {
 
