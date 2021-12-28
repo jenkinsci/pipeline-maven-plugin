@@ -24,17 +24,6 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.reporter;
 
-import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
-import org.codehaus.plexus.util.xml.XMLWriter;
-import org.codehaus.plexus.util.xml.XmlWriterUtil;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomWriter;
-import org.jenkinsci.plugins.pipeline.maven.eventspy.RuntimeIOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.annotation.concurrent.GuardedBy;
-import javax.annotation.concurrent.ThreadSafe;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -44,23 +33,28 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
+import org.codehaus.plexus.util.xml.XMLWriter;
+import org.codehaus.plexus.util.xml.XmlWriterUtil;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomWriter;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.RuntimeIOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-@ThreadSafe
 public class FileMavenEventReporter implements MavenEventReporter {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
-     * report file gets initially created with a "maven-spy-*.log.tmp" file extension and gets renamed "maven-spy-*.log"
-     * at the end of the execution
+     * report file gets initially created with a "maven-spy-*.log.tmp" file
+     * extension and gets renamed "maven-spy-*.log" at the end of the execution
      */
-    @GuardedBy("this")
     File outFile;
-    @GuardedBy("this")
     PrintWriter out;
-    @GuardedBy("this")
     XMLWriter xmlWriter;
     /**
      * used to support multiple calls of {@link #close()} }
@@ -80,8 +74,8 @@ public class FileMavenEventReporter implements MavenEventReporter {
                 boolean created = reportsFolder.mkdirs();
                 if (!created) {
                     reportsFolder = new File(".");
-                    logger.warn("[jenkins-event-spy] Failure to create folder '" + reportsFolder.getAbsolutePath() +
-                            "', generate report in '" + reportsFolder.getAbsolutePath() + "'");
+                    logger.warn("[jenkins-event-spy] Failure to create folder '" + reportsFolder.getAbsolutePath()
+                            + "', generate report in '" + reportsFolder.getAbsolutePath() + "'");
                 }
             }
         }

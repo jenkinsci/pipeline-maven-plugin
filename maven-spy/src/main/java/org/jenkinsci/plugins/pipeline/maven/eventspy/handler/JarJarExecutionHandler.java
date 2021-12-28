@@ -24,12 +24,13 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.maven.execution.ExecutionEvent;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
-import javax.annotation.Nullable;
-import java.util.Arrays;
-import java.util.List;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>

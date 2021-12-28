@@ -24,6 +24,14 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.regex.Pattern;
+
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Build;
@@ -36,15 +44,8 @@ import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.regex.Pattern;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -94,7 +95,7 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         return element;
     }
 
-    public Xpp3Dom newElement(@Nonnull String name, @Nullable final MavenProject project) {
+    public Xpp3Dom newElement(@NonNull String name, @Nullable final MavenProject project) {
         Xpp3Dom projectElt = new Xpp3Dom(name);
         if (project == null) {
             return projectElt;
@@ -175,7 +176,7 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
      * @return the "flattenedPomFilename" defined at the "flatten" execution level or at the plugin definition level. {@code null}
      */
     @Nullable
-    protected String getMavenFlattenPluginFlattenedPomFilename(@Nonnull MavenProject project) {
+    protected String getMavenFlattenPluginFlattenedPomFilename(@NonNull MavenProject project) {
         for(Plugin buildPlugin : project.getBuildPlugins()) {
             if ("org.codehaus.mojo:flatten-maven-plugin".equals(buildPlugin.getKey())) {
                 String mavenConfigurationElement = "flattenedPomFilename";
@@ -209,7 +210,7 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
     	return input;
     }
     
-    public Xpp3Dom newElement(@Nonnull String name, @Nullable Throwable t) {
+    public Xpp3Dom newElement(@NonNull String name, @Nullable Throwable t) {
         Xpp3Dom rootElt = new Xpp3Dom(name);
         if (t == null) {
             return rootElt;
@@ -228,7 +229,7 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         return rootElt;
     }
 
-    public Xpp3Dom newElement(@Nonnull String name, @Nullable File file) {
+    public Xpp3Dom newElement(@NonNull String name, @Nullable File file) {
         Xpp3Dom element = new Xpp3Dom(name);
         try {
             element.setValue(file == null ? null : file.getCanonicalPath());
@@ -238,7 +239,7 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
         return element;
     }
 
-    public Xpp3Dom newElement(@Nonnull String name, @Nullable Artifact artifact) {
+    public Xpp3Dom newElement(@NonNull String name, @Nullable Artifact artifact) {
         Xpp3Dom element = new Xpp3Dom(name);
         if (artifact == null) {
             return element;

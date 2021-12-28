@@ -5,21 +5,22 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class DeployDeployExecutionHandler extends CatchAllExecutionHandler {
-    public DeployDeployExecutionHandler(@Nonnull MavenEventReporter reporter) {
+    public DeployDeployExecutionHandler(@NonNull MavenEventReporter reporter) {
         super(reporter);
     }
 
     @Override
-    protected void addDetails(@Nonnull ExecutionEvent executionEvent, @Nonnull Xpp3Dom root) {
+    protected void addDetails(@NonNull ExecutionEvent executionEvent, @NonNull Xpp3Dom root) {
         super.addDetails(executionEvent, root);
-        ArtifactRepository artifactRepository = executionEvent.getProject().getDistributionManagementArtifactRepository();
+        ArtifactRepository artifactRepository = executionEvent.getProject()
+                .getDistributionManagementArtifactRepository();
         Xpp3Dom artifactRepositoryElt = new Xpp3Dom("artifactRepository");
         root.addChild(artifactRepositoryElt);
         if (artifactRepository == null) {
@@ -41,7 +42,6 @@ public class DeployDeployExecutionHandler extends CatchAllExecutionHandler {
     protected ExecutionEvent.Type getSupportedType() {
         return ExecutionEvent.Type.MojoSucceeded;
     }
-
 
     @Nullable
     @Override

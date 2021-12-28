@@ -4,8 +4,8 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositoryEvent;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 public class ArtifactDeployedEventHandler implements MavenEventHandler {
 
@@ -58,7 +58,7 @@ public class ArtifactDeployedEventHandler implements MavenEventHandler {
         return element;
     }
 
-    protected Xpp3Dom newElement(@Nonnull String name, @Nullable org.eclipse.aether.artifact.Artifact artifact) {
+    protected Xpp3Dom newElement(@NonNull String name, @Nullable org.eclipse.aether.artifact.Artifact artifact) {
         Xpp3Dom element = new Xpp3Dom(name);
         if (artifact == null) {
             return element;
@@ -73,7 +73,6 @@ public class ArtifactDeployedEventHandler implements MavenEventHandler {
         element.setAttribute("snapshot", String.valueOf(artifact.isSnapshot()));
         element.setAttribute("file", artifact.getFile().getAbsolutePath());
         element.setAttribute("extension", artifact.getExtension());
-
 
         return element;
     }

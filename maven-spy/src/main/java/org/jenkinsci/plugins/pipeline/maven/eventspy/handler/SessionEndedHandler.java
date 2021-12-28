@@ -24,31 +24,33 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
-import org.apache.maven.execution.ExecutionEvent;
-import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.maven.execution.ExecutionEvent;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
+
 /**
- * Don't generate an entry in the report for {@link ExecutionEvent.Type#SessionEnded}
+ * Don't generate an entry in the report for
+ * {@link ExecutionEvent.Type#SessionEnded}
  *
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class SessionEndedHandler extends AbstractExecutionHandler {
 
-    public SessionEndedHandler(@Nonnull MavenEventReporter reporter) {
+    public SessionEndedHandler(@NonNull MavenEventReporter reporter) {
         super(reporter);
     }
 
     @Override
-    public boolean _handle(@Nonnull ExecutionEvent executionEvent) {
+    public boolean _handle(@NonNull ExecutionEvent executionEvent) {
         return true;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     protected List<String> getConfigurationParametersToReport(ExecutionEvent executionEvent) {
         return Collections.emptyList();
