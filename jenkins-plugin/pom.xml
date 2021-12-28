@@ -161,7 +161,7 @@
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>maven-plugin</artifactId>
-      <version>3.15.1</version>
+      <version>3.16</version>
       <exclusions>
         <exclusion><!-- Require upper bound dependencies error for com.google.inject:guice:4.0-beta paths to dependency are:...-->
           <groupId>com.google.inject</groupId>
@@ -367,6 +367,10 @@
         <exclusion>
           <groupId>org.apache.commons</groupId>
           <artifactId>commons-lang3</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.sonatype.sisu</groupId>
+          <artifactId>sisu-inject-bean</artifactId>
         </exclusion>
       </exclusions>
       <optional>true</optional>
