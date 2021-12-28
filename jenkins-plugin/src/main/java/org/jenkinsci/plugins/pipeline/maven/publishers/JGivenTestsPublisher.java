@@ -72,6 +72,15 @@ public class JGivenTestsPublisher extends MavenPublisher {
         final Run run = context.get(Run.class);
         final Launcher launcher = context.get(Launcher.class);
 
+        try {
+            Class.forName("org.jenkinsci.plugins.jgiven.JgivenReportGenerator");
+        } catch (final ClassNotFoundException e) {
+            listener.getLogger().print("[withMaven] jgivenPublisher - Jenkins ");
+            listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/JGiven+Plugin", "JGiven Plugin");
+            listener.getLogger().println(" not found, do not archive jgiven reports.");
+            return;
+        }
+
         boolean foundJGivenDependency = false;
         List<MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
         for (MavenDependency dependency : dependencies) {
@@ -84,15 +93,6 @@ public class JGivenTestsPublisher extends MavenPublisher {
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger().println("[withMaven] jgivenPublisher - JGiven not found within your project dependencies, aborting.");
             }
-            return;
-        }
-
-        try {
-            Class.forName("org.jenkinsci.plugins.jgiven.JgivenReportGenerator");
-        } catch (final ClassNotFoundException e) {
-            listener.getLogger().print("[withMaven] jgivenPublisher - Jenkins ");
-            listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/JGiven+Plugin", "JGiven Plugin");
-            listener.getLogger().println(" not found, do not archive jgiven reports.");
             return;
         }
 
