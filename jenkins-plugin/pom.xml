@@ -106,7 +106,7 @@
       <dependency>
         <groupId>org.jenkins-ci</groupId>
         <artifactId>annotation-indexer</artifactId>
-        <version>1.15</version>
+        <version>1.16</version>
       </dependency>
       <dependency><!--
         for org.jenkins-ci.plugins:maven-invoker-plugin and org.jenkins-ci.main:maven-plugin
