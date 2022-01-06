@@ -24,18 +24,6 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.eventspy.EventSpy;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -63,6 +51,17 @@ import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.FileMavenEventRepo
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Named;
+import javax.inject.Singleton;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Maven {@link EventSpy} to capture build details consumed by the Jenkins Pipeline Maven Plugin
