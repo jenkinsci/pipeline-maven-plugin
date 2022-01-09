@@ -118,6 +118,14 @@ public abstract class AbstractIntegrationTest {
         loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_docker_dependency_project/");
     }
 
+    protected void loadDeployFileBaseMavenProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
+        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_deployfile_base_project/");
+    }
+
+    protected void loadDeployFileDependencyMavenJarProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
+        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_deployfile_dependency_project/");
+    }
+
     protected void loadSourceCodeInGitRepository(GitSampleRepoRule gitRepo, String name) throws Exception {
         gitRepo.init();
         Path mavenProjectRoot = Paths.get(WithMavenStepOnMasterTest.class.getResource(name).toURI());

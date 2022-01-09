@@ -8,6 +8,8 @@ import jenkins.plugins.git.GitSCMSource;
 import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.plugins.git.traits.BranchDiscoveryTrait;
 import jenkins.scm.api.trait.SCMSourceTrait;
+
+import org.eclipse.collections.impl.block.factory.Predicates;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
@@ -356,7 +358,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         mavenDockerBasePipeline.setDefinition(new CpsFlowDefinition(mavenDockerBasePipelineScript, true));
         mavenDockerBasePipeline.addTrigger(new WorkflowJobDependencyTrigger());
         WorkflowRun mavenDockerBasePipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenDockerBasePipeline.scheduleBuild2(0));
-        // TODO check in DB that the dependency on the war project is recorded
+        // TODO check in DB that the dependency on the docker project is recorded
         System.out.println("build-docker-dependencyFirstRun: " + mavenDockerBasePipelineFirstRun);
 
         WorkflowRun mavenDockerDependencyPipelineSecondRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenDockerDependency.scheduleBuild2(0));
@@ -369,6 +371,60 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
 
         assertThat(mavenDockerBasePipelineLastRun.getNumber(), is(mavenDockerBasePipelineFirstRun.getNumber() + 1));
         Cause.UpstreamCause upstreamCause = mavenDockerBasePipelineLastRun.getCause(Cause.UpstreamCause.class);
+        assertThat(upstreamCause, notNullValue());
+    }
+
+    @Test
+    public void verify_deployfile_downstream_simple_pipeline_trigger() throws Exception {
+        PipelineGraphPublisher publisher = GlobalPipelineMavenConfig.get().getPublisherOptions().stream()
+                .filter(p -> PipelineGraphPublisher.class.isInstance(p))
+                .findFirst()
+                .map(p -> (PipelineGraphPublisher)p)
+                .get();
+        publisher.setLifecycleThreshold("deploy");
+
+        System.out.println("gitRepoRule: " + gitRepoRule);
+        loadDeployFileDependencyMavenJarProjectInGitRepo(this.gitRepoRule);
+        System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
+        loadDeployFileBaseMavenProjectInGitRepo(this.downstreamArtifactRepoRule);
+
+        String mavenDeployFileDependencyPipelineScript = "node('master') {\n"
+                + "    git($/" + gitRepoRule.toString() + "/$)\n"
+                + "    withMaven() {\n"
+                + "        sh 'mvn install deploy:deploy-file@deploy-file'\n"
+                + "    }\n"
+                + "}";
+        String mavenDeployFileBasePipelineScript = "node('master') {\n"
+                + "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n"
+                + "    withMaven() {\n"
+                + "        sh 'mvn install'\n"
+                + "    }\n"
+                + "}";
+
+        WorkflowJob mavenDeployFileDependency = jenkinsRule.createProject(WorkflowJob.class, "build-deployfile-dependency");
+        mavenDeployFileDependency.setDefinition(new CpsFlowDefinition(mavenDeployFileDependencyPipelineScript, true));
+        mavenDeployFileDependency.addTrigger(new WorkflowJobDependencyTrigger());
+
+        WorkflowRun mavenDeployFileDependencyPipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenDeployFileDependency.scheduleBuild2(0));
+        // TODO check in DB that the generated artifact is recorded
+
+        WorkflowJob mavenDeployFileBasePipeline = jenkinsRule.createProject(WorkflowJob.class, "build-deployfile-base");
+        mavenDeployFileBasePipeline.setDefinition(new CpsFlowDefinition(mavenDeployFileBasePipelineScript, true));
+        mavenDeployFileBasePipeline.addTrigger(new WorkflowJobDependencyTrigger());
+        WorkflowRun mavenDeployFileBasePipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenDeployFileBasePipeline.scheduleBuild2(0));
+        // TODO check in DB that the dependency on the jar project is recorded
+        System.out.println("build-deployfile-dependencyFirstRun: " + mavenDeployFileBasePipelineFirstRun);
+
+        WorkflowRun mavenDeployFileDependencyPipelineSecondRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenDeployFileDependency.scheduleBuild2(0));
+
+        jenkinsRule.waitUntilNoActivity();
+
+        WorkflowRun mavenDeployFileBasePipelineLastRun = mavenDeployFileBasePipeline.getLastBuild();
+
+        System.out.println("build-deployfile-baseLastBuild: " + mavenDeployFileBasePipelineLastRun + " caused by " + mavenDeployFileBasePipelineLastRun.getCauses());
+
+        assertThat(mavenDeployFileBasePipelineLastRun.getNumber(), is(mavenDeployFileBasePipelineFirstRun.getNumber() + 1));
+        Cause.UpstreamCause upstreamCause = mavenDeployFileBasePipelineLastRun.getCause(Cause.UpstreamCause.class);
         assertThat(upstreamCause, notNullValue());
     }
 
