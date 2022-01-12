@@ -75,7 +75,7 @@
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
         <artifactId>bom-2.289.x</artifactId>
-        <version>1008.vb9e22885c9cf</version>
+        <version>1090.v0a_33df40457a_</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -134,6 +134,11 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
         <version>3.4.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jenkins-ci</groupId>
+        <artifactId>symbol-annotation</artifactId>
+        <version>1.17</version>
       </dependency>
       <dependency>
         <groupId>com.google.code.gson</groupId>
