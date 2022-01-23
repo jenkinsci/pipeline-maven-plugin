@@ -1,0 +1,8 @@
+jenkins:
+  systemMessage: "Hello World"
+
+tool:
+  pipelineMaven:
+    publisherOptions:
+    - mavenLinkerPublisher:
+        disabled: true

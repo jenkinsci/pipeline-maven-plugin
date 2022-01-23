@@ -1,0 +1,7 @@
+jenkins:
+  systemMessage: "Hello World"
+
+tool:
+  pipelineMaven:
+    jdbcUrl: jdbc:postgresql://dbserver/jenkinsdb
+    JdbcCredentialsId: pg-creds
