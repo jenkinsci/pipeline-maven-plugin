@@ -33,7 +33,6 @@
     </parent>
 
     <artifactId>pipeline-maven-spy</artifactId>
-    <packaging>jar</packaging>
 
     <name>Maven Spy for the Pipeline Maven Integration Plugin</name>
     <description>
@@ -65,6 +64,20 @@
         <tag>${scmTag}</tag>
     </scm>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>1.7.33</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.13.2</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <dependency>
             <groupId>javax.inject</groupId>
@@ -81,17 +94,16 @@
             <artifactId>aether-api</artifactId>
             <version>1.13.1</version>
         </dependency>
+
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.33</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
