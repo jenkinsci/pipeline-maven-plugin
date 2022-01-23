@@ -1,0 +1,10 @@
+jenkins:
+  systemMessage: "Hello World"
+
+tool:
+  pipelineMaven:
+    triggerDownstreamUponResultAborted: true
+    triggerDownstreamUponResultFailure: true
+    triggerDownstreamUponResultNotBuilt: true
+    triggerDownstreamUponResultSuccess: false
+    triggerDownstreamUponResultUnstable: true

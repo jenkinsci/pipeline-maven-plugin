@@ -1,0 +1,7 @@
+jdbcCredentialsId: "pg-creds"
+jdbcUrl: "jdbc:postgresql://dbserver/jenkinsdb"
+triggerDownstreamUponResultAborted: false
+triggerDownstreamUponResultFailure: false
+triggerDownstreamUponResultNotBuilt: false
+triggerDownstreamUponResultSuccess: true
+triggerDownstreamUponResultUnstable: false

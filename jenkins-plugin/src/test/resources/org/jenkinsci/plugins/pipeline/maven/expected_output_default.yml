@@ -1,0 +1,5 @@
+triggerDownstreamUponResultAborted: false
+triggerDownstreamUponResultFailure: false
+triggerDownstreamUponResultNotBuilt: false
+triggerDownstreamUponResultSuccess: true
+triggerDownstreamUponResultUnstable: false

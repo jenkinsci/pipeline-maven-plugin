@@ -1,0 +1,9 @@
+jenkins:
+  systemMessage: "Hello World"
+
+tool:
+  pipelineMaven:
+    jdbcUrl: jdbc:mysql://dbserver/jenkinsdb
+    properties: |
+      dataSource.cachePrepStmts=true
+      dataSource.prepStmtCacheSize=250

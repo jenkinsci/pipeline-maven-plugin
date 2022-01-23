@@ -1,0 +1,9 @@
+jdbcUrl: "jdbc:mysql://dbserver/jenkinsdb"
+properties: |
+  dataSource.cachePrepStmts=true
+  dataSource.prepStmtCacheSize=250
+triggerDownstreamUponResultAborted: false
+triggerDownstreamUponResultFailure: false
+triggerDownstreamUponResultNotBuilt: false
+triggerDownstreamUponResultSuccess: true
+triggerDownstreamUponResultUnstable: false
