@@ -120,10 +120,14 @@ public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineM
     }
 
     private void executeMonitored(CallableWithoutResult callable) {
-        executeMonitored(() -> {
+        long nanosBefore = System.nanoTime();
+        try {
             callable.call();
-            return null;
-        });
+        } finally {
+            long nanosAfter = System.nanoTime();
+            writeCount.incrementAndGet();
+            writeDurationInNanos.addAndGet(nanosAfter - nanosBefore);
+        }
     }
 
     private <V> V executeMonitored(CallableWithResult<V> callable) {
@@ -132,8 +136,8 @@ public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineM
             return callable.call();
         } finally {
             long nanosAfter = System.nanoTime();
-            writeCount.incrementAndGet();
-            writeDurationInNanos.addAndGet(nanosAfter - nanosBefore);
+            findCount.incrementAndGet();
+            findDurationInNanos.addAndGet(nanosAfter - nanosBefore);
         }
     }
 
