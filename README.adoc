@@ -72,7 +72,7 @@ node {
 }
 ----
 
-It can be supports various parameters to fine-tune its behavior.
+It can supports various parameters to fine-tune its behavior.
 
 Within a node or a docker.image block, create a withMaven block to set up a `with maven` environment.
 
@@ -150,6 +150,11 @@ In the above example the following parameters are used to configure Maven:
 [#features]
 == Features
 
+=== Configurable as code
+
+See demos on the [Configuration as Code](https://plugins.jenkins.io/configuration-as-code/) plugin:
+https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/demos/pipeline-maven
+
 [#feature-sensible-default-maven-settings]
 === Sensible default Maven parameters
 
@@ -157,6 +162,9 @@ The Maven parameters that are useful on a build server, `--batch-mode`(`-B`) and
 
 [#feature-maven-integration-global-settings]
 === Maven Settings Support
+
+Please note this is NOT part of this plugin, this is the [Maven](https://plugins.jenkins.io/maven-plugin/) plugin configuration, but we depend on it.
+
 
 The `withMaven()` pipeline step will setup the Maven settings file and global settings file either explicitly using the attributes of the `withMaven(){}` step declaration or implicitly using the Maven Global Settings and Settings files defined at the folder level or in the Jenkins Global Tools Configuration.
 
