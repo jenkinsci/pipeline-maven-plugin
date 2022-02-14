@@ -171,7 +171,7 @@
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>maven-plugin</artifactId>
-      <version>3.16</version>
+      <version>3.17</version>
       <exclusions>
         <exclusion><!-- Require upper bound dependencies error for com.google.inject:guice:4.0-beta paths to dependency are:...-->
           <groupId>com.google.inject</groupId>
