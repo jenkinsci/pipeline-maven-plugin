@@ -332,7 +332,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>flaky-test-handler</artifactId>
-      <version>1.2.0</version>
+      <version>1.2.1</version>
       <optional>true</optional>
     </dependency>
     <dependency>
