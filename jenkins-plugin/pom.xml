@@ -75,7 +75,7 @@
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
         <artifactId>bom-2.289.x</artifactId>
-        <version>1289.v5c4b_1c43511b_</version>
+        <version>1382.v7d694476f340</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -164,6 +164,16 @@
         <groupId>org.fusesource.jansi</groupId>
         <artifactId>jansi</artifactId>
         <version>2.4.0</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jenkins</groupId>
+        <artifactId>configuration-as-code</artifactId>
+        <version>1414.v878271fc496f</version>
+      </dependency>
+      <dependency>
+        <groupId>io.jenkins.configuration-as-code</groupId>
+        <artifactId>test-harness</artifactId>
+        <version>1414.v878271fc496f</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -514,12 +524,6 @@
           <artifactId>protobuf-java</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.main</groupId>
-      <artifactId>jenkins-test-harness-tools</artifactId>
-      <version>2.2</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
