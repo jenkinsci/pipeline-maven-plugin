@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
+import hudson.FilePath;
 import hudson.tasks.Maven;
 import jenkins.model.Jenkins;
 import jenkins.mvn.DefaultGlobalSettingsProvider;
@@ -13,10 +14,11 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.jvnet.hudson.test.ToolInstallations;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,7 +39,7 @@ public abstract class AbstractIntegrationTest {
     @Before
     public void setup() throws Exception {
 
-        Maven.MavenInstallation mvn = ToolInstallations.configureDefaultMaven( "apache-maven-3.6.3", Maven.MavenInstallation.MAVEN_30);
+        Maven.MavenInstallation mvn = configureDefaultMaven("3.6.3", Maven.MavenInstallation.MAVEN_30);
 
         Maven.MavenInstallation m3 = new Maven.MavenInstallation( "apache-maven-3.6.3", mvn.getHome(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType( Maven.DescriptorImpl.class).setInstallations( m3);
@@ -133,5 +135,19 @@ public abstract class AbstractIntegrationTest {
             throw new IllegalStateException("Folder '" + mavenProjectRoot + "' not found");
         }
         GitSampleRepoRuleUtils.addFilesAndCommit(mavenProjectRoot, gitRepo);
+    }
+
+    protected Maven.MavenInstallation configureDefaultMaven(String mavenVersion, int mavenReqVersion) throws Exception {
+        // first if we are running inside Maven, pick that Maven, if it meets the criteria we require..
+        File buildDirectory = new File(System.getProperty("buildDirectory", "target")); // TODO relative path
+        File mvnHome = new File(buildDirectory, "apache-maven-" + mavenVersion);
+        if (!mvnHome.exists()) {
+            FilePath mvn = Jenkins.getInstance().getRootPath().createTempFile("maven", "zip");
+            mvn.copyFrom(new URL("https://dlcdn.apache.org/maven/maven-3/" + mavenVersion + "/binaries/apache-maven-" + mavenVersion + "-bin.tar.gz"));
+            mvn.untar(new FilePath(buildDirectory), FilePath.TarCompression.GZIP);
+        }
+        Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getAbsolutePath(), JenkinsRule.NO_PROPERTIES);
+        Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
+        return mavenInstallation;
     }
 }
