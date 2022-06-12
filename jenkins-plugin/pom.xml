@@ -75,7 +75,7 @@
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
         <artifactId>bom-2.303.x</artifactId>
-        <version>1148.v7261f385f859</version>
+        <version>1409.v7659b_c072f18</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -136,7 +136,7 @@
       <dependency>
         <groupId>org.jenkins-ci.plugins.workflow</groupId>
         <artifactId>workflow-api</artifactId>
-        <version>1143.v2d42f1e9dea_5</version>
+        <version>1144.v61c3180fa_03f</version>
       </dependency>
       <dependency><!--
         for org.jenkins-ci.plugins:maven-invoker-plugin and org.jenkins-ci.main:maven-plugin
