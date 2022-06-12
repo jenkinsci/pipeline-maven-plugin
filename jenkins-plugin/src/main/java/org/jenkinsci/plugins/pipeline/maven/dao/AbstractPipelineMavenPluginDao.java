@@ -126,13 +126,15 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 " INNER JOIN JENKINS_JOB ON JENKINS_BUILD.JOB_ID = JENKINS_JOB.ID " +
                 " WHERE " +
                 "   JENKINS_JOB.FULL_NAME = ? AND" +
+                "   JENKINS_JOB.JENKINS_MASTER_ID = ? AND" +
                 "   JENKINS_BUILD.NUMBER = ? ";
 
         List<MavenDependency> results = new ArrayList<>();
         try (Connection cnn = this.ds.getConnection()) {
             try (PreparedStatement stmt = cnn.prepareStatement(dependenciesSql)) {
                 stmt.setString(1, jobFullName);
-                stmt.setInt(2, buildNumber);
+                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
+                stmt.setInt(3, buildNumber);
                 try (ResultSet rst = stmt.executeQuery()) {
                     while (rst.next()) {
                         MavenDependency artifact = new MavenDependency();
