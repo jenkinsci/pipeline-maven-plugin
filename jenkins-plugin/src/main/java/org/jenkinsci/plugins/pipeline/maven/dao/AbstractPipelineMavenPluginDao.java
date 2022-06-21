@@ -126,13 +126,15 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 " INNER JOIN JENKINS_JOB ON JENKINS_BUILD.JOB_ID = JENKINS_JOB.ID " +
                 " WHERE " +
                 "   JENKINS_JOB.FULL_NAME = ? AND" +
+                "   JENKINS_JOB.JENKINS_MASTER_ID = ? AND" +
                 "   JENKINS_BUILD.NUMBER = ? ";
 
         List<MavenDependency> results = new ArrayList<>();
         try (Connection cnn = this.ds.getConnection()) {
             try (PreparedStatement stmt = cnn.prepareStatement(dependenciesSql)) {
                 stmt.setString(1, jobFullName);
-                stmt.setInt(2, buildNumber);
+                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
+                stmt.setInt(3, buildNumber);
                 try (ResultSet rst = stmt.executeQuery()) {
                     while (rst.next()) {
                         MavenDependency artifact = new MavenDependency();
@@ -886,7 +888,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     protected Map<String, Integer> listUpstreamPipelinesBasedOnMavenDependencies(@Nonnull String downstreamJobFullName, int downstreamBuildNumber) {
         LOGGER.log(Level.FINER, "listUpstreamPipelinesBasedOnMavenDependencies({0}, {1})", new Object[]{downstreamJobFullName, downstreamBuildNumber});
 
-        String sql = "select  upstream_job.full_name, upstream_build.number\n" +
+        String sql = "select distinct upstream_job.full_name, upstream_build.number\n" +
                 "from JENKINS_JOB as upstream_job\n" +
                 "inner join JENKINS_BUILD as upstream_build on (upstream_job.id = upstream_build.job_id and upstream_job.last_successful_build_number = upstream_build.number)\n" +
                 "inner join GENERATED_MAVEN_ARTIFACT on (upstream_build.id = GENERATED_MAVEN_ARTIFACT.build_id  and GENERATED_MAVEN_ARTIFACT.skip_downstream_triggers = false)\n" +
@@ -922,7 +924,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     protected Map<String, Integer> listUpstreamPipelinesBasedOnParentProjectDependencies(@Nonnull String downstreamJobFullName, int downstreamBuildNumber) {
         LOGGER.log(Level.FINER, "listUpstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{downstreamJobFullName, downstreamBuildNumber});
 
-        String sql = "select  upstream_job.full_name, upstream_build.number\n" +
+        String sql = "select distinct upstream_job.full_name, upstream_build.number\n" +
                 "from JENKINS_JOB as upstream_job\n" +
                 "inner join JENKINS_BUILD as upstream_build on (upstream_job.id = upstream_build.job_id and upstream_job.last_successful_build_number = upstream_build.number)\n" +
                 "inner join GENERATED_MAVEN_ARTIFACT on (upstream_build.id = GENERATED_MAVEN_ARTIFACT.build_id  and GENERATED_MAVEN_ARTIFACT.skip_downstream_triggers = false)\n" +
