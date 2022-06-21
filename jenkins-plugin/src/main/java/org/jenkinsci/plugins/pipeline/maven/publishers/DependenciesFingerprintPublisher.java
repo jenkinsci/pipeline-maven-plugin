@@ -98,7 +98,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
 
         FilePath workspace = context.get(FilePath.class);
 
-        List<MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
+        Set<MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
 
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] dependenciesFingerprintPublisher - filter: " +
