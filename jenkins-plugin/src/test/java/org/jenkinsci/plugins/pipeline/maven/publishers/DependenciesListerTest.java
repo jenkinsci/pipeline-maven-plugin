@@ -1,17 +1,20 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
-import org.hamcrest.CoreMatchers;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsIterableContaining.hasItem;
+
+import java.io.InputStream;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.junit.Before;
 import org.junit.Test;
 import org.w3c.dom.Document;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.InputStream;
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -28,16 +31,42 @@ public class DependenciesListerTest {
 
     @Test
     public void listArtifactDependencies() throws Exception {
-        List<MavenDependency> mavenArtifacts = DependenciesLister.listDependencies(doc.getDocumentElement(), null);
-        System.out.println(mavenArtifacts);
-        assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
+        Set<MavenDependency> mavenArtifacts = DependenciesLister.listDependencies(doc.getDocumentElement(), null);
 
-        MavenArtifact dependencyArtifact = mavenArtifacts.get(0);
-        assertThat(dependencyArtifact.getArtifactId(), CoreMatchers.is("spring-test"));
-        assertThat(dependencyArtifact.getFile(), CoreMatchers.is("/path/to/spring-petclinic/spring-test/3.2.16.RELEASE/spring-test-3.2.16.RELEASE.jar"));
+        assertThat(mavenArtifacts.size(), is(2));
+        assertThat(mavenArtifacts, hasItem(new BaseMatcher<MavenDependency>() {
+            @Override
+            public boolean matches(Object actual) {
+                if (!(actual instanceof MavenDependency)) {
+                    return false;
+                }
+                MavenDependency dep = (MavenDependency) actual;
+                return "spring-test".equals(dep.getArtifactId())
+                        && "/path/to/spring-petclinic/spring-test/3.2.16.RELEASE/spring-test-3.2.16.RELEASE.jar"
+                                .equals(dep.getFile());
+            }
 
-        dependencyArtifact = mavenArtifacts.get(1);
-        assertThat(dependencyArtifact.getArtifactId(), CoreMatchers.is("spring-core"));
-        assertThat(dependencyArtifact.getFile(), CoreMatchers.is("/path/to/spring-petclinic/3.2.16.RELEASE/spring-core-3.2.16.RELEASE.jar"));
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("spring-test dependency");
+            }
+        }));
+        assertThat(mavenArtifacts, hasItem(new BaseMatcher<MavenDependency>() {
+            @Override
+            public boolean matches(Object actual) {
+                if (!(actual instanceof MavenDependency)) {
+                    return false;
+                }
+                MavenDependency dep = (MavenDependency) actual;
+                return "spring-core".equals(dep.getArtifactId())
+                        && "/path/to/spring-petclinic/3.2.16.RELEASE/spring-core-3.2.16.RELEASE.jar"
+                                .equals(dep.getFile());
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("spring-core dependency");
+            }
+        }));
     }
 }
