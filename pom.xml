@@ -67,6 +67,11 @@
             <name>Arnaud Héritier</name>
             <email>aheritier@apache.org</email>
         </developer>
+        <developer>
+            <id>bguerin</id>
+            <name>Benoit Guérin</name>
+            <email>benoit.guerin1@free.fr</email>
+        </developer>
     </developers>
 
     <modules>
