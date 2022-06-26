@@ -24,20 +24,22 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import com.google.common.base.Preconditions;
+import javax.sql.DataSource;
+
+import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
+import org.junit.ClassRule;
+import org.testcontainers.containers.PostgreSQLContainer;
+
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-
-import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Properties;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
+
+    @ClassRule
+    public static PostgreSQLContainer<?> DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE);
 
     @Override
     public DataSource before_newDataSource() throws Exception {
@@ -45,22 +47,9 @@ public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAb
         Class.forName("org.postgresql.Driver");
 
         HikariConfig config = new HikariConfig();
-        String configurationFilePath = ".postgresql_config";
-        InputStream propertiesInputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(configurationFilePath);
-
-        Properties properties = new Properties();
-        if (propertiesInputStream == null) {
-            throw new IllegalArgumentException("Config file " + configurationFilePath + " not found in classpath");
-        } else {
-            try {
-                properties.load(propertiesInputStream);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        config.setJdbcUrl(Preconditions.checkNotNull(properties.getProperty("jdbc.url")));
-        config.setUsername(Preconditions.checkNotNull(properties.getProperty("jdbc.username")));
-        config.setPassword(Preconditions.checkNotNull(properties.getProperty("jdbc.password")));
+        config.setJdbcUrl(DB.getJdbcUrl());
+        config.setUsername(DB.getUsername());
+        config.setPassword(DB.getPassword());
         return new HikariDataSource(config);
     }
 

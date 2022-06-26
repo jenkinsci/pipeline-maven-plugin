@@ -283,6 +283,8 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     // no tuning recommendations found for postgresql
                 } else if (jdbcUrl.startsWith("jdbc:h2")) {
                     // dsConfig.setDataSourceClassName("org.h2.jdbcx.JdbcDataSource"); don't specify the datasource due to a classloading issue
+                } else {
+                    // unsupported config
                 }
                 if (StringUtils.isNotBlank(properties)) {
                     p.load(new StringReader(properties));
@@ -543,6 +545,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                             }
                         }
                         switch (metaData.getDatabaseMajorVersion()) {
+                            case 14:
                             case 13:
                             case 12:
                             case 11:
