@@ -543,6 +543,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                             }
                         }
                         switch (metaData.getDatabaseMajorVersion()) {
+                            case 14:
                             case 13:
                             case 12:
                             case 11:

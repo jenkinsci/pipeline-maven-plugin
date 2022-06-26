@@ -499,6 +499,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                                 LOGGER.log(Level.FINER, "Execute command {0}", sqlCommand);
                                 stmt.execute(sqlCommand);
                             } catch (SQLException e) {
+                                LOGGER.log(Level.SEVERE, "Failed to run SQL {0} from script {1}: {2}", new Object[] {sqlCommand, sqlScriptPath, e.getMessage()});
                                 handleDatabaseInitialisationException(e);
                             }
                         }
@@ -664,12 +665,12 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 "inner join MAVEN_DEPENDENCY on (MAVEN_DEPENDENCY.artifact_id = MAVEN_ARTIFACT.id and MAVEN_DEPENDENCY.ignore_upstream_triggers = false) \n" +
                 "inner join JENKINS_BUILD as downstream_build on MAVEN_DEPENDENCY.build_id = downstream_build.id \n" +
                 "inner join JENKINS_JOB as downstream_job on (downstream_build.number = downstream_job.last_successful_build_number and downstream_build.job_id = downstream_job.id) \n" +
-                "where MAVEN_ARTIFACT.group_id = ?1 " +
-                "and MAVEN_ARTIFACT.artifact_id = ?2 " +
-                "and MAVEN_ARTIFACT.version = ?3 " +
-                "and MAVEN_ARTIFACT.type = ?4 " +
-                "and (MAVEN_ARTIFACT.classifier = ?5 or (MAVEN_ARTIFACT.classifier is null and ?5 is null)) " +
-                "and downstream_job.jenkins_master_id = ?6";
+                "where MAVEN_ARTIFACT.group_id = ? " +
+                "and MAVEN_ARTIFACT.artifact_id = ? " +
+                "and MAVEN_ARTIFACT.version = ? " +
+                "and MAVEN_ARTIFACT.type = ? " +
+                "and (MAVEN_ARTIFACT.classifier = ? or (MAVEN_ARTIFACT.classifier is null and ? is null)) " +
+                "and downstream_job.jenkins_master_id = ?";
 
         SortedSet<String> downstreamJobsFullNames = new TreeSet<>();
 
@@ -680,7 +681,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 stmt.setString(3, version);
                 stmt.setString(4, type);
                 stmt.setString(5, classifier);
-                stmt.setLong(6, getJenkinsMasterPrimaryKey(cnn));
+                stmt.setString(6, classifier);
+                stmt.setLong(7, getJenkinsMasterPrimaryKey(cnn));
                 try (ResultSet rst = stmt.executeQuery()) {
                     while (rst.next()) {
                         downstreamJobsFullNames.add(rst.getString(1));
