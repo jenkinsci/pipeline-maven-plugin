@@ -136,7 +136,7 @@
       <dependency>
         <groupId>org.jenkins-ci.plugins.workflow</groupId>
         <artifactId>workflow-api</artifactId>
-        <version>1144.v61c3180fa_03f</version>
+        <version>1164.v760c223ddb_32</version>
       </dependency>
       <dependency><!--
         for org.jenkins-ci.plugins:maven-invoker-plugin and org.jenkins-ci.main:maven-plugin
