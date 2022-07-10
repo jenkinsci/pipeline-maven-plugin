@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!--
  ~ The MIT License
  ~
@@ -22,181 +22,193 @@
  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  ~ THE SOFTWARE.
  -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  <modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>plugin</artifactId>
-        <version>4.41</version>
-        <relativePath />
-    </parent>
+  <parent>
+    <groupId>org.jenkins-ci.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>4.41</version>
+    <relativePath/>
+  </parent>
 
-    <artifactId>pipeline-maven-parent</artifactId>
-    <version>${changelist}</version>
-    <packaging>pom</packaging>
+  <artifactId>pipeline-maven-parent</artifactId>
+  <version>${changelist}</version>
+  <packaging>pom</packaging>
 
-    <name>Pipeline Maven Integration Plugin Parent</name>
-    <description>
-        This plugin provides maven integration with Pipeline by providing a withMaven step. Configures maven environment to use within a pipeline job by calling sh mvn or bat mvn.
-        The selected maven installation will be configured and prepended to the path.
-    </description>
-    <url>https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/README.adoc</url>
-    <licenses>
-        <license>
-            <name>The MIT license</name>
-            <url>http://www.opensource.org/licenses/mit-license.php</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+  <name>Pipeline Maven Integration Plugin Parent</name>
+  <description>This plugin provides maven integration with Pipeline by providing a withMaven step. Configures maven environment to use within a pipeline job by calling sh mvn or bat mvn.
+        The selected maven installation will be configured and prepended to the path.</description>
+  <url>https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/README.adoc</url>
+  <licenses>
+    <license>
+      <name>The MIT license</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
 
-    <developers>
-        <developer>
-            <id>cleclerc</id>
-            <name>Cyrille Le Clerc</name>
-            <email>cleclerc@cloudbees.com</email>
-        </developer>
-        <developer>
-            <id>alvarolobato</id>
-            <name>Alvaro Lobato</name>
-            <email>alobato@cloudbees.com</email>
-        </developer>
-        <developer>
-            <id>aheritier</id>
-            <name>Arnaud Héritier</name>
-            <email>aheritier@apache.org</email>
-        </developer>
-        <developer>
-            <id>bguerin</id>
-            <name>Benoit Guérin</name>
-            <email>benoit.guerin1@free.fr</email>
-        </developer>
-    </developers>
+  <developers>
+    <developer>
+      <id>cleclerc</id>
+      <name>Cyrille Le Clerc</name>
+      <email>cleclerc@cloudbees.com</email>
+    </developer>
+    <developer>
+      <id>alvarolobato</id>
+      <name>Alvaro Lobato</name>
+      <email>alobato@cloudbees.com</email>
+    </developer>
+    <developer>
+      <id>aheritier</id>
+      <name>Arnaud Héritier</name>
+      <email>aheritier@apache.org</email>
+    </developer>
+    <developer>
+      <id>bguerin</id>
+      <name>Benoit Guérin</name>
+      <email>benoit.guerin1@free.fr</email>
+    </developer>
+  </developers>
 
-    <modules>
-        <module>maven-spy</module>
-        <module>jenkins-plugin</module>
-    </modules>
+  <modules>
+    <module>maven-spy</module>
+    <module>jenkins-plugin</module>
+  </modules>
 
-    <scm>
-        <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
-        <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
-        <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
-        <tag>${scmTag}</tag>
-    </scm>
+  <scm>
+    <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
+    <tag>${scmTag}</tag>
+    <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
+  </scm>
 
-    <properties>
-        <changelist>999999-SNAPSHOT</changelist>
-        <findbugs-annotation.version>3.0.1</findbugs-annotation.version>
-        <groovy.version>2.4.21</groovy.version>
-        <gson.version>2.9.0</gson.version>
-        <hamcrest.version>1.3</hamcrest.version>
-        <hikaricp.version>4.0.3</hikaricp.version>
-        <jansi.version>2.4.0</jansi.version>
-        <java.level>8</java.level>
-        <jenkins.version>2.303.3</jenkins.version>
-        <jenkins-annotation-indexer.version>1.16</jenkins-annotation-indexer.version>
-        <jenkins-credentials.version>2.6.1.1</jenkins-credentials.version>
-        <jenkins-docker-fixtures.version>1.11</jenkins-docker-fixtures.version>
-        <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
-        <jenkins-plugin-flaky-test.version>1.2.2</jenkins-plugin-flaky-test.version>
-        <jenkins-plugin-folder.version>6.714.v79e858ef76a_2</jenkins-plugin-folder.version>
-        <jenkins-plugin-h2.version>1.4.199</jenkins-plugin-h2.version>
-        <jenkins-plugin-jacoco.version>3.3.2</jenkins-plugin-jacoco.version>
-        <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
-        <jenkins-plugin-maven.version>3.16</jenkins-plugin-maven.version>
-        <jenkins-plugin-maven-invoker.version>2.4</jenkins-plugin-maven-invoker.version>
-        <jenkins-plugin-mysql.version>8.0.16</jenkins-plugin-mysql.version>
-        <jenkins-plugin-postgresql.version>42.3.3</jenkins-plugin-postgresql.version>
-        <jenkins-plugin-script-security.version>1138.v8e727069a_025</jenkins-plugin-script-security.version>
-        <jenkins-plugin-ssh-creds.version>277.v95c2fec1c047</jenkins-plugin-ssh-creds.version>
-        <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
-        <jenkins-plugin-token.version>293.v283932a_0a_b_49</jenkins-plugin-token.version>
-        <jenkins-plugin-workflow.version>1144.v61c3180fa_03f</jenkins-plugin-workflow.version>
-        <jenkins-symbol.version>1.23</jenkins-symbol.version>
-        <jenkins-tools-bom.version>1466.v85a_616ea_b_87c</jenkins-tools-bom.version>
-        <joda-time.version>2.10.14</joda-time.version>
-        <junit.version>4.13.2</junit.version>
-        <maven.version>3.8.3</maven.version>
-        <maven-compat.version>3.3.9</maven-compat.version>
-        <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
-        <maven-plugin-surefire.version>3.0.0-M7</maven-plugin-surefire.version>
-        <maven-plugin-tidy.version>1.1.0</maven-plugin-tidy.version>
-        <maven-shared-utils.version>3.3.4</maven-shared-utils.version>
-        <plexus-utils.version>3.4.2</plexus-utils.version>
-        <slf4j.version>1.7.35</slf4j.version>
-        <testcontainers.version>1.17.3</testcontainers.version>
-    </properties>
+  <properties>
+    <changelist>999999-SNAPSHOT</changelist>
+    <findbugs-annotation.version>3.0.1</findbugs-annotation.version>
+    <groovy.version>2.4.21</groovy.version>
+    <gson.version>2.9.0</gson.version>
+    <hamcrest.version>1.3</hamcrest.version>
+    <hikaricp.version>4.0.3</hikaricp.version>
+    <jansi.version>2.4.0</jansi.version>
+    <java.level>8</java.level>
+    <jenkins-annotation-indexer.version>1.16</jenkins-annotation-indexer.version>
+    <jenkins-credentials.version>2.6.1.1</jenkins-credentials.version>
+    <jenkins-docker-fixtures.version>1.11</jenkins-docker-fixtures.version>
+    <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
+    <jenkins-plugin-flaky-test.version>1.2.2</jenkins-plugin-flaky-test.version>
+    <jenkins-plugin-folder.version>6.714.v79e858ef76a_2</jenkins-plugin-folder.version>
+    <jenkins-plugin-h2.version>1.4.199</jenkins-plugin-h2.version>
+    <jenkins-plugin-jacoco.version>3.3.2</jenkins-plugin-jacoco.version>
+    <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
+    <jenkins-plugin-maven-invoker.version>2.4</jenkins-plugin-maven-invoker.version>
+    <jenkins-plugin-maven.version>3.16</jenkins-plugin-maven.version>
+    <jenkins-plugin-mysql.version>8.0.16</jenkins-plugin-mysql.version>
+    <jenkins-plugin-postgresql.version>42.3.3</jenkins-plugin-postgresql.version>
+    <jenkins-plugin-script-security.version>1138.v8e727069a_025</jenkins-plugin-script-security.version>
+    <jenkins-plugin-ssh-creds.version>277.v95c2fec1c047</jenkins-plugin-ssh-creds.version>
+    <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
+    <jenkins-plugin-token.version>293.v283932a_0a_b_49</jenkins-plugin-token.version>
+    <jenkins-plugin-workflow.version>1144.v61c3180fa_03f</jenkins-plugin-workflow.version>
+    <jenkins-symbol.version>1.23</jenkins-symbol.version>
+    <jenkins-tools-bom.version>1466.v85a_616ea_b_87c</jenkins-tools-bom.version>
+    <jenkins.version>2.303.3</jenkins.version>
+    <joda-time.version>2.10.14</joda-time.version>
+    <junit.version>4.13.2</junit.version>
+    <maven-compat.version>3.3.9</maven-compat.version>
+    <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
+    <maven-plugin-sortpom.version>3.0.1</maven-plugin-sortpom.version>
+    <maven-plugin-surefire.version>3.0.0-M7</maven-plugin-surefire.version>
+    <maven-shared-utils.version>3.3.4</maven-shared-utils.version>
+    <maven.version>3.8.3</maven.version>
+    <plexus-utils.version>3.4.2</plexus-utils.version>
+    <slf4j.version>1.7.35</slf4j.version>
+    <testcontainers.version>1.17.3</testcontainers.version>
+  </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
 
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.hamcrest</groupId>
-                <artifactId>hamcrest-all</artifactId>
-                <version>${hamcrest.version}</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.hamcrest</groupId>
+        <artifactId>hamcrest-all</artifactId>
+        <version>${hamcrest.version}</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
-    <repositories>
-        <repository>
-            <id>repo.jenkins-ci.org</id>
-            <url>https://repo.jenkins-ci.org/public/</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>repo.jenkins-ci.org</id>
-            <url>https://repo.jenkins-ci.org/public/</url>
-        </pluginRepository>
-    </pluginRepositories>
+  <repositories>
+    <repository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                  <artifactId>maven-surefire-plugin</artifactId>
-                  <version>${maven-plugin-surefire.version}</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <configuration>
-                    <tagNameFormat>pipeline-maven-@{project.version}</tagNameFormat>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>tidy-maven-plugin</artifactId>
-                <version>${maven-plugin-tidy.version}</version>
-                <executions>
-                    <execution>
-                        <id>validate</id>
-                        <phase>validate</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>com.github.ekryd.sortpom</groupId>
+          <artifactId>sortpom-maven-plugin</artifactId>
+          <version>${maven-plugin-sortpom.version}</version>
+          <configuration>
+            <createBackupFile>false</createBackupFile>
+            <encoding>${project.build.sourceEncoding}</encoding>
+            <expandEmptyElements>false</expandEmptyElements>
+            <keepBlankLines>true</keepBlankLines>
+            <lineSeparator>\n</lineSeparator>
+            <ignoreLineSeparators>false</ignoreLineSeparators>
+            <nrOfIndentSpace>2</nrOfIndentSpace>
+            <sortDependencies>scope,groupId,artifactId</sortDependencies>
+            <sortPlugins>groupId,artifactId</sortPlugins>
+            <sortProperties>true</sortProperties>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-plugin-surefire.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>com.github.ekryd.sortpom</groupId>
+        <artifactId>sortpom-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>sort</goal>
+            </goals>
+            <phase>verify</phase>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <configuration>
+          <tagNameFormat>pipeline-maven-@{project.version}</tagNameFormat>
+          <autoVersionSubmodules>true</autoVersionSubmodules>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
