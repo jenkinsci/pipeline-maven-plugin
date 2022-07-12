@@ -39,7 +39,7 @@ public class JavaGitContainerTest {
 
     @Test
     public void smokes() throws Exception {
-        assertThat(rule.get().popen(new CommandBuilder("java", "-version")).verifyOrDieWith("could not launch Java"), containsString("openjdk version \"1.8.0_"));
+        assertThat(rule.get().popen(new CommandBuilder("java", "-version")).verifyOrDieWith("could not launch Java"), containsString("openjdk version \"11"));
         assertThat(rule.get().popen(new CommandBuilder("git", "version")).verifyOrDieWith("could not launch git"), containsString("git version 2."));
     }
 

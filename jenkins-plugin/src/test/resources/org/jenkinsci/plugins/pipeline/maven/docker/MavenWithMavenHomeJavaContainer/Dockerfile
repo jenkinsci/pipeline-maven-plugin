@@ -1,4 +1,4 @@
-FROM jenkins/java:d93654cc6239
+FROM jenkins/java:387404da3ce7
 
 ENV MAVEN_HOME="/usr/share/maven"
 
