@@ -106,7 +106,7 @@
     <jenkins-plugin-mysql.version>8.0.16</jenkins-plugin-mysql.version>
     <jenkins-plugin-postgresql.version>42.3.3</jenkins-plugin-postgresql.version>
     <jenkins-plugin-script-security.version>1138.v8e727069a_025</jenkins-plugin-script-security.version>
-    <jenkins-plugin-ssh-creds.version>277.v95c2fec1c047</jenkins-plugin-ssh-creds.version>
+    <jenkins-plugin-ssh-creds.version>291.v8211e4f8efb_c</jenkins-plugin-ssh-creds.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
     <jenkins-plugin-token.version>293.v283932a_0a_b_49</jenkins-plugin-token.version>
     <jenkins-plugin-workflow.version>1144.v61c3180fa_03f</jenkins-plugin-workflow.version>
