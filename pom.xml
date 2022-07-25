@@ -97,7 +97,7 @@
     <jenkins-docker-fixtures.version>1.12</jenkins-docker-fixtures.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-flaky-test.version>1.2.2</jenkins-plugin-flaky-test.version>
-    <jenkins-plugin-folder.version>6.714.v79e858ef76a_2</jenkins-plugin-folder.version>
+    <jenkins-plugin-folder.version>6.729.v2b_9d1a_74d673</jenkins-plugin-folder.version>
     <jenkins-plugin-h2.version>1.4.199</jenkins-plugin-h2.version>
     <jenkins-plugin-jacoco.version>3.3.2</jenkins-plugin-jacoco.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
