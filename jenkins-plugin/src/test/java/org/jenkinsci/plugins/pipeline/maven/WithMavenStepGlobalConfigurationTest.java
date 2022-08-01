@@ -83,7 +83,7 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
 
             loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-            String pipelineScript = "node('master') {\n" +
+            String pipelineScript = "node() {\n" +
                     "    git($/" + gitRepoRule.toString() + "/$)\n" +
                     "    withMaven() {\n" +
                     "        sh 'mvn package verify'\n" +
@@ -143,7 +143,7 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
 
             loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-            String pipelineScript = "node('master') {\n" +
+            String pipelineScript = "node() {\n" +
                     "    git($/" + gitRepoRule.toString() + "/$)\n" +
                     "    withMaven(options:[" + symbol + "(disabled: true)]) {\n" +
                     "        sh 'mvn package verify'\n" +

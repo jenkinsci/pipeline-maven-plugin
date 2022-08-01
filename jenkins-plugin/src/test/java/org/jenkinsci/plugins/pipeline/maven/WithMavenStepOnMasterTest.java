@@ -94,7 +94,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_build_on_master_with_specified_maven_installation_succeeds() throws Exception {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-        String pipelineScript = "node('master') {\n" +
+        String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven(maven: 'apache-maven-3.6.3') {\n" +
                 "        sh 'mvn package'\n" +
@@ -121,7 +121,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_build_on_master_with_missing_specified_maven_installation_fails() throws Exception {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-        String pipelineScript = "node('master') {\n" +
+        String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven(maven: 'install-does-not-exist') {\n" +
                 "        sh 'mvn package'\n" +
@@ -137,7 +137,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_build_jar_project_on_master_succeeds() throws Exception {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-        String pipelineScript = "node('master') {\n" +
+        String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn package verify'\n" +
@@ -187,7 +187,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_build_jar_with_jacoco_succeeds() throws Exception {
         loadMavenJarWithJacocoInGitRepo(this.gitRepoRule);
 
-        String pipelineScript = "node('master') {\n" +
+        String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn package verify'\n" +
@@ -221,7 +221,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_build_jar_project_with_whitespace_char_in_name() throws Exception {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-        String pipelineScript = "node('master') {\n" +
+        String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn help:effective-settings'\n" +
@@ -312,7 +312,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
             loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-            String pipelineScript = "node('master') {\n" +
+            String pipelineScript = "node() {\n" +
                     "    git($/" + gitRepoRule.toString() + "/$)\n" +
                     "    withMaven(options:[" + symbol + "(disabled:" + disabled + ")]) {\n" +
                     "        sh 'mvn package verify'\n" +
@@ -346,7 +346,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-        String pipelineScript = "node('master') {\n" +
+        String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven(options:[openTasksPublisher(" +
                 "       disabled:false, " +
@@ -369,7 +369,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_build_maven_jar_with_flatten_pom_project_on_master_succeeds() throws Exception {
         loadMavenJarWithFlattenPomProjectInGitRepo(this.gitRepoRule);
 
-        String pipelineScript = "node('master') {\n" +
+        String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn package'\n" +
@@ -411,7 +411,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_build_maven_hpi_project_on_master_succeeds() throws Exception {
         loadJenkinsPluginProjectInGitRepo(this.gitRepoRule);
 
-        String pipelineScript = "node('master') {\n" +
+        String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn package'\n" +
@@ -451,7 +451,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_build_maven_plugin_project_on_master_succeeds() throws Exception {
         loadMavenPluginProjectInGitRepo(this.gitRepoRule);
 
-        String pipelineScript = "node('master') {\n" +
+        String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn package'\n" +
@@ -493,7 +493,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_build_on_master_with_no_generated_jar_succeeds() throws Exception {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-        String pipelineScript = "node('master') {\n" +
+        String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn test'\n" +
@@ -974,7 +974,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         String pipelineScript = "stage('first') {\n" +
                 "    parallel(a: {\n" +
-                "        node('master') {\n" +
+                "        node() {\n" +
                 "            git($/" + gitRepoRule.toString() + "/$)\n" +
                 "            withMaven() {\n" +
                 "                sh 'mvn package verify'\n" +
@@ -982,7 +982,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "        }\n" +
                 "    },\n" +
                 "    b: {\n" +
-                "        node('master') {\n" +
+                "        node() {\n" +
                 "            git($/" + gitRepoRule.toString() + "/$)\n" +
                 "            withMaven() {\n" +
                 "                sh 'mvn package verify'\n" +

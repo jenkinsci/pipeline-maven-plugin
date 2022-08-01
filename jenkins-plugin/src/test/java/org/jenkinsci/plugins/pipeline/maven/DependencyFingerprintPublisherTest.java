@@ -28,7 +28,7 @@ public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest 
 
         loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
 
-        String pipelineScript = "node('master') {\n" +
+        String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven(options:[dependenciesFingerprintPublisher(includeReleaseVersions:true)]) {\n" +
                 "        sh 'mvn package'\n" +
