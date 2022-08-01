@@ -72,13 +72,13 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
         loadMavenWarProjectInGitRepo(this.downstreamArtifactRepoRule);
 
-        String mavenJarPipelineScript = "node('master') {\n" +
+        String mavenJarPipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn install'\n" +
                 "    }\n" +
                 "}";
-        String mavenWarPipelineScript = "node('master') {\n" +
+        String mavenWarPipelineScript = "node() {\n" +
                 "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn install'\n" +
@@ -123,7 +123,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
         loadMavenWarProjectInGitRepo(this.downstreamArtifactRepoRule);
 
-        String script = "node('master') {\n" +
+        String script = "node() {\n" +
                 "    checkout scm\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn install'\n" +
@@ -188,7 +188,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         loadOsgiBundleProjectInGitRepo(gitRepoRule);
 
 
-        String pipelineScript = "node('master') {\n" +
+        String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn package'\n" +
@@ -236,13 +236,13 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
         loadMavenWarProjectInGitRepo(this.downstreamArtifactRepoRule);
 
-        String mavenJarPipelineScript = "node('master') {\n" +
+        String mavenJarPipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn install'\n" +
                 "    }\n" +
                 "}";
-        String mavenWarPipelineScript = "node('master') {\n" +
+        String mavenWarPipelineScript = "node() {\n" +
                 "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn install'\n" +
@@ -287,13 +287,13 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
         loadNbmBaseMavenProjectInGitRepo(this.downstreamArtifactRepoRule);
 
-        String mavenNbmDependencyPipelineScript = "node('master') {\n"
+        String mavenNbmDependencyPipelineScript = "node() {\n"
                 + "    git($/" + gitRepoRule.toString() + "/$)\n"
                 + "    withMaven() {\n"
                 + "        sh 'mvn install'\n"
                 + "    }\n"
                 + "}";
-        String mavenNbmBasePipelineScript = "node('master') {\n"
+        String mavenNbmBasePipelineScript = "node() {\n"
                 + "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n"
                 + "    withMaven() {\n"
                 + "        sh 'mvn install'\n"
@@ -334,13 +334,13 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
         loadDockerBaseMavenProjectInGitRepo(this.downstreamArtifactRepoRule);
 
-        String mavenDockerDependencyPipelineScript = "node('master') {\n"
+        String mavenDockerDependencyPipelineScript = "node() {\n"
                 + "    git($/" + gitRepoRule.toString() + "/$)\n"
                 + "    withMaven() {\n"
                 + "        sh 'mvn install'\n"
                 + "    }\n"
                 + "}";
-        String mavenDockerBasePipelineScript = "node('master') {\n"
+        String mavenDockerBasePipelineScript = "node() {\n"
                 + "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n"
                 + "    withMaven() {\n"
                 + "        sh 'mvn install'\n"
@@ -388,13 +388,13 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
         loadDeployFileBaseMavenProjectInGitRepo(this.downstreamArtifactRepoRule);
 
-        String mavenDeployFileDependencyPipelineScript = "node('master') {\n"
+        String mavenDeployFileDependencyPipelineScript = "node() {\n"
                 + "    git($/" + gitRepoRule.toString() + "/$)\n"
                 + "    withMaven() {\n"
                 + "        sh 'mvn install deploy:deploy-file@deploy-file'\n"
                 + "    }\n"
                 + "}";
-        String mavenDeployFileBasePipelineScript = "node('master') {\n"
+        String mavenDeployFileBasePipelineScript = "node() {\n"
                 + "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n"
                 + "    withMaven() {\n"
                 + "        sh 'mvn install'\n"

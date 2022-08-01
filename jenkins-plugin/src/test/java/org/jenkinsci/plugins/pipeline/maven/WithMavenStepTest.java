@@ -87,7 +87,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
 
         runPipeline(Result.SUCCESS, "" +
-                "node('master') {\n" +
+                "node() {\n" +
                 "  git($/" + gitRepoRule.toString() + "/$)\n" +
                 "  withMaven(publisherStrategy: 'EXPLICIT') {\n" +
                 "    sh 'mvn package'\n" +
