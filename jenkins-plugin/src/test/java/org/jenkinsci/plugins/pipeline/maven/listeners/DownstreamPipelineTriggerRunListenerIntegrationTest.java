@@ -1,6 +1,12 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
+import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+
 import hudson.model.Result;
+
+import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
@@ -15,6 +21,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -72,25 +79,42 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
         pipeline2.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun pipeline2Build1 = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline2.scheduleBuild2(0));
 
+        for (WorkflowRun run : asList(pipeline1Build1, pipeline2Build1)) {
+            List<MavenDependency> dependencies = GlobalPipelineMavenConfig.get().getDao().listDependencies(run.getParent().getFullName(), run.number);
+            assertThat(dependencies, containsInAnyOrder(
+                dep("jenkins.mvn.test.multimodule", "shared-core", "jar", "0.0.1-SNAPSHOT", "compile"),
+                dep("junit", "junit", "jar", "4.13.1", "test"),
+                dep("org.hamcrest", "hamcrest-core", "jar", "1.3", "test")
+            ));
 
-        dumpBuildDetails(pipeline1Build1);
-        dumpBuildDetails(pipeline2Build1);
+            List<MavenArtifact> generatedArtifacts = GlobalPipelineMavenConfig.get().getDao().getGeneratedArtifacts(run.getParent().getFullName(), run.number);
+            assertThat(generatedArtifacts, containsInAnyOrder(
+                artifact("jenkins.mvn.test.multimodule:demo-1:jar:0.0.1-SNAPSHOT"),
+                artifact("jenkins.mvn.test.multimodule:demo-1:pom:0.0.1-SNAPSHOT"),
+                artifact("jenkins.mvn.test.multimodule:demo-2:jar:0.0.1-SNAPSHOT"),
+                artifact("jenkins.mvn.test.multimodule:demo-2:pom:0.0.1-SNAPSHOT"),
+                artifact("jenkins.mvn.test.multimodule:multimodule-parent:pom:0.0.1-SNAPSHOT"),
+                artifact("jenkins.mvn.test.multimodule:shared-core:jar:0.0.1-SNAPSHOT"),
+                artifact("jenkins.mvn.test.multimodule:shared-core:pom:0.0.1-SNAPSHOT")
+            ));
+        }
 
     }
 
-    protected void dumpBuildDetails(WorkflowRun build) {
-        System.out.println();
-        System.out.println("# BUILD: " + build.getFullDisplayName());
-        System.out.println("## Dependencies");
-        List<MavenDependency> mavenDependencies = GlobalPipelineMavenConfig.get().getDao().listDependencies(build.getParent().getFullName(), build.number);
-        for(MavenDependency mavenDependency: mavenDependencies) {
-            System.out.println(mavenDependency);
-        }
-        System.out.println("## Generated Artifacts");
-        List<MavenArtifact> generatedArtifacts = GlobalPipelineMavenConfig.get().getDao().getGeneratedArtifacts(build.getParent().getFullName(), build.number);
-        for(MavenArtifact generatedArtifact: generatedArtifacts) {
-            System.out.println(generatedArtifact);
-        }
+    private MavenDependency dep(String groupId, String artifactId, String type, String version, String scope) {
+        MavenDependency result = new MavenDependency();
+        result.setGroupId(groupId);
+        result.setArtifactId(artifactId);
+        result.setType(type);
+        result.setVersion(version);
+        result.setScope(scope);
+        return result;
+    }
+
+    private MavenArtifact artifact(String identifier) {
+        MavenArtifact result = new MavenArtifact(identifier);
+        result.setBaseVersion(result.getVersion());
+        return result;
     }
 
 }

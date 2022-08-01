@@ -212,9 +212,11 @@ public class WithMavenStep extends Step {
     @Extension
     public static class DescriptorImpl extends StepDescriptor {
 
+        public static final String FUNCTION_NAME = "withMaven";
+
         @Override
         public String getFunctionName() {
-            return "withMaven";
+            return FUNCTION_NAME;
         }
 
         @Override

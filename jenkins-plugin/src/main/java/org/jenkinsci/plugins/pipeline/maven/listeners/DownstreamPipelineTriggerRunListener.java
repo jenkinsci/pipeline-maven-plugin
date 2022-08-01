@@ -8,7 +8,6 @@ import hudson.model.Job;
 import hudson.model.Queue;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.model.listeners.RunListener;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
@@ -22,6 +21,7 @@ import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 @Extension
-public class DownstreamPipelineTriggerRunListener extends RunListener<Run<?, ?>> {
+public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunListener {
 
     private final static Logger LOGGER = Logger.getLogger(DownstreamPipelineTriggerRunListener.class.getName());
 
@@ -54,6 +54,13 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<Run<?, ?>>
     @Override
     public void onCompleted(Run<?, ?> upstreamBuild, @Nonnull TaskListener listener) {
         LOGGER.log(Level.FINER, "onCompleted({0})", new Object[]{upstreamBuild});
+
+        if (!shouldRun(upstreamBuild, listener)) {
+            LOGGER.log(Level.FINE, "Skipping downstream pipeline triggering for {0} as withMaven step not found.",
+                    new Object[]{upstreamBuild});
+            return;
+        }
+
         long startTimeInNanos = System.nanoTime();
         if(LOGGER.isLoggable(Level.FINER)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - triggerDownstreamPipelines");
