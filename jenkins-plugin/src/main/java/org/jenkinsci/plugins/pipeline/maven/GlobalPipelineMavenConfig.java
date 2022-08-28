@@ -62,7 +62,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.sql.DataSource;
-import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -258,38 +257,8 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     jdbcPassword = Secret.toString(jdbcCredentials.getPassword());
                 }
 
-                HikariConfig dsConfig = new HikariConfig();
-                dsConfig.setJdbcUrl(jdbcUrl);
-                dsConfig.setUsername(jdbcUserName);
-                dsConfig.setPassword(jdbcPassword);
+                HikariConfig dsConfig = createHikariConfig(properties, jdbcUrl, jdbcUserName, jdbcPassword);
                 dsConfig.setAutoCommit(false);
-
-                Properties p = new Properties();
-                // todo refactor the DAO to inject config defaults in the DAO
-                if (jdbcUrl.startsWith("jdbc:mysql")) {
-                    // https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
-                    // https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
-                    p.setProperty("dataSource.cachePrepStmts", "true");
-                    p.setProperty("dataSource.prepStmtCacheSize", "250");
-                    p.setProperty("dataSource.prepStmtCacheSqlLimit", "2048");
-                    p.setProperty("dataSource.useServerPrepStmts", "true");
-                    p.setProperty("dataSource.useLocalSessionState", "true");
-                    p.setProperty("dataSource.rewriteBatchedStatements", "true");
-                    p.setProperty("dataSource.cacheResultSetMetadata", "true");
-                    p.setProperty("dataSource.cacheServerConfiguration", "true");
-                    p.setProperty("dataSource.elideSetAutoCommits", "true");
-                    p.setProperty("dataSource.maintainTimeStats", "false");
-                } else if (jdbcUrl.startsWith("jdbc:postgresql")) {
-                    // no tuning recommendations found for postgresql
-                } else if (jdbcUrl.startsWith("jdbc:h2")) {
-                    // dsConfig.setDataSourceClassName("org.h2.jdbcx.JdbcDataSource"); don't specify the datasource due to a classloading issue
-                } else {
-                    // unsupported config
-                }
-                if (StringUtils.isNotBlank(properties)) {
-                    p.load(new StringReader(properties));
-                }
-                dsConfig.setDataSourceProperties(p);
 
                 // TODO cleanup this quick fix for JENKINS-54587, we should have a better solution with the JDBC driver loaded by the DAO itself
                 try {
@@ -324,7 +293,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                     }
                 }
 
-                LOGGER.log(Level.INFO, "Connect to database {0} with username {1} and properties {2}", new Object[]{jdbcUrl, jdbcUserName, p});
+                LOGGER.log(Level.INFO, "Connect to database {0} with username {1}", new Object[]{jdbcUrl, jdbcUserName});
                 DataSource ds = new HikariDataSource(dsConfig);
 
                 Class<? extends PipelineMavenPluginDao> daoClass;
@@ -346,7 +315,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 }
 
 
-            } catch (RuntimeException | SQLException | IOException e) {
+            } catch (RuntimeException | SQLException e) {
                 LOGGER.log(Level.WARNING, "Exception creating database dao, skip", e);
                 dao = new PipelineMavenPluginNullDao();
             }
@@ -452,20 +421,8 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 jdbcUserName = jdbcCredentials.getUsername();
                 jdbcPassword = Secret.toString(jdbcCredentials.getPassword());
             }
-            HikariConfig dsConfig = new HikariConfig();
-            dsConfig.setJdbcUrl(jdbcUrl);
-            dsConfig.setUsername(jdbcUserName);
-            dsConfig.setPassword(jdbcPassword);
 
-            if (StringUtils.isNotBlank(properties)) {
-                Properties p = new Properties();
-                try {
-                    p.load(new StringReader(properties));
-                } catch (IOException e) {
-                    throw new IllegalStateException(e);
-                }
-                dsConfig.setDataSourceProperties(p);
-            }
+            HikariConfig dsConfig = createHikariConfig(properties, jdbcUrl, jdbcUserName, jdbcPassword);
 
             try (HikariDataSource ds = new HikariDataSource(dsConfig)) {
                 try (Connection cnn = ds.getConnection()) {
@@ -577,6 +534,47 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
             return FormValidation.error(e, "Failed to load JDBC driver '" + driverClass + "' for JDBC connection '" + jdbcUrl + "'");
         }
 
+    }
+
+    private static HikariConfig createHikariConfig(String properties, String jdbcUrl, String jdbcUserName, String jdbcPassword) {
+        Properties p = new Properties();
+        // todo refactor the DAO to inject config defaults in the DAO
+        if (jdbcUrl.startsWith("jdbc:mysql")) {
+            // https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
+            // https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
+            p.setProperty("dataSource.cachePrepStmts", "true");
+            p.setProperty("dataSource.prepStmtCacheSize", "250");
+            p.setProperty("dataSource.prepStmtCacheSqlLimit", "2048");
+            p.setProperty("dataSource.useServerPrepStmts", "true");
+            p.setProperty("dataSource.useLocalSessionState", "true");
+            p.setProperty("dataSource.rewriteBatchedStatements", "true");
+            p.setProperty("dataSource.cacheResultSetMetadata", "true");
+            p.setProperty("dataSource.cacheServerConfiguration", "true");
+            p.setProperty("dataSource.elideSetAutoCommits", "true");
+            p.setProperty("dataSource.maintainTimeStats", "false");
+        } else if (jdbcUrl.startsWith("jdbc:postgresql")) {
+            // no tuning recommendations found for postgresql
+        } else if (jdbcUrl.startsWith("jdbc:h2")) {
+            // dsConfig.setDataSourceClassName("org.h2.jdbcx.JdbcDataSource"); don't specify the datasource due to a classloading issue
+        } else {
+            // unsupported config
+        }
+
+        if (StringUtils.isNotBlank(properties)) {
+            try {
+                p.load(new StringReader(properties));
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to read properties.", e);
+            }
+        }
+        LOGGER.log(Level.INFO, "Applied pool properties {0}", p);
+        HikariConfig dsConfig = new HikariConfig(p);
+        dsConfig.setJdbcUrl(jdbcUrl);
+        dsConfig.setUsername(jdbcUserName);
+        dsConfig.setPassword(jdbcPassword);
+        // to mimic the old behaviour pre JENKINS-69375 fix
+        dsConfig.setDataSourceProperties(p);
+        return dsConfig;
     }
 
     @Terminator
