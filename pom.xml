@@ -102,7 +102,7 @@
     <jenkins-plugin-jacoco.version>3.3.2</jenkins-plugin-jacoco.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
     <jenkins-plugin-maven-invoker.version>2.4</jenkins-plugin-maven-invoker.version>
-    <jenkins-plugin-maven.version>3.16</jenkins-plugin-maven.version>
+    <jenkins-plugin-maven.version>3.19</jenkins-plugin-maven.version>
     <jenkins-plugin-mysql.version>8.0.16</jenkins-plugin-mysql.version>
     <jenkins-plugin-postgresql.version>42.3.3</jenkins-plugin-postgresql.version>
     <jenkins-plugin-script-security.version>1138.v8e727069a_025</jenkins-plugin-script-security.version>
