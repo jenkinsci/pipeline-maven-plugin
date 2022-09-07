@@ -187,7 +187,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         if (withContainer) {
             console.trace("[withMaven] IMPORTANT \"withMaven(){...}\" step running within a Docker container. See " );
-            console.traceHyperlink("https://github.com/jenkinsci/pipeline-maven-plugin/FAQ.adoc", "Pipeline Maven Plugin FAQ");
+            console.traceHyperlink("https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/FAQ.adoc#how-to-use-the-pipeline-maven-plugin-with-docker", "Pipeline Maven Plugin FAQ");
             console.trace(" in case of problem.");
         }
 
