@@ -203,7 +203,7 @@ public class MavenSpyLogProcessor implements Serializable {
             listener.getLogger().print("[withMaven] One or multiple Maven executions have been ignored by the " +
                     "Jenkins Pipeline Maven Plugin because they have been interrupted before completion " +
                     "(" + mavenSpyLogsInterruptedList.length + "). See ");
-            listener.hyperlink("https://github.com/jenkinsci/pipeline-maven-plugin/FAQ.adoc", "Pipeline Maven Plugin FAQ");
+            listener.hyperlink("https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/FAQ.adoc#how-to-use-the-pipeline-maven-plugin-with-docker", "Pipeline Maven Plugin FAQ");
             listener.getLogger().println(" for more details.");
             if (LOGGER.isLoggable(Level.FINE)) {
                 for (FilePath mavenSpyLogsInterruptedLogs : mavenSpyLogsInterruptedList) {
