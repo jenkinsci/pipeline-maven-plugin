@@ -1,0 +1,64 @@
+<mavenExecution _time="2022-09-04 21:06:21.351">
+<ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2022-09-04 21:07:43.592">
+    <project baseDir="/home/jenkins/workspace/gresql-compare-maven-plugin_main" file="/home/jenkins/workspace/gresql-compare-maven-plugin_main/pom.xml" groupId="com.acme.maven.plugins" name="PostGreSQL comparison Maven plugin" artifactId="postgresql-compare-maven-plugin" packaging="maven-plugin" version="1.0.2-SNAPSHOT">
+      <build sourceDirectory="/home/jenkins/workspace/gresql-compare-maven-plugin_main/src/main/java" directory="/home/jenkins/workspace/gresql-compare-maven-plugin_main/target"/>
+    </project>
+    <plugin executionId="default-deploy" goal="deploy" lifecyclePhase="deploy" groupId="org.apache.maven.plugins" artifactId="maven-deploy-plugin" version="2.8.2">
+      <altDeploymentRepository>${altDeploymentRepository}</altDeploymentRepository>
+      <altReleaseDeploymentRepository>${altReleaseDeploymentRepository}</altReleaseDeploymentRepository>
+      <altSnapshotDeploymentRepository>${altSnapshotDeploymentRepository}</altSnapshotDeploymentRepository>
+      <deployAtEnd>${deployAtEnd}</deployAtEnd>
+      <offline>${settings.offline}</offline>
+      <project>${project}</project>
+      <reactorProjects>${reactorProjects}</reactorProjects>
+      <retryFailedDeploymentCount>${retryFailedDeploymentCount}</retryFailedDeploymentCount>
+      <session>${session}</session>
+      <skip>${maven.deploy.skip}</skip>
+    </plugin>
+  </ExecutionEvent>
+<RepositoryEvent type="ARTIFACT_DEPLOYED" class="org.eclipse.aether.RepositoryEvent" _time="2022-09-04 21:07:44.043">
+    <artifact extension="jar" file="/home/jenkins/workspace/gresql-compare-maven-plugin_main/target/postgresql-compare-maven-plugin-1.0.2-SNAPSHOT.jar" baseVersion="1.0.2-SNAPSHOT" groupId="com.acme.maven.plugins" classifier="" artifactId="postgresql-compare-maven-plugin" id="com.acme.maven.plugins:postgresql-compare-maven-plugin:jar:1.0.2-20220904.210621-1" version="1.0.2-20220904.210621-1" snapshot="true"/>
+    <repository layout="default" id="acme" url="https://server/maven-snapshots/"/>
+  </RepositoryEvent>
+<RepositoryEvent type="ARTIFACT_DEPLOYED" class="org.eclipse.aether.RepositoryEvent" _time="2022-09-04 21:07:44.08">
+    <artifact extension="pom" file="/home/jenkins/workspace/gresql-compare-maven-plugin_main/pom.xml" baseVersion="1.0.2-SNAPSHOT" groupId="com.acme.maven.plugins" classifier="" artifactId="postgresql-compare-maven-plugin" id="com.acme.maven.plugins:postgresql-compare-maven-plugin:pom:1.0.2-20220904.210621-1" version="1.0.2-20220904.210621-1" snapshot="true"/>
+    <repository layout="default" id="acme" url="https://server/maven-snapshots/"/>
+  </RepositoryEvent>
+<ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2022-09-04 21:07:44.178">
+    <project baseDir="/home/jenkins/workspace/gresql-compare-maven-plugin_main" file="/home/jenkins/workspace/gresql-compare-maven-plugin_main/pom.xml" groupId="com.acme.maven.plugins" name="PostGreSQL comparison Maven plugin" artifactId="postgresql-compare-maven-plugin" packaging="maven-plugin" version="1.0.2-SNAPSHOT">
+      <build sourceDirectory="/home/jenkins/workspace/gresql-compare-maven-plugin_main/src/main/java" directory="/home/jenkins/workspace/gresql-compare-maven-plugin_main/target"/>
+    </project>
+    <plugin executionId="default-deploy" goal="deploy" lifecyclePhase="deploy" groupId="org.apache.maven.plugins" artifactId="maven-deploy-plugin" version="2.8.2">
+      <altDeploymentRepository>${altDeploymentRepository}</altDeploymentRepository>
+      <altReleaseDeploymentRepository>${altReleaseDeploymentRepository}</altReleaseDeploymentRepository>
+      <altSnapshotDeploymentRepository>${altSnapshotDeploymentRepository}</altSnapshotDeploymentRepository>
+      <deployAtEnd>${deployAtEnd}</deployAtEnd>
+      <offline>${settings.offline}</offline>
+      <project>${project}</project>
+      <reactorProjects>${reactorProjects}</reactorProjects>
+      <retryFailedDeploymentCount>${retryFailedDeploymentCount}</retryFailedDeploymentCount>
+      <session>${session}</session>
+      <skip>${maven.deploy.skip}</skip>
+    </plugin>
+    <artifactRepository>
+      <id>acme</id>
+      <url>https://server/maven-snapshots/</url>
+    </artifactRepository>
+  </ExecutionEvent>
+<ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2022-09-04 21:07:44.178">
+    <project baseDir="/home/jenkins/workspace/gresql-compare-maven-plugin_main" file="/home/jenkins/workspace/gresql-compare-maven-plugin_main/pom.xml" groupId="com.acme.maven.plugins" name="PostGreSQL comparison Maven plugin" artifactId="postgresql-compare-maven-plugin" packaging="maven-plugin" version="1.0.2-SNAPSHOT">
+      <build sourceDirectory="/home/jenkins/workspace/gresql-compare-maven-plugin_main/src/main/java" directory="/home/jenkins/workspace/gresql-compare-maven-plugin_main/target"/>
+    </project>
+    <no-execution-found/>
+    <artifact extension="jar" baseVersion="1.0.2-SNAPSHOT" groupId="com.acme.maven.plugins" artifactId="postgresql-compare-maven-plugin" id="com.acme.maven.plugins:postgresql-compare-maven-plugin:maven-plugin:1.0.2-SNAPSHOT" type="maven-plugin" version="1.0.2-20220904.210621-1" snapshot="true">
+      <file>/home/jenkins/workspace/gresql-compare-maven-plugin_main/target/postgresql-compare-maven-plugin-1.0.2-SNAPSHOT.jar</file>
+    </artifact>
+    <attachedArtifacts/>
+  </ExecutionEvent>
+<MavenExecutionResult class="org.apache.maven.execution.DefaultMavenExecutionResult" _time="2022-09-04 21:07:44.18">
+    <buildSummary baseDir="/home/jenkins/workspace/gresql-compare-maven-plugin_main" file="/home/jenkins/workspace/gresql-compare-maven-plugin_main/pom.xml" groupId="com.acme.maven.plugins" name="PostGreSQL comparison Maven plugin" artifactId="postgresql-compare-maven-plugin" packaging="maven-plugin" time="82481" version="1.0.2-SNAPSHOT" class="org.apache.maven.execution.BuildSuccess">
+      <build sourceDirectory="/home/jenkins/workspace/gresql-compare-maven-plugin_main/src/main/java" directory="/home/jenkins/workspace/gresql-compare-maven-plugin_main/target"/>
+    </buildSummary>
+  </MavenExecutionResult>
+
+</mavenExecution>
