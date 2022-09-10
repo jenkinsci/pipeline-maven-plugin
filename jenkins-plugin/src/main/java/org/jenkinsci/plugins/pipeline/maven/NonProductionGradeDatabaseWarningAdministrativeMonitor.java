@@ -2,9 +2,12 @@ package org.jenkinsci.plugins.pipeline.maven;
 
 import hudson.Extension;
 import hudson.model.AdministrativeMonitor;
+
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.IOException;
 
@@ -16,8 +19,16 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitor extends Admi
 
     @Override
     public boolean isActivated() {
-        boolean isEnoughProductionGradeForTheWorkload = GlobalPipelineMavenConfig.get().getDao().isEnoughProductionGradeForTheWorkload();
-        return !isEnoughProductionGradeForTheWorkload;
+        String jdbcUrl = GlobalPipelineMavenConfig.get().getJdbcUrl();
+        if (!isBlank(jdbcUrl)) {
+            return jdbcUrl.startsWith("jdbc:h2:");
+        }
+
+        if (GlobalPipelineMavenConfig.get().isDaoInitialized()) {
+            return !GlobalPipelineMavenConfig.get().getDao().isEnoughProductionGradeForTheWorkload();
+        }
+
+        return false;
     }
 
     @Override

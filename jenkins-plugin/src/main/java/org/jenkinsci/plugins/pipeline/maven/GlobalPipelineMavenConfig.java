@@ -217,6 +217,10 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         return true;
     }
 
+    boolean isDaoInitialized() {
+        return dao != null;
+    }
+
     @Nonnull
     public synchronized PipelineMavenPluginDao getDao() {
         Jenkins j = Jenkins.getInstanceOrNull();
