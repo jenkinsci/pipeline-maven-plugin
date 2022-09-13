@@ -250,7 +250,7 @@ public class DownstreamPipelineTriggerRunListenerTest {
             when(dao.listDownstreamJobsByArtifact("pipeline", 42))
                     .thenReturn(Collections.singletonMap(new MavenArtifact("groupId:artifactId:jar:version"),
                             new TreeSet<>(Collections.singleton("downstream"))));
-            when(jenkins.getItemByFullName("downstream", WorkflowJob.class)).thenReturn(downstream);
+            when(jenkins.getItemByFullName("downstream", Job.class)).thenReturn(downstream);
 
             listener.onCompleted(build, taskListener);
 
@@ -286,7 +286,6 @@ public class DownstreamPipelineTriggerRunListenerTest {
             when(dao.listDownstreamJobsByArtifact("pipeline", 42))
                     .thenReturn(Collections.singletonMap(new MavenArtifact("groupId:upstreamArtifactId:jar:version"),
                             new TreeSet<>(Collections.singleton("downstream"))));
-            when(jenkins.getItemByFullName("downstream", WorkflowJob.class)).thenReturn(downstream);
             when(jenkins.getItemByFullName("downstream", Job.class)).thenReturn(downstream);
             when(dao.getGeneratedArtifacts("downstream", 4242)).thenReturn(
                     Collections.singletonList(new MavenArtifact("groupId:downstreamArtifactId:jar:version")));
@@ -336,7 +335,6 @@ public class DownstreamPipelineTriggerRunListenerTest {
             when(build.getParent()).thenReturn(job);
             when(build.getNumber()).thenReturn(42);
             when(dao.listDownstreamJobsByArtifact("pipeline", 42)).thenReturn(downstreamJobs);
-            when(jenkins.getItemByFullName("downstream", WorkflowJob.class)).thenReturn(downstream);
             when(jenkins.getItemByFullName("downstream", Job.class)).thenReturn(downstream);
             when(dao.getGeneratedArtifacts("downstream", 4242)).thenReturn(
                     Collections.singletonList(new MavenArtifact("groupId:downstreamArtifactId:jar:version")));

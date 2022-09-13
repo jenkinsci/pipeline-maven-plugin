@@ -19,8 +19,6 @@ import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCauseHelper;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause;
 import org.jenkinsci.plugins.pipeline.maven.cause.OtherMavenDependencyCause;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -46,7 +44,7 @@ import java.util.stream.Collectors;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 @Extension
-public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRun> {
+public class DownstreamPipelineTriggerRunListener extends RunListener<Run<?, ?>> {
 
     private final static Logger LOGGER = Logger.getLogger(DownstreamPipelineTriggerRunListener.class.getName());
 
@@ -54,7 +52,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
     public GlobalPipelineMavenConfig globalPipelineMavenConfig;
 
     @Override
-    public void onCompleted(WorkflowRun upstreamBuild, @Nonnull TaskListener listener) {
+    public void onCompleted(Run<?, ?> upstreamBuild, @Nonnull TaskListener listener) {
         LOGGER.log(Level.FINER, "onCompleted({0})", new Object[]{upstreamBuild});
         long startTimeInNanos = System.nanoTime();
         if(LOGGER.isLoggable(Level.FINER)) {
@@ -126,7 +124,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
             return;
         }
 
-        WorkflowJob upstreamPipeline = upstreamBuild.getParent();
+        Job<?, ?> upstreamPipeline = upstreamBuild.getParent();
 
         String upstreamPipelineFullName = upstreamPipeline.getFullName();
         int upstreamBuildNumber = upstreamBuild.getNumber();
@@ -173,7 +171,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                     continue;
                 }
 
-                final WorkflowJob downstreamPipeline = Jenkins.get().getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
+                final Job<?, ?> downstreamPipeline = Jenkins.get().getItemByFullName(downstreamPipelineFullName, Job.class);
                 if (downstreamPipeline == null || downstreamPipeline.getLastBuild() == null) {
                     LOGGER.log(Level.FINE, "Downstream pipeline {0} or downstream pipeline last build not found from upstream build {1}. Database synchronization issue or security restriction?",
                             new Object[]{downstreamPipelineFullName, upstreamBuild.getFullDisplayName(), Jenkins.getAuthentication()});
@@ -216,7 +214,7 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
                 for (String transitiveUpstreamPipelineName : transitiveUpstreamPipelines.keySet()) {
                     // Skip if one of the downstream's upstream is already building or in queue
                     // Then it will get triggered anyway by that upstream, we don't need to trigger it again
-                    WorkflowJob transitiveUpstreamPipeline = Jenkins.get().getItemByFullName(transitiveUpstreamPipelineName, WorkflowJob.class);
+                    Job<?, ?> transitiveUpstreamPipeline = Jenkins.get().getItemByFullName(transitiveUpstreamPipelineName, Job.class);
 
                     if (transitiveUpstreamPipeline == null) {
                         // security: not allowed to view this transitive upstream pipeline, continue to loop
@@ -244,12 +242,12 @@ public class DownstreamPipelineTriggerRunListener extends RunListener<WorkflowRu
 
                 if (!downstreamPipeline.isBuildable()) {
                     LOGGER.log(Level.FINE, "Skip triggering of non buildable (disabled: {0}, isHoldOffBuildUntilSave: {1}) downstream pipeline {2} from upstream build {3}",
-                            new Object[]{downstreamPipeline.isDisabled(), downstreamPipeline.isHoldOffBuildUntilSave(), downstreamPipeline.getFullName(), upstreamBuild.getFullDisplayName()});
+                            new Object[]{((ParameterizedJobMixIn.ParameterizedJob<?, ?>) downstreamPipeline).isDisabled(), downstreamPipeline.isHoldOffBuildUntilSave(), downstreamPipeline.getFullName(), upstreamBuild.getFullDisplayName()});
                     rejectedPipelines.add(downstreamPipelineFullName);
                     continue;
                 }
 
-                WorkflowJobDependencyTrigger downstreamPipelineTrigger = this.globalPipelineMavenConfig.getPipelineTriggerService().getWorkflowJobDependencyTrigger(downstreamPipeline);
+                WorkflowJobDependencyTrigger downstreamPipelineTrigger = this.globalPipelineMavenConfig.getPipelineTriggerService().getWorkflowJobDependencyTrigger((ParameterizedJobMixIn.ParameterizedJob<?, ?>) downstreamPipeline);
                 if (downstreamPipelineTrigger == null) {
                     LOGGER.log(Level.FINE, "Skip triggering of downstream pipeline {0} from upstream build {1}: dependency trigger not configured", new Object[]{downstreamPipeline.getFullName(), upstreamBuild.getFullDisplayName()});
                     rejectedPipelines.add(downstreamPipelineFullName);

@@ -1,11 +1,10 @@
 package org.jenkinsci.plugins.pipeline.maven.db.migration.h2;
 
 import hudson.model.Cause;
+import hudson.model.Job;
 import hudson.model.Run;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,11 +53,11 @@ public class MigrationStep11 implements MigrationStep {
                         long jenkinsMasterId = rst.getLong("jenkins_master_id");
 
                         try {
-                            WorkflowJob pipeline = Jenkins.get().getItemByFullName(jobFullName, WorkflowJob.class);
+                            Job<?, ?> pipeline = Jenkins.get().getItemByFullName(jobFullName, Job.class);
                             if (pipeline == null) {
                                 continue;
                             }
-                            WorkflowRun build = pipeline.getBuildByNumber(buildNumber);
+                            Run<?, ?> build = pipeline.getBuildByNumber(buildNumber);
                             if (build == null) {
                                 continue;
                             }

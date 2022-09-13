@@ -23,7 +23,6 @@ import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCause;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCauseHelper;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -116,7 +115,7 @@ public class PipelineTriggerService {
                     continue;
                 }
 
-                final WorkflowJob downstreamPipeline = Jenkins.get().getItemByFullName(downstreamPipelineFullName, WorkflowJob.class);
+                final Job<?, ?> downstreamPipeline = Jenkins.get().getItemByFullName(downstreamPipelineFullName, Job.class);
                 if (downstreamPipeline == null || downstreamPipeline.getLastBuild() == null) {
                     if (logger.isLoggable(Level.FINE)) {
                         logger.log(Level.FINE, "Downstream pipeline " + downstreamPipelineFullName + " or downstream pipeline last build not found. Database synchronization issue or security restriction?");
@@ -132,7 +131,7 @@ public class PipelineTriggerService {
                 for (String transitiveUpstreamPipelineName : transitiveUpstreamPipelines.keySet()) {
                     // Skip if one of the downstream's upstream is already building or in queue
                     // Then it will get triggered anyway by that upstream, we don't need to trigger it again
-                    WorkflowJob transitiveUpstreamPipeline = Jenkins.get().getItemByFullName(transitiveUpstreamPipelineName, WorkflowJob.class);
+                    Job<?, ?> transitiveUpstreamPipeline = Jenkins.get().getItemByFullName(transitiveUpstreamPipelineName, Job.class);
 
                     if (transitiveUpstreamPipeline == null) {
                         // security: not allowed to view this transitive upstream pipeline, continue to loop
@@ -157,14 +156,15 @@ public class PipelineTriggerService {
 
                 if (!downstreamPipeline.isBuildable()) {
                     if (logger.isLoggable(Level.FINE)) {
-                        logger.log(Level.FINE, "Skip triggering of non buildable (disabled: " + downstreamPipeline.isDisabled() +
-                                ", isHoldOffBuildUntilSave: " + downstreamPipeline.isHoldOffBuildUntilSave() +
+                        logger.log(Level.FINE, "Skip triggering of non buildable (" +
+                                (downstreamPipeline instanceof ParameterizedJobMixIn.ParameterizedJob ? ("disabled: " + ((ParameterizedJobMixIn.ParameterizedJob<?, ?>) downstreamPipeline).isDisabled() + ", ") : "") +
+                                "isHoldOffBuildUntilSave: " + downstreamPipeline.isHoldOffBuildUntilSave() +
                                 ") downstream pipeline " + downstreamPipeline.getFullName());
                     }
                     continue;
                 }
 
-                WorkflowJobDependencyTrigger downstreamPipelineTrigger = this.globalPipelineMavenConfig.getPipelineTriggerService().getWorkflowJobDependencyTrigger(downstreamPipeline);
+                WorkflowJobDependencyTrigger downstreamPipelineTrigger = this.globalPipelineMavenConfig.getPipelineTriggerService().getWorkflowJobDependencyTrigger((ParameterizedJobMixIn.ParameterizedJob<?, ?>) downstreamPipeline);
                 if (downstreamPipelineTrigger == null) {
                     LOGGER.log(Level.FINE, "Skip triggering of downstream pipeline {0}: dependency trigger not configured", new Object[]{downstreamPipeline.getFullName()});
                     continue;
@@ -311,13 +311,13 @@ public class PipelineTriggerService {
         return null;
     }
 
-    public boolean isUpstreamBuildVisibleByDownstreamBuildAuth(@Nonnull WorkflowJob upstreamPipeline, @Nonnull WorkflowJob downstreamPipeline) {
-        Authentication downstreamPipelineAuth = Tasks.getAuthenticationOf(downstreamPipeline);
+    public boolean isUpstreamBuildVisibleByDownstreamBuildAuth(@Nonnull Job<?, ?> upstreamPipeline, @Nonnull Job<?, ?>  downstreamPipeline) {
+        Authentication downstreamPipelineAuth = Tasks.getAuthenticationOf((Queue.FlyweightTask) downstreamPipeline);
 
         // see https://github.com/jenkinsci/jenkins/blob/jenkins-2.176.2/core/src/main/java/jenkins/triggers/ReverseBuildTrigger.java#L132
         // jenkins.triggers.ReverseBuildTrigger#shouldTrigger
         try (ACLContext ignored = ACL.as(downstreamPipelineAuth)) {
-            WorkflowJob upstreamPipelineObtainedAsImpersonated = getItemByFullName(upstreamPipeline.getFullName(), WorkflowJob.class);
+            Job<?, ?>  upstreamPipelineObtainedAsImpersonated = getItemByFullName(upstreamPipeline.getFullName(), Job.class);
             boolean result = upstreamPipelineObtainedAsImpersonated != null;
             if (LOGGER.isLoggable(Level.FINE)) {
                 LOGGER.log(Level.FINE, "isUpstreamBuildVisibleByDownstreamBuildAuth(upstreamPipeline: {0}, downstreamPipeline: {1}): downstreamPipelineAuth: {2}, upstreamPipelineObtainedAsImpersonated:{3}, result: {4}",
