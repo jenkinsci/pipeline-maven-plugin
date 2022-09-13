@@ -399,10 +399,6 @@
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-job</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-step-api</artifactId>
     </dependency>
     <dependency>
@@ -498,6 +494,11 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-durable-task-step</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-job</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
