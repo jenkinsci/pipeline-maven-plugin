@@ -39,7 +39,7 @@
   <name>Pipeline Maven Integration Plugin Parent</name>
   <description>This plugin provides maven integration with Pipeline by providing a withMaven step. Configures maven environment to use within a pipeline job by calling sh mvn or bat mvn.
         The selected maven installation will be configured and prepended to the path.</description>
-  <url>https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/README.adoc</url>
+  <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
   <licenses>
     <license>
       <name>The MIT license</name>
@@ -77,7 +77,7 @@
   </modules>
 
   <scm>
-    <connection>scm:git:git://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
+    <connection>scm:git:https://github.com/jenkinsci/pipeline-maven-plugin.git</connection>
     <developerConnection>scm:git:git@github.com:jenkinsci/pipeline-maven-plugin.git</developerConnection>
     <tag>${scmTag}</tag>
     <url>https://github.com/jenkinsci/pipeline-maven-plugin</url>
