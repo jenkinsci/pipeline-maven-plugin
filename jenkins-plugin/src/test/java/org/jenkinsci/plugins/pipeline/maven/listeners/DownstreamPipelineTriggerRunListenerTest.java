@@ -21,10 +21,14 @@ import java.util.TreeSet;
 
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.WithMavenStep;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.service.PipelineTriggerService;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
+import org.jenkinsci.plugins.workflow.flow.FlowExecution;
+import org.jenkinsci.plugins.workflow.flow.FlowExecutionOwner;
+import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.Before;
@@ -83,13 +87,35 @@ public class DownstreamPipelineTriggerRunListenerTest {
     @Mock
     private Item queuedItem;
 
+    @Mock
+    private FlowExecutionOwner flowExecutionOwner;
+
+    @Mock
+    private FlowExecution flowExecution;
+
+    @Mock
+    private FlowNode flowNode;
+
     @Before
-    public void configureMocks() {
+    public void configureMocks() throws Exception {
         when(config.getTriggerDownstreamBuildsResultsCriteria()).thenReturn(Collections.singleton(Result.SUCCESS));
         when(config.getPipelineTriggerService()).thenReturn(service);
         when(config.getDao()).thenReturn(dao);
         when(service.getWorkflowJobDependencyTrigger(any())).thenReturn(trigger);
         when(taskListener.getLogger()).thenReturn(stream);
+        when(build.asFlowExecutionOwner()).thenReturn(flowExecutionOwner);
+        when(flowExecutionOwner.get()).thenReturn(flowExecution);
+        when(flowExecution.getCurrentHeads()).thenReturn(Arrays.asList(flowNode));
+        when(flowNode.getDisplayFunctionName()).thenReturn(WithMavenStep.DescriptorImpl.FUNCTION_NAME);
+    }
+
+    @Test
+    public void test_abort_when_step_not_run() {
+        when(flowExecution.getCurrentHeads()).thenReturn(Collections.emptyList());
+
+        listener.onCompleted(build, taskListener);
+
+        verifyNoMoreInteractions(dao, service, trigger);
     }
 
     @Test

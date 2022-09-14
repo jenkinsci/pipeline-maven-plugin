@@ -5,7 +5,6 @@ import hudson.model.Cause;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.model.listeners.RunListener;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 
 import javax.annotation.Nonnull;
@@ -15,7 +14,7 @@ import javax.inject.Inject;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 @Extension
-public class DatabaseSyncRunListener extends RunListener<Run<?, ?>> {
+public class DatabaseSyncRunListener extends AbstractWorkflowRunListener {
 
     @Inject
     public GlobalPipelineMavenConfig globalPipelineMavenConfig;
@@ -47,6 +46,10 @@ public class DatabaseSyncRunListener extends RunListener<Run<?, ?>> {
     @Override
     public void onCompleted(Run<?, ?> workflowRun, @Nonnull TaskListener listener) {
         super.onCompleted(workflowRun, listener);
+
+        if (!shouldRun(workflowRun, listener)) {
+            return;
+        }
 
         // Note: run.duration is zero in onCompleted(), do the substraction in this listener
         Result result = workflowRun.getResult();
