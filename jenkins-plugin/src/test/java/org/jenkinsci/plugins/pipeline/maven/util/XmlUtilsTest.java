@@ -315,6 +315,65 @@ public class XmlUtilsTest {
             }
         }
     }
+
+    @Test
+    public void test_listGeneratedArtifacts_deploy_2_8() throws Exception {
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-2.8.xml");
+        in.getClass(); // check non null
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+
+        List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, false);
+
+        assertThat(generatedArtifacts.size(), is(2));
+
+        assertThat(generatedArtifacts.get(0).getGroupId(), is("com.acme.maven.plugins"));
+        assertThat(generatedArtifacts.get(0).getArtifactId(), is("postgresql-compare-maven-plugin"));
+        assertThat(generatedArtifacts.get(0).getExtension(), is("pom"));
+        assertThat(generatedArtifacts.get(0).getClassifier(), is(emptyOrNullString()));
+        assertThat(generatedArtifacts.get(0).getBaseVersion(), is("1.0.2-SNAPSHOT"));
+        assertThat(generatedArtifacts.get(0).getType(), is("pom"));
+        assertThat(generatedArtifacts.get(0).getVersion(), is("1.0.2-20220904.210621-1"));
+        assertThat(generatedArtifacts.get(0).isSnapshot(), is(true));
+
+        assertThat(generatedArtifacts.get(1).getGroupId(), is("com.acme.maven.plugins"));
+        assertThat(generatedArtifacts.get(1).getArtifactId(), is("postgresql-compare-maven-plugin"));
+        assertThat(generatedArtifacts.get(1).getExtension(), is("jar"));
+        assertThat(generatedArtifacts.get(1).getClassifier(), is(emptyOrNullString()));
+        assertThat(generatedArtifacts.get(1).getBaseVersion(), is("1.0.2-SNAPSHOT"));
+        assertThat(generatedArtifacts.get(1).getType(), is("maven-plugin"));
+        assertThat(generatedArtifacts.get(1).getVersion(), is("1.0.2-20220904.210621-1"));
+        assertThat(generatedArtifacts.get(1).isSnapshot(), is(true));
+    }
+
+    @Test
+    public void test_listGeneratedArtifacts_deploy_3_0() throws Exception {
+        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-3.0.xml");
+        in.getClass(); // check non null
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+
+        List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, false);
+
+        assertThat(generatedArtifacts.size(), is(2));
+
+        assertThat(generatedArtifacts.get(0).getGroupId(), is("com.acme.maven.plugins"));
+        assertThat(generatedArtifacts.get(0).getArtifactId(), is("postgresql-compare-maven-plugin"));
+        assertThat(generatedArtifacts.get(0).getExtension(), is("pom"));
+        assertThat(generatedArtifacts.get(0).getClassifier(), is(emptyOrNullString()));
+        assertThat(generatedArtifacts.get(0).getBaseVersion(), is("1.0.2-SNAPSHOT"));
+        assertThat(generatedArtifacts.get(0).getType(), is("pom"));
+        assertThat(generatedArtifacts.get(0).getVersion(), is("1.0.2-20220904.210621-1"));
+        assertThat(generatedArtifacts.get(0).isSnapshot(), is(true));
+
+        assertThat(generatedArtifacts.get(1).getGroupId(), is("com.acme.maven.plugins"));
+        assertThat(generatedArtifacts.get(1).getArtifactId(), is("postgresql-compare-maven-plugin"));
+        assertThat(generatedArtifacts.get(1).getExtension(), is("jar"));
+        assertThat(generatedArtifacts.get(1).getClassifier(), is(emptyOrNullString()));
+        assertThat(generatedArtifacts.get(1).getBaseVersion(), is("1.0.2-SNAPSHOT"));
+        assertThat(generatedArtifacts.get(1).getType(), is("maven-plugin"));
+        assertThat(generatedArtifacts.get(1).getVersion(), is("1.0.2-20220904.210621-1"));
+        assertThat(generatedArtifacts.get(1).isSnapshot(), is(true));
+    }
+
     @Test
     public void test_listGeneratedArtifacts_including_generated_artifacts() throws Exception {
         InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");

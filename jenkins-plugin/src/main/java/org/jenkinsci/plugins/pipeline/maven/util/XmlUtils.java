@@ -88,7 +88,10 @@ public class XmlUtils {
         if (mavenArtifact.getBaseVersion() == null || mavenArtifact.getBaseVersion().isEmpty()) {
             mavenArtifact.setBaseVersion(mavenArtifact.getVersion());
         }
-        mavenArtifact.setSnapshot(Boolean.parseBoolean(artifactElt.getAttribute("snapshot")));
+        String snapshot = artifactElt.getAttribute("snapshot");
+        mavenArtifact.setSnapshot(snapshot != null && !snapshot.trim().isEmpty()
+                ? Boolean.parseBoolean(artifactElt.getAttribute("snapshot"))
+                : mavenArtifact.getBaseVersion().contains("SNAPSHOT"));
         mavenArtifact.setType(artifactElt.getAttribute("type"));
         if (mavenArtifact.getType() == null || mavenArtifact.getType().isEmpty()) {
             // workaround: sometimes we use "XmlUtils.newMavenArtifact()" on "project" elements, in this case, "packaging" is defined but "type" is not defined
@@ -450,11 +453,17 @@ public class XmlUtils {
             pomArtifact.setGroupId(projectArtifact.getGroupId());
             pomArtifact.setArtifactId(projectArtifact.getArtifactId());
             pomArtifact.setBaseVersion(projectArtifact.getBaseVersion());
-            pomArtifact.setVersion(projectArtifact.getVersion());
             pomArtifact.setSnapshot(projectArtifact.isSnapshot());
             pomArtifact.setType("pom");
             pomArtifact.setExtension("pom");
             pomArtifact.setFile(projectElt.getAttribute("file"));
+            Element artifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, pomArtifact.getFile());
+            if (artifactDeployedEvent == null) {
+                // artifact has not been deployed ("mvn deploy")
+                pomArtifact.setVersion(projectArtifact.getVersion());
+            } else {
+                pomArtifact.setVersion(XmlUtils.getUniqueChildElement(artifactDeployedEvent, "artifact").getAttribute("version"));
+            }
 
             result.add(pomArtifact);
 
@@ -473,10 +482,11 @@ public class XmlUtils {
                 } else {
                     mavenArtifact.setFile(StringUtils.trim(fileElt.getTextContent()));
 
-                    Element artifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, mavenArtifact.getFile());
-                    if(artifactDeployedEvent == null) {
+                    artifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, mavenArtifact.getFile());
+                    if (artifactDeployedEvent == null) {
                         // artifact has not been deployed ("mvn deploy")
                     } else {
+                        mavenArtifact.setVersion(XmlUtils.getUniqueChildElement(artifactDeployedEvent, "artifact").getAttribute("version"));
                         mavenArtifact.setRepositoryUrl(XmlUtils.getUniqueChildElement(artifactDeployedEvent, "repository").getAttribute("url"));
                     }
                 }
