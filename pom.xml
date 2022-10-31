@@ -110,7 +110,7 @@
     <jenkins-plugin-token.version>308.v4f2b_ed62b_b_16</jenkins-plugin-token.version>
     <jenkins-plugin-workflow.version>1153.vb_912c0e47fb_a_</jenkins-plugin-workflow.version>
     <jenkins-symbol.version>1.23</jenkins-symbol.version>
-    <jenkins-tools-bom.version>1643.v1cffef51df73</jenkins-tools-bom.version>
+    <jenkins-tools-bom.version>1654.vcb_69d035fa_20</jenkins-tools-bom.version>
     <jenkins.version>2.319.3</jenkins.version>
     <joda-time.version>2.12.0</joda-time.version>
     <junit.version>4.13.2</junit.version>
