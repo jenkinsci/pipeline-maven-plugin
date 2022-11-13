@@ -27,7 +27,7 @@ THE SOFTWARE.
     <div class="alert alert-warning">
         <form method="post" action="${rootURL}/${it.url}/act" name="${it.id}">
                 <f:submit name="yes" value="${%Configure Pipeline Maven Plugin Database}"/>
-                <f:submit name="no" value="${%Dismiss}"/>
+                <f:submit primary="false" clazz="jenkins-!-destructive-color" name="no" value="${%Dismiss}"/>
         </form>
         The Pipeline Maven Plugin is currently using an embedded H2 database. A production grade database, MySQL or PostgreSQL, should be used.
     </div>
