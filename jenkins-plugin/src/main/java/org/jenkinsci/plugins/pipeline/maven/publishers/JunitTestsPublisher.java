@@ -33,7 +33,7 @@ import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.tasks.junit.JUnitResultArchiver;
 import hudson.tasks.junit.TestDataPublisher;
-import hudson.tasks.junit.TestResultAction;
+import hudson.tasks.junit.TestResultSummary;
 import hudson.tasks.junit.pipeline.JUnitResultsStepExecution;
 import hudson.tasks.test.PipelineTestDetails;
 import org.jenkinsci.Symbol;
@@ -347,23 +347,23 @@ public class JunitTestsPublisher extends MavenPublisher {
             if (LOGGER.isLoggable(Level.FINER)) {
                 listener.getLogger().println("[withMaven] junitPublisher - collect test reports: testResults=" + archiver.getTestResults() + ", healthScaleFactor="  + archiver.getHealthScaleFactor());
             }
-            TestResultAction testResultAction = JUnitResultArchiver.parseAndAttach(archiver, pipelineTestDetails, run, workspace, launcher, listener);
+            TestResultSummary testResultSummary = JUnitResultArchiver.parseAndSummarize(archiver, pipelineTestDetails, run, workspace, launcher, listener);
 
-            if (testResultAction == null) {
+            if (testResultSummary == null) {
                 // no unit test results found
                 if (LOGGER.isLoggable(Level.FINE)) {
                     listener.getLogger().println("[withMaven] junitPublisher - no unit test results found, ignore");
                 }
-            } else if (testResultAction.getResult().getFailCount() == 0) {
+            } else if (testResultSummary.getFailCount() == 0) {
                 // unit tests are all successful
                 if (LOGGER.isLoggable(Level.FINE)) {
                     listener.getLogger().println("[withMaven] junitPublisher - unit tests are all successful");
                 }
             } else {
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    listener.getLogger().println("[withMaven] junitPublisher - " + testResultAction.getResult().getFailCount() + " unit test failure(s) found, mark job as unstable");
+                    listener.getLogger().println("[withMaven] junitPublisher - " + testResultSummary.getFailCount() + " unit test failure(s) found, mark job as unstable");
                 }
-                node.addAction(new WarningAction(Result.UNSTABLE).withMessage(testResultAction.getResult().getFailCount() + " unit test failure(s) found"));
+                node.addAction(new WarningAction(Result.UNSTABLE).withMessage(testResultSummary.getFailCount() + " unit test failure(s) found"));
                 run.setResult(Result.UNSTABLE);
             }
         } catch (RuntimeException e) {
