@@ -250,7 +250,7 @@ public class WithMavenStep extends Step {
                 return r; // it's empty
             }
             item.checkPermission(Item.CONFIGURE);
-            r.add("--- Use system default Maven ---",null);
+            r.add("--- Use system default Maven ---");
             for (MavenInstallation installation : getMavenDescriptor().getInstallations()) {
                 r.add(installation.getName());
             }
@@ -268,7 +268,7 @@ public class WithMavenStep extends Step {
                 return r; // it's empty
             }
             item.checkPermission(Item.CONFIGURE);
-            r.add("--- Use system default JDK ---",null);
+            r.add("--- Use system default JDK ---");
             for (JDK installation : getJDKDescriptor().getInstallations()) {
                 r.add(installation.getName());
             }
@@ -282,7 +282,7 @@ public class WithMavenStep extends Step {
                 return r; // it's empty
             }
             item.checkPermission(Item.CONFIGURE);
-            r.add("--- Use system default settings or file path ---",null);
+            r.add("--- Use system default settings or file path ---");
             for (Config config : ConfigFiles.getConfigsInContext(context, MavenSettingsConfigProvider.class)) {
                 r.add(config.name, config.id);
             }
@@ -296,7 +296,7 @@ public class WithMavenStep extends Step {
                 return r; // it's empty
             }
             item.checkPermission(Item.CONFIGURE);
-            r.add("--- Use system default settings or file path ---",null);
+            r.add("--- Use system default settings or file path ---");
             for (Config config : ConfigFiles.getConfigsInContext(context, GlobalMavenSettingsConfigProvider.class)) {
                 r.add(config.name, config.id);
             }

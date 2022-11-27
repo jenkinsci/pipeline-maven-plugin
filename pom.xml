@@ -92,11 +92,11 @@
     <hikaricp.version>4.0.3</hikaricp.version>
     <jansi.version>2.4.0</jansi.version>
     <jenkins-annotation-indexer.version>1.16</jenkins-annotation-indexer.version>
-    <jenkins-credentials.version>1087.1089.v2f1b_9a_b_040e4</jenkins-credentials.version>
+    <jenkins-credentials.version>1143.vb_e8b_b_ceee347</jenkins-credentials.version>
     <jenkins-docker-fixtures.version>166.v912b_95083ffe</jenkins-docker-fixtures.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-flaky-test.version>1.2.2</jenkins-plugin-flaky-test.version>
-    <jenkins-plugin-folder.version>6.722.v8165b_a_cf25e9</jenkins-plugin-folder.version>
+    <jenkins-plugin-folder.version>6.740.ve4f4ffa_dea_54</jenkins-plugin-folder.version>
     <jenkins-plugin-h2.version>1.4.199</jenkins-plugin-h2.version>
     <jenkins-plugin-jacoco.version>3.3.2</jenkins-plugin-jacoco.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
@@ -104,14 +104,14 @@
     <jenkins-plugin-maven.version>3.16</jenkins-plugin-maven.version>
     <jenkins-plugin-mysql.version>8.0.16</jenkins-plugin-mysql.version>
     <jenkins-plugin-postgresql.version>42.3.3</jenkins-plugin-postgresql.version>
-    <jenkins-plugin-script-security.version>1138.v8e727069a_025</jenkins-plugin-script-security.version>
-    <jenkins-plugin-ssh-creds.version>277.280.v1e86b_7d0056b_</jenkins-plugin-ssh-creds.version>
+    <jenkins-plugin-script-security.version>1189.vb_a_b_7c8fd5fde</jenkins-plugin-script-security.version>
+    <jenkins-plugin-ssh-creds.version>305.v8f4381501156</jenkins-plugin-ssh-creds.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
     <jenkins-plugin-token.version>321.vd7cc1f2a_52c8</jenkins-plugin-token.version>
-    <jenkins-plugin-workflow.version>1153.vb_912c0e47fb_a_</jenkins-plugin-workflow.version>
+    <jenkins-plugin-workflow.version>1200.v8005c684b_a_c6</jenkins-plugin-workflow.version>
     <jenkins-symbol.version>1.23</jenkins-symbol.version>
-    <jenkins-tools-bom.version>1654.vcb_69d035fa_20</jenkins-tools-bom.version>
-    <jenkins.version>2.319.3</jenkins.version>
+    <jenkins-tools-bom.version>1678.vc1feb_6a_3c0f1</jenkins-tools-bom.version>
+    <jenkins.version>2.346.3</jenkins.version>
     <joda-time.version>2.12.1</joda-time.version>
     <junit.version>4.13.2</junit.version>
     <maven-compat.version>3.3.9</maven-compat.version>
