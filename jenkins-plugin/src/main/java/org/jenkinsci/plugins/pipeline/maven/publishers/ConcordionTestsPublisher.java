@@ -23,6 +23,7 @@ import htmlpublisher.HtmlPublisherTarget;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
@@ -141,8 +142,9 @@ public class ConcordionTestsPublisher extends MavenPublisher {
                             "\" with the following files: " + target.getReportFiles());
             HtmlPublisher.publishReports(run, workspace, listener, Collections.singletonList(target), HtmlPublisher.class);
         } catch (final Exception e) {
-            listener.error("[withMaven] concordionPublisher - Silently ignore exception archiving Concordion reports: " + e);
+            listener.error("[withMaven] concordionPublisher - exception archiving Concordion reports: " + e + ". Failing the build.");
             LOGGER.log(Level.WARNING, "Exception processing Concordion reports archiving", e);
+            run.setResult(Result.FAILURE);
         }
     }
 
