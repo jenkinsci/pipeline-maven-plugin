@@ -24,6 +24,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.WithMavenStep;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
+import org.jenkinsci.plugins.pipeline.maven.dao.UpstreamMemory;
 import org.jenkinsci.plugins.pipeline.maven.service.PipelineTriggerService;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.workflow.flow.FlowExecution;
@@ -284,7 +285,7 @@ public class DownstreamPipelineTriggerRunListenerTest {
             verify(dao).listDownstreamJobsByArtifact("pipeline", 42);
             verify(dao).getGeneratedArtifacts("downstream", 4242);
             verify(dao).listDownstreamJobsByArtifact("downstream", 4242);
-            verify(dao).listTransitiveUpstreamJobs("downstream", 4242);
+            verify(dao).listTransitiveUpstreamJobs(eq("downstream"), eq(4242), any(UpstreamMemory.class));
             verifyNoMoreInteractions(dao, service, trigger);
         }
     }
@@ -326,7 +327,7 @@ public class DownstreamPipelineTriggerRunListenerTest {
             verify(dao).listDownstreamJobsByArtifact("pipeline", 42);
             verify(dao).getGeneratedArtifacts("downstream", 4242);
             verify(dao).listDownstreamJobsByArtifact("downstream", 4242);
-            verify(dao).listTransitiveUpstreamJobs("downstream", 4242);
+            verify(dao).listTransitiveUpstreamJobs(eq("downstream"), eq(4242), any(UpstreamMemory.class));
             verify(service).getWorkflowJobDependencyTrigger(downstream);
             verify(service).isDownstreamVisibleByUpstreamBuildAuth(downstream);
             verify(service).isUpstreamBuildVisibleByDownstreamBuildAuth(job, downstream);
@@ -375,7 +376,7 @@ public class DownstreamPipelineTriggerRunListenerTest {
             verify(dao).listDownstreamJobsByArtifact("pipeline", 42);
             verify(dao).getGeneratedArtifacts("downstream", 4242);
             verify(dao).listDownstreamJobsByArtifact("downstream", 4242);
-            verify(dao).listTransitiveUpstreamJobs("downstream", 4242);
+            verify(dao).listTransitiveUpstreamJobs(eq("downstream"), eq(4242), any(UpstreamMemory.class));
             verify(service).getWorkflowJobDependencyTrigger(downstream);
             verify(service).isDownstreamVisibleByUpstreamBuildAuth(downstream);
             verify(service).isUpstreamBuildVisibleByDownstreamBuildAuth(job, downstream);
