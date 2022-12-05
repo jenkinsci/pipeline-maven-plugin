@@ -367,8 +367,9 @@ public class JunitTestsPublisher extends MavenPublisher {
                 run.setResult(Result.UNSTABLE);
             }
         } catch (RuntimeException e) {
-            listener.error("[withMaven] junitPublisher - Silently ignore exception archiving JUnit results:" + testResults + ": " + e);
+            listener.error("[withMaven] junitPublisher - exception archiving JUnit results " + testResults + ": " + e + ". Failing the build.");
             LOGGER.log(Level.WARNING, "Exception processing " + testResults, e);
+            run.setResult(Result.FAILURE);
         }
     }
 

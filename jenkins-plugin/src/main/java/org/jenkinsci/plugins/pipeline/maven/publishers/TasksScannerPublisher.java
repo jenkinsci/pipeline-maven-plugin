@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
@@ -169,8 +170,9 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
         try {
             tasksPublisher.perform(run, workspace, launcher, listener);
         } catch (Exception e) {
-            listener.error("[withMaven] openTasksPublisher - Silently ignore exception scanning tasks in " + pattern + ": " + e);
+            listener.error("[withMaven] openTasksPublisher - exception scanning tasks in " + pattern + ": " + e + ". Failing the build.");
             LOGGER.log(Level.WARNING, "Exception scanning tasks in  " + pattern, e);
+            run.setResult(Result.FAILURE);
         }
     }
 

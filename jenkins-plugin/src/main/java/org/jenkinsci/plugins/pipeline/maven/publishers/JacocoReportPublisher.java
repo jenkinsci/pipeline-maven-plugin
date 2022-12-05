@@ -27,6 +27,7 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
+import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.jacoco.JacocoPublisher;
@@ -219,15 +220,9 @@ public class JacocoReportPublisher extends MavenPublisher {
         try {
             jacocoPublisher.perform(run, workspace, launcher, listener);
         } catch (Exception e) {
-            listener.error("[withMaven] jacocoPublisher - Silently ignore exception archiving JaCoCo results for " + jacocoReportDetails);
-            listener.error("[withMaven] jacocoPublisher - Silently ignore exception archiving JaCoCo results: "  + e);
-
-            if (LOGGER.isLoggable(Level.FINE)) {
-                StringWriter buffer = new StringWriter();
-                PrintWriter printWriter = new PrintWriter(buffer);
-                e.printStackTrace(printWriter);
-                listener.error(buffer.toString());
-            }
+            listener.error("[withMaven] jacocoPublisher - exception archiving JaCoCo results for " + jacocoReportDetails + ": " + e + ". Failing the build.");
+            LOGGER.log(Level.WARNING, "Exception processing JaCoCo results", e);
+            run.setResult(Result.FAILURE);
         }
     }
 

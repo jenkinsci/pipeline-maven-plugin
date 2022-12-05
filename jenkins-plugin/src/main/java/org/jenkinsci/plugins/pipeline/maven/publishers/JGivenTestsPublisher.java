@@ -18,12 +18,17 @@
 
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.Run;
-import hudson.model.StreamBuildListener;
-import hudson.model.TaskListener;
+import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.annotation.Nonnull;
+
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.jgiven.JgivenReportGenerator;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
@@ -32,15 +37,13 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
-import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.Result;
+import hudson.model.Run;
+import hudson.model.StreamBuildListener;
+import hudson.model.TaskListener;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -91,7 +94,8 @@ public class JGivenTestsPublisher extends MavenPublisher {
         }
         if (!foundJGivenDependency) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println("[withMaven] jgivenPublisher - JGiven not found within your project dependencies, aborting.");
+                listener.getLogger().println(
+                        "[withMaven] jgivenPublisher - JGiven not found within your project dependencies, aborting.");
             }
             return;
         }
@@ -113,8 +117,9 @@ public class JGivenTestsPublisher extends MavenPublisher {
             generator.perform(run, workspace, launcher, listener);
         } catch (final Exception e) {
             listener.error(
-                    "[withMaven] jgivenPublisher - Silently ignore exception archiving JGiven reports: " + e);
+                    "[withMaven] jgivenPublisher - exception archiving JGiven reports: " + e + ". Failing the build.");
             LOGGER.log(Level.WARNING, "Exception processing JGiven reports archiving", e);
+            run.setResult(Result.FAILURE);
         }
     }
 
