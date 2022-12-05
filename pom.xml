@@ -91,7 +91,7 @@
     <hamcrest.version>1.3</hamcrest.version>
     <hikaricp.version>4.0.3</hikaricp.version>
     <jansi.version>2.4.0</jansi.version>
-    <jenkins-annotation-indexer.version>1.16</jenkins-annotation-indexer.version>
+    <jenkins-annotation-indexer.version>1.17</jenkins-annotation-indexer.version>
     <jenkins-credentials.version>1143.vb_e8b_b_ceee347</jenkins-credentials.version>
     <jenkins-docker-fixtures.version>166.v912b_95083ffe</jenkins-docker-fixtures.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
