@@ -95,6 +95,12 @@ public abstract class AbstractPipelineMavenPluginDaoDecorator implements Pipelin
         return delegate.listTransitiveUpstreamJobs(jobFullName, buildNumber);
     }
 
+	@Override
+	public Map<String, Integer> listTransitiveUpstreamJobs(String jobFullName, int buildNumber,
+			UpstreamMemory upstreamMemory) {
+		return delegate.listTransitiveUpstreamJobs(jobFullName, buildNumber, upstreamMemory);
+	}
+    
     @Override
     public void cleanup() {
         delegate.cleanup();
@@ -119,5 +125,4 @@ public abstract class AbstractPipelineMavenPluginDaoDecorator implements Pipelin
     public void close() throws IOException {
         delegate.close();
     }
-
 }

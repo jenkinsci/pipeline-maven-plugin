@@ -17,6 +17,7 @@ import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCause;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCauseHelper;
 import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause;
 import org.jenkinsci.plugins.pipeline.maven.cause.OtherMavenDependencyCause;
+import org.jenkinsci.plugins.pipeline.maven.dao.UpstreamMemory;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 
 import javax.annotation.Nonnull;
@@ -55,6 +56,8 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
     public void onCompleted(Run<?, ?> upstreamBuild, @Nonnull TaskListener listener) {
         LOGGER.log(Level.FINER, "onCompleted({0})", new Object[]{upstreamBuild});
 
+        UpstreamMemory upstreamMemory = new UpstreamMemory();
+        
         if (!shouldRun(upstreamBuild, listener)) {
             LOGGER.log(Level.FINE, "Skipping downstream pipeline triggering for {0} as withMaven step not found.",
                     new Object[]{upstreamBuild});
@@ -217,7 +220,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
 
                 // Avoid excessive triggering
                 // See #46313
-                Map<String, Integer> transitiveUpstreamPipelines = globalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber);
+                Map<String, Integer> transitiveUpstreamPipelines = globalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber, upstreamMemory);
                 for (String transitiveUpstreamPipelineName : transitiveUpstreamPipelines.keySet()) {
                     // Skip if one of the downstream's upstream is already building or in queue
                     // Then it will get triggered anyway by that upstream, we don't need to trigger it again

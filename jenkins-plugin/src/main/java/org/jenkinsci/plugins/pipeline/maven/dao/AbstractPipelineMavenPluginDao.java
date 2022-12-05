@@ -961,11 +961,17 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
 
     @Nonnull
     public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
-        return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<>(), 0);
+    	UpstreamMemory upstreamMemory = new UpstreamMemory();
+        return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<>(), 0, upstreamMemory);
+    }
+    
+    @Nonnull
+    public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, UpstreamMemory upstreamMemory) {
+    	return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<>(), 0, upstreamMemory);
     }
 
-    private Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, Map<String, Integer> transitiveUpstreamBuilds, int recursionDepth) {
-        Map<String, Integer> upstreamBuilds = listUpstreamJobs(jobFullName, buildNumber);
+    private Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, Map<String, Integer> transitiveUpstreamBuilds, int recursionDepth, UpstreamMemory upstreamMemory) {
+        Map<String, Integer> upstreamBuilds = upstreamMemory.listUpstreamJobs(this, jobFullName, buildNumber);
         for (Entry<String, Integer> upstreamBuild : upstreamBuilds.entrySet()) {
             String upstreamJobFullName = upstreamBuild.getKey();
             Integer upstreamBuildNumber = upstreamBuild.getValue();
@@ -974,7 +980,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
             } else {
                 transitiveUpstreamBuilds.put(upstreamJobFullName, upstreamBuildNumber);
                 if (recursionDepth < OPTIMIZATION_MAX_RECURSION_DEPTH) {
-                    listTransitiveUpstreamJobs(upstreamJobFullName, upstreamBuildNumber, transitiveUpstreamBuilds, recursionDepth++);
+                    listTransitiveUpstreamJobs(upstreamJobFullName, upstreamBuildNumber, transitiveUpstreamBuilds, recursionDepth++, upstreamMemory);
                 }
             }
         }
