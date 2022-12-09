@@ -46,6 +46,7 @@ import hudson.model.Queue;
 import hudson.model.Result;
 import hudson.model.TaskListener;
 import hudson.model.Queue.Item;
+import hudson.model.Queue.Task;
 import hudson.model.queue.ScheduleResult;
 import jenkins.model.Jenkins;
 
@@ -332,6 +333,7 @@ public class DownstreamPipelineTriggerRunListenerTest {
             verify(service).isDownstreamVisibleByUpstreamBuildAuth(downstream);
             verify(service).isUpstreamBuildVisibleByDownstreamBuildAuth(job, downstream);
             verify(queue).schedule2(eq(downstream), anyInt(), anyList());
+            verify(queue).contains(any(Task.class));
             verifyNoMoreInteractions(dao, service, trigger, queue);
         }
     }
@@ -381,6 +383,7 @@ public class DownstreamPipelineTriggerRunListenerTest {
             verify(service).isDownstreamVisibleByUpstreamBuildAuth(downstream);
             verify(service).isUpstreamBuildVisibleByDownstreamBuildAuth(job, downstream);
             verify(queue).schedule2(eq(downstream), anyInt(), anyList());
+            verify(queue).contains(any(Task.class));
             verifyNoMoreInteractions(dao, service, trigger, queue);
         }
     }

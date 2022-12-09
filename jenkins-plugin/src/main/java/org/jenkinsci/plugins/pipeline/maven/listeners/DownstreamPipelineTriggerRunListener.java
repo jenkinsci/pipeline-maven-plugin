@@ -8,6 +8,7 @@ import hudson.model.Job;
 import hudson.model.Queue;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.model.Queue.Task;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
@@ -57,6 +58,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
         LOGGER.log(Level.FINER, "onCompleted({0})", new Object[]{upstreamBuild});
 
         UpstreamMemory upstreamMemory = new UpstreamMemory();
+        DaoHelper daoHelper = new DaoHelper(globalPipelineMavenConfig);
         
         if (!shouldRun(upstreamBuild, listener)) {
             LOGGER.log(Level.FINE, "Skipping downstream pipeline triggering for {0} as withMaven step not found.",
@@ -191,7 +193,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
 
                 int downstreamBuildNumber = downstreamPipeline.getLastBuild().getNumber();
 
-                List<MavenArtifact> downstreamPipelineGeneratedArtifacts = globalPipelineMavenConfig.getDao().getGeneratedArtifacts(downstreamPipelineFullName, downstreamBuildNumber);
+                List<MavenArtifact> downstreamPipelineGeneratedArtifacts = daoHelper.getGeneratedArtifacts(downstreamPipelineFullName, downstreamBuildNumber);
                 if (LOGGER.isLoggable(Level.FINEST)) {
                     listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Pipeline " + ModelHyperlinkNote.encodeTo(downstreamPipeline) + " evaluated for because it has a dependency on " + mavenArtifact + " generates " + downstreamPipelineGeneratedArtifacts);
                 } 
@@ -206,7 +208,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                     }
                 }
 
-                Map<MavenArtifact, SortedSet<String>> downstreamDownstreamPipelinesByArtifact = globalPipelineMavenConfig.getDao().listDownstreamJobsByArtifact(downstreamPipelineFullName, downstreamBuildNumber);
+                Map<MavenArtifact, SortedSet<String>> downstreamDownstreamPipelinesByArtifact = daoHelper.listDownstreamJobsByArtifact(downstreamPipelineFullName, downstreamBuildNumber);
                 for (Map.Entry<MavenArtifact, SortedSet<String>> entry2 : downstreamDownstreamPipelinesByArtifact.entrySet()) {
                     SortedSet<String> downstreamDownstreamPipelines = entry2.getValue();
                     if (downstreamDownstreamPipelines.contains(upstreamPipelineFullName)) {
@@ -221,6 +223,18 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                 // Avoid excessive triggering
                 // See #46313
                 Map<String, Integer> transitiveUpstreamPipelines = globalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber, upstreamMemory);
+                
+                // If a job is running in this moment we get an empty list. We use the last successful build in this case
+                if (transitiveUpstreamPipelines != null && transitiveUpstreamPipelines.isEmpty()) {
+                	Job<?, ?> job = Jenkins.get().getItemByFullName(downstreamPipelineFullName, Job.class);
+                	if (job != null) {
+                		Run lastSuccessfulBuild = job.getLastSuccessfulBuild();
+	                	if (lastSuccessfulBuild != null) {
+	                		transitiveUpstreamPipelines = globalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, lastSuccessfulBuild.number, upstreamMemory);
+	                	}
+                	}
+                }
+                
                 for (String transitiveUpstreamPipelineName : transitiveUpstreamPipelines.keySet()) {
                     // Skip if one of the downstream's upstream is already building or in queue
                     // Then it will get triggered anyway by that upstream, we don't need to trigger it again
@@ -236,7 +250,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                         listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
                                 " because it has a dependency already building: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
                         continue downstreamPipelinesLoop;
-                    } else if (transitiveUpstreamPipeline.isInQueue()) {
+                    } else if (isInQueue(transitiveUpstreamPipeline)) {
                         listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
                                 " because it has a dependency already building or in queue: " + ModelHyperlinkNote.encodeTo(transitiveUpstreamPipeline));
                         continue downstreamPipelinesLoop;
@@ -249,6 +263,8 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                         continue downstreamPipelinesLoop;
                     }
                 }
+                
+                listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - checked transitive upstreams for: " + downstreamPipelineFullName + " build: " + downstreamBuildNumber + " result: " + String.join(",", transitiveUpstreamPipelines.keySet()));
 
                 if (!downstreamPipeline.isBuildable()) {
                     LOGGER.log(Level.FINE, "Skip triggering of non buildable (disabled: {0}, isHoldOffBuildUntilSave: {1}) downstream pipeline {2} from upstream build {3}",
@@ -332,8 +348,25 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                 }
             }
 
-            Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(downstreamJob, -1, new CauseAction(cause));
+            scheduleBuild(downstreamJob, cause, listener);
 
+
+        }
+        long durationInMillis = TimeUnit.MILLISECONDS.convert(System.nanoTime() - startTimeInNanos, TimeUnit.NANOSECONDS);
+        if (durationInMillis > TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS) || LOGGER.isLoggable(Level.FINE)) {
+            listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - completed in " + durationInMillis + " ms");
+        }
+    }
+
+	private void scheduleBuild(Job downstreamJob, MavenDependencyUpstreamCause cause, TaskListener listener) {
+		// double check if Job is already in the queue. This avoids performance problems caused
+		// by locking in hudson.model.Queue.schedule2()
+		
+		if (isInQueue(downstreamJob)) {
+			listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering " + ModelHyperlinkNote.encodeTo(downstreamJob) +
+                " because it is already in the queue");
+		} else {
+			Queue.Item queuedItem = ParameterizedJobMixIn.scheduleBuild2(downstreamJob, -1, new CauseAction(cause));
             String dependenciesMessage = cause.getMavenArtifactsDescription();
             if (queuedItem == null) {
                 listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering downstream pipeline " + ModelHyperlinkNote.encodeTo(downstreamJob) + " due to dependencies on " +
@@ -343,12 +376,14 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                         dependenciesMessage + " ...");
             }
 
-        }
-        long durationInMillis = TimeUnit.MILLISECONDS.convert(System.nanoTime() - startTimeInNanos, TimeUnit.NANOSECONDS);
-        if (durationInMillis > TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS) || LOGGER.isLoggable(Level.FINE)) {
-            listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - completed in " + durationInMillis + " ms");
-        }
-    }
+		}
+		
+	}
+
+	private boolean isInQueue(Job<?, ?> job) {
+		// isInQueue returns always false in WorkflowJob ! 
+		return job instanceof Task && Jenkins.get().getQueue().contains((Task)job);
+	}
 
 
 }
