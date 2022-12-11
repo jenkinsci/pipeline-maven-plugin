@@ -23,7 +23,7 @@ import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Set;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -85,7 +85,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
         }
 
         boolean foundJGivenDependency = false;
-        Set<MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
+        List<MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
         for (MavenDependency dependency : dependencies) {
             if (dependency.getArtifactId().contains("jgiven")) {
                 foundJGivenDependency = true;
