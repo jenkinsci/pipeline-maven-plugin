@@ -84,17 +84,17 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
         PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
 
-        Set<MavenArtifact> parentProjects = listParentProjects(mavenSpyLogsElt, LOGGER);
-        Set<MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
+        List<MavenArtifact> parentProjects = listParentProjects(mavenSpyLogsElt, LOGGER);
+        List<MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogsElt, true);
         List<String> executedLifecyclePhases = XmlUtils.getExecutedLifecyclePhases(mavenSpyLogsElt);
-        
+
         recordParentProject(parentProjects, run,listener, dao);
         recordDependencies(dependencies, generatedArtifacts, run, listener, dao);
         recordGeneratedArtifacts(generatedArtifacts, executedLifecyclePhases, run, listener, dao);
     }
 
-    protected void recordParentProject(Set<MavenArtifact> parentProjects,
+    protected void recordParentProject(List<MavenArtifact> parentProjects,
                                        @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordParentProject - filter: " +
@@ -136,7 +136,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
     }
 
-    protected void recordDependencies(Set<MavenDependency> dependencies, List<MavenArtifact> generatedArtifacts,
+    protected void recordDependencies(List<MavenDependency> dependencies, List<MavenArtifact> generatedArtifacts,
                                       @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordDependencies - filter: " +

@@ -7,7 +7,10 @@ import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.w3c.dom.Element;
 
 import javax.annotation.Nonnull;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,7 +27,7 @@ public class DependenciesLister {
      * @return list of {@link MavenArtifact}
      */
     @Nonnull
-    public static Set<MavenDependency> listDependencies(final Element mavenSpyLogs,
+    public static List<MavenDependency> listDependencies(final Element mavenSpyLogs,
                                                          final Logger logger) {
 
         final Set<MavenDependency> result = new HashSet<>();
@@ -56,7 +59,7 @@ public class DependenciesLister {
             }
         }
 
-        return result;
+        return new ArrayList<>(result);
     }
 
     /**
@@ -64,7 +67,7 @@ public class DependenciesLister {
      * @return list of {@link MavenArtifact}
      */
     @Nonnull
-    public static Set<MavenArtifact> listParentProjects(final Element mavenSpyLogs,
+    public static List<MavenArtifact> listParentProjects(final Element mavenSpyLogs,
                                                          final Logger logger) {
 
         final Set<MavenArtifact> result = new HashSet<>();
@@ -88,7 +91,7 @@ public class DependenciesLister {
             result.add(parentProject);
         }
 
-        return result;
+        return new ArrayList<>(result);
     }
 
 }
