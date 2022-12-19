@@ -889,7 +889,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
      */
     protected Map<String, Integer> listUpstreamPipelinesBasedOnMavenDependencies(@Nonnull String downstreamJobFullName, int downstreamBuildNumber) {
         LOGGER.log(Level.FINER, "listUpstreamPipelinesBasedOnMavenDependencies({0}, {1})", new Object[]{downstreamJobFullName, downstreamBuildNumber});
-        
+
         // if we join JENKINS_JOB to the listUpstreamPipelinesBasedOnMavenDependencies query we get performance problems 
         // in large setups with postgres.
         // The analyzer does not use an index for JENKINS_JOB and uses a sequential scan in the query plan and 
@@ -926,9 +926,10 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
             throw new RuntimeSqlException(e);
         }
 
-        if (jobPrimaryKey == null)
-        	return new HashMap<>();
-        
+        if (jobPrimaryKey == null) {
+            return new HashMap<>();
+        }
+
         String sql = "select distinct upstream_job.full_name, upstream_build.number\n" +
                 "from JENKINS_JOB as upstream_job\n" +
                 "inner join JENKINS_BUILD as upstream_build on (upstream_job.id = upstream_build.job_id and upstream_job.last_successful_build_number = upstream_build.number)\n" +
@@ -998,13 +999,13 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
 
     @Nonnull
     public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
-    	UpstreamMemory upstreamMemory = new UpstreamMemory();
+            UpstreamMemory upstreamMemory = new UpstreamMemory();
         return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<>(), 0, upstreamMemory);
     }
-    
+
     @Nonnull
     public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, UpstreamMemory upstreamMemory) {
-    	return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<>(), 0, upstreamMemory);
+        return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<>(), 0, upstreamMemory);
     }
 
     private Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, Map<String, Integer> transitiveUpstreamBuilds, int recursionDepth, UpstreamMemory upstreamMemory) {

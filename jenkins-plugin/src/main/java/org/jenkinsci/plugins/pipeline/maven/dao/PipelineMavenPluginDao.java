@@ -252,7 +252,6 @@ public interface PipelineMavenPluginDao extends Closeable {
     @Nonnull
     Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, UpstreamMemory upstreamMemory);
 
-    
     /**
      * Routine task to cleanup the database and reclaim disk space (if possible in the underlying database).
      */
