@@ -1,10 +1,12 @@
 package org.jenkinsci.plugins.pipeline.maven.util;
 
-import com.google.common.base.Objects;
 import org.h2.api.ErrorCode;
 
 import javax.annotation.Nonnull;
 import javax.sql.DataSource;
+
+import static java.util.Optional.ofNullable;
+
 import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -45,7 +47,7 @@ public class SqlTestsUtils {
         while (rst.next()) {
             for (int i = 1; i <= metaData.getColumnCount(); i++) {
                 Object object = rst.getObject(i);
-                out.print(Objects.firstNonNull(object, "#null#") + "\t");
+                out.print(ofNullable(object).orElse("#null#") + "\t");
             }
             out.println();
             rowCount++;
@@ -85,7 +87,7 @@ public class SqlTestsUtils {
         for (String table : tables) {
             try (Connection cnn = ds.getConnection()) {
                 try (Statement stmt = cnn.createStatement()) {
-                    int deleted = stmt.executeUpdate("delete from " + table);
+                    stmt.executeUpdate("delete from " + table);
                 }
             } catch (SQLException e) {
                 if (e.getErrorCode() == ErrorCode.TABLE_OR_VIEW_NOT_FOUND_1) {

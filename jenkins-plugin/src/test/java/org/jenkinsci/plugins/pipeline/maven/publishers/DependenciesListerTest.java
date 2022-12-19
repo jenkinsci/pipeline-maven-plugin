@@ -5,7 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.IsIterableContaining.hasItem;
 
 import java.io.InputStream;
-import java.util.Set;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -31,7 +31,7 @@ public class DependenciesListerTest {
 
     @Test
     public void listArtifactDependencies() throws Exception {
-        Set<MavenDependency> mavenArtifacts = DependenciesLister.listDependencies(doc.getDocumentElement(), null);
+        List<MavenDependency> mavenArtifacts = DependenciesLister.listDependencies(doc.getDocumentElement(), null);
 
         assertThat(mavenArtifacts.size(), is(2));
         assertThat(mavenArtifacts, hasItem(new BaseMatcher<MavenDependency>() {
