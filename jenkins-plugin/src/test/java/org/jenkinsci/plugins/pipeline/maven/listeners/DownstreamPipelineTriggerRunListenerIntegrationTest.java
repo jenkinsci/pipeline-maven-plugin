@@ -6,7 +6,6 @@ import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInA
 
 import hudson.model.Result;
 
-import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
@@ -21,7 +20,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
