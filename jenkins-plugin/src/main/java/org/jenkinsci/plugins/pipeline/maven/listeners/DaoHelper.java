@@ -1,9 +1,12 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
+import static org.jenkinsci.plugins.pipeline.maven.dao.MonitoringPipelineMavenPluginDaoDecorator.registerCacheStatsSupplier;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,6 +14,7 @@ import javax.annotation.Nonnull;
 
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.dao.CacheStats;
 
 import hudson.model.Item;
 import hudson.model.Run;
@@ -18,6 +22,17 @@ import hudson.model.Run;
 public class DaoHelper {
 
     private final static Logger LOGGER = Logger.getLogger(DownstreamPipelineTriggerRunListener.class.getName());
+
+    private static final AtomicInteger GET_GENERATED_ARTIFACTS_HITS = new AtomicInteger();
+    private static final AtomicInteger GET_GENERATED_ARTIFACTS_MISSES = new AtomicInteger();
+
+    private static final AtomicInteger LIST_DOWNSTREAM_JOBS_HITS = new AtomicInteger();
+    private static final AtomicInteger LIST_DOWNSTREAM_JOBS_MISSES = new AtomicInteger();
+
+    static {
+        registerCacheStatsSupplier(() -> new CacheStats("getGeneratedArtifacts", GET_GENERATED_ARTIFACTS_HITS.get(), GET_GENERATED_ARTIFACTS_MISSES.get()));
+        registerCacheStatsSupplier(() -> new CacheStats("listDownstreamJobsByArtifact", LIST_DOWNSTREAM_JOBS_HITS.get(), LIST_DOWNSTREAM_JOBS_MISSES.get()));
+    }
 
     private GlobalPipelineMavenConfig globalPipelineMavenConfig;
 
@@ -47,6 +62,9 @@ public class DaoHelper {
 
         if (generatedArtifactsCache.containsKey(key)) {
             LOGGER.log(Level.FINER, "cache hit for getGeneratedArtifacts {0} {1}", new Object[] { jobFullName, buildNumber });
+            GET_GENERATED_ARTIFACTS_HITS.incrementAndGet();
+        } else {
+            GET_GENERATED_ARTIFACTS_MISSES.incrementAndGet();
         }
 
         return generatedArtifactsCache.computeIfAbsent(key, k -> globalPipelineMavenConfig.getDao().getGeneratedArtifacts(jobFullName, buildNumber));
@@ -70,6 +88,9 @@ public class DaoHelper {
         String key = jobFullName + '#' + buildNumber;
         if (downstreamJobsByArtifact.containsKey(key)) {
             LOGGER.log(Level.FINER, "cache hit for listDownstreamJobsByArtifact {0} {1}", new Object[] { jobFullName, buildNumber });
+            LIST_DOWNSTREAM_JOBS_HITS.incrementAndGet();
+        } else {
+            LIST_DOWNSTREAM_JOBS_MISSES.incrementAndGet();
         }
         return downstreamJobsByArtifact.computeIfAbsent(key, k -> globalPipelineMavenConfig.getDao().listDownstreamJobsByArtifact(jobFullName, buildNumber));
     }

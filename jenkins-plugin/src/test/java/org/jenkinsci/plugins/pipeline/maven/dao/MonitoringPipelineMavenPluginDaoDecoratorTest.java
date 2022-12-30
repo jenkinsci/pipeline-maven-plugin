@@ -15,8 +15,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
 
     private PipelineMavenPluginDao delegate = mock(PipelineMavenPluginDao.class);
 
-    private MonitoringPipelineMavenPluginDaoDecorator decorator = new MonitoringPipelineMavenPluginDaoDecorator(
-            delegate);
+    private MonitoringPipelineMavenPluginDaoDecorator decorator = new MonitoringPipelineMavenPluginDaoDecorator(delegate);
 
     @After
     public void checkDelegate() {
@@ -28,7 +27,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementWriteWhenRecordDependency() {
         decorator.recordDependency("j", 42, "g", "a", "v", "t", "s", false, "c");
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1.*Cache.*", DOTALL)));
 
         verify(delegate).recordDependency("j", 42, "g", "a", "v", "t", "s", false, "c");
     }
@@ -37,7 +36,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementWriteWhenRecordParentProject() {
         decorator.recordParentProject("j", 42, "g", "a", "v", false);
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1.*Cache.*", DOTALL)));
 
         verify(delegate).recordParentProject("j", 42, "g", "a", "v", false);
     }
@@ -46,7 +45,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementWriteWhenRecordGeneratedArtifact() {
         decorator.recordGeneratedArtifact("j", 42, "g", "a", "v", "t", "bv", "r", false, "e", "c");
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1.*Cache.*", DOTALL)));
 
         verify(delegate).recordGeneratedArtifact("j", 42, "g", "a", "v", "t", "bv", "r", false, "e", "c");
     }
@@ -55,7 +54,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementWriteWhenRecordBuildUpstreamCause() {
         decorator.recordBuildUpstreamCause("j", 42, "d", 4242);
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1.*Cache.*", DOTALL)));
 
         verify(delegate).recordBuildUpstreamCause("j", 42, "d", 4242);
     }
@@ -64,7 +63,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementReadWhenListDependencies() {
         decorator.listDependencies("j", 42);
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0.*Cache.*", DOTALL)));
 
         verify(delegate).listDependencies("j", 42);
     }
@@ -73,7 +72,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementReadWhenGetGeneratedArtifacts() {
         decorator.getGeneratedArtifacts("j", 42);
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0.*Cache.*", DOTALL)));
 
         verify(delegate).getGeneratedArtifacts("j", 42);
     }
@@ -82,7 +81,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementWriteWhenRenameJob() {
         decorator.renameJob("o", "n");
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1.*Cache.*", DOTALL)));
 
         verify(delegate).renameJob("o", "n");
     }
@@ -91,7 +90,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementWriteWhenDeleteJob() {
         decorator.deleteJob("j");
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1.*Cache.*", DOTALL)));
 
         verify(delegate).deleteJob("j");
     }
@@ -100,7 +99,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementWriteWhenDeleteBuild() {
         decorator.deleteBuild("j", 42);
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1.*Cache.*", DOTALL)));
 
         verify(delegate).deleteBuild("j", 42);
     }
@@ -109,7 +108,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementReadWhenGetListDownstreamJobs() {
         decorator.listDownstreamJobs("j", 42);
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0.*Cache.*", DOTALL)));
 
         verify(delegate).listDownstreamJobs("j", 42);
     }
@@ -118,7 +117,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementReadWhenGetListDownstreamJobsByArtifact() {
         decorator.listDownstreamJobsByArtifact("j", 42);
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0.*Cache.*", DOTALL)));
 
         verify(delegate).listDownstreamJobsByArtifact("j", 42);
     }
@@ -127,7 +126,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementReadWhenGetListDownstreamJobsWithArtifact() {
         decorator.listDownstreamJobs("g", "a", "v", "bv", "t", "c");
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0.*Cache.*", DOTALL)));
 
         verify(delegate).listDownstreamJobs("g", "a", "v", "bv", "t", "c");
     }
@@ -136,7 +135,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementReadWhenGetListUpstreamJobs() {
         decorator.listUpstreamJobs("j", 42);
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0.*Cache.*", DOTALL)));
 
         verify(delegate).listUpstreamJobs("j", 42);
     }
@@ -145,7 +144,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementReadWhenGetListTransitiveUpstreamJobs() {
         decorator.listTransitiveUpstreamJobs("j", 42);
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=1.*write:.*count=0.*Cache.*", DOTALL)));
 
         verify(delegate).listTransitiveUpstreamJobs("j", 42);
     }
@@ -154,7 +153,7 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
     public void shoudIncrementWriteWhenCleanup() {
         decorator.cleanup();
 
-        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1", DOTALL)));
+        assertThat(decorator.toPrettyString(), matchesPattern(compile(".*find:.*count=0.*write:.*count=1.*Cache.*", DOTALL)));
 
         verify(delegate).cleanup();
     }
