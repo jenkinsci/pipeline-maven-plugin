@@ -2,17 +2,30 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
+import org.jenkinsci.plugins.pipeline.maven.listeners.DaoHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static java.util.Optional.ofNullable;
+
+import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineMavenPluginDaoDecorator {
+
+    private final static List<Supplier<CacheStats>> CACHE_STATS_SUPPLIERS = new ArrayList<>();
+
+    public static void registerCacheStatsSupplier(Supplier<CacheStats> supplier) {
+        CACHE_STATS_SUPPLIERS.add(supplier);
+    }
 
     private final AtomicLong findDurationInNanos = new AtomicLong();
     private final AtomicInteger findCount = new AtomicInteger();
@@ -113,10 +126,27 @@ public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineM
 
     @Override
     public String toPrettyString() {
-        return super.toPrettyString() +
-                "\r\n Performances: " +
-                "\r\n\t find: totalDurationInMs=" + TimeUnit.NANOSECONDS.toMillis(findDurationInNanos.get()) + ", count=" + findCount.get() +
-                "\r\n\t write: totalDurationInMs=" + TimeUnit.NANOSECONDS.toMillis(writeDurationInNanos.get()) + ", count=" + writeCount.get();
+        StringBuilder builder = new StringBuilder(ofNullable(super.toPrettyString()).orElse(""));
+        builder.append("\r\n Performances: ");
+        builder.append("\r\n\t find: totalDurationInMs=").append(TimeUnit.NANOSECONDS.toMillis(findDurationInNanos.get())).append(", count=").append(findCount.get());
+        builder.append("\r\n\t write: totalDurationInMs=").append(TimeUnit.NANOSECONDS.toMillis(writeDurationInNanos.get())).append(", count=").append(writeCount.get());
+        builder.append("\r\n Caches: ");
+        CACHE_STATS_SUPPLIERS.forEach(s -> builder.append("\r\n\t ").append(cachePrettyString(s.get())));
+        return builder.toString();
+    }
+
+    private String cachePrettyString(CacheStats stats) {
+        double h = stats.getHits();
+        double m = stats.getMisses();
+        double e = h + m == 0.0 ? 0.0 : h / (h + m);
+        StringBuilder builder = new StringBuilder(stats.getName());
+        builder.append(": hits=");
+        builder.append(h);
+        builder.append(", misses=");
+        builder.append(m);
+        builder.append(", efficency=");
+        builder.append(NumberFormat.getPercentInstance().format(e));
+        return builder.toString();
     }
 
     private void executeMonitored(CallableWithoutResult callable) {

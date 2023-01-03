@@ -1,6 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
 import hudson.model.Result;
+
 import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
