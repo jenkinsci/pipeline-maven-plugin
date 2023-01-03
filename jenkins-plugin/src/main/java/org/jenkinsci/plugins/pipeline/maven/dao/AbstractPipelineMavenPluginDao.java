@@ -890,6 +890,46 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     protected Map<String, Integer> listUpstreamPipelinesBasedOnMavenDependencies(@Nonnull String downstreamJobFullName, int downstreamBuildNumber) {
         LOGGER.log(Level.FINER, "listUpstreamPipelinesBasedOnMavenDependencies({0}, {1})", new Object[]{downstreamJobFullName, downstreamBuildNumber});
 
+        // if we join JENKINS_JOB to the listUpstreamPipelinesBasedOnMavenDependencies query we get performance problems 
+        // in large setups with postgres.
+        // The analyzer does not use an index for JENKINS_JOB and uses a sequential scan in the query plan and 
+        // the query needs some minutes to execute!
+        // There is a workaround: you can give the query a hint that only one row is selected on JENKINS_JOB
+        // I tried this out with Solution 4 of https://learnsql.com/blog/sql-join-only-first-row/ and it worked.
+        //
+        // ... 
+        // inner join JENKINS_BUILD as downstream_build on (MAVEN_DEPENDENCY.build_id = downstream_build.id and downstream_build.job_id = (
+        //  SELECT downstream_job.id FROM JENKINS_JOB as downstream_job 
+        //  WHERE downstream_job.full_name = ? and downstream_job.jenkins_master_id = ?
+        //  LIMIT 1))
+        //
+        // The LIMIT 1 gives the optimizer a hint that should not be necessary because it has a unique index on full_name and jenkins_master_id
+        //
+        // Problem: is LIMIT or a similar solutions supported by all databases?
+        // Therefore i made a second query that reads the primaryKey of the matching JENKINS_JOB first.
+        // The second query does not need the problematic join on JENKINS_BUILD and performs very well. 
+        
+        Long jobPrimaryKey;
+        try (Connection cnn = ds.getConnection()) {
+            try (PreparedStatement stmt = cnn.prepareStatement("SELECT ID FROM JENKINS_JOB WHERE FULL_NAME = ? AND JENKINS_MASTER_ID = ?")) {
+                stmt.setString(1, downstreamJobFullName);
+                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
+                try (ResultSet rst = stmt.executeQuery()) {
+                    if (rst.next()) {
+                        jobPrimaryKey = rst.getLong("ID");
+                    } else {
+                        jobPrimaryKey = null;
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeSqlException(e);
+        }
+
+        if (jobPrimaryKey == null) {
+            return new HashMap<>();
+        }
+
         String sql = "select distinct upstream_job.full_name, upstream_build.number\n" +
                 "from JENKINS_JOB as upstream_job\n" +
                 "inner join JENKINS_BUILD as upstream_build on (upstream_job.id = upstream_build.job_id and upstream_job.last_successful_build_number = upstream_build.number)\n" +
@@ -897,18 +937,16 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 "inner join MAVEN_ARTIFACT on GENERATED_MAVEN_ARTIFACT.artifact_id = MAVEN_ARTIFACT.id\n" +
                 "inner join MAVEN_DEPENDENCY on (MAVEN_DEPENDENCY.artifact_id = MAVEN_ARTIFACT.id and MAVEN_DEPENDENCY.ignore_upstream_triggers = false)\n" +
                 "inner join JENKINS_BUILD as downstream_build on MAVEN_DEPENDENCY.build_id = downstream_build.id\n" +
-                "inner join JENKINS_JOB as downstream_job on downstream_build.job_id = downstream_job.id\n" +
-                "where downstream_job.full_name = ? and downstream_job.jenkins_master_id = ? and  downstream_build.number = ? and upstream_job.jenkins_master_id = ?";
+                "where downstream_build.job_id = ? and downstream_build.number = ? and upstream_job.jenkins_master_id = ?";
 
         Map<String, Integer> upstreamJobsFullNames = new HashMap<>();
         LOGGER.log(Level.FINER, "sql: {0}, jobFullName:{1}, buildNumber: {2}", new Object[]{sql, downstreamJobFullName, downstreamBuildNumber});
 
         try (Connection cnn = ds.getConnection()) {
             try (PreparedStatement stmt = cnn.prepareStatement(sql)) {
-                stmt.setString(1, downstreamJobFullName);
-                stmt.setLong(2, getJenkinsMasterPrimaryKey(cnn));
-                stmt.setInt(3, downstreamBuildNumber);
-                stmt.setLong(4, getJenkinsMasterPrimaryKey(cnn));
+                stmt.setLong(1, jobPrimaryKey);
+                stmt.setInt(2, downstreamBuildNumber);
+                stmt.setLong(3, getJenkinsMasterPrimaryKey(cnn));
                 try (ResultSet rst = stmt.executeQuery()) {
                     while (rst.next()) {
                         upstreamJobsFullNames.put(rst.getString(1), rst.getInt(2));
@@ -961,11 +999,17 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
 
     @Nonnull
     public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
-        return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<>(), 0);
+            UpstreamMemory upstreamMemory = new UpstreamMemory();
+        return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<>(), 0, upstreamMemory);
     }
 
-    private Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, Map<String, Integer> transitiveUpstreamBuilds, int recursionDepth) {
-        Map<String, Integer> upstreamBuilds = listUpstreamJobs(jobFullName, buildNumber);
+    @Nonnull
+    public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, UpstreamMemory upstreamMemory) {
+        return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<>(), 0, upstreamMemory);
+    }
+
+    private Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, Map<String, Integer> transitiveUpstreamBuilds, int recursionDepth, UpstreamMemory upstreamMemory) {
+        Map<String, Integer> upstreamBuilds = upstreamMemory.listUpstreamJobs(this, jobFullName, buildNumber);
         for (Entry<String, Integer> upstreamBuild : upstreamBuilds.entrySet()) {
             String upstreamJobFullName = upstreamBuild.getKey();
             Integer upstreamBuildNumber = upstreamBuild.getValue();
@@ -974,7 +1018,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
             } else {
                 transitiveUpstreamBuilds.put(upstreamJobFullName, upstreamBuildNumber);
                 if (recursionDepth < OPTIMIZATION_MAX_RECURSION_DEPTH) {
-                    listTransitiveUpstreamJobs(upstreamJobFullName, upstreamBuildNumber, transitiveUpstreamBuilds, recursionDepth++);
+                    listTransitiveUpstreamJobs(upstreamJobFullName, upstreamBuildNumber, transitiveUpstreamBuilds, recursionDepth++, upstreamMemory);
                 }
             }
         }

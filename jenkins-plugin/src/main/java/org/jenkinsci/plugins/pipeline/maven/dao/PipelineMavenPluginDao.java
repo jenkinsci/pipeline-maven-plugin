@@ -237,6 +237,22 @@ public interface PipelineMavenPluginDao extends Closeable {
     Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber);
 
     /**
+     * List the upstream jobs who generate an artifact that the given build depends
+     * on, including transitive dependencies (build identified by the given
+     * {@code jobFullName}, {@code buildNumber})
+     * 
+     * Use a memory for already known upstreams to boost performance
+     *
+     * @param jobFullName see {@link Item#getFullName()}
+     * @param buildNumber see {@link Run#getNumber()}
+     * @param upstreamMemory see {@link UpstreamMemory}  - if called for several jobs in a loop we save the already known upstreams
+     * @return list of job full names (see {@link Item#getFullName()})
+     * @see Item#getFullName()
+     */
+    @Nonnull
+    Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, UpstreamMemory upstreamMemory);
+
+    /**
      * Routine task to cleanup the database and reclaim disk space (if possible in the underlying database).
      */
     void cleanup();
