@@ -223,6 +223,10 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                 // Avoid excessive triggering
                 // See #46313
                 Map<String, Integer> transitiveUpstreamPipelines = globalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber, upstreamMemory);
+                if (LOGGER.isLoggable(Level.FINER)) {
+                    listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Found transitive upstream pipelines for " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                            ": " + transitiveUpstreamPipelines.keySet().stream().collect(Collectors.joining(",")));
+                }
 
                 // If a job is running in this moment we get an empty list. We use the last successful build in this case
                 if (transitiveUpstreamPipelines != null && transitiveUpstreamPipelines.isEmpty()) {
@@ -231,6 +235,10 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                         Run lastSuccessfulBuild = job.getLastSuccessfulBuild();
                         if (lastSuccessfulBuild != null) {
                             transitiveUpstreamPipelines = globalPipelineMavenConfig.getDao().listTransitiveUpstreamJobs(downstreamPipelineFullName, lastSuccessfulBuild.number, upstreamMemory);
+                            if (LOGGER.isLoggable(Level.FINER)) {
+                                listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Updated transitive upstream pipelines for " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                                        ": " + transitiveUpstreamPipelines.keySet().stream().collect(Collectors.joining(",")));
+                            }
                         }
                     }
                 }
@@ -242,9 +250,17 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
 
                     if (transitiveUpstreamPipeline == null) {
                         // security: not allowed to view this transitive upstream pipeline, continue to loop
+                        if (LOGGER.isLoggable(Level.FINER)) {
+                            listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                                    " because transitive pipeline " + transitiveUpstreamPipelineName + " is unaccessible");
+                        }
                         continue;
                     } else if (transitiveUpstreamPipeline.getFullName().equals(upstreamPipeline.getFullName())) {
                         // this upstream pipeline of  the current downstreamPipeline is the upstream pipeline itself, continue to loop
+                        if (LOGGER.isLoggable(Level.FINER)) {
+                            listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
+                                    " because transitive pipeline " + transitiveUpstreamPipelineName + " is the current one");
+                        }
                         continue;
                     } else if (transitiveUpstreamPipeline.isBuilding()) {
                         listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering " + ModelHyperlinkNote.encodeTo(downstreamPipeline) +
@@ -264,18 +280,24 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                     }
                 }
 
-                listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - checked transitive upstreams for: " + downstreamPipelineFullName + " build: " + downstreamBuildNumber + " result: " + String.join(",", transitiveUpstreamPipelines.keySet()));
+                listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - checked transitive upstreams for: " + downstreamPipelineFullName + " build: " +
+                        downstreamBuildNumber + " result: " + String.join(",", transitiveUpstreamPipelines.keySet()));
 
                 if (!downstreamPipeline.isBuildable()) {
-                    LOGGER.log(Level.FINE, "Skip triggering of non buildable (disabled: {0}, isHoldOffBuildUntilSave: {1}) downstream pipeline {2} from upstream build {3}",
-                            new Object[]{((ParameterizedJobMixIn.ParameterizedJob<?, ?>) downstreamPipeline).isDisabled(), downstreamPipeline.isHoldOffBuildUntilSave(), downstreamPipeline.getFullName(), upstreamBuild.getFullDisplayName()});
+                    if (LOGGER.isLoggable(Level.FINER)) {
+                        listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering of non buildable (disabled: " + 
+                                ((ParameterizedJobMixIn.ParameterizedJob<?, ?>) downstreamPipeline).isDisabled() + ", isHoldOffBuildUntilSave: " + 
+                                downstreamPipeline.isHoldOffBuildUntilSave() + ") downstream pipeline " + downstreamPipeline.getFullName() +
+                                " from upstream build " + upstreamBuild.getFullDisplayName());
+                    }
                     rejectedPipelines.add(downstreamPipelineFullName);
                     continue;
                 }
 
                 WorkflowJobDependencyTrigger downstreamPipelineTrigger = this.globalPipelineMavenConfig.getPipelineTriggerService().getWorkflowJobDependencyTrigger((ParameterizedJobMixIn.ParameterizedJob<?, ?>) downstreamPipeline);
                 if (downstreamPipelineTrigger == null) {
-                    LOGGER.log(Level.FINE, "Skip triggering of downstream pipeline {0} from upstream build {1}: dependency trigger not configured", new Object[]{downstreamPipeline.getFullName(), upstreamBuild.getFullDisplayName()});
+                    listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering of downstream pipeline " + downstreamPipeline.getFullName() +
+                            " from upstream build " + upstreamBuild.getFullDisplayName() + ": dependency trigger not configured");
                     rejectedPipelines.add(downstreamPipelineFullName);
                     continue;
                 }
@@ -297,8 +319,11 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                         mavenArtifactsCausingTheTrigger.add(mavenArtifact);
                     }
                 } else {
-                    LOGGER.log(Level.FINE, "Skip triggering of {0} by {1}: downstreamVisibleByUpstreamBuildAuth: {2}, upstreamVisibleByDownstreamBuildAuth: {3}",
-                            new Object[]{downstreamPipeline.getFullName(), upstreamBuild.getFullDisplayName(), downstreamVisibleByUpstreamBuildAuth, upstreamVisibleByDownstreamBuildAuth});
+                    if (LOGGER.isLoggable(Level.FINER)) {
+                        listener.getLogger().println("[withMaven] downstreamPipelineTriggerRunListener - Skip triggering of " + downstreamPipeline.getFullName() + " by " +
+                                upstreamBuild.getFullDisplayName() + ": downstreamVisibleByUpstreamBuildAuth: " + downstreamVisibleByUpstreamBuildAuth +
+                                ", upstreamVisibleByDownstreamBuildAuth: " + upstreamVisibleByDownstreamBuildAuth);
+                    }
                 }
             }
         }
