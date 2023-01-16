@@ -58,7 +58,30 @@ node("linux-agent-running-docker") { // Linux agent with the Docker daemon
 
 === Using `withMaven` with `docker.image(...).inside{...}` to a Jenkins Declarative Pipeline
 
-NOTE: TODO: provide a sample with Jenkins Declarative Pipeline
+**Using generated Script via MVN_CMD**
+
+[source,groovy]
+----
+pipeline {
+    agent {
+        docker {
+            image 'maven:latest'
+        }
+    }
+    stages {
+        stage ('Maven') {
+            steps {
+                withMaven() {
+                    sh '$MVN_CMD clean deploy'
+                }
+            }
+        }
+    }
+}
+----
+
+Note: In Declarative Pipelines, the agent configuration is used to define the docker environment instead of `docker.image(...).inside{...}`  (docs https://www.jenkins.io/doc/book/pipeline/docker)[here]). Stage-level agents work with `withMaven` as well. 
+
 
 === Sample message displayed in the build logs when using withMaven in a Docker Pipeline execution environment
 
