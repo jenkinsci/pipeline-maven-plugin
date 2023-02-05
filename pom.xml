@@ -28,7 +28,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.51</version>
+    <version>4.54</version>
     <relativePath/>
   </parent>
 
@@ -92,7 +92,7 @@
     <hikaricp.version>4.0.3</hikaricp.version>
     <jansi.version>2.4.0</jansi.version>
     <jenkins-annotation-indexer.version>1.17</jenkins-annotation-indexer.version>
-    <jenkins-credentials.version>1143.vb_e8b_b_ceee347</jenkins-credentials.version>
+    <jenkins-credentials.version>1189.vf61b_a_5e2f62e</jenkins-credentials.version>
     <jenkins-docker-fixtures.version>166.v912b_95083ffe</jenkins-docker-fixtures.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-flaky-test.version>1.2.2</jenkins-plugin-flaky-test.version>
@@ -100,7 +100,7 @@
     <jenkins-plugin-h2.version>1.4.199</jenkins-plugin-h2.version>
     <jenkins-plugin-jacoco.version>3.3.2</jenkins-plugin-jacoco.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
-    <jenkins-plugin-maven-invoker.version>2.4</jenkins-plugin-maven-invoker.version>
+    <jenkins-plugin-maven-invoker.version>2.5</jenkins-plugin-maven-invoker.version>
     <jenkins-plugin-maven.version>3.16</jenkins-plugin-maven.version>
     <jenkins-plugin-mysql.version>8.0.16</jenkins-plugin-mysql.version>
     <jenkins-plugin-postgresql.version>42.3.3</jenkins-plugin-postgresql.version>
@@ -108,10 +108,10 @@
     <jenkins-plugin-ssh-creds.version>305.v8f4381501156</jenkins-plugin-ssh-creds.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
     <jenkins-plugin-token.version>321.vd7cc1f2a_52c8</jenkins-plugin-token.version>
-    <jenkins-plugin-workflow.version>1200.v8005c684b_a_c6</jenkins-plugin-workflow.version>
+    <jenkins-plugin-workflow.version>1208.v0cc7c6e0da_9e</jenkins-plugin-workflow.version>
     <jenkins-symbol.version>1.24</jenkins-symbol.version>
-    <jenkins-tools-bom.version>1763.v092b_8980a_f5e</jenkins-tools-bom.version>
-    <jenkins.version>2.346.3</jenkins.version>
+    <jenkins-tools-bom.version>1798.vc671fe94856f</jenkins-tools-bom.version>
+    <jenkins.version>2.361.4</jenkins.version>
     <joda-time.version>2.12.2</joda-time.version>
     <junit.version>4.13.2</junit.version>
     <maven-compat.version>3.3.9</maven-compat.version>
@@ -119,7 +119,7 @@
     <maven-plugin-sortpom.version>3.2.1</maven-plugin-sortpom.version>
     <maven-plugin-surefire.version>3.0.0-M8</maven-plugin-surefire.version>
     <maven-shared-utils.version>3.3.4</maven-shared-utils.version>
-    <maven.version>3.8.3</maven.version>
+    <maven.version>3.8.7</maven.version>
     <plexus-utils.version>3.5.0</plexus-utils.version>
     <slf4j.version>2.0.6</slf4j.version>
     <testcontainers.version>1.17.6</testcontainers.version>
