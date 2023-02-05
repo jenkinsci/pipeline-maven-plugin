@@ -1,5 +1,20 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.jvnet.hudson.test.BuildWatcher;
+import org.jvnet.hudson.test.JenkinsRule;
+
 import hudson.FilePath;
 import hudson.tasks.Maven;
 import jenkins.model.Jenkins;
@@ -8,20 +23,6 @@ import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
-import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.jvnet.hudson.test.BuildWatcher;
-import org.jvnet.hudson.test.JenkinsRule;
-
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -41,8 +42,8 @@ public abstract class AbstractIntegrationTest {
 
         Maven.MavenInstallation mvn = configureDefaultMaven("3.6.3", Maven.MavenInstallation.MAVEN_30);
 
-        Maven.MavenInstallation m3 = new Maven.MavenInstallation( "apache-maven-3.6.3", mvn.getHome(), JenkinsRule.NO_PROPERTIES);
-        Jenkins.get().getDescriptorByType( Maven.DescriptorImpl.class).setInstallations( m3);
+        Maven.MavenInstallation m3 = new Maven.MavenInstallation("apache-maven-3.6.3", mvn.getHome(), JenkinsRule.NO_PROPERTIES);
+        Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(m3);
         mavenInstallationName = mvn.getName();
 
         GlobalMavenConfig globalMavenConfig = jenkinsRule.get(GlobalMavenConfig.class);
@@ -92,10 +93,6 @@ public abstract class AbstractIntegrationTest {
         loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/multi_module_bundle_project/");
     }
 
-    protected void loadMavenPluginProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_plugin_project/");
-    }
-
     protected void loadJenkinsPluginProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
         loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_hpi_project/");
     }
@@ -138,7 +135,8 @@ public abstract class AbstractIntegrationTest {
     }
 
     protected Maven.MavenInstallation configureDefaultMaven(String mavenVersion, int mavenReqVersion) throws Exception {
-        // first if we are running inside Maven, pick that Maven, if it meets the criteria we require..
+        // first if we are running inside Maven, pick that Maven, if it meets the
+        // criteria we require..
         File buildDirectory = new File(System.getProperty("buildDirectory", "target")); // TODO relative path
         File mvnHome = new File(buildDirectory, "apache-maven-" + mavenVersion);
         if (!mvnHome.exists()) {
