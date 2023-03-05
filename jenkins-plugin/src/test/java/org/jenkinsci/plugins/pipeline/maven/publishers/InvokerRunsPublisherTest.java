@@ -49,7 +49,6 @@ public class InvokerRunsPublisherTest {
         FilePath workspace = new FilePath(new File("/path/to/khmarbaise/maui/src/main/resources/mp-it-1"));
         TaskListener listener = new StreamTaskListener(System.out, StandardCharsets.UTF_8);
 
-        System.out.println(invokerRunEvents.size());
         List<Element> invokerRunSucceededEvents = new ArrayList<>();
         for (Element invokerRunEvent : invokerRunEvents) {
             String eventType = invokerRunEvent.getAttribute("type");

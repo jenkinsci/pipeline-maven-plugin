@@ -26,23 +26,15 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.Extension;
 import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.Result;
-import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.tasks.junit.JUnitResultArchiver;
 import hudson.tasks.junit.TestDataPublisher;
-import hudson.tasks.junit.TestResultSummary;
-import hudson.tasks.junit.pipeline.JUnitResultsStepExecution;
-import hudson.tasks.test.PipelineTestDetails;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
-import org.jenkinsci.plugins.workflow.actions.WarningAction;
-import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -201,7 +193,7 @@ public class JunitTestsPublisher extends MavenPublisher {
             listener.getLogger().print("[withMaven] Jenkins ");
             listener.hyperlink("http://wiki.jenkins-ci.org/display/JENKINS/JUnit+Plugin", "JUnit Plugin");
             listener.getLogger().print(" not found, don't display " + APACHE_GROUP_ID + ":" + SUREFIRE_ID + ":" + SUREFIRE_GOAL);
-            listener.getLogger().print(" nor " + APACHE_GROUP_ID + ":" + FAILSAFE_ID + ":" + FAILSAFE_GOAL + " results in pipeline screen.");
+            listener.getLogger().println(" nor " + APACHE_GROUP_ID + ":" + FAILSAFE_ID + ":" + FAILSAFE_GOAL + " results in pipeline screen.");
             return;
         }
 
@@ -219,18 +211,15 @@ public class JunitTestsPublisher extends MavenPublisher {
     }
 
     private void executeReporter(StepContext context, TaskListener listener, List<Element> testEvents, String goal, String... reportsDirElementNames) throws IOException, InterruptedException {
-        FilePath workspace = context.get(FilePath.class);
-        final String fileSeparatorOnAgent = XmlUtils.getFileSeparatorOnRemote(workspace);
-
-        Run run = context.get(Run.class);
-        Launcher launcher = context.get(Launcher.class);
-
         if (testEvents.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger().println("[withMaven] junitPublisher - No " + goal + " execution found");
             }
             return;
         }
+
+        FilePath workspace = context.get(FilePath.class);
+        final String fileSeparatorOnAgent = XmlUtils.getFileSeparatorOnRemote(workspace);
 
         List<String> testResultsList = new ArrayList<>();
 
@@ -280,15 +269,8 @@ public class JunitTestsPublisher extends MavenPublisher {
             }
         }
         String testResults = String.join(",", testResultsList);
-        JUnitResultArchiver archiver = new JUnitResultArchiver(testResults);
 
-        if (healthScaleFactor != null) {
-            archiver.setHealthScaleFactor(this.healthScaleFactor);
-        }
-        archiver.setKeepLongStdio(this.keepLongStdio);
-
-        // even if "org.apache.maven.plugins:maven-surefire-plugin@test" succeeds, it maybe with "-DskipTests" and thus not have any test results.
-        archiver.setAllowEmptyResults(true);
+        JUnitResultArchiver archiver = JUnitUtils.buildArchiver(testResults, this.keepLongStdio, this.healthScaleFactor);
 
         List<TestDataPublisher> testDataPublishers = new ArrayList<>();
 
@@ -334,43 +316,7 @@ public class JunitTestsPublisher extends MavenPublisher {
             archiver.setTestDataPublishers(testDataPublishers);
         }
 
-        try {
-            // see hudson.tasks.junit.pipeline.JUnitResultsStepExecution.run
-            FlowNode node = context.get(FlowNode.class);
-            String nodeId = node.getId();
-            List<FlowNode> enclosingBlocks = JUnitResultsStepExecution.getEnclosingStagesAndParallels(node);
-            PipelineTestDetails pipelineTestDetails = new PipelineTestDetails();
-            pipelineTestDetails.setNodeId(nodeId);
-            pipelineTestDetails.setEnclosingBlocks(JUnitResultsStepExecution.getEnclosingBlockIds(enclosingBlocks));
-            pipelineTestDetails.setEnclosingBlockNames(JUnitResultsStepExecution.getEnclosingBlockNames(enclosingBlocks));
-
-            if (LOGGER.isLoggable(Level.FINER)) {
-                listener.getLogger().println("[withMaven] junitPublisher - collect test reports: testResults=" + archiver.getTestResults() + ", healthScaleFactor="  + archiver.getHealthScaleFactor());
-            }
-            TestResultSummary testResultSummary = JUnitResultArchiver.parseAndSummarize(archiver, pipelineTestDetails, run, workspace, launcher, listener);
-
-            if (testResultSummary == null) {
-                // no unit test results found
-                if (LOGGER.isLoggable(Level.FINE)) {
-                    listener.getLogger().println("[withMaven] junitPublisher - no unit test results found, ignore");
-                }
-            } else if (testResultSummary.getFailCount() == 0) {
-                // unit tests are all successful
-                if (LOGGER.isLoggable(Level.FINE)) {
-                    listener.getLogger().println("[withMaven] junitPublisher - unit tests are all successful");
-                }
-            } else {
-                if (LOGGER.isLoggable(Level.FINE)) {
-                    listener.getLogger().println("[withMaven] junitPublisher - " + testResultSummary.getFailCount() + " unit test failure(s) found, mark job as unstable");
-                }
-                node.addAction(new WarningAction(Result.UNSTABLE).withMessage(testResultSummary.getFailCount() + " unit test failure(s) found"));
-                run.setResult(Result.UNSTABLE);
-            }
-        } catch (RuntimeException e) {
-            listener.error("[withMaven] junitPublisher - exception archiving JUnit results " + testResults + ": " + e + ". Failing the build.");
-            LOGGER.log(Level.WARNING, "Exception processing " + testResults, e);
-            run.setResult(Result.FAILURE);
-        }
+        JUnitUtils.archiveResults(context, archiver, testResults, "junitPublisher");
     }
 
     public boolean getIgnoreAttachments() {
