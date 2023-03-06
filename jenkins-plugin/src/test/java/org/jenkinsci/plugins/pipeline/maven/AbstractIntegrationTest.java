@@ -1,5 +1,10 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -7,8 +12,11 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -16,6 +24,8 @@ import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import hudson.FilePath;
+import hudson.model.Fingerprint;
+import hudson.tasks.Fingerprinter;
 import hudson.tasks.Maven;
 import jenkins.model.Jenkins;
 import jenkins.mvn.DefaultGlobalSettingsProvider;
@@ -69,60 +79,8 @@ public abstract class AbstractIntegrationTest {
         loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_project/");
     }
 
-    protected void loadMavenPomProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_pom_project/");
-    }
-
-    protected void loadMavenJarWithParentPomProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_with_parent_pom_project/");
-    }
-
-    protected void loadMavenJarWithJacocoInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_with_jacoco_project/");
-    }
-
     protected void loadMavenWarProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
         loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_war_project/");
-    }
-
-    protected void loadMavenJarWithFlattenPomProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_with_flatten_pom_project/");
-    }
-
-    protected void loadOsgiBundleProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/multi_module_bundle_project/");
-    }
-
-    protected void loadJenkinsPluginProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_hpi_project/");
-    }
-
-    protected void loadMultiModuleProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/multi_module_maven_project/");
-    }
-
-    protected void loadNbmBaseMavenProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_nbm_base_project/");
-    }
-
-    protected void loadNbmDependencyMavenJarProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_nbm_dependency_project/");
-    }
-
-    protected void loadDockerBaseMavenProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_docker_base_project/");
-    }
-
-    protected void loadDockerDependencyMavenJarProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_docker_dependency_project/");
-    }
-
-    protected void loadDeployFileBaseMavenProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_deployfile_base_project/");
-    }
-
-    protected void loadDeployFileDependencyMavenJarProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
-        loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_deployfile_dependency_project/");
     }
 
     protected void loadSourceCodeInGitRepository(GitSampleRepoRule gitRepo, String name) throws Exception {
@@ -140,12 +98,24 @@ public abstract class AbstractIntegrationTest {
         File buildDirectory = new File(System.getProperty("buildDirectory", "target")); // TODO relative path
         File mvnHome = new File(buildDirectory, "apache-maven-" + mavenVersion);
         if (!mvnHome.exists()) {
-            FilePath mvn = Jenkins.getInstance().getRootPath().createTempFile("maven", "zip");
+            FilePath mvn = Jenkins.get().getRootPath().createTempFile("maven", "zip");
             mvn.copyFrom(new URL("https://dlcdn.apache.org/maven/maven-3/" + mavenVersion + "/binaries/apache-maven-" + mavenVersion + "-bin.tar.gz"));
             mvn.untar(new FilePath(buildDirectory), FilePath.TarCompression.GZIP);
         }
         Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getAbsolutePath(), JenkinsRule.NO_PROPERTIES);
-        Jenkins.getInstance().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
+        Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
         return mavenInstallation;
+    }
+
+    protected void verifyFileIsFingerPrinted(WorkflowJob pipeline, WorkflowRun build, String fileName) throws java.io.IOException {
+        Fingerprinter.FingerprintAction fingerprintAction = build.getAction(Fingerprinter.FingerprintAction.class);
+        Map<String, String> records = fingerprintAction.getRecords();
+        String jarFileMd5sum = records.get(fileName);
+        assertThat(jarFileMd5sum, not(nullValue()));
+
+        Fingerprint jarFileFingerPrint = jenkinsRule.getInstance().getFingerprintMap().get(jarFileMd5sum);
+        assertThat(jarFileFingerPrint.getFileName(), is(fileName));
+        assertThat(jarFileFingerPrint.getOriginal().getJob().getName(), is(pipeline.getName()));
+        assertThat(jarFileFingerPrint.getOriginal().getNumber(), is(build.getNumber()));
     }
 }

@@ -61,7 +61,7 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
 
     @Test
     public void test_infinite_loop() throws Exception {
-        loadMultiModuleProjectInGitRepo(this.gitRepoRule);
+        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/multi_module_maven_project/");
         String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +

@@ -25,12 +25,10 @@ package org.jenkinsci.plugins.pipeline.maven;
 
 
 import com.cloudbees.hudson.plugins.folder.Folder;
-import hudson.model.Fingerprint;
 import hudson.model.Result;
-import hudson.plugins.jacoco.JacocoBuildAction;
 import hudson.plugins.tasks.TasksResultAction;
-import hudson.tasks.Fingerprinter;
 import hudson.tasks.junit.TestResultAction;
+import hudson.tasks.junit.pipeline.JUnitResultsStepTest;
 import jenkins.mvn.FilePathGlobalSettingsProvider;
 import jenkins.mvn.FilePathSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
@@ -41,9 +39,15 @@ import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnGlobalSettingsProvider;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnSettingsProvider;
+import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JacocoReportPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -55,16 +59,13 @@ import org.jvnet.hudson.test.Issue;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 
@@ -116,7 +117,6 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         jenkinsRule.assertLogContains("under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.jar", build);
     }
 
-
     @Test
     public void maven_build_on_master_with_missing_specified_maven_installation_fails() throws Exception {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
@@ -130,7 +130,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-with-tool-provided-maven");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.FAILURE, pipeline.scheduleBuild2(0));
+        jenkinsRule.assertBuildStatus(Result.FAILURE, pipeline.scheduleBuild2(0));
     }
 
     @Test
@@ -183,39 +183,6 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         assertThat(tasksResultAction.getProjectActions().size(), is(1));
     }
 
-    @Test
-    public void maven_build_jar_with_jacoco_succeeds() throws Exception {
-        loadMavenJarWithJacocoInGitRepo(this.gitRepoRule);
-
-        String pipelineScript = "node() {\n" +
-                "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                "    withMaven() {\n" +
-                "        sh 'mvn package verify'\n" +
-                "    }\n" +
-                "}";
-
-        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "jar-with-jacoco");
-        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
-
-       Collection<String> artifactsFileNames = TestUtils.artifactsToArtifactsFileNames(build.getArtifacts());
-        assertThat(artifactsFileNames, hasItems("jar-with-jacoco-0.1-SNAPSHOT.pom", "jar-with-jacoco-0.1-SNAPSHOT.jar"));
-
-        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/jar-with-jacoco/0.1-SNAPSHOT/jar-with-jacoco-0.1-SNAPSHOT.jar");
-        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/jar-with-jacoco/0.1-SNAPSHOT/jar-with-jacoco-0.1-SNAPSHOT.pom");
-
-        List<TestResultAction> testResultActions = build.getActions(TestResultAction.class);
-        assertThat(testResultActions.size(), is(1));
-        TestResultAction testResultAction = testResultActions.get(0);
-        assertThat(testResultAction.getTotalCount(), is(2));
-        assertThat(testResultAction.getFailCount(), is(0));
-
-        List<JacocoBuildAction> jacocoBuildActions = build.getActions(JacocoBuildAction.class);
-        assertThat(jacocoBuildActions.size(), is(1));
-        JacocoBuildAction jacocoBuildAction = jacocoBuildActions.get(0);
-        assertThat(jacocoBuildAction.getProjectActions().size(), is(1));
-    }
-
     @Issue("JENKINS-48264")
     @Test
     public void maven_build_jar_project_with_whitespace_char_in_name() throws Exception {
@@ -254,52 +221,59 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         } finally {
             GlobalMavenConfig.get().setSettingsProvider(null);
         }
-
     }
 
     @Test
-    public void maven_build_jar_project_on_master_disable_findbugs_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new FindbugsAnalysisPublisher.DescriptorImpl(), "findbugsPublisher", true);
+    public void maven_build_jar_project_on_master_findbugs_publisher_desactivation() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new FindbugsAnalysisPublisher.DescriptorImpl(), "findbugsPublisher");
     }
 
     @Test
-    public void maven_build_jar_project_on_master_disable_tasks_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new TasksScannerPublisher.DescriptorImpl(), "openTasksPublisher", true);
+    public void maven_build_jar_project_on_master_spotbugs_publisher_desactivation() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new SpotBugsAnalysisPublisher.DescriptorImpl(), "spotbugsPublisher");
     }
 
     @Test
-    public void maven_build_jar_project_on_master_disable_junit_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new JunitTestsPublisher.DescriptorImpl(), "junitPublisher", true);
+    public void maven_build_jar_project_on_master_tasks_publisher_desactivation() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new TasksScannerPublisher.DescriptorImpl(), "openTasksPublisher");
     }
 
     @Test
-    public void maven_build_jar_project_on_master_disable_generated_artifacts_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new GeneratedArtifactsPublisher.DescriptorImpl(), "artifactsPublisher", true);
+    public void maven_build_jar_project_on_master_concordion_publisher_desactivation() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new ConcordionTestsPublisher.DescriptorImpl(), "concordionPublisher");
     }
 
     @Test
-    public void maven_build_jar_project_on_master_force_enable_findbugs_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new FindbugsAnalysisPublisher.DescriptorImpl(), "findbugsPublisher", false);
+    public void maven_build_jar_project_on_master_dependencies_fingerprint_publisher_desactivation() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new DependenciesFingerprintPublisher.DescriptorImpl(), "dependenciesFingerprintPublisher");
     }
 
     @Test
-    public void maven_build_jar_project_on_master_force_enable_tasks_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new TasksScannerPublisher.DescriptorImpl(), "openTasksPublisher", false);
+    public void maven_build_jar_project_on_master_generated_artifacts_publisher_desactivation() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new GeneratedArtifactsPublisher.DescriptorImpl(), "artifactsPublisher");
     }
 
     @Test
-    public void maven_build_jar_project_on_master_force_enable_junit_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new JunitTestsPublisher.DescriptorImpl(), "junitPublisher", false);
+    public void maven_build_jar_project_on_master_invoker_publisher_desactivation() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new InvokerRunsPublisher.DescriptorImpl(), "invokerPublisher");
     }
 
     @Test
-    public void maven_build_jar_project_on_master_force_enable_generated_artifacts_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new GeneratedArtifactsPublisher.DescriptorImpl(), "artifactsPublisher", false);
+    public void maven_build_jar_project_on_master_jacoco_publisher_desactivation() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new JacocoReportPublisher.DescriptorImpl(), "jacocoPublisher");
     }
 
+    @Test
+    public void maven_build_jar_project_on_master_jgiven_publisher_desactivation() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new JGivenTestsPublisher.DescriptorImpl(), "jgivenPublisher");
+    }
 
-    private void maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(MavenPublisher.DescriptorImpl descriptor, String symbol, boolean disabled) throws Exception {
+    @Test
+    public void maven_build_jar_project_on_master_junit_publisher_desactivation() throws Exception {
+        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(new JunitTestsPublisher.DescriptorImpl(), "junitPublisher");
+    }
 
+    private void maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(MavenPublisher.DescriptorImpl descriptor, String symbol) throws Exception {
         Logger logger = Logger.getLogger(MavenSpyLogProcessor.class.getName());
         Level level = logger.getLevel();
         logger.setLevel(Level.FINE);
@@ -312,22 +286,24 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
             loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-            String pipelineScript = "node() {\n" +
-                    "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                    "    withMaven(options:[" + symbol + "(disabled:" + disabled + ")]) {\n" +
-                    "        sh 'mvn package verify'\n" +
-                    "    }\n" +
-                    "}";
+            for (Boolean disabled : Arrays.asList(Boolean.TRUE, Boolean.FALSE)) {
+                String pipelineScript = "node() {\n" +
+                        "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                        "    withMaven(options:[" + symbol + "(disabled:" + disabled + ")]) {\n" +
+                        "        sh 'mvn package verify'\n" +
+                        "    }\n" +
+                        "}";
 
-            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-" + symbol + "-publisher-disabled-" + disabled);
-            pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-            WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+                WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-" + symbol + "-publisher-disabled-" + disabled);
+                pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+                WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
-            String message = "[withMaven] Skip '" + displayName + "' disabled by configuration";
-            if (disabled) {
-                jenkinsRule.assertLogContains(message, build);
-            } else {
-                jenkinsRule.assertLogNotContains(message, build);
+                String message = "[withMaven] Skip '" + displayName + "' disabled by configuration";
+                if (disabled) {
+                    jenkinsRule.assertLogContains(message, build);
+                } else {
+                    jenkinsRule.assertLogNotContains(message, build);
+                }
             }
         } finally {
             logger.setLevel(level);
@@ -367,7 +343,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
     @Test
     public void maven_build_maven_jar_with_flatten_pom_project_on_master_succeeds() throws Exception {
-        loadMavenJarWithFlattenPomProjectInGitRepo(this.gitRepoRule);
+        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_with_flatten_pom_project/");
 
         String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
@@ -406,10 +382,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         jenkinsRule.assertLogContains("[withMaven] openTasksPublisher - Scan Tasks for Maven artifact jenkins.mvn.test:maven-jar-with-flattened-pom:jar:0.1-SNAPSHOT in source directory", build);
     }
 
-
     @Test
     public void maven_build_maven_hpi_project_on_master_succeeds() throws Exception {
-        loadJenkinsPluginProjectInGitRepo(this.gitRepoRule);
+        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_hpi_project/");
 
         String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
@@ -447,80 +422,6 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         jenkinsRule.assertLogContains("[withMaven] openTasksPublisher - Scan Tasks for Maven artifact jenkins.mvn.test:test-jenkins-hpi:hpi:0.1-SNAPSHOT in source directory", build);
     }
 
-    @Issue("JENKINS-70561")
-    @Test
-    public void maven_build_maven_plugin_project_on_master_succeeds() throws Exception {
-        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_plugin_project/");
-
-        String pipelineScript = "node() {\n" +
-                "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                "    withMaven() {\n" +
-                "        sh 'mvn verify'\n" +
-                "    }\n" +
-                "}";
-
-        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
-        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
-
-        // verify Maven installation provided by the build agent is used
-        // can be either "by the build agent with executable..." or "by the build agent with the environment variable MAVEN_HOME=..."
-        jenkinsRule.assertLogContains("[withMaven] using Maven installation provided by the build agent with", build);
-
-        // verify .pom is archived and fingerprinted
-        jenkinsRule.assertLogContains("under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom", build);
-
-        // verify .jar is archived and fingerprinted
-        jenkinsRule.assertLogContains("under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.jar", build);
-
-        Collection<String> artifactsFileNames = TestUtils.artifactsToArtifactsFileNames(build.getArtifacts());
-        assertThat(artifactsFileNames, hasItems("hello-maven-plugin-1.0-SNAPSHOT.pom", "hello-maven-plugin-1.0-SNAPSHOT.jar"));
-
-
-        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.jar");
-        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom");
-
-        //  verify Invoker Archiver is called
-        jenkinsRule.assertLogContains("[withMaven] invokerPublisher - Archive invoker results for Maven artifact jenkins.mvn.test:hello-maven-plugin:maven-plugin:1.0-SNAPSHOT generated by", build);
-    }
-
-    @Issue("JENKINS-70561")
-    @Test
-    public void maven_build_maven_plugin_project_with_invoker_as_junit_on_master_succeeds() throws Exception {
-        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_plugin_project_with_invoker_as_junit/");
-
-        String pipelineScript = "node() {\n" +
-                "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                "    withMaven() {\n" +
-                "        sh 'mvn verify'\n" +
-                "    }\n" +
-                "}";
-
-        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
-        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
-
-        // verify Maven installation provided by the build agent is used
-        // can be either "by the build agent with executable..." or "by the build agent with the environment variable MAVEN_HOME=..."
-        jenkinsRule.assertLogContains("[withMaven] using Maven installation provided by the build agent with", build);
-
-        // verify .pom is archived and fingerprinted
-        jenkinsRule.assertLogContains("under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom", build);
-
-        // verify .jar is archived and fingerprinted
-        jenkinsRule.assertLogContains("under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.jar", build);
-
-        Collection<String> artifactsFileNames = TestUtils.artifactsToArtifactsFileNames(build.getArtifacts());
-        assertThat(artifactsFileNames, hasItems("hello-maven-plugin-1.0-SNAPSHOT.pom", "hello-maven-plugin-1.0-SNAPSHOT.jar"));
-
-
-        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.jar");
-        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom");
-
-        //  verify Invoker Archiver is called
-        jenkinsRule.assertLogContains("[withMaven] invokerPublisher - Archive test results for Maven artifact jenkins.mvn.test:hello-maven-plugin:maven-plugin:1.0-SNAPSHOT generated by", build);
-    }
-
     @Issue("JENKINS-43678")
     @Test
     public void maven_build_on_master_with_no_generated_jar_succeeds() throws Exception {
@@ -543,20 +444,6 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         Collection<String> artifactsFileNames = TestUtils.artifactsToArtifactsFileNames(build.getArtifacts());
         assertThat(artifactsFileNames, hasItems("mono-module-maven-app-0.1-SNAPSHOT.pom"));
         assertThat(build.getArtifacts().toString(), build.getArtifacts().size(), is(1));
-    }
-
-    private void verifyFileIsFingerPrinted(WorkflowJob pipeline, WorkflowRun build, String fileName) throws java.io.IOException {
-        System.out.println(getClass() + " verifyFileIsFingerPrinted(" + build + ", " + fileName + ")");
-        Fingerprinter.FingerprintAction fingerprintAction = build.getAction(Fingerprinter.FingerprintAction.class);
-        Map<String, String> records = fingerprintAction.getRecords();
-        System.out.println(getClass() + " records: " + records);
-        String jarFileMd5sum = records.get(fileName);
-        assertThat(jarFileMd5sum, not(nullValue()));
-
-        Fingerprint jarFileFingerPrint = jenkinsRule.getInstance().getFingerprintMap().get(jarFileMd5sum);
-        assertThat(jarFileFingerPrint.getFileName(), is(fileName));
-        assertThat(jarFileFingerPrint.getOriginal().getJob().getName(), is(pipeline.getName()));
-        assertThat(jarFileFingerPrint.getOriginal().getNumber(), is(build.getNumber()));
     }
 
     @Test
@@ -754,7 +641,6 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
         jenkinsRule.assertLogContains("[withMaven] using Maven global settings provided on the build agent", build);
             jenkinsRule.assertLogContains("<id>id-global-settings-test</id>", build);
-
     }
 
     @Issue("JENKINS-42565")
@@ -796,7 +682,6 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
         jenkinsRule.assertLogContains("[withMaven] using Maven settings provided on the build agent", build);
         jenkinsRule.assertLogContains("<id>id-settings-test</id>", build);
-
     }
 
     @Test
@@ -1030,13 +915,10 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         assertThat(testResultAction.getTotalCount(), is(4));
         assertThat(testResultAction.getFailCount(), is(0));
 
-        /*
-        TODO enable test below when we can bump the junit-plugin to version 1.23+
-        JUnitResultsStepTest.assertStageResults(build, 4, 6, "first");
+        JUnitResultsStepTest.assertStageResults(build, 4, 4, 0, "first");
 
-        JUnitResultsStepTest.assertBranchResults(build, 2, 3, "a", "first");
-        JUnitResultsStepTest.assertBranchResults(build, 2, 3, "b", "first");
-        */
+        JUnitResultsStepTest.assertBranchResults(build, 2, 2, 0, "a", "first", null);
+        JUnitResultsStepTest.assertBranchResults(build, 2, 2, 0, "b", "first", null);
     }
 
 }
