@@ -9,7 +9,6 @@ import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.plugins.git.traits.BranchDiscoveryTrait;
 import jenkins.scm.api.trait.SCMSourceTrait;
 
-import org.eclipse.collections.impl.block.factory.Predicates;
 import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
@@ -40,12 +39,6 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
 
     @Rule
     public GitSampleRepoRule downstreamArtifactRepoRule = new GitSampleRepoRule();
-
-    /*
-    Does not work
-    @Inject
-    public GlobalPipelineMavenConfig globalPipelineMavenConfig;
-    */
 
     @Before
     @Override
@@ -185,8 +178,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
 
     @Test
     public void verify_osgi_bundle_recorded_as_bundle_and_as_jar() throws Exception {
-        loadOsgiBundleProjectInGitRepo(gitRepoRule);
-
+        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/multi_module_bundle_project/");
 
         String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
@@ -210,8 +202,8 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         {skip_downstream_triggers=TRUE, type=jar, gav=jenkins.mvn.test.bundle:print-api:0.0.1-SNAPSHOT},
         {skip_downstream_triggers=TRUE, type=pom, gav=jenkins.mvn.test.bundle:print-api:0.0.1-SNAPSHOT},
         {skip_downstream_triggers=TRUE, type=pom, gav=jenkins.mvn.test.bundle:print-impl:0.0.1-SNAPSHOT}]
-
          */
+
         System.out.println("generated artifacts" + generatedArtifacts);
 
         Iterable<String> matchingArtifactTypes = generatedArtifacts.stream()
@@ -225,12 +217,86 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         assertThat(matchingArtifactTypes, Matchers.containsInAnyOrder("jar", "bundle", "pom"));
     }
 
+    @Test
+    public void verify_downstream_pipeline_triggered_on_parent_pom_build() throws Exception {
+        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_pom_project/");
+
+        String pipelineScript = "node() {\n" +
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven() {\n" +
+                "        sh 'mvn package'\n" +
+                "    }\n" +
+                "}";
+
+        // TRIGGER maven-jar#1 to record that "build-maven-jar"
+        WorkflowJob multiModuleBundleProjectPipeline = jenkinsRule.createProject(WorkflowJob.class, "build-multi-module-bundle");
+        multiModuleBundleProjectPipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, multiModuleBundleProjectPipeline.scheduleBuild2(0));
+
+        PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
+        List<MavenArtifact> generatedArtifacts = dao.getGeneratedArtifacts(multiModuleBundleProjectPipeline.getFullName(), build.getNumber());
+
+        Iterable<String> matchingArtifactTypes = generatedArtifacts.stream()
+                .filter(input -> input != null &&
+                        input.getGroupId().equals("com.example") &&
+                        input.getArtifactId().equals("my-pom") &&
+                        input.getVersion().equals("0.1-SNAPSHOT"))
+                .map(MavenArtifact::getType)
+                .collect(Collectors.toList());
+
+        assertThat(matchingArtifactTypes, Matchers.containsInAnyOrder("pom"));
+    }
+
+    @Test
+    public void verify_downstream_pipeline_triggered_on_jar_having_parent_pom_dependency() throws Exception {
+        System.out.println("gitRepoRule: " + gitRepoRule);
+        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_pom_project/");
+        System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
+        loadSourceCodeInGitRepository(this.downstreamArtifactRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_with_parent_pom_project/");
+
+        String mavenParentPipelineScript = "node() {\n" +
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven() {\n" +
+                "        sh 'mvn install'\n" +
+                "    }\n" +
+                "}";
+        String mavenJarPipelineScript = "node() {\n" +
+                "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
+                "    withMaven() {\n" +
+                "        sh 'mvn install'\n" +
+                "    }\n" +
+                "}";
+
+
+        WorkflowJob mavenParentPipeline = jenkinsRule.createProject(WorkflowJob.class, "build-maven-parent");
+        mavenParentPipeline.setDefinition(new CpsFlowDefinition(mavenParentPipelineScript, true));
+        mavenParentPipeline.addTrigger(new WorkflowJobDependencyTrigger());
+
+        WorkflowRun mavenParentPipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenParentPipeline.scheduleBuild2(0));
+        // TODO check in DB that the generated artifact is recorded
+
+        WorkflowJob mavenJarPipeline = jenkinsRule.createProject(WorkflowJob.class, "build-maven-jar");
+        mavenJarPipeline.setDefinition(new CpsFlowDefinition(mavenJarPipelineScript, true));
+        mavenJarPipeline.addTrigger(new WorkflowJobDependencyTrigger());
+        WorkflowRun mavenJarPipelineFirstRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenJarPipeline.scheduleBuild2(0));
+        // TODO check in DB that the dependency on the war project is recorded
+
+        WorkflowRun mavenParentPipelineSecondRun = jenkinsRule.assertBuildStatus(Result.SUCCESS, mavenParentPipeline.scheduleBuild2(0));
+
+        jenkinsRule.waitUntilNoActivity();
+
+        WorkflowRun mavenJarPipelineLastRun = mavenJarPipeline.getLastBuild();
+
+        assertThat(mavenJarPipelineLastRun.getNumber(), is(mavenJarPipelineFirstRun.getNumber() + 1));
+        Cause.UpstreamCause upstreamCause = mavenJarPipelineLastRun.getCause(Cause.UpstreamCause.class);
+        assertThat(upstreamCause, notNullValue());
+    }
 
     /**
      * The maven-war-app has a dependency on the maven-jar-app
      */
     @Test
-    public void verify_downstream_pipeline_triggered_on_parent_pom_build() throws Exception {
+    public void verify_downstream_pipeline_triggered_on_war_having_jar_dependency() throws Exception {
         System.out.println("gitRepoRule: " + gitRepoRule);
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
         System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
@@ -276,16 +342,14 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         assertThat(mavenWarPipelineLastRun.getNumber(), is(mavenWarPipelineFirstRun.getNumber() + 1));
         Cause.UpstreamCause upstreamCause = mavenWarPipelineLastRun.getCause(Cause.UpstreamCause.class);
         assertThat(upstreamCause, notNullValue());
-
-
     }
 
     @Test
     public void verify_nbm_downstream_simple_pipeline_trigger() throws Exception {
         System.out.println("gitRepoRule: " + gitRepoRule);
-        loadNbmDependencyMavenJarProjectInGitRepo(this.gitRepoRule);
+        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_nbm_dependency_project/");
         System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
-        loadNbmBaseMavenProjectInGitRepo(this.downstreamArtifactRepoRule);
+        loadSourceCodeInGitRepository(this.downstreamArtifactRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_nbm_base_project/");
 
         String mavenNbmDependencyPipelineScript = "node() {\n"
                 + "    git($/" + gitRepoRule.toString() + "/$)\n"
@@ -330,9 +394,9 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
     @Test
     public void verify_docker_downstream_simple_pipeline_trigger() throws Exception {
         System.out.println("gitRepoRule: " + gitRepoRule);
-        loadDockerDependencyMavenJarProjectInGitRepo(this.gitRepoRule);
+        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_docker_dependency_project/");
         System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
-        loadDockerBaseMavenProjectInGitRepo(this.downstreamArtifactRepoRule);
+        loadSourceCodeInGitRepository(this.downstreamArtifactRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_docker_base_project/");
 
         String mavenDockerDependencyPipelineScript = "node() {\n"
                 + "    git($/" + gitRepoRule.toString() + "/$)\n"
@@ -384,9 +448,9 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         publisher.setLifecycleThreshold("deploy");
 
         System.out.println("gitRepoRule: " + gitRepoRule);
-        loadDeployFileDependencyMavenJarProjectInGitRepo(this.gitRepoRule);
+        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_deployfile_dependency_project/");
         System.out.println("downstreamArtifactRepoRule: " + downstreamArtifactRepoRule);
-        loadDeployFileBaseMavenProjectInGitRepo(this.downstreamArtifactRepoRule);
+        loadSourceCodeInGitRepository(this.downstreamArtifactRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_deployfile_base_project/");
 
         String mavenDeployFileDependencyPipelineScript = "node() {\n"
                 + "    git($/" + gitRepoRule.toString() + "/$)\n"
