@@ -6,7 +6,7 @@ import hudson.model.ItemGroup;
 import hudson.model.listeners.ItemListener;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
-import org.jenkinsci.plugins.workflow.flow.FlowExecutionOwner;
+import org.jenkinsci.plugins.workflow.flow.BlockableResume;
 
 import javax.inject.Inject;
 import java.util.logging.Level;
@@ -26,7 +26,7 @@ public class DatabaseSyncItemListener extends ItemListener {
 
     @Override
     public void onDeleted(Item item) {
-        if (item instanceof FlowExecutionOwner.Executable) {
+        if (item instanceof BlockableResume) {
             LOGGER.log(Level.FINE, "onDeleted({0})", item);
             globalPipelineMavenConfig.getDao().deleteJob(item.getFullName());
         } else {
@@ -36,7 +36,7 @@ public class DatabaseSyncItemListener extends ItemListener {
 
     @Override
     public void onRenamed(Item item, String oldName, String newName) {
-        if (item instanceof FlowExecutionOwner.Executable) {
+        if (item instanceof BlockableResume) {
             LOGGER.log(Level.FINE, "onRenamed({0}, {1}, {2})", new Object[]{item, oldName, newName});
 
             String oldFullName;
@@ -55,7 +55,7 @@ public class DatabaseSyncItemListener extends ItemListener {
 
     @Override
     public void onLocationChanged(Item item, String oldFullName, String newFullName) {
-        if (item instanceof FlowExecutionOwner.Executable) {
+        if (item instanceof BlockableResume) {
             LOGGER.log(Level.FINE, "onLocationChanged({0}, {1}, {2})", new Object[]{item, oldFullName, newFullName});
             globalPipelineMavenConfig.getDao().renameJob(oldFullName, newFullName);
         } else {
