@@ -7,7 +7,7 @@ import hudson.triggers.TriggerDescriptor;
 import jenkins.branch.MultiBranchProject;
 import jenkins.branch.OrganizationFolder;
 import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.workflow.flow.FlowExecutionOwner;
+import org.jenkinsci.plugins.workflow.flow.BlockableResume;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 /**
@@ -25,7 +25,7 @@ public class WorkflowJobDependencyTrigger extends Trigger<Item> {
     public static class DescriptorImpl extends TriggerDescriptor {
         @Override
         public boolean isApplicable(Item item) {
-            return item instanceof FlowExecutionOwner.Executable || item instanceof MultiBranchProject || item instanceof OrganizationFolder;
+            return item instanceof BlockableResume || item instanceof MultiBranchProject || item instanceof OrganizationFolder;
         }
 
         public String getDisplayName() {
