@@ -463,7 +463,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>junit</artifactId>
-      <version>1177.v90374a_ef4d09</version>
+      <version>1189.v1b_e593637fa_e</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
