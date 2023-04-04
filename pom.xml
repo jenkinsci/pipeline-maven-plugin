@@ -112,7 +112,7 @@
     <jenkins-symbol.version>1.24</jenkins-symbol.version>
     <jenkins-tools-bom.version>1763.v092b_8980a_f5e</jenkins-tools-bom.version>
     <jenkins.version>2.346.3</jenkins.version>
-    <joda-time.version>2.12.4</joda-time.version>
+    <joda-time.version>2.12.5</joda-time.version>
     <junit.version>4.13.2</junit.version>
     <maven-compat.version>3.3.9</maven-compat.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
