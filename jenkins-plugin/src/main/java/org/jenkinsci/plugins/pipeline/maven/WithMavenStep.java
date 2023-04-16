@@ -249,8 +249,8 @@ public class WithMavenStep extends Step {
             if (item == null) {
                 return r; // it's empty
             }
-            item.checkPermission(Item.CONFIGURE);
-            r.add("--- Use system default Maven ---");
+            item.checkPermission(Item.EXTENDED_READ);
+            r.add("--- Use system default Maven ---", "");
             for (MavenInstallation installation : getMavenDescriptor().getInstallations()) {
                 r.add(installation.getName());
             }
@@ -267,8 +267,8 @@ public class WithMavenStep extends Step {
             if (item == null) {
                 return r; // it's empty
             }
-            item.checkPermission(Item.CONFIGURE);
-            r.add("--- Use system default JDK ---");
+            item.checkPermission(Item.EXTENDED_READ);
+            r.add("--- Use system default JDK ---", "");
             for (JDK installation : getJDKDescriptor().getInstallations()) {
                 r.add(installation.getName());
             }
@@ -281,8 +281,8 @@ public class WithMavenStep extends Step {
             if (item == null) {
                 return r; // it's empty
             }
-            item.checkPermission(Item.CONFIGURE);
-            r.add("--- Use system default settings or file path ---");
+            item.checkPermission(Item.EXTENDED_READ);
+            r.add("--- Use system default settings or file path ---", "");
             for (Config config : ConfigFiles.getConfigsInContext(context, MavenSettingsConfigProvider.class)) {
                 r.add(config.name, config.id);
             }
@@ -295,8 +295,8 @@ public class WithMavenStep extends Step {
             if (item == null) {
                 return r; // it's empty
             }
-            item.checkPermission(Item.CONFIGURE);
-            r.add("--- Use system default settings or file path ---");
+            item.checkPermission(Item.EXTENDED_READ);
+            r.add("--- Use system default settings or file path ---", "");
             for (Config config : ConfigFiles.getConfigsInContext(context, GlobalMavenSettingsConfigProvider.class)) {
                 r.add(config.name, config.id);
             }
@@ -309,7 +309,7 @@ public class WithMavenStep extends Step {
             if (item == null) {
                 return r; // it's empty
             }
-            item.checkPermission(Item.CONFIGURE);
+            item.checkPermission(Item.EXTENDED_READ);
             for(MavenPublisherStrategy publisherStrategy: MavenPublisherStrategy.values()) {
                 r.add(publisherStrategy.getDescription(), publisherStrategy.name());
             }
