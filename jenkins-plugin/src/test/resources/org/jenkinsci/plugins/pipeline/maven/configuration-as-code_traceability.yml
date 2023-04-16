@@ -1,0 +1,6 @@
+jenkins:
+  systemMessage: "Hello World"
+
+tool:
+  pipelineMaven:
+    globalTraceability: true

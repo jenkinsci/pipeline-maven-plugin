@@ -1,3 +1,4 @@
+globalTraceability: false
 jdbcCredentialsId: "pg-creds"
 jdbcUrl: "jdbc:postgresql://dbserver/jenkinsdb"
 triggerDownstreamUponResultAborted: false

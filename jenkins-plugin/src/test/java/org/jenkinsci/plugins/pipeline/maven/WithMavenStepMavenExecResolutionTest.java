@@ -85,7 +85,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
                 "node('" + AGENT_NAME + "') {\n" +
                 "  def mavenHome = tool '" + MAVEN_GLOBAL_TOOL_NAME + "'\n" +
                 "  withEnv([\"MAVEN_HOME=${mavenHome}\"]) {\n" +
-                "    withMaven() {\n" +
+                "    withMaven(traceability: true) {\n" +
                 "      sh \"mvn --version\"\n" +
                 "    }\n" +
                 "  }\n" +
@@ -109,7 +109,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
                 "  stages {\n" +
                 "    stage('Build') {\n" +
                 "      steps {\n" +
-                "        withMaven() {\n" +
+                "        withMaven(traceability: true) {\n" +
                 "          sh \"mvn --version\"\n" +
                 "        }\n" +
                 "      }\n" +
@@ -127,7 +127,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
         WorkflowRun run = runPipeline("" +
                 "node('" + AGENT_NAME + "') {\n" +
-                "  withMaven() {\n" +
+                "  withMaven(traceability: true) {\n" +
                 "    sh \"mvn --version\"\n" +
                 "  }\n" +
                 "}");
@@ -143,7 +143,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
         WorkflowRun run = runPipeline("" +
                 "node('" + AGENT_NAME + "') {\n" +
                 "  sh 'echo $MAVEN_HOME'\n" +
-                "  withMaven() {\n" +
+                "  withMaven(traceability: true) {\n" +
                 "    sh \"mvn --version\"\n" +
                 "  }\n" +
                 "}");

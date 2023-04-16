@@ -93,6 +93,8 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
     private transient PipelineTriggerService pipelineTriggerService;
 
+    private boolean globalTraceability = false;
+
     private boolean triggerDownstreamUponResultSuccess = true;
     private boolean triggerDownstreamUponResultUnstable;
     private boolean triggerDownstreamUponResultFailure;
@@ -123,6 +125,15 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     @DataBoundSetter
     public void setPublisherOptions(List<MavenPublisher> publisherOptions) {
         this.publisherOptions = publisherOptions;
+    }
+
+    public boolean isGlobalTraceability() {
+        return globalTraceability;
+    }
+
+    @DataBoundSetter
+    public void setGlobalTraceability(boolean globalTraceability) {
+        this.globalTraceability = globalTraceability;
     }
 
     public boolean isTriggerDownstreamUponResultSuccess() {

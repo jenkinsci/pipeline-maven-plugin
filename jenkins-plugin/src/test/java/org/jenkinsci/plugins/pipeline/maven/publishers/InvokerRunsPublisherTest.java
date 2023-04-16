@@ -33,10 +33,6 @@ public class InvokerRunsPublisherTest extends AbstractIntegrationTest {
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
-        // verify Maven installation provided by the build agent is used
-        // can be either "by the build agent with executable..." or "by the build agent with the environment variable MAVEN_HOME=..."
-        jenkinsRule.assertLogContains("[withMaven] using Maven installation provided by the build agent with", build);
-
         // verify .pom is archived and fingerprinted
         jenkinsRule.assertLogContains("under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom", build);
 
@@ -69,10 +65,6 @@ public class InvokerRunsPublisherTest extends AbstractIntegrationTest {
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
-
-        // verify Maven installation provided by the build agent is used
-        // can be either "by the build agent with executable..." or "by the build agent with the environment variable MAVEN_HOME=..."
-        jenkinsRule.assertLogContains("[withMaven] using Maven installation provided by the build agent with", build);
 
         // verify .pom is archived and fingerprinted
         jenkinsRule.assertLogContains("under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom", build);
