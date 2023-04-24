@@ -107,7 +107,7 @@
     <jenkins-plugin-script-security.version>1229.v4880b_b_e905a_6</jenkins-plugin-script-security.version>
     <jenkins-plugin-ssh-creds.version>305.v8f4381501156</jenkins-plugin-ssh-creds.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
-    <jenkins-plugin-token.version>321.vd7cc1f2a_52c8</jenkins-plugin-token.version>
+    <jenkins-plugin-token.version>359.vb_cde11682e0c</jenkins-plugin-token.version>
     <jenkins-plugin-workflow.version>1200.v8005c684b_a_c6</jenkins-plugin-workflow.version>
     <jenkins-symbol.version>1.24</jenkins-symbol.version>
     <jenkins-tools-bom.version>1763.v092b_8980a_f5e</jenkins-tools-bom.version>
