@@ -7,8 +7,6 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
 import org.kohsuke.stapler.interceptor.RequirePOST;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-
 import java.io.IOException;
 
 /**
@@ -20,7 +18,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitor extends Admi
     @Override
     public boolean isActivated() {
         String jdbcUrl = GlobalPipelineMavenConfig.get().getJdbcUrl();
-        if (!isBlank(jdbcUrl)) {
+        if (jdbcUrl != null && !jdbcUrl.trim().isEmpty()) {
             return jdbcUrl.startsWith("jdbc:h2:");
         }
 

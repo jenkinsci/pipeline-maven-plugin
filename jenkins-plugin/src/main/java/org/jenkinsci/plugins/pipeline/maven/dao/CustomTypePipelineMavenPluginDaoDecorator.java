@@ -1,11 +1,11 @@
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import org.apache.commons.lang3.StringUtils;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This decorator handles the reporting of generated artifacts with custom types which do not match the artifact extension.
@@ -27,6 +27,8 @@ public class CustomTypePipelineMavenPluginDaoDecorator extends AbstractPipelineM
             "javadoc"
     );
 
+    private final Logger LOGGER = Logger.getLogger(getClass().getName());
+
     public CustomTypePipelineMavenPluginDaoDecorator(@Nonnull PipelineMavenPluginDao delegate) {
         super(delegate);
     }
@@ -36,6 +38,7 @@ public class CustomTypePipelineMavenPluginDaoDecorator extends AbstractPipelineM
         super.recordGeneratedArtifact(jobFullName, buildNumber, groupId, artifactId, version, type, baseVersion, repositoryUrl, skipDownstreamTriggers, extension, classifier);
 
         if (shouldReportAgainWithExtensionAsType(type, extension)) {
+            LOGGER.log(Level.FINE, "Recording generated artifact " + groupId + ":" + artifactId + ":" + version + " as " + extension + " (in addition to " + type + ")");
             super.recordGeneratedArtifact(jobFullName, buildNumber, groupId, artifactId, version, extension, baseVersion, repositoryUrl, skipDownstreamTriggers, extension, classifier);
         }
     }
@@ -45,7 +48,7 @@ public class CustomTypePipelineMavenPluginDaoDecorator extends AbstractPipelineM
             return false;
         }
 
-        return !StringUtils.equals(type, extension);
+        return type != null && !type.equals(extension);
     }
 
 }
