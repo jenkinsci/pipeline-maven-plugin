@@ -117,9 +117,9 @@ public class JGivenTestsPublisher extends MavenPublisher {
             generator.perform(run, workspace, launcher, listener);
         } catch (final Exception e) {
             listener.error(
-                    "[withMaven] jgivenPublisher - exception archiving JGiven reports: " + e + ". Failing the build.");
+                    "[withMaven] jgivenPublisher - exception archiving JGiven reports: " + e);
             LOGGER.log(Level.WARNING, "Exception processing JGiven reports archiving", e);
-            run.setResult(Result.FAILURE);
+            throw new MavenPipelinePublisherException("jgivenPublisher", "archiving JGiven reports", e);
         }
     }
 

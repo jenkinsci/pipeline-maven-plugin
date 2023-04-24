@@ -353,7 +353,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         }
     }
 
-    protected long getOrCreateBuildPrimaryKey(String jobFullName, int buildNumber) {
+    protected synchronized long getOrCreateBuildPrimaryKey(String jobFullName, int buildNumber) {
         try (Connection cnn = ds.getConnection()) {
             cnn.setAutoCommit(false);
 

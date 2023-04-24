@@ -100,9 +100,9 @@ public class JUnitUtils {
                 run.setResult(Result.UNSTABLE);
             }
         } catch (RuntimeException e) {
-            listener.error("[withMaven] " + publisherName + " - exception archiving JUnit results " + testResults + ": " + e + ". Failing the build.");
+            listener.error("[withMaven] " + publisherName + " - exception archiving JUnit results " + testResults + ": " + e);
             LOGGER.log(Level.WARNING, "Exception processing " + testResults, e);
-            run.setResult(Result.FAILURE);
+            throw new MavenPipelinePublisherException(publisherName, "archiving JUnit results " + testResults, e);
         }
     }
 }
