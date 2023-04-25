@@ -12,8 +12,8 @@ import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
@@ -42,7 +42,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
 
     private transient List<MavenArtifact> generatedArtifacts;
 
-    public MavenReport(@Nonnull Run run) {
+    public MavenReport(@NonNull Run run) {
         this.run = run;
     }
 

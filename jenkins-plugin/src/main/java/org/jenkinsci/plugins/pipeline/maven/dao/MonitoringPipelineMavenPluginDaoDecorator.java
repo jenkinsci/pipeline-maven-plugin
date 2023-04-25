@@ -4,8 +4,8 @@ import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.listeners.DaoHelper;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 
 import static java.util.Optional.ofNullable;
 
@@ -32,22 +32,22 @@ public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineM
     private final AtomicLong writeDurationInNanos = new AtomicLong();
     private final AtomicInteger writeCount = new AtomicInteger();
 
-    public MonitoringPipelineMavenPluginDaoDecorator(@Nonnull PipelineMavenPluginDao delegate) {
+    public MonitoringPipelineMavenPluginDaoDecorator(@NonNull PipelineMavenPluginDao delegate) {
         super(delegate);
     }
 
     @Override
-    public void recordDependency(@Nonnull String jobFullName, int buildNumber, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nonnull String scope, boolean ignoreUpstreamTriggers, String classifier) {
+    public void recordDependency(@NonNull String jobFullName, int buildNumber, @NonNull String groupId, @NonNull String artifactId, @NonNull String version, @NonNull String type, @NonNull String scope, boolean ignoreUpstreamTriggers, String classifier) {
         executeMonitored(() -> super.recordDependency(jobFullName, buildNumber, groupId, artifactId, version, type, scope, ignoreUpstreamTriggers, classifier));
     }
 
     @Override
-    public void recordParentProject(@Nonnull String jobFullName, int buildNumber, @Nonnull String parentGroupId, @Nonnull String parentArtifactId, @Nonnull String parentVersion, boolean ignoreUpstreamTriggers) {
+    public void recordParentProject(@NonNull String jobFullName, int buildNumber, @NonNull String parentGroupId, @NonNull String parentArtifactId, @NonNull String parentVersion, boolean ignoreUpstreamTriggers) {
         executeMonitored(() -> super.recordParentProject(jobFullName, buildNumber, parentGroupId, parentArtifactId, parentVersion, ignoreUpstreamTriggers));
     }
 
     @Override
-    public void recordGeneratedArtifact(@Nonnull String jobFullName, int buildNumber, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nonnull String baseVersion, @Nullable String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier) {
+    public void recordGeneratedArtifact(@NonNull String jobFullName, int buildNumber, @NonNull String groupId, @NonNull String artifactId, @NonNull String version, @NonNull String type, @NonNull String baseVersion, @Nullable String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier) {
         executeMonitored(() -> super.recordGeneratedArtifact(jobFullName, buildNumber, groupId, artifactId, version, type, baseVersion, repositoryUrl, skipDownstreamTriggers, extension, classifier));
     }
 
@@ -57,60 +57,60 @@ public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineM
     }
 
     @Override
-    @Nonnull
-    public List<MavenDependency> listDependencies(@Nonnull String jobFullName, int buildNumber) {
+    @NonNull
+    public List<MavenDependency> listDependencies(@NonNull String jobFullName, int buildNumber) {
         return executeMonitored(() -> super.listDependencies(jobFullName, buildNumber));
     }
 
     @Override
-    @Nonnull
-    public List<MavenArtifact> getGeneratedArtifacts(@Nonnull String jobFullName, int buildNumber) {
+    @NonNull
+    public List<MavenArtifact> getGeneratedArtifacts(@NonNull String jobFullName, int buildNumber) {
         return executeMonitored(() -> super.getGeneratedArtifacts(jobFullName, buildNumber));
     }
 
     @Override
-    public void renameJob(@Nonnull String oldFullName, @Nonnull String newFullName) {
+    public void renameJob(@NonNull String oldFullName, @NonNull String newFullName) {
         executeMonitored(() -> super.renameJob(oldFullName, newFullName));
     }
 
     @Override
-    public void deleteJob(@Nonnull String jobFullName) {
+    public void deleteJob(@NonNull String jobFullName) {
         executeMonitored(() -> super.deleteJob(jobFullName));
     }
 
     @Override
-    public void deleteBuild(@Nonnull String jobFullName, int buildNumber) {
+    public void deleteBuild(@NonNull String jobFullName, int buildNumber) {
         executeMonitored(() -> super.deleteBuild(jobFullName, buildNumber));
     }
 
     @Override
-    @Nonnull
+    @NonNull
     @Deprecated
-    public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+    public List<String> listDownstreamJobs(@NonNull String jobFullName, int buildNumber) {
         return executeMonitored(() -> super.listDownstreamJobs(jobFullName, buildNumber));
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@Nonnull String jobFullName, int buildNumber) {
+    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@NonNull String jobFullName, int buildNumber) {
         return executeMonitored(() -> super.listDownstreamJobsByArtifact(jobFullName, buildNumber));
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public SortedSet<String> listDownstreamJobs(String groupId, String artifactId, String version, String baseVersion, String type, String classifier) {
         return executeMonitored(() -> super.listDownstreamJobs(groupId, artifactId, version, baseVersion, type, classifier));
     }
 
     @Override
-    @Nonnull
-    public Map<String, Integer> listUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+    @NonNull
+    public Map<String, Integer> listUpstreamJobs(@NonNull String jobFullName, int buildNumber) {
         return executeMonitored(() -> super.listUpstreamJobs(jobFullName, buildNumber));
     }
 
     @Override
-    @Nonnull
-    public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+    @NonNull
+    public Map<String, Integer> listTransitiveUpstreamJobs(@NonNull String jobFullName, int buildNumber) {
         return executeMonitored(() -> super.listTransitiveUpstreamJobs(jobFullName, buildNumber));
     }
 
@@ -120,7 +120,7 @@ public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineM
     }
 
     @Override
-    public void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
+    public void updateBuildOnCompletion(@NonNull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
         executeMonitored(() -> super.updateBuildOnCompletion(jobFullName, buildNumber, buildResultOrdinal, startTimeInMillis, durationInMillis));
     }
 

@@ -4,7 +4,7 @@ import com.google.common.base.Preconditions;
 import hudson.model.Cause;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +18,7 @@ public class MavenDependencyCauseHelper {
     /**
      * Return matching artifact if the given causes refer to common Maven artifact. Empty list if there are no matching artifact
      */
-    @Nonnull
+    @NonNull
     public static List<MavenArtifact> isSameCause(MavenDependencyCause newMavenCause, Cause oldMavenCause) {
         if (!(oldMavenCause instanceof MavenDependencyCause)) {
             return Collections.emptyList();

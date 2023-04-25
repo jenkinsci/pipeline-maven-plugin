@@ -26,8 +26,8 @@ package org.jenkinsci.plugins.pipeline.maven.service;
 
 import hudson.model.Item;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.logging.Level;
 
 /**
@@ -40,6 +40,6 @@ public interface ServiceLogger {
 
     void log(Level level, String message);
 
-    @Nonnull
+    @NonNull
     String modelHyperlinkNoteEncodeTo(@Nullable Item item);
 }

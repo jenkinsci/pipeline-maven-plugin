@@ -35,7 +35,7 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -62,8 +62,8 @@ public class MavenSpyLogProcessor implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(MavenSpyLogProcessor.class.getName());
 
-    public void processMavenSpyLogs(@Nonnull StepContext context, @Nonnull FilePath mavenSpyLogFolder, @Nonnull List<MavenPublisher> options,
-                                    @Nonnull MavenPublisherStrategy publisherStrategy) throws IOException, InterruptedException {
+    public void processMavenSpyLogs(@NonNull StepContext context, @NonNull FilePath mavenSpyLogFolder, @NonNull List<MavenPublisher> options,
+                                    @NonNull MavenPublisherStrategy publisherStrategy) throws IOException, InterruptedException {
 
         long nanosBefore = System.nanoTime();
 

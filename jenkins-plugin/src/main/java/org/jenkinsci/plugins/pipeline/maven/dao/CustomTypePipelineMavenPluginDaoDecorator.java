@@ -1,7 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,12 +29,12 @@ public class CustomTypePipelineMavenPluginDaoDecorator extends AbstractPipelineM
 
     private final Logger LOGGER = Logger.getLogger(getClass().getName());
 
-    public CustomTypePipelineMavenPluginDaoDecorator(@Nonnull PipelineMavenPluginDao delegate) {
+    public CustomTypePipelineMavenPluginDaoDecorator(@NonNull PipelineMavenPluginDao delegate) {
         super(delegate);
     }
 
     @Override
-    public void recordGeneratedArtifact(@Nonnull String jobFullName, int buildNumber, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nonnull String baseVersion, @Nullable String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier) {
+    public void recordGeneratedArtifact(@NonNull String jobFullName, int buildNumber, @NonNull String groupId, @NonNull String artifactId, @NonNull String version, @NonNull String type, @NonNull String baseVersion, @Nullable String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier) {
         super.recordGeneratedArtifact(jobFullName, buildNumber, groupId, artifactId, version, type, baseVersion, repositoryUrl, skipDownstreamTriggers, extension, classifier);
 
         if (shouldReportAgainWithExtensionAsType(type, extension)) {

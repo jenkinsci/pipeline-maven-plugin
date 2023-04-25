@@ -3,8 +3,8 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -14,22 +14,22 @@ public abstract class AbstractPipelineMavenPluginDaoDecorator implements Pipelin
 
     protected final PipelineMavenPluginDao delegate;
 
-    public AbstractPipelineMavenPluginDaoDecorator(@Nonnull PipelineMavenPluginDao delegate) {
+    public AbstractPipelineMavenPluginDaoDecorator(@NonNull PipelineMavenPluginDao delegate) {
         this.delegate = delegate;
     }
 
     @Override
-    public void recordDependency(@Nonnull String jobFullName, int buildNumber, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nonnull String scope, boolean ignoreUpstreamTriggers, String classifier) {
+    public void recordDependency(@NonNull String jobFullName, int buildNumber, @NonNull String groupId, @NonNull String artifactId, @NonNull String version, @NonNull String type, @NonNull String scope, boolean ignoreUpstreamTriggers, String classifier) {
         delegate.recordDependency(jobFullName, buildNumber, groupId, artifactId, version, type, scope, ignoreUpstreamTriggers, classifier);
     }
 
     @Override
-    public void recordParentProject(@Nonnull String jobFullName, int buildNumber, @Nonnull String parentGroupId, @Nonnull String parentArtifactId, @Nonnull String parentVersion, boolean ignoreUpstreamTriggers) {
+    public void recordParentProject(@NonNull String jobFullName, int buildNumber, @NonNull String parentGroupId, @NonNull String parentArtifactId, @NonNull String parentVersion, boolean ignoreUpstreamTriggers) {
         delegate.recordParentProject(jobFullName, buildNumber, parentGroupId, parentArtifactId, parentVersion, ignoreUpstreamTriggers);
     }
 
     @Override
-    public void recordGeneratedArtifact(@Nonnull String jobFullName, int buildNumber, @Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nonnull String baseVersion, @Nullable String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier) {
+    public void recordGeneratedArtifact(@NonNull String jobFullName, int buildNumber, @NonNull String groupId, @NonNull String artifactId, @NonNull String version, @NonNull String type, @NonNull String baseVersion, @Nullable String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier) {
         delegate.recordGeneratedArtifact(jobFullName, buildNumber, groupId, artifactId, version, type, baseVersion, repositoryUrl, skipDownstreamTriggers, extension, classifier);
     }
 
@@ -38,60 +38,60 @@ public abstract class AbstractPipelineMavenPluginDaoDecorator implements Pipelin
         delegate.recordBuildUpstreamCause(upstreamJobName, upstreamBuildNumber, downstreamJobName, downstreamBuildNumber);
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<MavenDependency> listDependencies(@Nonnull String jobFullName, int buildNumber) {
+    public List<MavenDependency> listDependencies(@NonNull String jobFullName, int buildNumber) {
         return delegate.listDependencies(jobFullName, buildNumber);
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<MavenArtifact> getGeneratedArtifacts(@Nonnull String jobFullName, int buildNumber) {
+    public List<MavenArtifact> getGeneratedArtifacts(@NonNull String jobFullName, int buildNumber) {
         return delegate.getGeneratedArtifacts(jobFullName, buildNumber);
     }
 
     @Override
-    public void renameJob(@Nonnull String oldFullName, @Nonnull String newFullName) {
+    public void renameJob(@NonNull String oldFullName, @NonNull String newFullName) {
         delegate.renameJob(oldFullName, newFullName);
     }
 
     @Override
-    public void deleteJob(@Nonnull String jobFullName) {
+    public void deleteJob(@NonNull String jobFullName) {
         delegate.deleteJob(jobFullName);
     }
 
     @Override
-    public void deleteBuild(@Nonnull String jobFullName, int buildNumber) {
+    public void deleteBuild(@NonNull String jobFullName, int buildNumber) {
         delegate.deleteBuild(jobFullName, buildNumber);
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+    public List<String> listDownstreamJobs(@NonNull String jobFullName, int buildNumber) {
         return delegate.listDownstreamJobs(jobFullName, buildNumber);
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@Nonnull String jobFullName, int buildNumber) {
+    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@NonNull String jobFullName, int buildNumber) {
         return delegate.listDownstreamJobsByArtifact(jobFullName, buildNumber);
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public SortedSet<String> listDownstreamJobs(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nullable String baseVersion, @Nonnull String type, @Nullable String classifier) {
+    public SortedSet<String> listDownstreamJobs(@NonNull String groupId, @NonNull String artifactId, @NonNull String version, @Nullable String baseVersion, @NonNull String type, @Nullable String classifier) {
         return delegate.listDownstreamJobs(groupId, artifactId, version, baseVersion, type, classifier);
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Map<String, Integer> listUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+    public Map<String, Integer> listUpstreamJobs(@NonNull String jobFullName, int buildNumber) {
         return delegate.listUpstreamJobs(jobFullName, buildNumber);
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+    public Map<String, Integer> listTransitiveUpstreamJobs(@NonNull String jobFullName, int buildNumber) {
         return delegate.listTransitiveUpstreamJobs(jobFullName, buildNumber);
     }
 
@@ -112,7 +112,7 @@ public abstract class AbstractPipelineMavenPluginDaoDecorator implements Pipelin
     }
 
     @Override
-    public void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
+    public void updateBuildOnCompletion(@NonNull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
         delegate.updateBuildOnCompletion(jobFullName, buildNumber, buildResultOrdinal, startTimeInMillis, durationInMillis);
     }
 

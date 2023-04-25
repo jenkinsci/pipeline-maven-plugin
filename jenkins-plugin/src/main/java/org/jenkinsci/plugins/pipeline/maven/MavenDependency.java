@@ -1,6 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Objects;
 
 /**
@@ -11,7 +11,7 @@ public class MavenDependency extends MavenArtifact {
     private String scope;
     public boolean optional;
 
-    @Nonnull
+    @NonNull
     public String getScope() {
         return scope == null ? "compile" : scope;
     }

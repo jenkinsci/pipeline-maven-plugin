@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
@@ -53,8 +53,8 @@ public class DaoHelper {
      * @param buildNumber see {@link Run#getNumber()}
      * @return sorted list of generated maven artifacts.
      */
-    @Nonnull
-    List<MavenArtifact> getGeneratedArtifacts(@Nonnull String jobFullName, int buildNumber) {
+    @NonNull
+    List<MavenArtifact> getGeneratedArtifacts(@NonNull String jobFullName, int buildNumber) {
         String key = jobFullName + '#' + buildNumber;
 
         LOGGER.log(Level.FINER, "calling getGeneratedArtifacts {0} {1}, cache size: {2}",

@@ -3,14 +3,14 @@ package org.jenkinsci.plugins.pipeline.maven.cause;
 import hudson.model.Job;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.List;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public interface MavenDependencyCause {
-    @Nonnull
+    @NonNull
     List<MavenArtifact> getMavenArtifacts();
 
     void setMavenArtifacts(List<MavenArtifact> mavenArtifacts);
@@ -21,7 +21,7 @@ public interface MavenDependencyCause {
      * We have omitted these pipeline triggers to prevent excessive triggers.
      * @return list of {@link Job#getFullName()}
      */
-    @Nonnull
+    @NonNull
     List<String> getOmittedPipelineFullNames();
 
     void setOmittedPipelineFullNames(List<String> omittedPipelineFullNames);

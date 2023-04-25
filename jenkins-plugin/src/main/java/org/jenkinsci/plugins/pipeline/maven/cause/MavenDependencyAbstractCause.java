@@ -3,8 +3,8 @@ package org.jenkinsci.plugins.pipeline.maven.cause;
 import hudson.model.Cause;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,7 +25,7 @@ public abstract class MavenDependencyAbstractCause extends Cause implements Mave
         this.mavenArtifacts = mavenArtifacts;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public List<MavenArtifact> getMavenArtifacts() {
         if (mavenArtifacts == null) {
@@ -35,12 +35,12 @@ public abstract class MavenDependencyAbstractCause extends Cause implements Mave
     }
 
     @Override
-    public void setMavenArtifacts(@Nonnull List<MavenArtifact> mavenArtifacts) {
+    public void setMavenArtifacts(@NonNull List<MavenArtifact> mavenArtifacts) {
         this.mavenArtifacts = mavenArtifacts;
     }
 
 
-    @Nonnull
+    @NonNull
     @Override
     public List<String> getOmittedPipelineFullNames() {
         if (omittedPipelineFullNames == null) {
@@ -54,7 +54,7 @@ public abstract class MavenDependencyAbstractCause extends Cause implements Mave
         this.omittedPipelineFullNames = omittedPipelines;
     }
 
-    @Nonnull
+    @NonNull
     public String getMavenArtifactsDescription() {
         return getMavenArtifacts().stream()
                 .map(mavenArtifact -> mavenArtifact == null ? "null" : mavenArtifact.getShortDescription())

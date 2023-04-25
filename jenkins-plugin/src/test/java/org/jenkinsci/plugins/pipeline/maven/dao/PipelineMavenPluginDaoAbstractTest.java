@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
@@ -74,10 +74,10 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         }
     }
 
-    @Nonnull
+    @NonNull
     public abstract DataSource before_newDataSource() throws Exception;
 
-    @Nonnull
+    @NonNull
     public abstract AbstractPipelineMavenPluginDao before_newAbstractPipelineMavenPluginDao(DataSource ds);
 
     @Test

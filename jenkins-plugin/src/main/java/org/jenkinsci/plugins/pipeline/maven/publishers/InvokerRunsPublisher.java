@@ -45,8 +45,8 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -81,7 +81,7 @@ public class InvokerRunsPublisher extends MavenPublisher {
   </ExecutionEvent>
      */
     @Override
-    public void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
 
         TaskListener listener = context.get(TaskListener.class);
         if (listener == null) {
@@ -281,7 +281,7 @@ public class InvokerRunsPublisher extends MavenPublisher {
     @Symbol("invokerPublisher")
     @Extension
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Invoker Publisher";
@@ -293,7 +293,7 @@ public class InvokerRunsPublisher extends MavenPublisher {
         }
 
 
-        @Nonnull
+        @NonNull
         @Override
         public String getSkipFileName() {
             return ".skip-publish-invoker-runs";

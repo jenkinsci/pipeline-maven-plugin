@@ -9,7 +9,7 @@ import jenkins.mvn.SettingsProvider;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Provides a way to override maven configuration at a folder level
@@ -72,7 +72,7 @@ public class MavenConfigFolderOverrideProperty extends AbstractFolderProperty<Ab
     @Extension
     public static class DescriptorImpl extends AbstractFolderPropertyDescriptor {
 
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Override Maven Settings";

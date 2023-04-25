@@ -28,8 +28,8 @@ import com.mysql.cj.exceptions.MysqlErrorNumbers;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -69,7 +69,7 @@ public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao 
     }
 
 
-    public PipelineMavenPluginMySqlDao(@Nonnull DataSource ds) {
+    public PipelineMavenPluginMySqlDao(@NonNull DataSource ds) {
         super(ds);
     }
 

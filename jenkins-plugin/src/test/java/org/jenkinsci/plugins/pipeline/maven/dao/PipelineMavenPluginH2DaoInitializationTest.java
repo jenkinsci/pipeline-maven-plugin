@@ -29,7 +29,7 @@ import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 import org.junit.Test;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -72,13 +72,13 @@ public class PipelineMavenPluginH2DaoInitializationTest {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {
-                    @Nonnull
+                    @NonNull
                     @Override
                     public String getMasterLegacyInstanceId() {
                         return "123456";
                     }
 
-                    @Nonnull
+                    @NonNull
                     @Override
                     public String getMasterRootUrl() {
                         return "";
@@ -104,13 +104,13 @@ public class PipelineMavenPluginH2DaoInitializationTest {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {
-                    @Nonnull
+                    @NonNull
                     @Override
                     public String getMasterLegacyInstanceId() {
                         return "123456";
                     }
 
-                    @Nonnull
+                    @NonNull
                     @Override
                     public String getMasterRootUrl() {
                         return "http://jenkins.mycompany.com";

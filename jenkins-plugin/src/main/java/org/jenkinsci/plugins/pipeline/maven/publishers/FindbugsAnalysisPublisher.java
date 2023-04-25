@@ -40,7 +40,7 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
@@ -161,7 +161,7 @@ public class FindbugsAnalysisPublisher extends AbstractHealthAwarePublisher {
       </ExecutionEvent>
          */
     @Override
-    public void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
 
         TaskListener listener = context.get(TaskListener.class);
         if (listener == null) {
@@ -250,7 +250,7 @@ public class FindbugsAnalysisPublisher extends AbstractHealthAwarePublisher {
     @Symbol("findbugsPublisher")
     @Extension
     public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Findbugs Publisher";
@@ -261,7 +261,7 @@ public class FindbugsAnalysisPublisher extends AbstractHealthAwarePublisher {
             return 20;
         }
 
-        @Nonnull
+        @NonNull
         @Override
         public String getSkipFileName() {
             return ".skip-publish-findbugs-results";

@@ -84,9 +84,9 @@ import org.jenkinsci.plugins.workflow.steps.GeneralNonBlockingStepExecution;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.springframework.util.ClassUtils;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -297,7 +297,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @throws IOException
      * @throws InterruptedException
      */
-    private void setupMaven(@Nonnull Collection<Credentials> credentials) throws IOException, InterruptedException {
+    private void setupMaven(@NonNull Collection<Credentials> credentials) throws IOException, InterruptedException {
         // Temp dir with the wrapper that will be prepended to the path and the temporary files used by withMaven (settings files...)
         if (step.getTempBinDir() != null && !step.getTempBinDir().isEmpty()) {
             String expandedTargetLocation = step.getTempBinDir();
@@ -595,7 +595,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @return wrapper script content
      * @throws AbortException when problems creating content
      */
-    private String generateMavenWrapperScriptContent(@Nonnull FilePath mvnExec, @Nonnull String mavenConfig) throws AbortException {
+    private String generateMavenWrapperScriptContent(@NonNull FilePath mvnExec, @NonNull String mavenConfig) throws AbortException {
 
         boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
 
@@ -678,7 +678,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @throws IOException          when reading files
      */
     @Nullable
-    private String setupSettingFile(@Nonnull Collection<Credentials> credentials) throws IOException, InterruptedException {
+    private String setupSettingFile(@NonNull Collection<Credentials> credentials) throws IOException, InterruptedException {
         final FilePath settingsDest = tempBinDir.child("settings.xml");
 
         // Settings from Config File Provider
@@ -803,7 +803,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @throws IOException          when reading files
      */
     @Nullable
-    private String setupGlobalSettingFile(@Nonnull Collection<Credentials> credentials) throws IOException, InterruptedException {
+    private String setupGlobalSettingFile(@NonNull Collection<Credentials> credentials) throws IOException, InterruptedException {
         final FilePath settingsDest = tempBinDir.child("globalSettings.xml");
 
         // Global settings from Config File Provider
@@ -912,7 +912,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @return the {@link FilePath} to the settings file
      * @throws AbortException in case of error
      */
-    private void settingsFromConfig(String mavenSettingsConfigId, FilePath mavenSettingsFile, @Nonnull Collection<Credentials> credentials) throws AbortException {
+    private void settingsFromConfig(String mavenSettingsConfigId, FilePath mavenSettingsFile, @NonNull Collection<Credentials> credentials) throws AbortException {
 
         Config c = ConfigFiles.getByIdOrNull(build, mavenSettingsConfigId);
         if (c == null) {
@@ -1017,7 +1017,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @param logMessagePrefix
      * @return credentials by Maven server Id
      */
-    @Nonnull
+    @NonNull
     public Map<String, StandardUsernameCredentials> resolveCredentials(@Nullable final List<ServerCredentialMapping> serverCredentialMappings, String logMessagePrefix) {
         // CredentialsHelper.removeMavenServerDefinitions() requires a Map implementation that supports `null` values. `HashMap` supports `null` values, `TreeMap` doesn't
         // https://github.com/jenkinsci/config-file-provider-plugin/blob/config-file-provider-2.16.4/src/main/java/org/jenkinsci/plugins/configfiles/maven/security/CredentialsHelper.java#L252
@@ -1090,8 +1090,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         private final MavenSpyLogProcessor mavenSpyLogProcessor = new MavenSpyLogProcessor();
 
-        private WithMavenStepExecutionCallBack(@Nonnull FilePath tempBinDir, @Nonnull List<MavenPublisher> options,
-                                              @Nonnull MavenPublisherStrategy mavenPublisherStrategy) {
+        private WithMavenStepExecutionCallBack(@NonNull FilePath tempBinDir, @NonNull List<MavenPublisher> options,
+                                              @NonNull MavenPublisherStrategy mavenPublisherStrategy) {
             this.tempBinDir = tempBinDir;
             this.options = options;
             this.mavenPublisherStrategy = mavenPublisherStrategy;
@@ -1132,7 +1132,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @return the computer
      * @throws AbortException in case of error.
      */
-    @Nonnull
+    @NonNull
     private Computer getComputer() throws AbortException {
         if (computer != null) {
             return computer;

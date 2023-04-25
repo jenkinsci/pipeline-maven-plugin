@@ -2,7 +2,7 @@ package org.jenkinsci.plugins.pipeline.maven.util;
 
 import org.h2.api.ErrorCode;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.sql.DataSource;
 
 import static java.util.Optional.ofNullable;
@@ -57,13 +57,13 @@ public class SqlTestsUtils {
         out.println();
     }
 
-    public static int countRows(@Nonnull String sql, @Nonnull DataSource ds, Object... params) throws SQLException {
+    public static int countRows(@NonNull String sql, @NonNull DataSource ds, Object... params) throws SQLException {
         try (Connection cnn = ds.getConnection()) {
             return countRows(sql, cnn, params);
         }
     }
 
-    public static int countRows(@Nonnull String sql, @Nonnull Connection cnn, Object... params) throws SQLException {
+    public static int countRows(@NonNull String sql, @NonNull Connection cnn, Object... params) throws SQLException {
         String sqlQuery ;
         if (sql.startsWith("select * from")){
             sqlQuery = "select count(*) from " + sql.substring("select * from".length());
