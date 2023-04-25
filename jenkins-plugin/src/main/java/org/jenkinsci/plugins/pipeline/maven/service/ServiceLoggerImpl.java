@@ -26,8 +26,8 @@ package org.jenkinsci.plugins.pipeline.maven.service;
 
 import hudson.model.Item;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,12 +39,12 @@ public class ServiceLoggerImpl implements ServiceLogger {
 
     private final Logger logger = Logger.getLogger(ServiceLoggerImpl.class.getName());
 
-    @Nonnull
+    @NonNull
     private final PrintStream stdOut, stdErr;
     @Nullable
     String prefix;
 
-    public ServiceLoggerImpl(@Nonnull PrintStream stdOut, @Nonnull PrintStream stdErr, @Nullable String prefix) {
+    public ServiceLoggerImpl(@NonNull PrintStream stdOut, @NonNull PrintStream stdErr, @Nullable String prefix) {
         this.stdOut = stdOut;
         this.stdErr = stdErr;
         this.prefix = prefix;

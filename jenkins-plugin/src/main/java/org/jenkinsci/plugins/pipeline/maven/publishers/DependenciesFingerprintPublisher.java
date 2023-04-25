@@ -39,7 +39,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +92,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
     }
 
     @Override
-    public void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
         Run run = context.get(Run.class);
         TaskListener listener = context.get(TaskListener.class);
 
@@ -258,7 +258,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
     @Symbol("dependenciesFingerprintPublisher")
     @Extension
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Dependencies Fingerprint Publisher";
@@ -269,7 +269,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
             return 20;
         }
 
-        @Nonnull
+        @NonNull
         @Override
         public String getSkipFileName() {
             return ".skip-fingerprint-maven-dependencies";

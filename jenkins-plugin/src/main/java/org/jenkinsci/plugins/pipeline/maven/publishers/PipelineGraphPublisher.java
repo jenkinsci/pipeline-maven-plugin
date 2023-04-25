@@ -16,7 +16,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -78,7 +78,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
     }
 
     @Override
-    public void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
         Run run = context.get(Run.class);
         TaskListener listener = context.get(TaskListener.class);
 
@@ -95,7 +95,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
     }
 
     protected void recordParentProject(List<MavenArtifact> parentProjects,
-                                       @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+                                       @NonNull Run run, @NonNull TaskListener listener, @NonNull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordParentProject - filter: " +
                     "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "]");
@@ -137,7 +137,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
     }
 
     protected void recordDependencies(List<MavenDependency> dependencies, List<MavenArtifact> generatedArtifacts,
-                                      @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+                                      @NonNull Run run, @NonNull TaskListener listener, @NonNull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordDependencies - filter: " +
                     "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "], " +
@@ -191,7 +191,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
      * @param listener
      * @param dao
      */
-    protected void recordGeneratedArtifacts(List<MavenArtifact> generatedArtifacts, List<String> executedLifecyclePhases, @Nonnull Run run, @Nonnull TaskListener listener, @Nonnull PipelineMavenPluginDao dao) {
+    protected void recordGeneratedArtifacts(List<MavenArtifact> generatedArtifacts, List<String> executedLifecyclePhases, @NonNull Run run, @NonNull TaskListener listener, @NonNull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordGeneratedArtifacts...");
         }
@@ -314,7 +314,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
     @Symbol("pipelineGraphPublisher")
     @Extension
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Pipeline Graph Publisher";
@@ -325,7 +325,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
             return 0;
         }
 
-        @Nonnull
+        @NonNull
         @Override
         public String getSkipFileName() {
             return ".skip-pipeline-graph";

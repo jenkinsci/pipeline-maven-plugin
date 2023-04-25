@@ -2,14 +2,14 @@ package org.jenkinsci.plugins.pipeline.maven.util;
 
 import hudson.FilePath;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class FileUtils {
 
-    public static boolean isAbsolutePath(@Nonnull String path) {
+    public static boolean isAbsolutePath(@NonNull String path) {
         if (isWindows(path)) {
             if (path.length() > 3 && path.charAt(1) == ':' && path.charAt(2) == '\\') {
                 // windows path such as "C:\path\to\..."
@@ -26,11 +26,11 @@ public class FileUtils {
 
     }
 
-    public static boolean isWindows(@Nonnull FilePath path) {
+    public static boolean isWindows(@NonNull FilePath path) {
         return isWindows(path.getRemote());
     }
 
-    public static boolean isWindows(@Nonnull String path) {
+    public static boolean isWindows(@NonNull String path) {
         if (path.length() > 3 && path.charAt(1) == ':' && path.charAt(2) == '\\') {
             // windows path such as "C:\path\to\..."
             return true;

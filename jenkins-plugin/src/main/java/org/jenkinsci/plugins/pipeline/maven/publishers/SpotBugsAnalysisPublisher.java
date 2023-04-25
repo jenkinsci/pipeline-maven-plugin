@@ -39,7 +39,7 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
@@ -163,7 +163,7 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
     </ExecutionEvent>
          */
     @Override
-    public void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
 
         TaskListener listener = context.get(TaskListener.class);
         FilePath workspace = context.get(FilePath.class);
@@ -248,7 +248,7 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
     @Symbol("spotbugsPublisher")
     @Extension
     public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "SpotBugs Publisher";
@@ -259,7 +259,7 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
             return 20;
         }
 
-        @Nonnull
+        @NonNull
         @Override
         public String getSkipFileName() {
             return ".skip-publish-spotbugs-results";

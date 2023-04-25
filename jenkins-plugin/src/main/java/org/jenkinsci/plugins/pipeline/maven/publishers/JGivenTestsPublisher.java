@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.jgiven.JgivenReportGenerator;
@@ -62,7 +62,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
     }
 
     @Override
-    public void process(@Nonnull final StepContext context, @Nonnull final Element mavenSpyLogsElt)
+    public void process(@NonNull final StepContext context, @NonNull final Element mavenSpyLogsElt)
             throws IOException, InterruptedException {
 
         TaskListener listener = context.get(TaskListener.class);
@@ -126,7 +126,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
     @Symbol("jgivenPublisher")
     @Extension
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "JGiven Publisher";
@@ -137,7 +137,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
             return 20;
         }
 
-        @Nonnull
+        @NonNull
         @Override
         public String getSkipFileName() {
             return ".skip-publish-jgiven-results";

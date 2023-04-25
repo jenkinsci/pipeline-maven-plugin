@@ -5,8 +5,8 @@ import hudson.model.Descriptor;
 import hudson.model.TaskListener;
 import jenkins.model.Jenkins;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,8 +37,8 @@ public enum MavenPublisherStrategy {
          *  @param configuredPublishers
          * @param listener
          */
-        @Nonnull
-        public List<MavenPublisher> buildPublishersList(@Nonnull List<MavenPublisher> configuredPublishers, @Nonnull TaskListener listener) {
+        @NonNull
+        public List<MavenPublisher> buildPublishersList(@NonNull List<MavenPublisher> configuredPublishers, @NonNull TaskListener listener) {
 
             // configuration passed as parameter of "withMaven(options=[...]){}"
             // mavenPublisher.descriptor.id -> mavenPublisher
@@ -103,10 +103,10 @@ public enum MavenPublisherStrategy {
     },
 
     EXPLICIT("Explicit") {
-        @Nonnull
+        @NonNull
         @Override
         public List<MavenPublisher> buildPublishersList
-                (@Nonnull List<MavenPublisher> configuredPublishers, @Nonnull TaskListener listener) {
+                (@NonNull List<MavenPublisher> configuredPublishers, @NonNull TaskListener listener) {
 
             // filter null entries caused by missing plugins
             List<MavenPublisher> result = new ArrayList<>();
@@ -128,7 +128,7 @@ public enum MavenPublisherStrategy {
         this.description = description;
     }
 
-    public MavenPublisher buildConfiguredMavenPublisher(@Nullable MavenPublisher pipelinePublisher, @Nullable MavenPublisher globallyConfiguredPublisher, @Nonnull MavenPublisher defaultPublisher, @Nonnull TaskListener listener) {
+    public MavenPublisher buildConfiguredMavenPublisher(@Nullable MavenPublisher pipelinePublisher, @Nullable MavenPublisher globallyConfiguredPublisher, @NonNull MavenPublisher defaultPublisher, @NonNull TaskListener listener) {
 
         MavenPublisher result;
         String logMessage;
@@ -189,8 +189,8 @@ public enum MavenPublisherStrategy {
      *  @param configuredPublishers
      * @param listener
      */
-    @Nonnull
-    public abstract List<MavenPublisher> buildPublishersList(@Nonnull List<MavenPublisher> configuredPublishers, @Nonnull TaskListener listener);
+    @NonNull
+    public abstract List<MavenPublisher> buildPublishersList(@NonNull List<MavenPublisher> configuredPublishers, @NonNull TaskListener listener);
 
     private final static Logger LOGGER = Logger.getLogger(MavenPublisherStrategy.class.getName());
 }

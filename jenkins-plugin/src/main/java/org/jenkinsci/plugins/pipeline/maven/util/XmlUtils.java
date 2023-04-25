@@ -37,8 +37,8 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -116,8 +116,8 @@ public class XmlUtils {
         return pluginInvocation;
     }
 
-    @Nonnull
-    public static Element getUniqueChildElement(@Nonnull Element element, @Nonnull String childElementName) {
+    @NonNull
+    public static Element getUniqueChildElement(@NonNull Element element, @NonNull String childElementName) {
         Element child = getUniqueChildElementOrNull(element, childElementName);
         if (child == null) {
             throw new IllegalStateException("No <" + childElementName + "> element found");
@@ -126,7 +126,7 @@ public class XmlUtils {
     }
 
     @Nullable
-    public static Element getUniqueChildElementOrNull(@Nonnull Element element, String... childElementName) {
+    public static Element getUniqueChildElementOrNull(@NonNull Element element, String... childElementName) {
         Element result = element;
         for (String childEltName : childElementName) {
             List<Element> childElts = getChildrenElements(result, childEltName);
@@ -141,8 +141,8 @@ public class XmlUtils {
         return result;
     }
 
-    @Nonnull
-    public static List<Element> getChildrenElements(@Nonnull Element element, @Nonnull String childElementName) {
+    @NonNull
+    public static List<Element> getChildrenElements(@NonNull Element element, @NonNull String childElementName) {
         NodeList childElts = element.getChildNodes();
         List<Element> result = new ArrayList<>();
 
@@ -156,7 +156,7 @@ public class XmlUtils {
         return result;
     }
 
-    @Nonnull
+    @NonNull
     public static String toString(@Nullable Node node) {
         try {
             StringWriter out = new StringWriter();
@@ -169,8 +169,8 @@ public class XmlUtils {
         }
     }
 
-    @Nonnull
-    public static List<Element> getExecutionEvents(@Nonnull Element mavenSpyLogs, String... expectedType) {
+    @NonNull
+    public static List<Element> getExecutionEvents(@NonNull Element mavenSpyLogs, String... expectedType) {
 
         Set<String> expectedTypes = new HashSet<>(Arrays.asList(expectedType));
         List<Element> result = new ArrayList<>();
@@ -198,8 +198,8 @@ public class XmlUtils {
         <attachedArtifacts/>
     </ExecutionEvent>
      */
-    @Nonnull
-    public static List<Element> getArtifactDeployedEvents(@Nonnull Element mavenSpyLogs) {
+    @NonNull
+    public static List<Element> getArtifactDeployedEvents(@NonNull Element mavenSpyLogs) {
         List<Element> elements = new ArrayList<>();
 
         NodeList nodes = mavenSpyLogs.getChildNodes();
@@ -243,7 +243,7 @@ public class XmlUtils {
      * @return The "RepositoryEvent" of type "ARTIFACT_DEPLOYED" or {@code null} if non found
      */
     @Nullable
-    public static Element getArtifactDeployedEvent(@Nonnull List<Element> artifactDeployedEvents, @Nonnull String filePath) {
+    public static Element getArtifactDeployedEvent(@NonNull List<Element> artifactDeployedEvents, @NonNull String filePath) {
         for (Element artifactDeployedEvent: artifactDeployedEvents) {
             if (!"RepositoryEvent".equals(artifactDeployedEvent.getNodeName()) || !"ARTIFACT_DEPLOYED".equals(artifactDeployedEvent.getAttribute("type"))) {
                 // skip unexpected element
@@ -265,8 +265,8 @@ public class XmlUtils {
       </plugin>
    </ExecutionEvent>
      */
-    @Nonnull
-    public static List<Element> getExecutionEventsByPlugin(@Nonnull Element mavenSpyLogs, String pluginGroupId, String pluginArtifactId, String pluginGoal, String... eventType) {
+    @NonNull
+    public static List<Element> getExecutionEventsByPlugin(@NonNull Element mavenSpyLogs, String pluginGroupId, String pluginArtifactId, String pluginGoal, String... eventType) {
         Set<String> eventTypes = new HashSet<>(Arrays.asList(eventType));
 
         List<Element> result = new ArrayList<>();
@@ -302,8 +302,8 @@ public class XmlUtils {
     </plugin>
   </ExecutionEvent>
      */
-    @Nonnull
-    public static List<String> getExecutedLifecyclePhases(@Nonnull Element mavenSpyLogs) {
+    @NonNull
+    public static List<String> getExecutedLifecyclePhases(@NonNull Element mavenSpyLogs) {
         List<String> lifecyclePhases = new ArrayList<>();
         for (Element mojoSucceededEvent :getExecutionEvents(mavenSpyLogs, "MojoSucceeded")) {
             Element pluginElement = getUniqueChildElement(mojoSucceededEvent, "plugin");
@@ -328,8 +328,8 @@ public class XmlUtils {
      *                                  against this path
      * @see java.nio.file.Path#relativize(Path)
      */
-    @Nonnull
-    public static String getPathInWorkspace(@Nonnull final String absoluteFilePath, @Nonnull FilePath workspace) {
+    @NonNull
+    public static String getPathInWorkspace(@NonNull final String absoluteFilePath, @NonNull FilePath workspace) {
         boolean windows = FileUtils.isWindows(workspace);
 
         final String workspaceRemote = workspace.getRemote();
@@ -382,7 +382,7 @@ public class XmlUtils {
      * @deprecated  use {@link FileUtils#isWindows(FilePath)}
      */
     @Deprecated
-    public static boolean isWindows(@Nonnull FilePath path) {
+    public static boolean isWindows(@NonNull FilePath path) {
         return FileUtils.isWindows(path);
     }
 
@@ -392,8 +392,8 @@ public class XmlUtils {
      * @param filePath
      * @return "/" or "\"
      */
-    @Nonnull
-    public static String getFileSeparatorOnRemote(@Nonnull FilePath filePath) {
+    @NonNull
+    public static String getFileSeparatorOnRemote(@NonNull FilePath filePath) {
         int indexOfSlash = filePath.getRemote().indexOf('/');
         int indexOfBackSlash = filePath.getRemote().indexOf('\\');
         if (indexOfSlash == -1) {
@@ -412,7 +412,7 @@ public class XmlUtils {
      * @return {@code project/build/@directory"}
      */
     @Nullable
-    public static String getProjectBuildDirectory(@Nonnull Element projectElt) {
+    public static String getProjectBuildDirectory(@NonNull Element projectElt) {
         Element build = XmlUtils.getUniqueChildElementOrNull(projectElt, "build");
         if (build == null) {
             return null;
@@ -423,8 +423,8 @@ public class XmlUtils {
     /**
      * Concatenate the given {@code elements} using the given {@code delimiter} to concatenate.
      */
-    @Nonnull
-    public static String join(@Nonnull Iterable<String> elements, @Nonnull String delimiter) {
+    @NonNull
+    public static String join(@NonNull Iterable<String> elements, @NonNull String delimiter) {
         StringBuilder result = new StringBuilder();
         Iterator<String> it = elements.iterator();
         while (it.hasNext()) {
@@ -438,7 +438,7 @@ public class XmlUtils {
     }
 
 
-    @Nonnull
+    @NonNull
     public static List<MavenArtifact> listGeneratedArtifacts(Element mavenSpyLogs, boolean includeAttachedArtifacts) {
 
         List<Element> artifactDeployedEvents = XmlUtils.getArtifactDeployedEvents(mavenSpyLogs);

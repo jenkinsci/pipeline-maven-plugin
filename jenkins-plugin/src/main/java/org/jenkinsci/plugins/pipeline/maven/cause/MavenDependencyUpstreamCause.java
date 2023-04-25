@@ -6,8 +6,8 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,7 +21,7 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
 
     private List<String> omittedPipelineFullNames;
 
-    public MavenDependencyUpstreamCause(Run<?, ?> up, @Nonnull MavenArtifact... mavenArtifact) {
+    public MavenDependencyUpstreamCause(Run<?, ?> up, @NonNull MavenArtifact... mavenArtifact) {
         super(up);
         this.mavenArtifacts = Arrays.asList(mavenArtifact);
     }
@@ -94,14 +94,14 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
         }
     }
 
-    @Nonnull
+    @NonNull
     public String getMavenArtifactsDescription() {
         return mavenArtifacts.stream()
                 .map(mavenArtifact -> mavenArtifact == null ? "null" : mavenArtifact.getShortDescription())
                 .collect(Collectors.joining(","));
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public List<MavenArtifact> getMavenArtifacts() {
         if (mavenArtifacts == null) {
@@ -110,7 +110,7 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
         return mavenArtifacts;
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public List<String> getOmittedPipelineFullNames() {
         if (omittedPipelineFullNames == null) {

@@ -26,7 +26,7 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import org.h2.jdbcx.JdbcConnectionPool;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
@@ -41,11 +41,11 @@ import java.util.logging.Level;
  */
 public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
 
-    public PipelineMavenPluginH2Dao(@Nonnull DataSource ds) {
+    public PipelineMavenPluginH2Dao(@NonNull DataSource ds) {
         super(ds);
     }
 
-    public PipelineMavenPluginH2Dao(@Nonnull File rootDir) {
+    public PipelineMavenPluginH2Dao(@NonNull File rootDir) {
         this(JdbcConnectionPool.create("jdbc:h2:file:" + new File(rootDir, "jenkins-jobs").getAbsolutePath() + ";" +
                 "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE", "sa", "sa"));
     }

@@ -24,9 +24,9 @@ import org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyCauseHelper;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,11 +53,11 @@ public class PipelineTriggerService {
 
     private final GlobalPipelineMavenConfig globalPipelineMavenConfig;
 
-    public PipelineTriggerService(@Nonnull GlobalPipelineMavenConfig globalPipelineMavenConfig) {
+    public PipelineTriggerService(@NonNull GlobalPipelineMavenConfig globalPipelineMavenConfig) {
         this.globalPipelineMavenConfig = globalPipelineMavenConfig;
     }
 
-    public Collection<String> triggerDownstreamPipelines(@Nonnull String groupId, @Nonnull String artifactId, @Nullable String baseVersion, @Nonnull String version, @Nonnull String type, @Nonnull MavenDependencyCause cause, @Nonnull ServiceLogger logger) {
+    public Collection<String> triggerDownstreamPipelines(@NonNull String groupId, @NonNull String artifactId, @Nullable String baseVersion, @NonNull String version, @NonNull String type, @NonNull MavenDependencyCause cause, @NonNull ServiceLogger logger) {
         MavenArtifact mavenArtifact = new MavenArtifact();
         mavenArtifact.setGroupId(groupId);
         mavenArtifact.setArtifactId(artifactId);
@@ -68,7 +68,7 @@ public class PipelineTriggerService {
         return triggerDownstreamPipelines(Collections.singleton(mavenArtifact), cause, logger);
     }
 
-    public Collection<String> triggerDownstreamPipelines(@Nonnull Collection<MavenArtifact> upstreamArtifacts, @Nonnull MavenDependencyCause cause, @Nonnull ServiceLogger logger) {
+    public Collection<String> triggerDownstreamPipelines(@NonNull Collection<MavenArtifact> upstreamArtifacts, @NonNull MavenDependencyCause cause, @NonNull ServiceLogger logger) {
 
         if (!(cause instanceof Cause)) {
             throw new IllegalArgumentException("Given cause must extend hudson.model.Cause: " + cause);
@@ -258,7 +258,7 @@ public class PipelineTriggerService {
      * @param initialBuild
      * @throws IllegalStateException if an infinite loop is detected
      */
-    public void checkNoInfiniteLoopOfUpstreamCause(@Nonnull Run initialBuild) throws IllegalStateException {
+    public void checkNoInfiniteLoopOfUpstreamCause(@NonNull Run initialBuild) throws IllegalStateException {
         java.util.Queue<Run> builds = new LinkedList<>(Collections.singleton(initialBuild));
         Run currentBuild;
         while ((currentBuild = builds.poll()) != null) {
@@ -279,7 +279,7 @@ public class PipelineTriggerService {
     }
 
     @Nullable
-    public WorkflowJobDependencyTrigger getWorkflowJobDependencyTrigger(@Nonnull ParameterizedJobMixIn.ParameterizedJob parameterizedJob) {
+    public WorkflowJobDependencyTrigger getWorkflowJobDependencyTrigger(@NonNull ParameterizedJobMixIn.ParameterizedJob parameterizedJob) {
         Map<TriggerDescriptor, Trigger<?>> triggers = parameterizedJob.getTriggers();
         for (Trigger trigger : triggers.values()) {
             if (trigger instanceof WorkflowJobDependencyTrigger) {
@@ -311,7 +311,7 @@ public class PipelineTriggerService {
         return null;
     }
 
-    public boolean isUpstreamBuildVisibleByDownstreamBuildAuth(@Nonnull Job<?, ?> upstreamPipeline, @Nonnull Job<?, ?>  downstreamPipeline) {
+    public boolean isUpstreamBuildVisibleByDownstreamBuildAuth(@NonNull Job<?, ?> upstreamPipeline, @NonNull Job<?, ?>  downstreamPipeline) {
         Authentication downstreamPipelineAuth = Tasks.getAuthenticationOf((Queue.FlyweightTask) downstreamPipeline);
 
         // see https://github.com/jenkinsci/jenkins/blob/jenkins-2.176.2/core/src/main/java/jenkins/triggers/ReverseBuildTrigger.java#L132
@@ -327,7 +327,7 @@ public class PipelineTriggerService {
         }
     }
 
-    public boolean isDownstreamVisibleByUpstreamBuildAuth(@Nonnull Item downstreamPipeline) {
+    public boolean isDownstreamVisibleByUpstreamBuildAuth(@NonNull Item downstreamPipeline) {
         boolean result = getItemByFullName(downstreamPipeline.getFullName(), Job.class) != null;
         LOGGER.log(Level.FINE, "isDownstreamVisibleByUpstreamBuildAuth({0}, auth: {1}): {2}",
                 new Object[]{downstreamPipeline, Jenkins.getAuthentication(), result});

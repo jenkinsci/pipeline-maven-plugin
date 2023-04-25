@@ -21,7 +21,7 @@ import org.jenkinsci.plugins.pipeline.maven.cause.OtherMavenDependencyCause;
 import org.jenkinsci.plugins.pipeline.maven.dao.UpstreamMemory;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.inject.Inject;
 
 import java.io.IOException;
@@ -54,7 +54,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
     public GlobalPipelineMavenConfig globalPipelineMavenConfig;
 
     @Override
-    public void onCompleted(Run<?, ?> upstreamBuild, @Nonnull TaskListener listener) {
+    public void onCompleted(Run<?, ?> upstreamBuild, @NonNull TaskListener listener) {
         LOGGER.log(Level.FINER, "onCompleted({0})", new Object[]{upstreamBuild});
 
         UpstreamMemory upstreamMemory = new UpstreamMemory();

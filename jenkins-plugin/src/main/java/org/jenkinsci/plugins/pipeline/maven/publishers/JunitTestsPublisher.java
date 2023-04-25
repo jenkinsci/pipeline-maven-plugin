@@ -40,9 +40,9 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -179,7 +179,7 @@ public class JunitTestsPublisher extends MavenPublisher {
   </ExecutionEvent>
      */
     @Override
-    public void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
 
         TaskListener listener = context.get(TaskListener.class);
         if (listener == null) {
@@ -363,7 +363,7 @@ public class JunitTestsPublisher extends MavenPublisher {
     @Symbol("junitPublisher")
     @Extension
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Junit Publisher";
@@ -375,7 +375,7 @@ public class JunitTestsPublisher extends MavenPublisher {
         }
 
 
-        @Nonnull
+        @NonNull
         @Override
         public String getSkipFileName() {
             return ".skip-publish-junit-results";

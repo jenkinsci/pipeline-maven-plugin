@@ -8,7 +8,7 @@ import jenkins.model.ArtifactManager;
 import jenkins.util.BuildListenerAdapter;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
@@ -24,7 +24,7 @@ public class JenkinsMavenEventSpyLogsPublisher implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public void process(@Nonnull StepContext context, @Nonnull FilePath mavenSpyLogs) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull FilePath mavenSpyLogs) throws IOException, InterruptedException {
 
         Run run = context.get(Run.class);
         ArtifactManager artifactManager = run.pickArtifactManager();

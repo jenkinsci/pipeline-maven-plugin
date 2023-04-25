@@ -7,7 +7,7 @@ import hudson.console.ConsoleLogFilter;
 import hudson.model.Run;
 import hudson.util.Secret;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -30,7 +30,7 @@ public class MaskPasswordsConsoleLogFilter extends ConsoleLogFilter implements S
     private final Secret secretsAsRegexp;
     private final String charsetName;
 
-    public MaskPasswordsConsoleLogFilter(@Nonnull Collection<String> secrets, @Nonnull String charsetName) {
+    public MaskPasswordsConsoleLogFilter(@NonNull Collection<String> secrets, @NonNull String charsetName) {
         this.secretsAsRegexp = Secret.fromString(SecretPatterns.getAggregateSecretPattern(secrets).toString());
         this.charsetName = charsetName;
     }
@@ -40,14 +40,14 @@ public class MaskPasswordsConsoleLogFilter extends ConsoleLogFilter implements S
         return new SecretPatterns.MaskingOutputStream(logger, () -> Pattern.compile(secretsAsRegexp.getPlainText()), charsetName);
     }
 
-    @Nonnull
-    public static MaskPasswordsConsoleLogFilter newMaskPasswordsConsoleLogFilter(@Nonnull Iterable<Credentials> credentials, @Nonnull Charset charset){
+    @NonNull
+    public static MaskPasswordsConsoleLogFilter newMaskPasswordsConsoleLogFilter(@NonNull Iterable<Credentials> credentials, @NonNull Charset charset){
         Collection<String> secrets = toString(credentials);
         return new MaskPasswordsConsoleLogFilter(secrets, charset.name());
     }
 
-    @Nonnull
-    protected static Collection<String> toString(@Nonnull Iterable<Credentials> credentials) {
+    @NonNull
+    protected static Collection<String> toString(@NonNull Iterable<Credentials> credentials) {
         List<String> result = new ArrayList<>();
         for (Credentials creds : credentials) {
             if (creds instanceof PasswordCredentials) {

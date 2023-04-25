@@ -4,7 +4,7 @@ import com.cloudbees.hudson.plugins.folder.computed.FolderComputation;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import static org.junit.Assert.fail;
 
@@ -16,8 +16,8 @@ public class WorkflowMultibranchProjectTestsUtils {
      *
      * @see org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProjectTest#scheduleAndFindBranchProject
      */
-    @Nonnull
-    public static WorkflowJob scheduleAndFindBranchProject(@Nonnull WorkflowMultiBranchProject mp, @Nonnull String name) throws Exception {
+    @NonNull
+    public static WorkflowJob scheduleAndFindBranchProject(@NonNull WorkflowMultiBranchProject mp, @NonNull String name) throws Exception {
         mp.scheduleBuild2(0).getFuture().get();
         return findBranchProject(mp, name);
     }
@@ -25,8 +25,8 @@ public class WorkflowMultibranchProjectTestsUtils {
     /**
      * @see org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProjectTest#findBranchProject
      */
-    @Nonnull
-    public static WorkflowJob findBranchProject(@Nonnull WorkflowMultiBranchProject mp, @Nonnull String name) throws Exception {
+    @NonNull
+    public static WorkflowJob findBranchProject(@NonNull WorkflowMultiBranchProject mp, @NonNull String name) throws Exception {
         WorkflowJob p = mp.getItem(name);
         showIndexing(mp);
         if (p == null) {
@@ -38,7 +38,7 @@ public class WorkflowMultibranchProjectTestsUtils {
     /**
      * @see org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProjectTest#showIndexing
      */
-    static void showIndexing(@Nonnull WorkflowMultiBranchProject mp) throws Exception {
+    static void showIndexing(@NonNull WorkflowMultiBranchProject mp) throws Exception {
         FolderComputation<?> indexing = mp.getIndexing();
         System.out.println("---%<--- " + indexing.getUrl());
         indexing.writeWholeLogTo(System.out);
