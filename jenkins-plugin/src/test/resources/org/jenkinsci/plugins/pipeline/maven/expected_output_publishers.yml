@@ -1,3 +1,4 @@
+globalTraceability: false
 publisherOptions:
 - mavenLinkerPublisher:
     disabled: true

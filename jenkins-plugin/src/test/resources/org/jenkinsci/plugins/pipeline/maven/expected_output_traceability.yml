@@ -1,4 +1,4 @@
-globalTraceability: false
+globalTraceability: true
 triggerDownstreamUponResultAborted: false
 triggerDownstreamUponResultFailure: false
 triggerDownstreamUponResultNotBuilt: false

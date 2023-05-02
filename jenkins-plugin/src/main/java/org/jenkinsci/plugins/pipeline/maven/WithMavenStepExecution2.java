@@ -160,7 +160,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
     protected boolean doStart() throws Exception {
         envOverride = new EnvVars();
-        console = new TaskListenerTraceWrapper(listener, step.isTraceability());
+        console = new TaskListenerTraceWrapper(listener, computeTraceability());
 
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.log(Level.FINE, "Maven: {0}", step.getMaven());
@@ -506,7 +506,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         // if at this point mvnExecPath is still null try to use which/where command to find a maven executable
         if (mvnExecPath == null) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                console.println("[withMaven] No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which/where command");
+                console.trace("[withMaven] No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which/where command");
             }
             if (Boolean.TRUE.equals(getComputer().isUnix())) {
                 mvnExecPath = readFromProcess("/bin/sh", "-c", "which mvn");
@@ -748,7 +748,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                 envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
                 if (LOGGER.isLoggable(Level.FINE)) {
                     mavenSettingsLog.append("Maven settings on the build agent'").append(settingsPath).append("'");
-                    console.println(mavenSettingsLog);
+                    console.trace(mavenSettingsLog);
                 }
                 return settingsDest.getRemote();
             } else {
@@ -759,14 +759,14 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             // do nothing
             if (LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("Maven settings defined by 'DefaultSettingsProvider', NOT overriding it.");
-                console.println(mavenSettingsLog);
+                console.trace(mavenSettingsLog);
             }
         } else if (settingsProvider == null) {
             // should not happen according to the source code of jenkins.mvn.MavenConfig.getSettingsProvider() in jenkins-core 2.7
             // do nothing
             if (LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("Maven settings are null. NO settings will be defined.");
-                console.println(mavenSettingsLog);
+                console.trace(mavenSettingsLog);
             }
         } else {
             console.trace("[withMaven] Ignore unsupported Maven SettingsProvider " + settingsProvider);
@@ -876,7 +876,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                 settings.copyTo(settingsDest);
                 envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    console.println(mavenSettingsLog);
+                    console.trace(mavenSettingsLog);
                 }
                 return settingsDest.getRemote();
             } else {
@@ -886,14 +886,14 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             // do nothing
             if (LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("Maven global settings defined by 'DefaultSettingsProvider', NOT overriding it.");
-                console.println(mavenSettingsLog);
+                console.trace(mavenSettingsLog);
             }
         } else if (globalSettingsProvider == null) {
             // should not happen according to the source code of jenkins.mvn.GlobalMavenConfig.getGlobalSettingsProvider() in jenkins-core 2.7
             // do nothing
             if (LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("Maven global settings are null. NO settings will be defined.");
-                console.println(mavenSettingsLog);
+                console.trace(mavenSettingsLog);
             }
         } else {
             console.trace("[withMaven] Ignore unsupported Maven GlobalSettingsProvider " + globalSettingsProvider);
@@ -1050,9 +1050,14 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
     }
 
     private void ifTraceabilityEnabled(Runnable runnable) {
-        if (step.isTraceability()) {
+        if (computeTraceability()) {
             runnable.run();
         }
+    }
+
+    private boolean computeTraceability() {
+        return GlobalPipelineMavenConfig.get().isGlobalTraceability() && step.isTraceability() == null
+                || Boolean.TRUE.equals(step.isTraceability());
     }
 
     /**

@@ -28,6 +28,7 @@ public class ConfigurationAsCodeTest {
     public void should_support_default_configuration() throws Exception {
         GlobalPipelineMavenConfig config = r.jenkins.getExtensionList(GlobalPipelineMavenConfig.class).get(0);
 
+        assertThat(config.isGlobalTraceability(), is(false));
         assertThat(config.getJdbcUrl(), nullValue());
         assertThat(config.getJdbcCredentialsId(), nullValue());
         assertThat(config.getProperties(), nullValue());
@@ -42,6 +43,21 @@ public class ConfigurationAsCodeTest {
         ConfigurationContext context = new ConfigurationContext(registry);
         String exported = toYamlString(getToolRoot(context).get("pipelineMaven"));
         String expected = toStringFromYamlFile(this, "expected_output_default.yml");
+
+        assertThat(exported, is(expected));
+    }
+
+    @Test
+    @ConfiguredWithCode("configuration-as-code_traceability.yml")
+    public void should_support_global_traceability() throws Exception {
+        GlobalPipelineMavenConfig config = r.jenkins.getExtensionList(GlobalPipelineMavenConfig.class).get(0);
+
+        assertThat(config.isGlobalTraceability(), is(true));
+
+        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+        ConfigurationContext context = new ConfigurationContext(registry);
+        String exported = toYamlString(getToolRoot(context).get("pipelineMaven"));
+        String expected = toStringFromYamlFile(this, "expected_output_traceability.yml");
 
         assertThat(exported, is(expected));
     }
