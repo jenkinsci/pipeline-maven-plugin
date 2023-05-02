@@ -220,9 +220,9 @@ public class JacocoReportPublisher extends MavenPublisher {
         try {
             jacocoPublisher.perform(run, workspace, launcher, listener);
         } catch (Exception e) {
-            listener.error("[withMaven] jacocoPublisher - exception archiving JaCoCo results for " + jacocoReportDetails + ": " + e + ". Failing the build.");
+            listener.error("[withMaven] jacocoPublisher - exception archiving JaCoCo results for " + jacocoReportDetails + ": " + e);
             LOGGER.log(Level.WARNING, "Exception processing JaCoCo results", e);
-            run.setResult(Result.FAILURE);
+            throw new MavenPipelinePublisherException("jacocoPublisher", "archiving JaCoCo results for " + jacocoReportDetails, e);
         }
     }
 

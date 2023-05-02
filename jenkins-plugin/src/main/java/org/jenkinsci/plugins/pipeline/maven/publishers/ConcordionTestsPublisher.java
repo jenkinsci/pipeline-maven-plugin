@@ -142,9 +142,9 @@ public class ConcordionTestsPublisher extends MavenPublisher {
                             "\" with the following files: " + target.getReportFiles());
             HtmlPublisher.publishReports(run, workspace, listener, Collections.singletonList(target), HtmlPublisher.class);
         } catch (final Exception e) {
-            listener.error("[withMaven] concordionPublisher - exception archiving Concordion reports: " + e + ". Failing the build.");
+            listener.error("[withMaven] concordionPublisher - exception archiving Concordion reports: " + e);
             LOGGER.log(Level.WARNING, "Exception processing Concordion reports archiving", e);
-            run.setResult(Result.FAILURE);
+            throw new MavenPipelinePublisherException("concordionPublisher", "archiving Concordion reports", e);
         }
     }
 

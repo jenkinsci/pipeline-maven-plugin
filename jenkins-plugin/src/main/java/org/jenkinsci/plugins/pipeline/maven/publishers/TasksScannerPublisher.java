@@ -170,9 +170,9 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
         try {
             tasksPublisher.perform(run, workspace, launcher, listener);
         } catch (Exception e) {
-            listener.error("[withMaven] openTasksPublisher - exception scanning tasks in " + pattern + ": " + e + ". Failing the build.");
+            listener.error("[withMaven] openTasksPublisher - exception scanning tasks in " + pattern + ": " + e);
             LOGGER.log(Level.WARNING, "Exception scanning tasks in  " + pattern, e);
-            run.setResult(Result.FAILURE);
+            throw new MavenPipelinePublisherException("openTasksPublisher", "scanning tasks in " + pattern, e);
         }
     }
 

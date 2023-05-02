@@ -136,11 +136,13 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
 
         // FINGERPRINT GENERATED MAVEN ARTIFACT
         if (!fingerprintFilesDisabled) {
-          FingerprintMap fingerprintMap = Jenkins.get().getFingerprintMap();
-          for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
-              String artifactPathInArchiveZone = artifactToFingerprint.getKey();
-              String artifactMd5 = artifactToFingerprint.getValue();
-              fingerprintMap.getOrCreate(run, artifactPathInArchiveZone, artifactMd5).addFor(run);
+          synchronized (this) { // to avoid exceptions when creating folders under Jenkins home
+              FingerprintMap fingerprintMap = Jenkins.get().getFingerprintMap();
+              for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
+                  String artifactPathInArchiveZone = artifactToFingerprint.getKey();
+                  String artifactMd5 = artifactToFingerprint.getValue();
+                  fingerprintMap.getOrCreate(run, artifactPathInArchiveZone, artifactMd5).addFor(run);
+              }
           }
 
           // add action
