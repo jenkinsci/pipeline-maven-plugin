@@ -120,7 +120,7 @@
     <maven-plugin-surefire.version>3.1.0</maven-plugin-surefire.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.8.3</maven.version>
-    <plexus-utils.version>3.5.1</plexus-utils.version>
+    <plexus-utils.version>4.0.0</plexus-utils.version>
     <slf4j.version>2.0.7</slf4j.version>
     <testcontainers.version>1.18.1</testcontainers.version>
   </properties>
