@@ -99,7 +99,7 @@ public abstract class AbstractIntegrationTest {
         File mvnHome = new File(buildDirectory, "apache-maven-" + mavenVersion);
         if (!mvnHome.exists()) {
             FilePath mvn = Jenkins.get().getRootPath().createTempFile("maven", "zip");
-            mvn.copyFrom(new URL("https://dlcdn.apache.org/maven/maven-3/" + mavenVersion + "/binaries/apache-maven-" + mavenVersion + "-bin.tar.gz"));
+            mvn.copyFrom(new URL("https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/" + mavenVersion + "/apache-maven-" + mavenVersion + "-bin.tar.gz"));
             mvn.untar(new FilePath(buildDirectory), FilePath.TarCompression.GZIP);
         }
         Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getAbsolutePath(), JenkinsRule.NO_PROPERTIES);
