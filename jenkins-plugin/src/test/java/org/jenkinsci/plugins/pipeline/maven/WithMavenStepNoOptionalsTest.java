@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
+import org.jenkinsci.plugins.pipeline.maven.util.MavenUtil;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -75,12 +76,11 @@ public class WithMavenStepNoOptionalsTest {
     private static void setup(final JenkinsRule r) throws Throwable {
         Slave agent = agentRule.createAgent(r, "mock");
         r.waitOnline(agent);
-        // FIXME hardcoded version
-        String mavenVersion = "3.6.3";
+        String mavenVersion = MavenUtil.MAVEN_VERSION;
         FilePath buildDirectory = agent.getRootPath();
         FilePath mvnHome = buildDirectory.child("apache-maven-" + mavenVersion);
         FilePath mvn = buildDirectory.createTempFile("maven", "zip");
-        mvn.copyFrom(Files.newInputStream(Paths.get(System.getProperty("buildDirectory", "target"), "apache-maven-3.6.3-bin.zip")));
+        mvn.copyFrom(Files.newInputStream(Paths.get(System.getProperty("buildDirectory", "target"), "apache-maven-" + mavenVersion + "-bin.zip")));
         mvn.unzip(buildDirectory);
         Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getRemote(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);

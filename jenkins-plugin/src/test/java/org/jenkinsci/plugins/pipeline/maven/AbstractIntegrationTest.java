@@ -16,6 +16,7 @@ import java.util.Map;
 
 import hudson.FilePath;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
+import org.jenkinsci.plugins.pipeline.maven.util.MavenUtil;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.Before;
@@ -49,10 +50,9 @@ public abstract class AbstractIntegrationTest {
 
     @Before
     public void setup() throws Exception {
-        // FIXME hardcoded version
-        Maven.MavenInstallation mvn = configureDefaultMaven("3.6.3", Maven.MavenInstallation.MAVEN_30);
+        Maven.MavenInstallation mvn = configureDefaultMaven(MavenUtil.MAVEN_VERSION, Maven.MavenInstallation.MAVEN_30);
 
-        Maven.MavenInstallation m3 = new Maven.MavenInstallation("apache-maven-3.6.3", mvn.getHome(), JenkinsRule.NO_PROPERTIES);
+        Maven.MavenInstallation m3 = new Maven.MavenInstallation("apache-maven-" + MavenUtil.MAVEN_VERSION, mvn.getHome(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(m3);
         mavenInstallationName = mvn.getName();
 
