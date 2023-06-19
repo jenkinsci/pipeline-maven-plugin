@@ -97,7 +97,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+                "    withMaven(traceability: true, maven: 'apache-maven-3.9.2') {\n" +
                 "        sh 'mvn package'\n" +
                 "    }\n" +
                 "}";
@@ -107,7 +107,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
         // verify provided Maven is used
-        jenkinsRule.assertLogContains("using Maven installation 'apache-maven-3.6.3'", build);
+        jenkinsRule.assertLogContains("using Maven installation 'apache-maven-3.9.2'", build);
 
         // verify .pom is archived and fingerprinted
         // "[withMaven] Archive ... under jenkins/mvn/test/mono-module-maven-app/0.1-SNAPSHOT/mono-module-maven-app-0.1-SNAPSHOT.pom"
