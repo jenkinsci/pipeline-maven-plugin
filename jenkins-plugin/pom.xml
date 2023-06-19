@@ -610,9 +610,32 @@
                   <version>${maven.version}</version>
                   <type>zip</type>
                   <classifier>bin</classifier>
-                  <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                  <destFileName>apache-maven-${maven.version}-bin.zip</destFileName>
                 </artifactItem>
               </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy-maven-distro-3.9.2</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>apache-maven</artifactId>
+                  <version>3.9.2</version>
+                  <classifier>bin</classifier>
+                  <type>zip</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${project.build.directory}/</outputDirectory>
+                  <destFileName>apache-maven-3.9.2-bin.zip</destFileName>
+                </artifactItem>
+              </artifactItems>
+              <overWriteReleases>false</overWriteReleases>
             </configuration>
           </execution>
         </executions>

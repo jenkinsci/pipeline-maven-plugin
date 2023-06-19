@@ -76,12 +76,12 @@ public class WithMavenStepNoOptionalsTest {
         Slave agent = agentRule.createAgent(r, "mock");
         r.waitOnline(agent);
 
-        String mavenVersion = "3.6.3";
-        FilePath buildDirectory = agent.getRootPath(); // No need of MasterToSlaveCallable because agent is a dumb, thus sharing file system with controller
+        String mavenVersion = "3.9.2";
+        FilePath buildDirectory = agent.getRootPath();
         FilePath mvnHome = buildDirectory.child("apache-maven-" + mavenVersion);
         FilePath mvn = buildDirectory.createTempFile("maven", "zip");
-        mvn.copyFrom(new URL("https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/" + mavenVersion + "/apache-maven-" + mavenVersion + "-bin.tar.gz"));
-        mvn.untar(buildDirectory, FilePath.TarCompression.GZIP);
+        mvn.copyFrom(Files.newInputStream(Paths.get(System.getProperty("buildDirectory", "target"), "apache-maven-3.9.2-bin.zip")));
+        mvn.unzip(buildDirectory);
         Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getRemote(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
 

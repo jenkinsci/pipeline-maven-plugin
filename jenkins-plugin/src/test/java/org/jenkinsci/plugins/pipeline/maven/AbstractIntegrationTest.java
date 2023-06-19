@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
+import hudson.FilePath;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -23,7 +24,6 @@ import org.junit.Rule;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
 
-import hudson.FilePath;
 import hudson.model.Fingerprint;
 import hudson.tasks.Fingerprinter;
 import hudson.tasks.Maven;
@@ -50,9 +50,9 @@ public abstract class AbstractIntegrationTest {
     @Before
     public void setup() throws Exception {
 
-        Maven.MavenInstallation mvn = configureDefaultMaven("3.6.3", Maven.MavenInstallation.MAVEN_30);
+        Maven.MavenInstallation mvn = configureDefaultMaven("3.9.2", Maven.MavenInstallation.MAVEN_30);
 
-        Maven.MavenInstallation m3 = new Maven.MavenInstallation("apache-maven-3.6.3", mvn.getHome(), JenkinsRule.NO_PROPERTIES);
+        Maven.MavenInstallation m3 = new Maven.MavenInstallation("apache-maven-3.9.2", mvn.getHome(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(m3);
         mavenInstallationName = mvn.getName();
 
@@ -95,14 +95,14 @@ public abstract class AbstractIntegrationTest {
     protected Maven.MavenInstallation configureDefaultMaven(String mavenVersion, int mavenReqVersion) throws Exception {
         // first if we are running inside Maven, pick that Maven, if it meets the
         // criteria we require..
-        File buildDirectory = new File(System.getProperty("buildDirectory", "target")); // TODO relative path
-        File mvnHome = new File(buildDirectory, "apache-maven-" + mavenVersion);
+        FilePath buildDirectory = new FilePath(new File(System.getProperty("buildDirectory", "target"))); // TODO relative path
+        FilePath mvnHome = new FilePath(new File(buildDirectory.getRemote(), "apache-maven-" + mavenVersion));
         if (!mvnHome.exists()) {
-            FilePath mvn = Jenkins.get().getRootPath().createTempFile("maven", "zip");
-            mvn.copyFrom(new URL("https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/" + mavenVersion + "/apache-maven-" + mavenVersion + "-bin.tar.gz"));
-            mvn.untar(new FilePath(buildDirectory), FilePath.TarCompression.GZIP);
+            FilePath mvn = buildDirectory.createTempFile("maven", "zip");
+            mvn.copyFrom(Files.newInputStream(Paths.get(System.getProperty("buildDirectory", "target"), "apache-maven-"+mavenVersion+"-bin.zip")));
+            mvn.unzip(buildDirectory);
         }
-        Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getAbsolutePath(), JenkinsRule.NO_PROPERTIES);
+        Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getRemote(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
         return mavenInstallation;
     }
