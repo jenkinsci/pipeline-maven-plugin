@@ -455,7 +455,7 @@
                   <version>${maven.version}</version>
                   <type>zip</type>
                   <classifier>bin</classifier>
-                  <outputDirectory>${project.build.testOutputDirectory}</outputDirectory>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>

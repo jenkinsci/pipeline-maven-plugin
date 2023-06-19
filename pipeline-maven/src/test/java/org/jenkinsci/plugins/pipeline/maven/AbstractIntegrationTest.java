@@ -5,15 +5,14 @@ import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runAfterMethod;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runBeforeMethod;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
+import org.jenkinsci.plugins.pipeline.maven.util.MavenUtil;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.AfterAll;
@@ -24,7 +23,6 @@ import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import hudson.FilePath;
 import hudson.model.Fingerprint;
 import hudson.tasks.Fingerprinter;
 import hudson.tasks.Maven;
@@ -62,8 +60,7 @@ public abstract class AbstractIntegrationTest {
         gitRepoRule = new GitSampleRepoRule();
         runBeforeMethod(gitRepoRule);
 
-        Maven.MavenInstallation mvn = configureDefaultMaven("3.8.8", Maven.MavenInstallation.MAVEN_30);
-
+        Maven.MavenInstallation mvn = MavenUtil.configureDefaultMaven(Jenkins.get().getRootPath());
         Maven.MavenInstallation m3 = new Maven.MavenInstallation("apache-maven-3", mvn.getHome(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(m3);
         mavenInstallationName = mvn.getName();
@@ -107,22 +104,6 @@ public abstract class AbstractIntegrationTest {
             throw new IllegalStateException("Folder '" + mavenProjectRoot + "' not found");
         }
         GitSampleRepoRuleUtils.addFilesAndCommit(mavenProjectRoot, gitRepo);
-    }
-
-    protected Maven.MavenInstallation configureDefaultMaven(String mavenVersion, int mavenReqVersion) throws Exception {
-        // first if we are running inside Maven, pick that Maven, if it meets the
-        // criteria we require..
-        File buildDirectory = new File(System.getProperty("buildDirectory", "target")); // TODO relative path
-        File mvnHome = new File(buildDirectory, "apache-maven-" + mavenVersion);
-        if (!mvnHome.exists()) {
-            FilePath mvn = Jenkins.get().getRootPath().createTempFile("maven", "zip");
-            mvn.copyFrom(new URL(
-                    "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/" + mavenVersion + "/apache-maven-" + mavenVersion + "-bin.tar.gz"));
-            mvn.untar(new FilePath(buildDirectory), FilePath.TarCompression.GZIP);
-        }
-        Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getAbsolutePath(), JenkinsRule.NO_PROPERTIES);
-        Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
-        return mavenInstallation;
     }
 
     protected void verifyFileIsFingerPrinted(WorkflowJob pipeline, WorkflowRun build, String fileName) throws java.io.IOException {

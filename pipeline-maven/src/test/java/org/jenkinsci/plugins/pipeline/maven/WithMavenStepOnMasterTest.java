@@ -658,9 +658,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
             "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
             "    <servers>\n" +
-            "    	<server>\n" +
-            "	        <id>id-global-settings-test</id>\n" +
-            "	    </server>\n" +
+            "        <server>\n" +
+            "            <id>id-global-settings-test</id>\n" +
+            "        </server>\n" +
             "    </servers>\n" +
             "</settings>\n";
         //@formatter:on
@@ -713,9 +713,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
             "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
             "    <servers>\n" +
-            "    	<server>\n" +
-            "	        <id>id-global-settings-test-from-config-file-provider</id>\n" +
-            "	    </server>\n" +
+            "        <server>\n" +
+            "            <id>id-global-settings-test-from-config-file-provider</id>\n" +
+            "        </server>\n" +
             "    </servers>\n" +
             "</settings>\n";
         //@formatter:on
@@ -846,9 +846,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
             "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
             "    <servers>\n" +
-            "    	<server>\n" +
-            "	        <id>id-global-settings-test</id>\n" +
-            "	    </server>\n" +
+            "        <server>\n" +
+            "            <id>id-global-settings-test</id>\n" +
+            "        </server>\n" +
             "    </servers>\n" +
             "</settings>'''\n" +
             "\n" +
@@ -894,9 +894,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
             "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
             "    <servers>\n" +
-            "    	<server>\n" +
-            "	        <id>id-settings-test</id>\n" +
-            "	    </server>\n" +
+            "        <server>\n" +
+            "            <id>id-settings-test</id>\n" +
+            "        </server>\n" +
             "    </servers>\n" +
             "</settings>'''\n" +
             "\n" +
@@ -941,9 +941,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
             "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
             "    <servers>\n" +
-            "    	<server>\n" +
-            "	        <id>id-settings-test</id>\n" +
-            "	    </server>\n" +
+            "        <server>\n" +
+            "            <id>id-settings-test</id>\n" +
+            "        </server>\n" +
             "    </servers>\n" +
             "</settings>\n";
         //@formatter:on
@@ -1120,9 +1120,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
             "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
             "    <servers>\n" +
-            "    	<server>\n" +
-            "	        <id>id-settings-test-from-pipeline-attribute-and-config-file-provider</id>\n" +
-            "	    </server>\n" +
+            "        <server>\n" +
+            "            <id>id-settings-test-from-pipeline-attribute-and-config-file-provider</id>\n" +
+            "        </server>\n" +
             "    </servers>\n" +
             "</settings>\n";
         //@formatter:on
