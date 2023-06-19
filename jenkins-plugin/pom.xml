@@ -638,6 +638,28 @@
               <overWriteReleases>false</overWriteReleases>
             </configuration>
           </execution>
+          <execution>
+            <id>copy-maven-distro-3.6.3</id>
+            <phase>process-test-resources</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.apache.maven</groupId>
+                  <artifactId>apache-maven</artifactId>
+                  <version>3.6.3</version>
+                  <classifier>bin</classifier>
+                  <type>zip</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${project.build.directory}/</outputDirectory>
+                  <destFileName>apache-maven-3.6.3-bin.zip</destFileName>
+                </artifactItem>
+              </artifactItems>
+              <overWriteReleases>false</overWriteReleases>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>

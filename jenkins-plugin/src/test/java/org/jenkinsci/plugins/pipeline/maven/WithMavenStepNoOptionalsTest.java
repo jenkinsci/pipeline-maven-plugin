@@ -75,12 +75,12 @@ public class WithMavenStepNoOptionalsTest {
     private static void setup(final JenkinsRule r) throws Throwable {
         Slave agent = agentRule.createAgent(r, "mock");
         r.waitOnline(agent);
-
-        String mavenVersion = "3.9.2";
+        // FIXME hardcoded version
+        String mavenVersion = "3.6.3";
         FilePath buildDirectory = agent.getRootPath();
         FilePath mvnHome = buildDirectory.child("apache-maven-" + mavenVersion);
         FilePath mvn = buildDirectory.createTempFile("maven", "zip");
-        mvn.copyFrom(Files.newInputStream(Paths.get(System.getProperty("buildDirectory", "target"), "apache-maven-3.9.2-bin.zip")));
+        mvn.copyFrom(Files.newInputStream(Paths.get(System.getProperty("buildDirectory", "target"), "apache-maven-3.6.3-bin.zip")));
         mvn.unzip(buildDirectory);
         Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getRemote(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
