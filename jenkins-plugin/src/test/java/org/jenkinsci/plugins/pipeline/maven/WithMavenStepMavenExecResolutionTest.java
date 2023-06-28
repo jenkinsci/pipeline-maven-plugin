@@ -58,7 +58,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
     @Test
     public void testMavenNotInstalledInDockerImage() throws Exception {
-        assertThat(nonMavenContainerRule.execInContainer("mvn", "--version").getStdout(), containsString("sh: 1: mvn: not found"));
+        assertThat(nonMavenContainerRule.execInContainer("mvn", "--version").getStdout(), containsString("exec: \"mvn\": executable file not found in $PATH"));
     }
 
     @Test
