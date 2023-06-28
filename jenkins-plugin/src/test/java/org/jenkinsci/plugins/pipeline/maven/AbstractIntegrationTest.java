@@ -6,12 +6,14 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -95,7 +97,7 @@ public abstract class AbstractIntegrationTest {
     public void after() throws IOException {
         PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
         if (dao instanceof Closeable) {
-            ((Closeable) dao).close();
+            dao.close();
         }
     }
 
@@ -136,6 +138,28 @@ public abstract class AbstractIntegrationTest {
         Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getAbsolutePath(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
         return mavenInstallation;
+    }
+
+    public static void unzip(Path source, Path target) throws IOException {
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(source.toFile()))) {
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                boolean isDirectory = zipEntry.getName().endsWith(File.separator);
+                Path newPath = target.resolve(zipEntry.getName());
+                if (isDirectory) {
+                    Files.createDirectories(newPath);
+                } else {
+                    if (newPath.getParent() != null) {
+                        if (Files.notExists(newPath.getParent())) {
+                            Files.createDirectories(newPath.getParent());
+                        }
+                    }
+                    Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
+                }
+                zipEntry = zis.getNextEntry();
+            }
+            zis.closeEntry();
+        }
     }
 
     protected void verifyFileIsFingerPrinted(WorkflowJob pipeline, WorkflowRun build, String fileName) throws java.io.IOException {
