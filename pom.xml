@@ -93,7 +93,6 @@
     <jansi.version>2.4.0</jansi.version>
     <jenkins-annotation-indexer.version>1.17</jenkins-annotation-indexer.version>
     <jenkins-credentials.version>1143.vb_e8b_b_ceee347</jenkins-credentials.version>
-    <jenkins-docker-fixtures.version>166.v912b_95083ffe</jenkins-docker-fixtures.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-flaky-test.version>1.2.2</jenkins-plugin-flaky-test.version>
     <jenkins-plugin-folder.version>6.740.ve4f4ffa_dea_54</jenkins-plugin-folder.version>
@@ -121,7 +120,7 @@
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.8.3</maven.version>
     <plexus-utils.version>3.5.1</plexus-utils.version>
-    <slf4j.version>2.0.7</slf4j.version>
+    <slf4j.version>1.7.36</slf4j.version>
     <testcontainers.version>1.18.3</testcontainers.version>
   </properties>
 

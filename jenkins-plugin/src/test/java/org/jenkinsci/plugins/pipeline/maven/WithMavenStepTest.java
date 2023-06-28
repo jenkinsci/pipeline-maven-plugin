@@ -36,15 +36,12 @@ import hudson.slaves.DumbSlave;
 import hudson.slaves.RetentionStrategy;
 import org.apache.commons.io.FileUtils;
 import org.hamcrest.Matchers;
-import org.jenkinsci.plugins.pipeline.maven.docker.JavaGitContainer;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.jenkinsci.test.acceptance.docker.DockerRule;
-import org.jenkinsci.test.acceptance.docker.fixtures.SshdContainer;
-import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
+import org.testcontainers.containers.GenericContainer;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -59,13 +56,10 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     private static final String SLAVE_BASE_PATH = "/home/test/slave";
     private static final String COMMONS_LANG3_FINGERPRINT = "780b5a8b72eebe6d0dbff1c11b5658fa";
 
-    @Rule
-    public DockerRule<JavaGitContainer> javaGitContainerRule = new DockerRule<>(JavaGitContainer.class);
-
     @Issue("SECURITY-441")
     @Test
     public void testMavenBuildOnRemoteAgentWithSettingsFileOnMasterFails() throws Exception {
-        registerAgentForContainer(javaGitContainerRule.get());
+        registerAgentForContainer(javaGitContainerRule);
 
         File onMaster = new File(jenkinsRule.jenkins.getRootDir(), "onmaster");
         String secret = "secret content on master";
@@ -83,7 +77,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
 
     @Test
     public void testDisableAllPublishers() throws Exception {
-        registerAgentForContainer(javaGitContainerRule.get());
+        registerAgentForContainer(javaGitContainerRule);
         loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
 
         runPipeline(Result.SUCCESS, "" +
@@ -110,7 +104,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         assertThat(fingerprint, Matchers.nullValue());
     }
 
-    private void registerAgentForContainer(SshdContainer container) throws Exception {
+    private void registerAgentForContainer(GenericContainer<?> container) throws Exception {
         addTestSshCredentials();
         registerAgentForSlaveContainer(container);
     }
@@ -123,8 +117,8 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
                 .put(Domain.global(), Collections.singletonList(credentials));
     }
 
-    private void registerAgentForSlaveContainer(SshdContainer slaveContainer) throws Exception {
-        SSHLauncher sshLauncher = new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), SSH_CREDENTIALS_ID);
+    private void registerAgentForSlaveContainer(GenericContainer<?> slaveContainer) throws Exception {
+        SSHLauncher sshLauncher = new SSHLauncher(slaveContainer.getHost(), slaveContainer.getMappedPort(22), SSH_CREDENTIALS_ID);
 
         DumbSlave agent = new DumbSlave(AGENT_NAME, SLAVE_BASE_PATH, sshLauncher);
         agent.setNumExecutors(1);

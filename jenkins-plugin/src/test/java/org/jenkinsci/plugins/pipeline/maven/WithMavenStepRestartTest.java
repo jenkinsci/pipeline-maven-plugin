@@ -27,8 +27,6 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.test.steps.SemaphoreStep;
-import org.jenkinsci.test.acceptance.docker.DockerRule;
-import org.jenkinsci.test.acceptance.docker.fixtures.JavaContainer;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,9 +42,6 @@ public class WithMavenStepRestartTest {
 
     @Rule
     public RestartableJenkinsRule rr = new RestartableJenkinsRule();
-
-    @Rule
-    public DockerRule<JavaContainer> slaveRule = new DockerRule<>(JavaContainer.class);
 
     @Issue("JENKINS-39134")
     @Test

@@ -36,18 +36,12 @@ import hudson.slaves.RetentionStrategy;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
 import hudson.tools.InstallSourceProperty;
-import org.jenkinsci.plugins.pipeline.maven.docker.JavaGitContainer;
-import org.jenkinsci.plugins.pipeline.maven.docker.MavenWithMavenHomeJavaContainer;
-import org.jenkinsci.plugins.pipeline.maven.docker.NonMavenJavaContainer;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.jenkinsci.test.acceptance.docker.DockerRule;
-import org.jenkinsci.test.acceptance.docker.fixtures.SshdContainer;
-import org.jenkinsci.utils.process.CommandBuilder;
-import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
+import org.testcontainers.containers.GenericContainer;
 
 import java.util.Collections;
 
@@ -62,23 +56,14 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
     private static final String MAVEN_GLOBAL_TOOL_NAME = "maven";
     private static final String SLAVE_BASE_PATH = "/home/test/slave";
 
-    @Rule
-    public DockerRule<NonMavenJavaContainer> nonMavenContainerRule = new DockerRule<>(NonMavenJavaContainer.class);
-
-    @Rule
-    public DockerRule<JavaGitContainer> mavenWithoutMavenHomeContainerRule = new DockerRule<>(JavaGitContainer.class);
-
-    @Rule
-    public DockerRule<MavenWithMavenHomeJavaContainer> mavenWithMavenHomeContainerRule = new DockerRule<>(MavenWithMavenHomeJavaContainer.class);
-
     @Test
     public void testMavenNotInstalledInDockerImage() throws Exception {
-        assertThat(nonMavenContainerRule.get().popen(new CommandBuilder("mvn", "--version")).asText(), containsString("sh: 1: mvn: not found"));
+        assertThat(nonMavenContainerRule.execInContainer("mvn", "--version").getStdout(), containsString("sh: 1: mvn: not found"));
     }
 
     @Test
     public void testMavenGlobalToolRecognizedInScriptedPipeline() throws Exception {
-        registerAgentForContainer(nonMavenContainerRule.get());
+        registerAgentForContainer(nonMavenContainerRule);
         String version = registerLatestMavenVersionAsGlobalTool();
 
         WorkflowRun run = runPipeline("" +
@@ -97,7 +82,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
     @Test
     public void testMavenGlobalToolRecognizedInDeclarativePipeline() throws Exception {
-        registerAgentForContainer(nonMavenContainerRule.get());
+        registerAgentForContainer(nonMavenContainerRule);
         String version = registerLatestMavenVersionAsGlobalTool();
 
         WorkflowRun run = runPipeline("" +
@@ -123,7 +108,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
     @Test
     public void testPreInstalledMavenRecognizedWithoutMavenHome() throws Exception {
-        registerAgentForContainer(mavenWithoutMavenHomeContainerRule.get());
+        registerAgentForContainer(javaGitContainerRule);
 
         WorkflowRun run = runPipeline("" +
                 "node('" + AGENT_NAME + "') {\n" +
@@ -138,7 +123,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
     @Test
     public void testPreInstalledMavenRecognizedWithMavenHome() throws Exception {
-        registerAgentForContainer(mavenWithMavenHomeContainerRule.get());
+        registerAgentForContainer(mavenWithMavenHomeContainerRule);
 
         WorkflowRun run = runPipeline("" +
                 "node('" + AGENT_NAME + "') {\n" +
@@ -159,7 +144,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
         return jenkinsRule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0));
     }
 
-    private void registerAgentForContainer(SshdContainer slaveContainer) throws Exception {
+    private void registerAgentForContainer(GenericContainer<?> slaveContainer) throws Exception {
         addTestSshCredentials();
         registerAgentForSlaveContainer(slaveContainer);
     }
@@ -172,8 +157,8 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
                 .put(Domain.global(), Collections.singletonList(credentials));
     }
 
-    private void registerAgentForSlaveContainer(SshdContainer slaveContainer) throws Exception {
-        SSHLauncher sshLauncher = new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), SSH_CREDENTIALS_ID);
+    private void registerAgentForSlaveContainer(GenericContainer<?> slaveContainer) throws Exception {
+        SSHLauncher sshLauncher = new SSHLauncher(slaveContainer.getHost(), slaveContainer.getMappedPort(22), SSH_CREDENTIALS_ID);
 
         DumbSlave agent = new DumbSlave(AGENT_NAME, SLAVE_BASE_PATH, sshLauncher);
         agent.setNumExecutors(1);
