@@ -48,8 +48,9 @@ public class WithMavenStepNoOptionalsTest {
     @Test
     public void maven_build_jar_project_on_master_succeeds() throws Throwable {
         loadMavenJarProjectInGitRepo(gitRepoRule);
-
-        jenkinsRule.then(WithMavenStepNoOptionalsTest::setup, new Build(gitRepoRule.toString()));
+        jenkinsRule.extraEnv("MAVEN_ZIP_PATH", Paths.get("target", "apache-maven-" + MavenUtil.MAVEN_VERSION + "-bin.zip").toAbsolutePath().toString())
+                .extraEnv("MAVEN_VERSION", MavenUtil.MAVEN_VERSION)
+                .then(WithMavenStepNoOptionalsTest::setup, new Build(gitRepoRule.toString()));
     }
 
     private static class Build implements RealJenkinsRule.Step {
@@ -76,11 +77,11 @@ public class WithMavenStepNoOptionalsTest {
     private static void setup(final JenkinsRule r) throws Throwable {
         Slave agent = agentRule.createAgent(r, "mock");
         r.waitOnline(agent);
-        String mavenVersion = MavenUtil.MAVEN_VERSION;
+
         FilePath buildDirectory = agent.getRootPath();
-        FilePath mvnHome = buildDirectory.child("apache-maven-" + mavenVersion);
+        FilePath mvnHome = buildDirectory.child("apache-maven-" + System.getenv("MAVEN_VERSION"));
         FilePath mvn = buildDirectory.createTempFile("maven", "zip");
-        mvn.copyFrom(Files.newInputStream(Paths.get(System.getProperty("buildDirectory", "target"), "apache-maven-" + mavenVersion + "-bin.zip")));
+        mvn.copyFrom(Files.newInputStream(Paths.get(System.getenv("MAVEN_ZIP_PATH"))));
         mvn.unzip(buildDirectory);
         Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getRemote(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
