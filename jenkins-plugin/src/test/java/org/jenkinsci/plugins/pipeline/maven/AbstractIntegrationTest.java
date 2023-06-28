@@ -8,7 +8,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,6 +32,8 @@ import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.images.builder.ImageFromDockerfile;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -46,6 +47,36 @@ public abstract class AbstractIntegrationTest {
     public JenkinsRule jenkinsRule = new JenkinsRule();
 
     String mavenInstallationName;
+
+//    @Rule
+//    public GenericContainer<?> sshContainerRule = new GenericContainer<>(
+//            new ImageFromDockerfile("jenkins/sshd:32edfdd58111", true)
+//                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/SshdContainer/Dockerfile"))
+//                    .withExposedPorts(22);
+//
+//    @Rule
+//    public GenericContainer<?> javaContainerRule = new GenericContainer<>(
+//            new ImageFromDockerfile("jenkins/java:9a1fc28fe17f", true)
+//                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/JavaContainer/Dockerfile"))
+//                    .withExposedPorts(22);
+
+    @Rule
+    public GenericContainer<?> javaGitContainerRule = new GenericContainer<>(
+            new ImageFromDockerfile("jenkins/java:f2055d7f7d61", true)
+                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/Dockerfile"))
+                    .withExposedPorts(22);
+
+    @Rule
+    public GenericContainer<?> nonMavenContainerRule = new GenericContainer<>(
+            new ImageFromDockerfile("jenkins/java:c64985b7a0da", true)
+                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile"))
+                    .withExposedPorts(22);
+
+    @Rule
+    public GenericContainer<?> mavenWithMavenHomeContainerRule = new GenericContainer<>(
+            new ImageFromDockerfile("jenkins/java:7daff089469e", true)
+                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/MavenWithMavenHomeJavaContainer/Dockerfile"))
+                    .withExposedPorts(22);
 
     @Before
     public void setup() throws Exception {

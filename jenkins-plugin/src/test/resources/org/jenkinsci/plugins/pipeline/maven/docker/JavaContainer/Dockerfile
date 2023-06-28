@@ -1,3 +1,7 @@
+#
+# Container for running Java processes
+#
+
 FROM ubuntu:bionic
 
 RUN apt-get update && \
@@ -6,11 +10,11 @@ RUN apt-get update && \
         openjdk-11-jdk-headless \
         curl \
         ant \
-        maven \
-        git
+        maven
 
 # install SSHD
-RUN apt-get install -y \
+RUN apt-get update -y && \
+    apt-get install -y \
         openssh-server \
         locales
 RUN mkdir -p /var/run/sshd
@@ -28,16 +32,6 @@ RUN useradd test -d /home/test && \
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
     update-locale LANG=en_US.UTF-8
-
-ENV MAVEN_HOME="/usr/share/maven"
-
-# see https://www.jenkins.io/doc/book/using/using-agents/ and https://github.com/jenkinsci/docker-ssh-agent/issues/33
-# probably, it would be better to use the official image docker-ssh-agent as a base
-RUN VARS1="HOME=|USER=|MAIL=|LC_ALL=|LS_COLORS=|LANG=" \
-    VARS2="HOSTNAME=|PWD=|TERM=|SHLVL=|LANGUAGE=|_=" \
-    VARS="${VARS1}|${VARS2}" \
-    env | egrep -v '^(${VARS})' >> /etc/environment
-
 ENV LANG en_US.UTF-8
 
 # run SSHD in the foreground with error messages to stderr
