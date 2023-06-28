@@ -6,14 +6,15 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
-import hudson.FilePath;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.util.MavenUtil;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -95,7 +96,7 @@ public abstract class AbstractIntegrationTest {
     public void after() throws IOException {
         PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
         if (dao instanceof Closeable) {
-            ((Closeable) dao).close();
+            dao.close();
         }
     }
 
@@ -126,16 +127,37 @@ public abstract class AbstractIntegrationTest {
     protected Maven.MavenInstallation configureDefaultMaven(String mavenVersion, int mavenReqVersion) throws Exception {
         // first if we are running inside Maven, pick that Maven, if it meets the
         // criteria we require..
-        FilePath buildDirectory = new FilePath(new File(System.getProperty("buildDirectory", "target"))); // TODO relative path
-        FilePath mvnHome = new FilePath(new File(buildDirectory.getRemote(), "apache-maven-" + mavenVersion));
-        if (!mvnHome.exists()) {
-            FilePath mvn = buildDirectory.createTempFile("maven", "zip");
-            mvn.copyFrom(Files.newInputStream(Paths.get(System.getProperty("buildDirectory", "target"), "apache-maven-"+mavenVersion+"-bin.zip")));
-            mvn.unzip(buildDirectory);
+        Path mvnHome = Paths.get(System.getProperty("buildDirectory", "target"), "apache-maven-" + mavenVersion);
+        if (!Files.exists(mvnHome)) {
+            Path zipDist = Paths.get(System.getProperty("buildDirectory", "target"), "apache-maven-"+mavenVersion+"-bin.zip");
+            unzip(zipDist, mvnHome);
         }
-        Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getRemote(), JenkinsRule.NO_PROPERTIES);
+
+        Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.toFile().getAbsolutePath(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
         return mavenInstallation;
+    }
+
+    public static void unzip(Path source, Path target) throws IOException {
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(source.toFile()))) {
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                boolean isDirectory = zipEntry.getName().endsWith(File.separator);
+                Path newPath = target.resolve(zipEntry.getName());
+                if (isDirectory) {
+                    Files.createDirectories(newPath);
+                } else {
+                    if (newPath.getParent() != null) {
+                        if (Files.notExists(newPath.getParent())) {
+                            Files.createDirectories(newPath.getParent());
+                        }
+                    }
+                    Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
+                }
+                zipEntry = zis.getNextEntry();
+            }
+            zis.closeEntry();
+        }
     }
 
     protected void verifyFileIsFingerPrinted(WorkflowJob pipeline, WorkflowRun build, String fileName) throws java.io.IOException {
