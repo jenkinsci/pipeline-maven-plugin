@@ -6,6 +6,7 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -141,7 +142,7 @@ public abstract class AbstractIntegrationTest {
     }
 
     public static void unzip(Path source, Path target) throws IOException {
-        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(source.toFile()))) {
+        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(source))) {
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
                 boolean isDirectory = zipEntry.getName().endsWith(File.separator);
