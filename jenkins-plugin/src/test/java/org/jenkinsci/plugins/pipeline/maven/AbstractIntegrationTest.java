@@ -8,13 +8,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -51,33 +49,21 @@ public abstract class AbstractIntegrationTest {
 
     String mavenInstallationName;
 
-//    @Rule
-//    public GenericContainer<?> sshContainerRule = new GenericContainer<>(
-//            new ImageFromDockerfile("jenkins/sshd:32edfdd58111", true)
-//                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/SshdContainer/Dockerfile"))
-//                    .withExposedPorts(22);
-//
-//    @Rule
-//    public GenericContainer<?> javaContainerRule = new GenericContainer<>(
-//            new ImageFromDockerfile("jenkins/java:9a1fc28fe17f", true)
-//                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/JavaContainer/Dockerfile"))
-//                    .withExposedPorts(22);
-
     @Rule
     public GenericContainer<?> javaGitContainerRule = new GenericContainer<>(
-            new ImageFromDockerfile("jenkins/java:f2055d7f7d61", true)
+            new ImageFromDockerfile("jenkins/pipeline-maven-java-git", true)
                     .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/Dockerfile"))
                     .withExposedPorts(22);
 
     @Rule
     public GenericContainer<?> nonMavenContainerRule = new GenericContainer<>(
-            new ImageFromDockerfile("jenkins/java:c64985b7a0da", true)
+            new ImageFromDockerfile("jenkins/pipeline-maven-non-maven", true)
                     .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile"))
                     .withExposedPorts(22);
 
     @Rule
     public GenericContainer<?> mavenWithMavenHomeContainerRule = new GenericContainer<>(
-            new ImageFromDockerfile("jenkins/java:7daff089469e", true)
+            new ImageFromDockerfile("jenkins/pipeline-maven-java", true)
                     .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/MavenWithMavenHomeJavaContainer/Dockerfile"))
                     .withExposedPorts(22);
 
@@ -139,28 +125,6 @@ public abstract class AbstractIntegrationTest {
         Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getAbsolutePath(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
         return mavenInstallation;
-    }
-
-    public static void unzip(Path source, Path target) throws IOException {
-        try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(source))) {
-            ZipEntry zipEntry = zis.getNextEntry();
-            while (zipEntry != null) {
-                boolean isDirectory = zipEntry.getName().endsWith(File.separator);
-                Path newPath = target.resolve(zipEntry.getName());
-                if (isDirectory) {
-                    Files.createDirectories(newPath);
-                } else {
-                    if (newPath.getParent() != null) {
-                        if (Files.notExists(newPath.getParent())) {
-                            Files.createDirectories(newPath.getParent());
-                        }
-                    }
-                    Files.copy(zis, newPath, StandardCopyOption.REPLACE_EXISTING);
-                }
-                zipEntry = zis.getNextEntry();
-            }
-            zis.closeEntry();
-        }
     }
 
     protected void verifyFileIsFingerPrinted(WorkflowJob pipeline, WorkflowRun build, String fileName) throws java.io.IOException {

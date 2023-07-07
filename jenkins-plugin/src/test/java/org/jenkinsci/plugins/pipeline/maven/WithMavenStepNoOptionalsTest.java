@@ -47,8 +47,8 @@ public class WithMavenStepNoOptionalsTest {
     @Test
     public void maven_build_jar_project_on_master_succeeds() throws Throwable {
         loadMavenJarProjectInGitRepo(gitRepoRule);
-        jenkinsRule.extraEnv("MAVEN_ZIP_PATH", Paths.get("target", "apache-maven-" + MavenUtil.MAVEN_VERSION + "-bin.zip").toAbsolutePath().toString())
-                .extraEnv("MAVEN_VERSION", MavenUtil.MAVEN_VERSION)
+        jenkinsRule.extraEnv("MAVEN_ZIP_PATH", Paths.get("target", "apache-maven-3.6.3-bin.zip").toAbsolutePath().toString())
+                .extraEnv("MAVEN_VERSION", "3.6.3")
                 .then(WithMavenStepNoOptionalsTest::setup, new Build(gitRepoRule.toString()));
     }
 
