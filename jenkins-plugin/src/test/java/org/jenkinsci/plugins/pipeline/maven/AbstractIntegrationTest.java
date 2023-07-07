@@ -33,6 +33,8 @@ import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.images.builder.ImageFromDockerfile;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -46,6 +48,24 @@ public abstract class AbstractIntegrationTest {
     public JenkinsRule jenkinsRule = new JenkinsRule();
 
     String mavenInstallationName;
+
+    @Rule
+    public GenericContainer<?> javaGitContainerRule = new GenericContainer<>(
+            new ImageFromDockerfile("jenkins/pipeline-maven-java-git", true)
+                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/Dockerfile"))
+                    .withExposedPorts(22);
+
+    @Rule
+    public GenericContainer<?> nonMavenContainerRule = new GenericContainer<>(
+            new ImageFromDockerfile("jenkins/pipeline-maven-non-maven", true)
+                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile"))
+                    .withExposedPorts(22);
+
+    @Rule
+    public GenericContainer<?> mavenWithMavenHomeContainerRule = new GenericContainer<>(
+            new ImageFromDockerfile("jenkins/pipeline-maven-java", true)
+                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/MavenWithMavenHomeJavaContainer/Dockerfile"))
+                    .withExposedPorts(22);
 
     @Before
     public void setup() throws Exception {
@@ -64,7 +84,7 @@ public abstract class AbstractIntegrationTest {
     public void after() throws IOException {
         PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
         if (dao instanceof Closeable) {
-            ((Closeable) dao).close();
+            dao.close();
         }
     }
 
