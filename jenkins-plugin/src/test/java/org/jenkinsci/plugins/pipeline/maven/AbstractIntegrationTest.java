@@ -51,33 +51,21 @@ public abstract class AbstractIntegrationTest {
 
     String mavenInstallationName;
 
-//    @Rule
-//    public GenericContainer<?> sshContainerRule = new GenericContainer<>(
-//            new ImageFromDockerfile("jenkins/sshd:32edfdd58111", true)
-//                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/SshdContainer/Dockerfile"))
-//                    .withExposedPorts(22);
-//
-//    @Rule
-//    public GenericContainer<?> javaContainerRule = new GenericContainer<>(
-//            new ImageFromDockerfile("jenkins/java:9a1fc28fe17f", true)
-//                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/JavaContainer/Dockerfile"))
-//                    .withExposedPorts(22);
-
     @Rule
     public GenericContainer<?> javaGitContainerRule = new GenericContainer<>(
-            new ImageFromDockerfile("jenkins/java:f2055d7f7d61", true)
+            new ImageFromDockerfile("jenkins/pipeline-maven-java-git", true)
                     .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/Dockerfile"))
                     .withExposedPorts(22);
 
     @Rule
     public GenericContainer<?> nonMavenContainerRule = new GenericContainer<>(
-            new ImageFromDockerfile("jenkins/java:c64985b7a0da", true)
+            new ImageFromDockerfile("jenkins/pipeline-maven-non-maven", true)
                     .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile"))
                     .withExposedPorts(22);
 
     @Rule
     public GenericContainer<?> mavenWithMavenHomeContainerRule = new GenericContainer<>(
-            new ImageFromDockerfile("jenkins/java:7daff089469e", true)
+            new ImageFromDockerfile("jenkins/pipeline-maven-java", true)
                     .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/MavenWithMavenHomeJavaContainer/Dockerfile"))
                     .withExposedPorts(22);
 
