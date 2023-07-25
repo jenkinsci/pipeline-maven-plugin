@@ -1087,7 +1087,10 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * Callback to cleanup tmp script after finishing the job
      */
     private class WithMavenStepExecutionCallBack extends TailCall {
-        private final FilePath tempBinDir;
+        @Deprecated
+        private FilePath tempBinDir;
+
+        private final String tempBinDirPath;
 
         private final MavenPublisherStrategy mavenPublisherStrategy;
 
@@ -1097,13 +1100,17 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         private WithMavenStepExecutionCallBack(@NonNull FilePath tempBinDir, @NonNull List<MavenPublisher> options,
                                               @NonNull MavenPublisherStrategy mavenPublisherStrategy) {
-            this.tempBinDir = tempBinDir;
+            this.tempBinDirPath = tempBinDir.getRemote();
             this.options = options;
             this.mavenPublisherStrategy = mavenPublisherStrategy;
         }
 
         @Override
         protected void finished(StepContext context) throws Exception {
+            if (tempBinDir == null) { // normal case
+                tempBinDir = context.get(FilePath.class).child(tempBinDirPath);
+            } // else resuming old build
+
             mavenSpyLogProcessor.processMavenSpyLogs(context, tempBinDir, options, mavenPublisherStrategy);
 
             try {
