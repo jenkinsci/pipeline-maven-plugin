@@ -24,20 +24,7 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy;
 
-import org.apache.maven.eventspy.EventSpy;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.execution.ExecutionEvent;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
-import org.hamcrest.CoreMatchers;
-import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
-import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.OutputStreamEventReporter;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.InputStream;
@@ -46,7 +33,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.apache.maven.eventspy.EventSpy;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.project.MavenProject;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.OutputStreamEventReporter;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -58,7 +57,7 @@ public class JenkinsMavenEventSpyTest {
     StringWriter writer = new StringWriter();
     MavenProject project;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         reporter = new OutputStreamEventReporter(writer);
         spy = new JenkinsMavenEventSpy(reporter) {
@@ -77,7 +76,7 @@ public class JenkinsMavenEventSpyTest {
         MavenXpp3Reader mavenXpp3Reader = new MavenXpp3Reader();
         InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/eventspy/pom.xml");
 
-        assertThat(in, CoreMatchers.notNullValue());
+        assertThat(in).isNotNull();
         Model model = mavenXpp3Reader.read(in);
         project = new MavenProject(model);
         project.setGroupId(model.getGroupId());
@@ -86,7 +85,7 @@ public class JenkinsMavenEventSpyTest {
         project.setName(model.getName());
     }
 
-    @After
+    @AfterEach
     public void after() throws Exception {
         spy.close();
     }
@@ -101,12 +100,12 @@ public class JenkinsMavenEventSpyTest {
 
         String actual = writer.toString();
         System.out.println(actual);
-        assertThat(actual, CoreMatchers.containsString("MavenExecutionRequest"));
+        assertThat(actual).contains("MavenExecutionRequest");
     }
 
     @Test
     public void testExecutionProjectStarted() throws Exception {
-        ExecutionEvent executionEvent = new  ExecutionEvent(){
+        ExecutionEvent executionEvent = new ExecutionEvent() {
             @Override
             public Type getType() {
                 return Type.ProjectStarted;
@@ -137,7 +136,7 @@ public class JenkinsMavenEventSpyTest {
 
         String actual = writer.toString();
         System.out.println(actual);
-        assertThat(actual, CoreMatchers.containsString("ProjectStarted"));
-        assertThat(actual, CoreMatchers.containsString("petclinic"));
+        assertThat(actual).contains("ProjectStarted");
+        assertThat(actual).contains("petclinic");
     }
 }

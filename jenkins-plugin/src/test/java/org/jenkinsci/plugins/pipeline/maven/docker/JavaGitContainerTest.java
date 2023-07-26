@@ -24,19 +24,17 @@
 
 package org.jenkinsci.plugins.pipeline.maven.docker;
 
-import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
+import org.junit.jupiter.api.Test;
 
 public class JavaGitContainerTest extends AbstractIntegrationTest {
 
-
     @Test
     public void smokes() throws Exception {
-        assertThat(javaGitContainerRule.execInContainer("java", "-version").getStderr(), containsString("openjdk version \"11"));
-        assertThat(javaGitContainerRule.execInContainer("git", "--version").getStdout(), containsString("git version 2."));
+        assertThat(javaGitContainerRule.execInContainer("java", "-version").getStderr()).contains("openjdk version \"11");
+        assertThat(javaGitContainerRule.execInContainer("git", "--version").getStdout()).contains("git version 2.");
     }
 
 }

@@ -1,9 +1,8 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runAfterMethod;
+import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runBeforeMethod;
 
 import java.io.Closeable;
 import java.io.File;
@@ -17,11 +16,17 @@ import java.util.Map;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import hudson.FilePath;
 import hudson.model.Fingerprint;
@@ -33,42 +38,47 @@ import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.images.builder.ImageFromDockerfile;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
+@Testcontainers
+@WithJenkins
 public abstract class AbstractIntegrationTest {
 
-    @ClassRule
-    public static BuildWatcher buildWatcher = new BuildWatcher();
+    @Container
+    public GenericContainer<?> javaGitContainerRule = new GenericContainer<>(new ImageFromDockerfile("jenkins/pipeline-maven-java-git", true)
+            .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/Dockerfile")).withExposedPorts(22);
 
-    @Rule
-    public JenkinsRule jenkinsRule = new JenkinsRule();
+    @Container
+    public GenericContainer<?> nonMavenContainerRule = new GenericContainer<>(new ImageFromDockerfile("jenkins/pipeline-maven-non-maven", true)
+            .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile")).withExposedPorts(22);
+
+    @Container
+    public GenericContainer<?> mavenWithMavenHomeContainerRule = new GenericContainer<>(new ImageFromDockerfile("jenkins/pipeline-maven-java", true)
+            .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/MavenWithMavenHomeJavaContainer/Dockerfile"))
+            .withExposedPorts(22);
+
+    public static BuildWatcher buildWatcher;
+
+    public GitSampleRepoRule gitRepoRule;
+
+    public JenkinsRule jenkinsRule;
 
     String mavenInstallationName;
 
-    @Rule
-    public GenericContainer<?> javaGitContainerRule = new GenericContainer<>(
-            new ImageFromDockerfile("jenkins/pipeline-maven-java-git", true)
-                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/Dockerfile"))
-                    .withExposedPorts(22);
+    @BeforeAll
+    public static void setupWatcher() {
+        buildWatcher = new BuildWatcher();
+        runBeforeMethod(buildWatcher);
+    }
 
-    @Rule
-    public GenericContainer<?> nonMavenContainerRule = new GenericContainer<>(
-            new ImageFromDockerfile("jenkins/pipeline-maven-non-maven", true)
-                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile"))
-                    .withExposedPorts(22);
+    @BeforeEach
+    public void setup(JenkinsRule r) throws Exception {
+        jenkinsRule = r;
 
-    @Rule
-    public GenericContainer<?> mavenWithMavenHomeContainerRule = new GenericContainer<>(
-            new ImageFromDockerfile("jenkins/pipeline-maven-java", true)
-                    .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/MavenWithMavenHomeJavaContainer/Dockerfile"))
-                    .withExposedPorts(22);
-
-    @Before
-    public void setup() throws Exception {
+        gitRepoRule = new GitSampleRepoRule();
+        runBeforeMethod(gitRepoRule);
 
         Maven.MavenInstallation mvn = configureDefaultMaven("3.6.3", Maven.MavenInstallation.MAVEN_30);
 
@@ -81,15 +91,20 @@ public abstract class AbstractIntegrationTest {
         globalMavenConfig.setSettingsProvider(new DefaultSettingsProvider());
     }
 
+    @AfterEach
     public void after() throws IOException {
         PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
         if (dao instanceof Closeable) {
             dao.close();
         }
+
+        runAfterMethod(gitRepoRule);
     }
 
-    @Rule
-    public GitSampleRepoRule gitRepoRule = new GitSampleRepoRule();
+    @AfterAll
+    public static void stopWatcher() {
+        runAfterMethod(buildWatcher);
+    }
 
     protected void loadMonoDependencyMavenProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
         loadSourceCodeInGitRepository(gitRepo, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/mono_dependency_maven_jar_project/");
@@ -119,7 +134,8 @@ public abstract class AbstractIntegrationTest {
         File mvnHome = new File(buildDirectory, "apache-maven-" + mavenVersion);
         if (!mvnHome.exists()) {
             FilePath mvn = Jenkins.get().getRootPath().createTempFile("maven", "zip");
-            mvn.copyFrom(new URL("https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/" + mavenVersion + "/apache-maven-" + mavenVersion + "-bin.tar.gz"));
+            mvn.copyFrom(new URL(
+                    "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/" + mavenVersion + "/apache-maven-" + mavenVersion + "-bin.tar.gz"));
             mvn.untar(new FilePath(buildDirectory), FilePath.TarCompression.GZIP);
         }
         Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getAbsolutePath(), JenkinsRule.NO_PROPERTIES);
@@ -131,11 +147,11 @@ public abstract class AbstractIntegrationTest {
         Fingerprinter.FingerprintAction fingerprintAction = build.getAction(Fingerprinter.FingerprintAction.class);
         Map<String, String> records = fingerprintAction.getRecords();
         String jarFileMd5sum = records.get(fileName);
-        assertThat(jarFileMd5sum, not(nullValue()));
+        assertThat(jarFileMd5sum).isNotNull();
 
         Fingerprint jarFileFingerPrint = jenkinsRule.getInstance().getFingerprintMap().get(jarFileMd5sum);
-        assertThat(jarFileFingerPrint.getFileName(), is(fileName));
-        assertThat(jarFileFingerPrint.getOriginal().getJob().getName(), is(pipeline.getName()));
-        assertThat(jarFileFingerPrint.getOriginal().getNumber(), is(build.getNumber()));
+        assertThat(jarFileFingerPrint.getFileName()).isEqualTo(fileName);
+        assertThat(jarFileFingerPrint.getOriginal().getJob().getName()).isEqualTo(pipeline.getName());
+        assertThat(jarFileFingerPrint.getOriginal().getNumber()).isEqualTo(build.getNumber());
     }
 }

@@ -29,6 +29,7 @@ import jenkins.mvn.GlobalMavenConfig;
 import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
 
+// Migrate to full JUnit5 impossible because of RealJenkinsRule
 public class WithMavenStepNoOptionalsTest {
 
     @ClassRule
@@ -38,33 +39,35 @@ public class WithMavenStepNoOptionalsTest {
     public GitSampleRepoRule gitRepoRule = new GitSampleRepoRule();
 
     @Rule
-    public RealJenkinsRule jenkinsRule = new RealJenkinsRule()
-            .omitPlugins(
-                    "commons-lang3-api", "mysql-api", "postgresql-api", "maven-plugin", "flaky-test-handler",
-                    "htmlpublisher", "jacoco", "jgiven", "junit", "junit-attachments", "matrix-project",
-                    "maven-invoker-plugin", "pipeline-build-step", "findbugs", "tasks");
+    public RealJenkinsRule jenkinsRule = new RealJenkinsRule().omitPlugins("commons-lang3-api", "mysql-api", "postgresql-api", "maven-plugin",
+            "flaky-test-handler", "htmlpublisher", "jacoco", "jgiven", "junit", "junit-attachments", "matrix-project", "maven-invoker-plugin",
+            "pipeline-build-step", "findbugs", "tasks");
 
     @Test
     public void maven_build_jar_project_on_master_succeeds() throws Throwable {
         loadMavenJarProjectInGitRepo(gitRepoRule);
-        jenkinsRule.extraEnv("MAVEN_ZIP_PATH", Paths.get("target", "apache-maven-3.6.3-bin.zip").toAbsolutePath().toString())
-                .extraEnv("MAVEN_VERSION", "3.6.3")
+        jenkinsRule.extraEnv("MAVEN_ZIP_PATH", Paths.get("target", "apache-maven-3.6.3-bin.zip").toAbsolutePath().toString()).extraEnv("MAVEN_VERSION", "3.6.3")
                 .then(WithMavenStepNoOptionalsTest::setup, new Build(gitRepoRule.toString()));
     }
 
     private static class Build implements RealJenkinsRule.Step {
+
         private final String repoUrl;
+
         Build(String repoUrl) {
             this.repoUrl = repoUrl;
         }
+
         @Override
         public void run(JenkinsRule r) throws Throwable {
+            //@formatter:off
             String pipelineScript = "node('mock') {\n" +
                 "    git($/" + repoUrl + "/$)\n" +
                 "    withMaven() {\n" +
                 "        sh 'mvn verify -Dmaven.test.failure.ignore=true'\n" +
                 "    }\n" +
                 "}";
+            //@formatter:on
 
             WorkflowJob pipeline = r.createProject(WorkflowJob.class, "build-on-master");
             pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
@@ -78,10 +81,12 @@ public class WithMavenStepNoOptionalsTest {
         r.waitOnline(agent);
 
         String mavenVersion = "3.6.3";
-        FilePath buildDirectory = agent.getRootPath(); // No need of MasterToSlaveCallable because agent is a dumb, thus sharing file system with controller
+        FilePath buildDirectory = agent.getRootPath(); // No need of MasterToSlaveCallable because agent is a dumb, thus sharing file
+                                                       // system with controller
         FilePath mvnHome = buildDirectory.child("apache-maven-" + mavenVersion);
         FilePath mvn = buildDirectory.createTempFile("maven", "zip");
-        mvn.copyFrom(new URL("https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/" + mavenVersion + "/apache-maven-" + mavenVersion + "-bin.tar.gz"));
+        mvn.copyFrom(new URL(
+                "https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/" + mavenVersion + "/apache-maven-" + mavenVersion + "-bin.tar.gz"));
         mvn.untar(buildDirectory, FilePath.TarCompression.GZIP);
         Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getRemote(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);

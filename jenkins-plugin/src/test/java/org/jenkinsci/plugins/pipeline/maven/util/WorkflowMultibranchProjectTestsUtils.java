@@ -1,12 +1,13 @@
 package org.jenkinsci.plugins.pipeline.maven.util;
 
-import com.cloudbees.hudson.plugins.folder.computed.FolderComputation;
+import static org.assertj.core.api.Assertions.fail;
+
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
+import com.cloudbees.hudson.plugins.folder.computed.FolderComputation;
 
-import static org.junit.Assert.fail;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>

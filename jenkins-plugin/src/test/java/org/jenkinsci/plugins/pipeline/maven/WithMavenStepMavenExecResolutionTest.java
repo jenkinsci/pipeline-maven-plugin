@@ -23,11 +23,23 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.Collections;
+
+import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.Issue;
+import org.testcontainers.containers.GenericContainer;
+
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.Domain;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
+
 import hudson.model.DownloadService;
 import hudson.model.Result;
 import hudson.plugins.sshslaves.SSHLauncher;
@@ -36,17 +48,6 @@ import hudson.slaves.RetentionStrategy;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
 import hudson.tools.InstallSourceProperty;
-import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.Test;
-import org.jvnet.hudson.test.Issue;
-import org.testcontainers.containers.GenericContainer;
-
-import java.util.Collections;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 @Issue("JENKINS-43651")
 public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTest {
@@ -58,7 +59,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
     @Test
     public void testMavenNotInstalledInDockerImage() throws Exception {
-        assertThat(nonMavenContainerRule.execInContainer("mvn", "--version").getStdout(), containsString("exec: \"mvn\": executable file not found in $PATH"));
+        assertThat(nonMavenContainerRule.execInContainer("mvn", "--version").getStdout()).contains("exec: \"mvn\": executable file not found in $PATH");
     }
 
     @Test
@@ -66,15 +67,17 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
         registerAgentForContainer(nonMavenContainerRule);
         String version = registerLatestMavenVersionAsGlobalTool();
 
+        //@formatter:off
         WorkflowRun run = runPipeline("" +
-                "node('" + AGENT_NAME + "') {\n" +
-                "  def mavenHome = tool '" + MAVEN_GLOBAL_TOOL_NAME + "'\n" +
-                "  withEnv([\"MAVEN_HOME=${mavenHome}\"]) {\n" +
-                "    withMaven(traceability: true) {\n" +
-                "      sh \"mvn --version\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "}");
+            "node('" + AGENT_NAME + "') {\n" +
+            "  def mavenHome = tool '" + MAVEN_GLOBAL_TOOL_NAME + "'\n" +
+            "  withEnv([\"MAVEN_HOME=${mavenHome}\"]) {\n" +
+            "    withMaven(traceability: true) {\n" +
+            "      sh \"mvn --version\"\n" +
+            "    }\n" +
+            "  }\n" +
+            "}");
+        //@formatter:on
 
         jenkinsRule.assertLogContains("Apache Maven " + version, run);
         jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/home/test/slave", run);
@@ -85,22 +88,24 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
         registerAgentForContainer(nonMavenContainerRule);
         String version = registerLatestMavenVersionAsGlobalTool();
 
+        //@formatter:off
         WorkflowRun run = runPipeline("" +
-                "pipeline {\n" +
-                "  agent { label '" + AGENT_NAME + "' }\n" +
-                "  tools {\n" +
-                "    maven '" + MAVEN_GLOBAL_TOOL_NAME + "'\n" +
-                "  }\n" +
-                "  stages {\n" +
-                "    stage('Build') {\n" +
-                "      steps {\n" +
-                "        withMaven(traceability: true) {\n" +
-                "          sh \"mvn --version\"\n" +
-                "        }\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "}");
+            "pipeline {\n" +
+            "  agent { label '" + AGENT_NAME + "' }\n" +
+            "  tools {\n" +
+            "    maven '" + MAVEN_GLOBAL_TOOL_NAME + "'\n" +
+            "  }\n" +
+            "  stages {\n" +
+            "    stage('Build') {\n" +
+            "      steps {\n" +
+            "        withMaven(traceability: true) {\n" +
+            "          sh \"mvn --version\"\n" +
+            "        }\n" +
+            "      }\n" +
+            "    }\n" +
+            "  }\n" +
+            "}");
+        //@formatter:on
 
         jenkinsRule.assertLogContains("Apache Maven " + version, run);
         jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/home/test/slave", run);
@@ -110,12 +115,14 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
     public void testPreInstalledMavenRecognizedWithoutMavenHome() throws Exception {
         registerAgentForContainer(javaGitContainerRule);
 
+        //@formatter:off
         WorkflowRun run = runPipeline("" +
-                "node('" + AGENT_NAME + "') {\n" +
-                "  withMaven(traceability: true) {\n" +
-                "    sh \"mvn --version\"\n" +
-                "  }\n" +
-                "}");
+            "node('" + AGENT_NAME + "') {\n" +
+            "  withMaven(traceability: true) {\n" +
+            "    sh \"mvn --version\"\n" +
+            "  }\n" +
+            "}");
+        //@formatter:on
 
         jenkinsRule.assertLogContains("Apache Maven 3.6.0", run);
         jenkinsRule.assertLogContains("using Maven installation provided by the build agent with executable /usr/bin/mvn", run);
@@ -125,13 +132,15 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
     public void testPreInstalledMavenRecognizedWithMavenHome() throws Exception {
         registerAgentForContainer(mavenWithMavenHomeContainerRule);
 
+        //@formatter:off
         WorkflowRun run = runPipeline("" +
-                "node('" + AGENT_NAME + "') {\n" +
-                "  sh 'echo $MAVEN_HOME'\n" +
-                "  withMaven(traceability: true) {\n" +
-                "    sh \"mvn --version\"\n" +
-                "  }\n" +
-                "}");
+            "node('" + AGENT_NAME + "') {\n" +
+            "  sh 'echo $MAVEN_HOME'\n" +
+            "  withMaven(traceability: true) {\n" +
+            "    sh \"mvn --version\"\n" +
+            "  }\n" +
+            "}");
+        //@formatter:on
 
         jenkinsRule.assertLogContains("Apache Maven 3.6.0", run);
         jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/usr/share/maven", run);
@@ -152,9 +161,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
     private void addTestSshCredentials() {
         Credentials credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, SSH_CREDENTIALS_ID, null, "test", "test");
 
-        SystemCredentialsProvider.getInstance()
-                .getDomainCredentialsMap()
-                .put(Domain.global(), Collections.singletonList(credentials));
+        SystemCredentialsProvider.getInstance().getDomainCredentialsMap().put(Domain.global(), Collections.singletonList(credentials));
     }
 
     private void registerAgentForSlaveContainer(GenericContainer<?> slaveContainer) throws Exception {

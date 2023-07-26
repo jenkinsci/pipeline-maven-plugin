@@ -84,11 +84,11 @@
   </scm>
 
   <properties>
+    <assertj.version>3.24.2</assertj.version>
     <changelist>999999-SNAPSHOT</changelist>
     <findbugs-annotation.version>3.0.1</findbugs-annotation.version>
     <groovy.version>2.4.21</groovy.version>
     <gson.version>2.10.1</gson.version>
-    <hamcrest.version>2.2</hamcrest.version>
     <hikaricp.version>4.0.3</hikaricp.version>
     <jansi.version>2.4.0</jansi.version>
     <jenkins-annotation-indexer.version>1.17</jenkins-annotation-indexer.version>
@@ -112,7 +112,8 @@
     <jenkins-tools-bom.version>1763.v092b_8980a_f5e</jenkins-tools-bom.version>
     <jenkins.version>2.346.3</jenkins.version>
     <joda-time.version>2.12.5</joda-time.version>
-    <junit.version>4.13.2</junit.version>
+    <junit.version>5.9.3</junit.version>
+    <logback.version>1.4.8</logback.version>
     <maven-compat.version>3.3.9</maven-compat.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
     <maven-plugin-sortpom.version>3.2.1</maven-plugin-sortpom.version>
@@ -127,25 +128,39 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.hamcrest</groupId>
-        <artifactId>hamcrest</artifactId>
-        <version>${hamcrest.version}</version>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertj.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>org.assertj</groupId>
+      <artifactId>assertj-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <repositories>
     <repository>
