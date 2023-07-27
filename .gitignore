@@ -27,6 +27,7 @@ work/
 .project
 .metadata
 .loadpath
+.factorypath
 
 # log files
 *.log

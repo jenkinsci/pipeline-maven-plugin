@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.jgiven.JgivenReportGenerator;
@@ -62,7 +62,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
     }
 
     @Override
-    public void process(@Nonnull final StepContext context, @Nonnull final Element mavenSpyLogsElt)
+    public void process(@NonNull final StepContext context, @NonNull final Element mavenSpyLogsElt)
             throws IOException, InterruptedException {
 
         TaskListener listener = context.get(TaskListener.class);
@@ -117,16 +117,16 @@ public class JGivenTestsPublisher extends MavenPublisher {
             generator.perform(run, workspace, launcher, listener);
         } catch (final Exception e) {
             listener.error(
-                    "[withMaven] jgivenPublisher - exception archiving JGiven reports: " + e + ". Failing the build.");
+                    "[withMaven] jgivenPublisher - exception archiving JGiven reports: " + e);
             LOGGER.log(Level.WARNING, "Exception processing JGiven reports archiving", e);
-            run.setResult(Result.FAILURE);
+            throw new MavenPipelinePublisherException("jgivenPublisher", "archiving JGiven reports", e);
         }
     }
 
     @Symbol("jgivenPublisher")
     @Extension
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "JGiven Publisher";
@@ -137,7 +137,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
             return 20;
         }
 
-        @Nonnull
+        @NonNull
         @Override
         public String getSkipFileName() {
             return ".skip-publish-jgiven-results";

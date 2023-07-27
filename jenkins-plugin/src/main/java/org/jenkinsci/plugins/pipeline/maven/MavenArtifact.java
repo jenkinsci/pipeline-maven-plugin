@@ -2,8 +2,8 @@ package org.jenkinsci.plugins.pipeline.maven;
 
 import org.apache.commons.lang.builder.CompareToBuilder;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -77,7 +77,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     /**
      * @see MavenArtifact#version
      */
-    @Nonnull
+    @NonNull
     public String getFileName() {
         return getArtifactId() + "-" + getVersion() + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : "-" + getClassifier()) + "." + getExtension();
     }
@@ -85,7 +85,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     /**
      * @see MavenArtifact#baseVersion
      */
-    @Nonnull
+    @NonNull
     public String getFileNameWithBaseVersion() {
         return getArtifactId() + "-" + getBaseVersion() + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : "-" + getClassifier()) + "." + getExtension();
     }
@@ -93,7 +93,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     /**
      * @see MavenArtifact#baseVersion
      */
-    @Nonnull
+    @NonNull
     public String getFileNameWithVersion() {
         return getArtifactId() + "-" + getVersion() + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : "-" + getClassifier()) + "." + getExtension();
     }
@@ -101,7 +101,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     /**
      * @see org.apache.maven.artifact.Artifact#getId()
      */
-    @Nonnull
+    @NonNull
     public String getId() {
         return getGroupId() + ":" + getArtifactId() + ":" +
                 getType() + ":" +
@@ -112,7 +112,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     /**
      * Gets a human readable description of this artifact
      */
-    @Nonnull
+    @NonNull
     public String getShortDescription() {
         if (getBaseVersion() == null) {
             return getId();

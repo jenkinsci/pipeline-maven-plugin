@@ -27,7 +27,7 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -49,14 +49,14 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
                 new Object[]{jobFullName, buildNumber, groupId, artifactId, version, type, scope, ignoreUpstreamTriggers});
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<MavenDependency> listDependencies(@Nonnull String jobFullName, int buildNumber) {
+    public List<MavenDependency> listDependencies(@NonNull String jobFullName, int buildNumber) {
         return Collections.emptyList();
     }
 
     @Override
-    public void recordParentProject(@Nonnull String jobFullName, int buildNumber, @Nonnull String parentGroupId, @Nonnull String parentArtifactId, @Nonnull String parentVersion, boolean ignoreUpstreamTriggers) {
+    public void recordParentProject(@NonNull String jobFullName, int buildNumber, @NonNull String parentGroupId, @NonNull String parentArtifactId, @NonNull String parentVersion, boolean ignoreUpstreamTriggers) {
         LOGGER.log(Level.INFO, "recordParentProject({0}#{1}, {2}:{3} ignoreUpstreamTriggers:{5}})",
                 new Object[]{jobFullName, buildNumber, parentGroupId, parentArtifactId, parentVersion, ignoreUpstreamTriggers});
 
@@ -93,38 +93,38 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
 
     }
 
-    @Nonnull
+    @NonNull
     @Override
     @Deprecated
-    public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+    public List<String> listDownstreamJobs(@NonNull String jobFullName, int buildNumber) {
         return Collections.emptyList();
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@Nonnull String jobFullName, int buildNumber) {
+    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@NonNull String jobFullName, int buildNumber) {
         return Collections.emptyMap();
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public SortedSet<String> listDownstreamJobs(String groupId, String artifactId, String version, String baseVersion, String type, String classifier) {
         return new TreeSet<>();
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Map<String, Integer> listUpstreamJobs(String jobFullName, int buildNumber) {
         return Collections.emptyMap();
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Map<String, Integer> listTransitiveUpstreamJobs(String jobFullName, int buildNumber) {
         return Collections.emptyMap();
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public Map<String, Integer> listTransitiveUpstreamJobs(String jobFullName, int buildNumber,
             UpstreamMemory upstreamMemory) {
@@ -136,14 +136,14 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
         LOGGER.log(Level.INFO, "cleanup()");
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<MavenArtifact> getGeneratedArtifacts(@Nonnull String jobFullName, int buildNumber) {
+    public List<MavenArtifact> getGeneratedArtifacts(@NonNull String jobFullName, int buildNumber) {
         return Collections.emptyList();
     }
 
     @Override
-    public void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
+    public void updateBuildOnCompletion(@NonNull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
         LOGGER.log(Level.INFO, "updateBuildOnCompletion({0}, {1}, result: {2}, startTime): {3}, duration: {4}",
                 new Object[]{jobFullName, buildNumber, buildResultOrdinal, startTimeInMillis, durationInMillis});
     }

@@ -1,21 +1,20 @@
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import static java.util.Collections.singletonMap;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasEntry;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Map;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UpstreamMemoryTest {
 
     @InjectMocks
@@ -30,7 +29,7 @@ public class UpstreamMemoryTest {
 
         Map<String, Integer> result = memory.listUpstreamJobs(dao, "a job", 42);
 
-        assertThat(result, hasEntry("upstream", 1));
+        assertThat(result).containsEntry("upstream", 1);
         verify(dao).listUpstreamJobs("a job", 42);
         verifyNoMoreInteractions(dao);
     }
@@ -42,7 +41,7 @@ public class UpstreamMemoryTest {
         memory.listUpstreamJobs(dao, "a job", 42);
         Map<String, Integer> result = memory.listUpstreamJobs(dao, "a job", 42);
 
-        assertThat(result, hasEntry("upstream", 1));
+        assertThat(result).containsEntry("upstream", 1);
         verify(dao).listUpstreamJobs("a job", 42);
         verifyNoMoreInteractions(dao);
     }

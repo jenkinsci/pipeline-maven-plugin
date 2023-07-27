@@ -7,7 +7,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.inject.Inject;
 
 /**
@@ -44,7 +44,7 @@ public class DatabaseSyncRunListener extends AbstractWorkflowRunListener {
      * TODO ensure that this code executes before DownstreamPipelineTriggerRunListener#onCompleted
      */
     @Override
-    public void onCompleted(Run<?, ?> workflowRun, @Nonnull TaskListener listener) {
+    public void onCompleted(Run<?, ?> workflowRun, @NonNull TaskListener listener) {
         super.onCompleted(workflowRun, listener);
 
         if (!shouldRun(workflowRun, listener)) {

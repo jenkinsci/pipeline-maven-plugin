@@ -6,7 +6,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.w3c.dom.Element;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -26,7 +26,7 @@ public class DependenciesLister {
      * @param mavenSpyLogs Root XML element
      * @return list of {@link MavenArtifact}
      */
-    @Nonnull
+    @NonNull
     public static List<MavenDependency> listDependencies(final Element mavenSpyLogs,
                                                          final Logger logger) {
 
@@ -66,7 +66,7 @@ public class DependenciesLister {
      * @param mavenSpyLogs Root XML element
      * @return list of {@link MavenArtifact}
      */
-    @Nonnull
+    @NonNull
     public static List<MavenArtifact> listParentProjects(final Element mavenSpyLogs,
                                                          final Logger logger) {
 

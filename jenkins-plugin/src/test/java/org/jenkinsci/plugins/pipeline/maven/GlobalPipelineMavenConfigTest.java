@@ -2,10 +2,7 @@ package org.jenkinsci.plugins.pipeline.maven;
 
 import static com.cloudbees.plugins.credentials.CredentialsScope.GLOBAL;
 import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsEqual.equalTo;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -19,11 +16,14 @@ import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginMySqlDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginPostgreSqlDao;
-import org.junit.ClassRule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -38,18 +38,22 @@ import hudson.ExtensionList;
 import hudson.model.ItemGroup;
 import jenkins.model.Jenkins;
 
+@Testcontainers
+@WithJenkins
 public class GlobalPipelineMavenConfigTest {
 
-    @ClassRule
-    public static MySQLContainer<?> MYSQL_DB = new MySQLContainer<>(MySQLContainer.NAME).withUsername("aUser")
-            .withPassword("aPass");
+    @Container
+    public static MySQLContainer<?> MYSQL_DB = new MySQLContainer<>(MySQLContainer.NAME).withUsername("aUser").withPassword("aPass");
 
-    @ClassRule
-    public static PostgreSQLContainer<?> POSTGRE_DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE)
-            .withUsername("aUser").withPassword("aPass");
+    @Container
+    public static PostgreSQLContainer<?> POSTGRE_DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE).withUsername("aUser").withPassword("aPass");
 
-    @ClassRule
-    public static JenkinsRule j = new JenkinsRule();
+    @BeforeAll
+    public static void setup(JenkinsRule r) {
+        j = r;
+    }
+
+    private static JenkinsRule j;
 
     private static class FakeCredentialsProvider extends CredentialsProvider {
         public FakeCredentialsProvider() {
@@ -61,14 +65,13 @@ public class GlobalPipelineMavenConfigTest {
         }
 
         @Override
-        public <C extends Credentials> List<C> getCredentials(Class<C> type, ItemGroup itemGroup,
-                Authentication authentication, List<DomainRequirement> domainRequirements) {
+        public <C extends Credentials> List<C> getCredentials(Class<C> type, ItemGroup itemGroup, Authentication authentication,
+                List<DomainRequirement> domainRequirements) {
             return (List<C>) asList(new UsernamePasswordCredentialsImpl(GLOBAL, "credsId", "", "aUser", "aPass"));
         }
 
         @Override
-        public <C extends Credentials> List<C> getCredentials(Class<C> type, ItemGroup itemGroup,
-                Authentication authentication) {
+        public <C extends Credentials> List<C> getCredentials(Class<C> type, ItemGroup itemGroup, Authentication authentication) {
             return getCredentials(type, itemGroup, authentication, null);
         }
     }
@@ -79,17 +82,16 @@ public class GlobalPipelineMavenConfigTest {
     public void shouldBuildH2Dao() throws Exception {
         PipelineMavenPluginDao dao = config.getDao();
 
-        assertThat(dao, instanceOf(MonitoringPipelineMavenPluginDaoDecorator.class));
+        assertThat(dao).isInstanceOf(MonitoringPipelineMavenPluginDaoDecorator.class);
         Object innerDao = getField(dao, "delegate");
-        assertThat(innerDao, instanceOf(CustomTypePipelineMavenPluginDaoDecorator.class));
+        assertThat(innerDao).isInstanceOf(CustomTypePipelineMavenPluginDaoDecorator.class);
         innerDao = getField(innerDao, "delegate");
-        assertThat(innerDao, instanceOf(PipelineMavenPluginH2Dao.class));
+        assertThat(innerDao).isInstanceOf(PipelineMavenPluginH2Dao.class);
     }
 
     @Test
     public void shouldBuildMysqlDao() throws Exception {
-        ExtensionList<CredentialsProvider> extensionList = Jenkins.getInstance()
-                .getExtensionList(CredentialsProvider.class);
+        ExtensionList<CredentialsProvider> extensionList = Jenkins.getInstance().getExtensionList(CredentialsProvider.class);
         extensionList.add(extensionList.size(), new FakeCredentialsProvider());
         config.setJdbcUrl(MYSQL_DB.getJdbcUrl());
         config.setJdbcCredentialsId("credsId");
@@ -97,51 +99,50 @@ public class GlobalPipelineMavenConfigTest {
 
         PipelineMavenPluginDao dao = config.getDao();
 
-        assertThat(dao, instanceOf(MonitoringPipelineMavenPluginDaoDecorator.class));
+        assertThat(dao).isInstanceOf(MonitoringPipelineMavenPluginDaoDecorator.class);
         Object innerDao = getField(dao, "delegate");
-        assertThat(innerDao, instanceOf(CustomTypePipelineMavenPluginDaoDecorator.class));
+        assertThat(innerDao).isInstanceOf(CustomTypePipelineMavenPluginDaoDecorator.class);
         innerDao = getField(innerDao, "delegate");
-        assertThat(innerDao, instanceOf(PipelineMavenPluginMySqlDao.class));
+        assertThat(innerDao).isInstanceOf(PipelineMavenPluginMySqlDao.class);
         Object ds = getField(innerDao, "ds");
-        assertThat(ds, instanceOf(HikariDataSource.class));
+        assertThat(ds).isInstanceOf(HikariDataSource.class);
         HikariDataSource datasource = (HikariDataSource) ds;
-        assertThat(datasource.getJdbcUrl(), equalTo(MYSQL_DB.getJdbcUrl()));
-        assertThat(datasource.getUsername(), equalTo("aUser"));
-        assertThat(datasource.getPassword(), equalTo("aPass"));
-        assertThat(datasource.getMaxLifetime(), is(42000L));
-        assertThat(datasource.getDataSourceProperties().containsKey("dataSource.cachePrepStmts"), is(true));
-        assertThat(datasource.getDataSourceProperties().getProperty("dataSource.cachePrepStmts"), is("true"));
-        assertThat(datasource.getDataSourceProperties().containsKey("dataSource.prepStmtCacheSize"), is(true));
-        assertThat(datasource.getDataSourceProperties().getProperty("dataSource.prepStmtCacheSize"), is("250"));
+        assertThat(datasource.getJdbcUrl()).isEqualTo(MYSQL_DB.getJdbcUrl());
+        assertThat(datasource.getUsername()).isEqualTo("aUser");
+        assertThat(datasource.getPassword()).isEqualTo("aPass");
+        assertThat(datasource.getMaxLifetime()).isEqualTo(42000L);
+        assertThat(datasource.getDataSourceProperties()).containsKey("dataSource.cachePrepStmts");
+        assertThat(datasource.getDataSourceProperties().getProperty("dataSource.cachePrepStmts")).isEqualTo("true");
+        assertThat(datasource.getDataSourceProperties()).containsKey("dataSource.prepStmtCacheSize");
+        assertThat(datasource.getDataSourceProperties().getProperty("dataSource.prepStmtCacheSize")).isEqualTo("250");
         Connection connection = datasource.getConnection();
-        assertThat(connection, instanceOf(HikariProxyConnection.class));
+        assertThat(connection).isInstanceOf(HikariProxyConnection.class);
         connection = (Connection) getField(connection, "delegate");
-        assertThat(connection, instanceOf(ConnectionImpl.class));
+        assertThat(connection).isInstanceOf(ConnectionImpl.class);
         RuntimeProperty<Boolean> cachePrepStmts = (RuntimeProperty<Boolean>) getField(connection, "cachePrepStmts");
-        assertThat(cachePrepStmts.getValue(), is(true));
+        assertThat(cachePrepStmts.getValue()).isTrue();
     }
 
     @Test
     public void shouldBuildPostgresqlDao() throws Exception {
-        ExtensionList<CredentialsProvider> extensionList = Jenkins.getInstance()
-                .getExtensionList(CredentialsProvider.class);
+        ExtensionList<CredentialsProvider> extensionList = Jenkins.getInstance().getExtensionList(CredentialsProvider.class);
         extensionList.add(extensionList.size(), new FakeCredentialsProvider());
         config.setJdbcUrl(POSTGRE_DB.getJdbcUrl());
         config.setJdbcCredentialsId("credsId");
 
         PipelineMavenPluginDao dao = config.getDao();
 
-        assertThat(dao, instanceOf(MonitoringPipelineMavenPluginDaoDecorator.class));
+        assertThat(dao).isInstanceOf(MonitoringPipelineMavenPluginDaoDecorator.class);
         Object innerDao = getField(dao, "delegate");
-        assertThat(innerDao, instanceOf(CustomTypePipelineMavenPluginDaoDecorator.class));
+        assertThat(innerDao).isInstanceOf(CustomTypePipelineMavenPluginDaoDecorator.class);
         innerDao = getField(innerDao, "delegate");
-        assertThat(innerDao, instanceOf(PipelineMavenPluginPostgreSqlDao.class));
+        assertThat(innerDao).isInstanceOf(PipelineMavenPluginPostgreSqlDao.class);
         Object ds = getField(innerDao, "ds");
-        assertThat(ds, instanceOf(HikariDataSource.class));
+        assertThat(ds).isInstanceOf(HikariDataSource.class);
         HikariDataSource datasource = (HikariDataSource) ds;
-        assertThat(datasource.getJdbcUrl(), equalTo(POSTGRE_DB.getJdbcUrl()));
-        assertThat(datasource.getUsername(), equalTo("aUser"));
-        assertThat(datasource.getPassword(), equalTo("aPass"));
+        assertThat(datasource.getJdbcUrl()).isEqualTo(POSTGRE_DB.getJdbcUrl());
+        assertThat(datasource.getUsername()).isEqualTo("aUser");
+        assertThat(datasource.getPassword()).isEqualTo("aPass");
     }
 
     private Object getField(Object targetObject, String name) throws Exception {
@@ -166,8 +167,8 @@ public class GlobalPipelineMavenConfigTest {
     }
 
     private void makeAccessible(Field field) {
-        if ((!Modifier.isPublic(field.getModifiers()) || !Modifier.isPublic(field.getDeclaringClass().getModifiers())
-                || Modifier.isFinal(field.getModifiers())) && !field.isAccessible()) {
+        if ((!Modifier.isPublic(field.getModifiers()) || !Modifier.isPublic(field.getDeclaringClass().getModifiers()) || Modifier.isFinal(field.getModifiers()))
+                && !field.isAccessible()) {
             field.setAccessible(true);
         }
     }

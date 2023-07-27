@@ -9,7 +9,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
@@ -53,7 +53,7 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
     }
 
     @Override
-    public void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
 
         Run run = context.get(Run.class);
         ArtifactManager artifactManager = run.pickArtifactManager();
@@ -136,11 +136,13 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
 
         // FINGERPRINT GENERATED MAVEN ARTIFACT
         if (!fingerprintFilesDisabled) {
-          FingerprintMap fingerprintMap = Jenkins.get().getFingerprintMap();
-          for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
-              String artifactPathInArchiveZone = artifactToFingerprint.getKey();
-              String artifactMd5 = artifactToFingerprint.getValue();
-              fingerprintMap.getOrCreate(run, artifactPathInArchiveZone, artifactMd5).addFor(run);
+          synchronized (this) { // to avoid exceptions when creating folders under Jenkins home
+              FingerprintMap fingerprintMap = Jenkins.get().getFingerprintMap();
+              for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
+                  String artifactPathInArchiveZone = artifactToFingerprint.getKey();
+                  String artifactMd5 = artifactToFingerprint.getValue();
+                  fingerprintMap.getOrCreate(run, artifactPathInArchiveZone, artifactMd5).addFor(run);
+              }
           }
 
           // add action
@@ -155,7 +157,7 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
 
     @Symbol("artifactsPublisher")
     @Extension public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Generated Artifacts Publisher";
@@ -167,7 +169,7 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
         }
 
 
-        @Nonnull
+        @NonNull
         @Override
         public String getSkipFileName() {
             return ".skip-archive-generated-artifacts";

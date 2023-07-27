@@ -62,10 +62,8 @@ import java.util.Set;
 /**
  * Configures maven environment to use within a pipeline job by calling <code>sh mvn</code> or <code>bat mvn</code>.
  * The selected maven installation will be configured and prepended to the path.
- *
  */
 public class WithMavenStep extends Step {
-
 
     private String tempBinDir = "";
     private String mavenSettingsConfig;
@@ -78,7 +76,7 @@ public class WithMavenStep extends Step {
     private String mavenLocalRepo = "";
     private List<MavenPublisher> options = new ArrayList<>();
     private MavenPublisherStrategy publisherStrategy = MavenPublisherStrategy.IMPLICIT;
-    private boolean traceability = true;
+    private Boolean traceability = null;
 
     @DataBoundConstructor
     public WithMavenStep() {
@@ -174,12 +172,12 @@ public class WithMavenStep extends Step {
         this.publisherStrategy = publisherStrategy;
     }
 
-    public boolean isTraceability() {
+    public Boolean isTraceability() {
         return traceability;
     }
 
     @DataBoundSetter
-    public void setTraceability(final boolean traceability) {
+    public void setTraceability(final Boolean traceability) {
         this.traceability = traceability;
     }
 
@@ -249,8 +247,8 @@ public class WithMavenStep extends Step {
             if (item == null) {
                 return r; // it's empty
             }
-            item.checkPermission(Item.CONFIGURE);
-            r.add("--- Use system default Maven ---");
+            item.checkPermission(Item.EXTENDED_READ);
+            r.add("--- Use system default Maven ---", "");
             for (MavenInstallation installation : getMavenDescriptor().getInstallations()) {
                 r.add(installation.getName());
             }
@@ -267,8 +265,8 @@ public class WithMavenStep extends Step {
             if (item == null) {
                 return r; // it's empty
             }
-            item.checkPermission(Item.CONFIGURE);
-            r.add("--- Use system default JDK ---");
+            item.checkPermission(Item.EXTENDED_READ);
+            r.add("--- Use system default JDK ---", "");
             for (JDK installation : getJDKDescriptor().getInstallations()) {
                 r.add(installation.getName());
             }
@@ -281,8 +279,8 @@ public class WithMavenStep extends Step {
             if (item == null) {
                 return r; // it's empty
             }
-            item.checkPermission(Item.CONFIGURE);
-            r.add("--- Use system default settings or file path ---");
+            item.checkPermission(Item.EXTENDED_READ);
+            r.add("--- Use system default settings or file path ---", "");
             for (Config config : ConfigFiles.getConfigsInContext(context, MavenSettingsConfigProvider.class)) {
                 r.add(config.name, config.id);
             }
@@ -295,8 +293,8 @@ public class WithMavenStep extends Step {
             if (item == null) {
                 return r; // it's empty
             }
-            item.checkPermission(Item.CONFIGURE);
-            r.add("--- Use system default settings or file path ---");
+            item.checkPermission(Item.EXTENDED_READ);
+            r.add("--- Use system default settings or file path ---", "");
             for (Config config : ConfigFiles.getConfigsInContext(context, GlobalMavenSettingsConfigProvider.class)) {
                 r.add(config.name, config.id);
             }
@@ -309,7 +307,7 @@ public class WithMavenStep extends Step {
             if (item == null) {
                 return r; // it's empty
             }
-            item.checkPermission(Item.CONFIGURE);
+            item.checkPermission(Item.EXTENDED_READ);
             for(MavenPublisherStrategy publisherStrategy: MavenPublisherStrategy.values()) {
                 r.add(publisherStrategy.getDescription(), publisherStrategy.name());
             }

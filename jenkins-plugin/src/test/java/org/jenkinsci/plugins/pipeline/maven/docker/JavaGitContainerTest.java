@@ -24,23 +24,17 @@
 
 package org.jenkinsci.plugins.pipeline.maven.docker;
 
-import org.jenkinsci.test.acceptance.docker.DockerRule;
-import org.jenkinsci.utils.process.CommandBuilder;
-import org.junit.Rule;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
+import org.junit.jupiter.api.Test;
 
-public class JavaGitContainerTest {
-
-    @Rule
-    public DockerRule<JavaGitContainer> rule = new DockerRule<>(JavaGitContainer.class);
+public class JavaGitContainerTest extends AbstractIntegrationTest {
 
     @Test
     public void smokes() throws Exception {
-        assertThat(rule.get().popen(new CommandBuilder("java", "-version")).verifyOrDieWith("could not launch Java"), containsString("openjdk version \"11"));
-        assertThat(rule.get().popen(new CommandBuilder("git", "version")).verifyOrDieWith("could not launch git"), containsString("git version 2."));
+        assertThat(javaGitContainerRule.execInContainer("java", "-version").getStderr()).contains("openjdk version \"11");
+        assertThat(javaGitContainerRule.execInContainer("git", "--version").getStdout()).contains("git version 2.");
     }
 
 }

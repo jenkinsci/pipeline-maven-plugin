@@ -26,7 +26,7 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import org.postgresql.util.PSQLState;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -41,7 +41,7 @@ import java.util.logging.Level;
  */
 public class PipelineMavenPluginPostgreSqlDao extends AbstractPipelineMavenPluginDao {
 
-    public PipelineMavenPluginPostgreSqlDao(@Nonnull DataSource ds) {
+    public PipelineMavenPluginPostgreSqlDao(@NonNull DataSource ds) {
         super(ds);
     }
 

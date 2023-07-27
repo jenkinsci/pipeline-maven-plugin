@@ -48,6 +48,9 @@ THE SOFTWARE.
 
             <f:validateButton title="${%Validate Database Configuration}" method="validateJdbcConnection" with="jdbcUrl,properties,jdbcCredentialsId"/>
         </f:entry>
+        <f:entry title="${%Global traceability}" >
+            <f:checkbox title="${%Enable traceability globally : Java/Maven versions, settings, ...}" field="globalTraceability" />
+        </f:entry>
         <f:entry title="${%Trigger downstream upon result}" field="triggerDownstreamUponResult" >
             <f:checkbox title="${%Success}" field="triggerDownstreamUponResultSuccess" default="true" />
             <f:checkbox title="${%Unstable}" field="triggerDownstreamUponResultUnstable" />

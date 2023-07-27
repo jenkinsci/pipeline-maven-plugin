@@ -7,8 +7,8 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.logging.Logger;
@@ -39,7 +39,7 @@ public abstract class MavenPublisher extends AbstractDescribableImpl<MavenPublis
      * @throws IOException
      * @throws InterruptedException
      */
-    public abstract void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException;
+    public abstract void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException;
 
     @Override
     public DescriptorImpl getDescriptor() {

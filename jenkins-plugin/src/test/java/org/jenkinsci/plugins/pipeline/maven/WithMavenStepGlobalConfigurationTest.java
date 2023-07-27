@@ -23,7 +23,10 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
-import hudson.model.Result;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
@@ -32,14 +35,13 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import hudson.model.Result;
 
 /**
- * TODO migrate to {@link WithMavenStepTest} once we have implemented a GitRepoRule that can be used on remote agents
+ * TODO migrate to {@link WithMavenStepTest} once we have implemented a
+ * GitRepoRule that can be used on remote agents
  */
 public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTest {
 
@@ -76,19 +78,20 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
         logger.setLevel(Level.FINE);
         try {
 
-
             Symbol symbolAnnotation = descriptor.getClass().getAnnotation(Symbol.class);
             String symbol = symbolAnnotation.value()[0];
             String displayName = descriptor.getDisplayName();
 
             loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
+            //@formatter:off
             String pipelineScript = "node() {\n" +
-                    "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                    "    withMaven() {\n" +
-                    "        sh 'mvn package verify'\n" +
-                    "    }\n" +
-                    "}";
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven() {\n" +
+                "        sh 'mvn package verify'\n" +
+                "    }\n" +
+                "}";
+            //@formatter:on
 
             WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-" + symbol + "-publisher-globally-disabled");
             pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
@@ -101,7 +104,6 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
             globalPipelineMavenConfig.setPublisherOptions(null);
         }
     }
-
 
     @Test
     public void maven_build_jar_project_on_master_with_findbugs_publisher_configured_both_globally_and_on_the_pipeline_succeeds() throws Exception {
@@ -120,10 +122,12 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
 
     @Test
     public void maven_build_jar_project_on_master_with_generated_artifacts_publisher_configured_both_globally_and_on_the_pipeline_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(new GeneratedArtifactsPublisher.DescriptorImpl());
+        maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(
+                new GeneratedArtifactsPublisher.DescriptorImpl());
     }
 
-    private void maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(MavenPublisher.DescriptorImpl descriptor) throws Exception {
+    private void maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(
+            MavenPublisher.DescriptorImpl descriptor) throws Exception {
 
         MavenPublisher publisher = descriptor.clazz.newInstance();
         publisher.setDisabled(true);
@@ -136,32 +140,35 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
         logger.setLevel(Level.FINE);
         try {
 
-
             Symbol symbolAnnotation = descriptor.getClass().getAnnotation(Symbol.class);
             String symbol = symbolAnnotation.value()[0];
             String displayName = descriptor.getDisplayName();
 
             loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
+            //@formatter:off
             String pipelineScript = "node() {\n" +
-                    "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                    "    withMaven(options:[" + symbol + "(disabled: true)]) {\n" +
-                    "        sh 'mvn package verify'\n" +
-                    "    }\n" +
-                    "}";
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven(options:[" + symbol + "(disabled: true)]) {\n" +
+                "        sh 'mvn package verify'\n" +
+                "    }\n" +
+                "}";
+            //@formatter:on
 
-            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-" + symbol + "-publisher-defined-globally-and-in-the-pipeline");
+            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class,
+                    "build-on-master-" + symbol + "-publisher-defined-globally-and-in-the-pipeline");
             pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
             WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
-            jenkinsRule.assertLogContains("[withMaven] WARNING merging publisher configuration defined in the 'Global Tool Configuration' and at the pipeline level is not yet supported. " +
-                    "Use pipeline level configuration for '" + displayName +                     "'", build);
+            jenkinsRule.assertLogContains(
+                    "[withMaven] WARNING merging publisher configuration defined in the 'Global Tool Configuration' and at the pipeline level is not yet supported. "
+                            + "Use pipeline level configuration for '" + displayName + "'",
+                    build);
             jenkinsRule.assertLogContains("[withMaven] Skip '" + displayName + "' disabled by configuration", build);
         } finally {
             logger.setLevel(level);
             globalPipelineMavenConfig.setPublisherOptions(null);
         }
     }
-
 
 }

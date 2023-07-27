@@ -26,8 +26,8 @@ package org.jenkinsci.plugins.pipeline.maven.service;
 
 import hudson.model.Item;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,7 +38,7 @@ public class ServiceLoggerJulImpl implements ServiceLogger {
 
     private transient final Logger logger;
 
-    public ServiceLoggerJulImpl(@Nonnull Logger logger) {
+    public ServiceLoggerJulImpl(@NonNull Logger logger) {
         this.logger = logger;
     }
 
@@ -52,7 +52,7 @@ public class ServiceLoggerJulImpl implements ServiceLogger {
         logger.log(level, message);
     }
 
-    @Nonnull
+    @NonNull
     @Override
     public String modelHyperlinkNoteEncodeTo(@Nullable Item item) {
         return item == null ? "#null#" : item.getFullDisplayName();

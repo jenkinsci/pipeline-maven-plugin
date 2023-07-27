@@ -23,34 +23,32 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+
+import org.apache.commons.io.FileUtils;
+import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.Issue;
+import org.testcontainers.containers.GenericContainer;
+
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.Domain;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
+
 import hudson.model.Fingerprint;
 import hudson.model.FingerprintMap;
 import hudson.model.Result;
 import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.slaves.DumbSlave;
 import hudson.slaves.RetentionStrategy;
-import org.apache.commons.io.FileUtils;
-import org.hamcrest.Matchers;
-import org.jenkinsci.plugins.pipeline.maven.docker.JavaGitContainer;
-import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.jenkinsci.test.acceptance.docker.DockerRule;
-import org.jenkinsci.test.acceptance.docker.fixtures.SshdContainer;
-import org.junit.Rule;
-import org.junit.Test;
-import org.jvnet.hudson.test.Issue;
-
-import java.io.File;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class WithMavenStepTest extends AbstractIntegrationTest {
 
@@ -59,40 +57,41 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     private static final String SLAVE_BASE_PATH = "/home/test/slave";
     private static final String COMMONS_LANG3_FINGERPRINT = "780b5a8b72eebe6d0dbff1c11b5658fa";
 
-    @Rule
-    public DockerRule<JavaGitContainer> javaGitContainerRule = new DockerRule<>(JavaGitContainer.class);
-
     @Issue("SECURITY-441")
     @Test
     public void testMavenBuildOnRemoteAgentWithSettingsFileOnMasterFails() throws Exception {
-        registerAgentForContainer(javaGitContainerRule.get());
+        registerAgentForContainer(javaGitContainerRule);
 
         File onMaster = new File(jenkinsRule.jenkins.getRootDir(), "onmaster");
         String secret = "secret content on master";
         FileUtils.writeStringToFile(onMaster, secret, StandardCharsets.UTF_8);
 
+        //@formatter:off
         WorkflowRun run = runPipeline(Result.FAILURE, "" +
-                "node('remote') {\n" +
-                "  withMaven(mavenSettingsFilePath: '" + onMaster + "') {\n" +
-                "    echo readFile(MVN_SETTINGS)\n" +
-                "  }\n" +
-                "}");
+            "node('remote') {\n" +
+            "  withMaven(mavenSettingsFilePath: '" + onMaster + "') {\n" +
+            "    echo readFile(MVN_SETTINGS)\n" +
+            "  }\n" +
+            "}");
+        //@formatter:on
 
         jenkinsRule.assertLogNotContains(secret, run);
     }
 
     @Test
     public void testDisableAllPublishers() throws Exception {
-        registerAgentForContainer(javaGitContainerRule.get());
+        registerAgentForContainer(javaGitContainerRule);
         loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
 
+        //@formatter:off
         runPipeline(Result.SUCCESS, "" +
-                "node() {\n" +
-                "  git($/" + gitRepoRule.toString() + "/$)\n" +
-                "  withMaven(publisherStrategy: 'EXPLICIT') {\n" +
-                "    sh 'mvn package'\n" +
-                "  }\n" +
-                "}");
+            "node() {\n" +
+            "  git($/" + gitRepoRule.toString() + "/$)\n" +
+            "  withMaven(publisherStrategy: 'EXPLICIT') {\n" +
+            "    sh 'mvn package'\n" +
+            "  }\n" +
+            "}");
+        //@formatter:on
 
         assertFingerprintDoesNotExist(COMMONS_LANG3_FINGERPRINT);
     }
@@ -107,10 +106,10 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     private void assertFingerprintDoesNotExist(String fingerprintAsString) throws Exception {
         FingerprintMap fingerprintMap = jenkinsRule.jenkins.getFingerprintMap();
         Fingerprint fingerprint = fingerprintMap.get(fingerprintAsString);
-        assertThat(fingerprint, Matchers.nullValue());
+        assertThat(fingerprint).isNull();
     }
 
-    private void registerAgentForContainer(SshdContainer container) throws Exception {
+    private void registerAgentForContainer(GenericContainer<?> container) throws Exception {
         addTestSshCredentials();
         registerAgentForSlaveContainer(container);
     }
@@ -118,13 +117,11 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     private void addTestSshCredentials() {
         Credentials credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, SSH_CREDENTIALS_ID, null, "test", "test");
 
-        SystemCredentialsProvider.getInstance()
-                .getDomainCredentialsMap()
-                .put(Domain.global(), Collections.singletonList(credentials));
+        SystemCredentialsProvider.getInstance().getDomainCredentialsMap().put(Domain.global(), Collections.singletonList(credentials));
     }
 
-    private void registerAgentForSlaveContainer(SshdContainer slaveContainer) throws Exception {
-        SSHLauncher sshLauncher = new SSHLauncher(slaveContainer.ipBound(22), slaveContainer.port(22), SSH_CREDENTIALS_ID);
+    private void registerAgentForSlaveContainer(GenericContainer<?> slaveContainer) throws Exception {
+        SSHLauncher sshLauncher = new SSHLauncher(slaveContainer.getHost(), slaveContainer.getMappedPort(22), SSH_CREDENTIALS_ID);
 
         DumbSlave agent = new DumbSlave(AGENT_NAME, SLAVE_BASE_PATH, sshLauncher);
         agent.setNumExecutors(1);

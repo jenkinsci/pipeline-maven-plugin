@@ -39,6 +39,7 @@ public class InvokerRunExecutionHandler extends AbstractExecutionHandler {
         super(reporter);
     }
 
+    @Override
     @Nullable
     protected ExecutionEvent.Type getSupportedType() {
         return ExecutionEvent.Type.MojoSucceeded;
@@ -53,6 +54,6 @@ public class InvokerRunExecutionHandler extends AbstractExecutionHandler {
     @NonNull
     @Override
     protected List<String> getConfigurationParametersToReport(ExecutionEvent executionEvent) {
-        return Arrays.asList("projectsDirectory", "cloneProjectsTo", "reportsDirectory");
+        return Arrays.asList("projectsDirectory", "cloneProjectsTo", "reportsDirectory", "writeJunitReport");
     }
 }

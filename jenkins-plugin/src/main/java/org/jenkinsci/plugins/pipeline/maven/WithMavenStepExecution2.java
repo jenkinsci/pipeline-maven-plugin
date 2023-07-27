@@ -84,9 +84,9 @@ import org.jenkinsci.plugins.workflow.steps.GeneralNonBlockingStepExecution;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.springframework.util.ClassUtils;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -160,7 +160,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
     protected boolean doStart() throws Exception {
         envOverride = new EnvVars();
-        console = new TaskListenerTraceWrapper(listener, step.isTraceability());
+        console = new TaskListenerTraceWrapper(listener, computeTraceability());
 
         if (LOGGER.isLoggable(Level.FINE)) {
             LOGGER.log(Level.FINE, "Maven: {0}", step.getMaven());
@@ -297,7 +297,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @throws IOException
      * @throws InterruptedException
      */
-    private void setupMaven(@Nonnull Collection<Credentials> credentials) throws IOException, InterruptedException {
+    private void setupMaven(@NonNull Collection<Credentials> credentials) throws IOException, InterruptedException {
         // Temp dir with the wrapper that will be prepended to the path and the temporary files used by withMaven (settings files...)
         if (step.getTempBinDir() != null && !step.getTempBinDir().isEmpty()) {
             String expandedTargetLocation = step.getTempBinDir();
@@ -506,7 +506,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         // if at this point mvnExecPath is still null try to use which/where command to find a maven executable
         if (mvnExecPath == null) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                console.println("[withMaven] No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which/where command");
+                console.trace("[withMaven] No Maven Installation or MAVEN_HOME found, looking for mvn executable by using which/where command");
             }
             if (Boolean.TRUE.equals(getComputer().isUnix())) {
                 mvnExecPath = readFromProcess("/bin/sh", "-c", "which mvn");
@@ -595,7 +595,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @return wrapper script content
      * @throws AbortException when problems creating content
      */
-    private String generateMavenWrapperScriptContent(@Nonnull FilePath mvnExec, @Nonnull String mavenConfig) throws AbortException {
+    private String generateMavenWrapperScriptContent(@NonNull FilePath mvnExec, @NonNull String mavenConfig) throws AbortException {
 
         boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
 
@@ -678,7 +678,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @throws IOException          when reading files
      */
     @Nullable
-    private String setupSettingFile(@Nonnull Collection<Credentials> credentials) throws IOException, InterruptedException {
+    private String setupSettingFile(@NonNull Collection<Credentials> credentials) throws IOException, InterruptedException {
         final FilePath settingsDest = tempBinDir.child("settings.xml");
 
         // Settings from Config File Provider
@@ -748,7 +748,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                 envOverride.put("MVN_SETTINGS", settingsDest.getRemote());
                 if (LOGGER.isLoggable(Level.FINE)) {
                     mavenSettingsLog.append("Maven settings on the build agent'").append(settingsPath).append("'");
-                    console.println(mavenSettingsLog);
+                    console.trace(mavenSettingsLog);
                 }
                 return settingsDest.getRemote();
             } else {
@@ -759,14 +759,14 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             // do nothing
             if (LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("Maven settings defined by 'DefaultSettingsProvider', NOT overriding it.");
-                console.println(mavenSettingsLog);
+                console.trace(mavenSettingsLog);
             }
         } else if (settingsProvider == null) {
             // should not happen according to the source code of jenkins.mvn.MavenConfig.getSettingsProvider() in jenkins-core 2.7
             // do nothing
             if (LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("Maven settings are null. NO settings will be defined.");
-                console.println(mavenSettingsLog);
+                console.trace(mavenSettingsLog);
             }
         } else {
             console.trace("[withMaven] Ignore unsupported Maven SettingsProvider " + settingsProvider);
@@ -803,7 +803,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @throws IOException          when reading files
      */
     @Nullable
-    private String setupGlobalSettingFile(@Nonnull Collection<Credentials> credentials) throws IOException, InterruptedException {
+    private String setupGlobalSettingFile(@NonNull Collection<Credentials> credentials) throws IOException, InterruptedException {
         final FilePath settingsDest = tempBinDir.child("globalSettings.xml");
 
         // Global settings from Config File Provider
@@ -876,7 +876,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                 settings.copyTo(settingsDest);
                 envOverride.put("GLOBAL_MVN_SETTINGS", settingsDest.getRemote());
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    console.println(mavenSettingsLog);
+                    console.trace(mavenSettingsLog);
                 }
                 return settingsDest.getRemote();
             } else {
@@ -886,14 +886,14 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             // do nothing
             if (LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("Maven global settings defined by 'DefaultSettingsProvider', NOT overriding it.");
-                console.println(mavenSettingsLog);
+                console.trace(mavenSettingsLog);
             }
         } else if (globalSettingsProvider == null) {
             // should not happen according to the source code of jenkins.mvn.GlobalMavenConfig.getGlobalSettingsProvider() in jenkins-core 2.7
             // do nothing
             if (LOGGER.isLoggable(Level.FINE)) {
                 mavenSettingsLog.append("Maven global settings are null. NO settings will be defined.");
-                console.println(mavenSettingsLog);
+                console.trace(mavenSettingsLog);
             }
         } else {
             console.trace("[withMaven] Ignore unsupported Maven GlobalSettingsProvider " + globalSettingsProvider);
@@ -912,7 +912,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @return the {@link FilePath} to the settings file
      * @throws AbortException in case of error
      */
-    private void settingsFromConfig(String mavenSettingsConfigId, FilePath mavenSettingsFile, @Nonnull Collection<Credentials> credentials) throws AbortException {
+    private void settingsFromConfig(String mavenSettingsConfigId, FilePath mavenSettingsFile, @NonNull Collection<Credentials> credentials) throws AbortException {
 
         Config c = ConfigFiles.getByIdOrNull(build, mavenSettingsConfigId);
         if (c == null) {
@@ -1017,7 +1017,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @param logMessagePrefix
      * @return credentials by Maven server Id
      */
-    @Nonnull
+    @NonNull
     public Map<String, StandardUsernameCredentials> resolveCredentials(@Nullable final List<ServerCredentialMapping> serverCredentialMappings, String logMessagePrefix) {
         // CredentialsHelper.removeMavenServerDefinitions() requires a Map implementation that supports `null` values. `HashMap` supports `null` values, `TreeMap` doesn't
         // https://github.com/jenkinsci/config-file-provider-plugin/blob/config-file-provider-2.16.4/src/main/java/org/jenkinsci/plugins/configfiles/maven/security/CredentialsHelper.java#L252
@@ -1050,9 +1050,14 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
     }
 
     private void ifTraceabilityEnabled(Runnable runnable) {
-        if (step.isTraceability()) {
+        if (computeTraceability()) {
             runnable.run();
         }
+    }
+
+    private boolean computeTraceability() {
+        return GlobalPipelineMavenConfig.get().isGlobalTraceability() && step.isTraceability() == null
+                || Boolean.TRUE.equals(step.isTraceability());
     }
 
     /**
@@ -1082,7 +1087,10 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * Callback to cleanup tmp script after finishing the job
      */
     private class WithMavenStepExecutionCallBack extends TailCall {
-        private final FilePath tempBinDir;
+        @Deprecated
+        private FilePath tempBinDir;
+
+        private final String tempBinDirPath;
 
         private final MavenPublisherStrategy mavenPublisherStrategy;
 
@@ -1090,15 +1098,19 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         private final MavenSpyLogProcessor mavenSpyLogProcessor = new MavenSpyLogProcessor();
 
-        private WithMavenStepExecutionCallBack(@Nonnull FilePath tempBinDir, @Nonnull List<MavenPublisher> options,
-                                              @Nonnull MavenPublisherStrategy mavenPublisherStrategy) {
-            this.tempBinDir = tempBinDir;
+        private WithMavenStepExecutionCallBack(@NonNull FilePath tempBinDir, @NonNull List<MavenPublisher> options,
+                                              @NonNull MavenPublisherStrategy mavenPublisherStrategy) {
+            this.tempBinDirPath = tempBinDir.getRemote();
             this.options = options;
             this.mavenPublisherStrategy = mavenPublisherStrategy;
         }
 
         @Override
         protected void finished(StepContext context) throws Exception {
+            if (tempBinDir == null) { // normal case
+                tempBinDir = context.get(FilePath.class).child(tempBinDirPath);
+            } // else resuming old build
+
             mavenSpyLogProcessor.processMavenSpyLogs(context, tempBinDir, options, mavenPublisherStrategy);
 
             try {
@@ -1132,7 +1144,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * @return the computer
      * @throws AbortException in case of error.
      */
-    @Nonnull
+    @NonNull
     private Computer getComputer() throws AbortException {
         if (computer != null) {
             return computer;

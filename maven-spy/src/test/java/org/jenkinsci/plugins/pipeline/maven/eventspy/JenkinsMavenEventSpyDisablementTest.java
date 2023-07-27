@@ -24,20 +24,19 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy;
 
-import org.apache.maven.eventspy.EventSpy;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.hamcrest.CoreMatchers;
-import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.DevNullMavenEventReporter;
-import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.apache.maven.eventspy.EventSpy;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.DevNullMavenEventReporter;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test how to disable the Maven Event Spy
@@ -54,7 +53,7 @@ public class JenkinsMavenEventSpyDisablementTest {
                 return true;
             }
         };
-        assertThat(spy.getReporter(), CoreMatchers.nullValue());
+        assertThat(spy.getReporter()).isNull();
         spy.init(new EventSpy.Context() {
             @Override
             public Map<String, Object> getData() {
@@ -62,9 +61,10 @@ public class JenkinsMavenEventSpyDisablementTest {
             }
         });
 
-        assertThat(spy.getReporter(), CoreMatchers.instanceOf(DevNullMavenEventReporter.class));
-        assertThat(spy.disabled, CoreMatchers.is(true));
+        assertThat(spy.getReporter()).isInstanceOf(DevNullMavenEventReporter.class);
+        assertThat(spy.disabled).isTrue();
     }
+
     @Test
     public void when_disabled_maven_event_spy_must_not_call_reporter() throws Exception {
         MavenEventReporter reporterMustNeverBeInvoked = new MavenEventReporter() {

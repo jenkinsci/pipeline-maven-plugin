@@ -40,7 +40,7 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -120,7 +120,7 @@ public class JacocoReportPublisher extends MavenPublisher {
      * @throws InterruptedException
      */
     @Override
-    public void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
 
         TaskListener listener = context.get(TaskListener.class);
         FilePath workspace = context.get(FilePath.class);
@@ -220,9 +220,9 @@ public class JacocoReportPublisher extends MavenPublisher {
         try {
             jacocoPublisher.perform(run, workspace, launcher, listener);
         } catch (Exception e) {
-            listener.error("[withMaven] jacocoPublisher - exception archiving JaCoCo results for " + jacocoReportDetails + ": " + e + ". Failing the build.");
+            listener.error("[withMaven] jacocoPublisher - exception archiving JaCoCo results for " + jacocoReportDetails + ": " + e);
             LOGGER.log(Level.WARNING, "Exception processing JaCoCo results", e);
-            run.setResult(Result.FAILURE);
+            throw new MavenPipelinePublisherException("jacocoPublisher", "archiving JaCoCo results for " + jacocoReportDetails, e);
         }
     }
 
@@ -249,7 +249,7 @@ public class JacocoReportPublisher extends MavenPublisher {
     @Symbol("jacocoPublisher")
     @Extension
     public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Jacoco Publisher";
@@ -260,7 +260,7 @@ public class JacocoReportPublisher extends MavenPublisher {
             return 20;
         }
 
-        @Nonnull
+        @NonNull
         @Override
         public String getSkipFileName() {
             return ".skip-publish-jacoco-results";

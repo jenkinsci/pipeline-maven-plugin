@@ -34,7 +34,7 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -79,7 +79,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
   </ExecutionEvent>
      */
     @Override
-    public void process(@Nonnull final StepContext context, @Nonnull final Element mavenSpyLogsElt)
+    public void process(@NonNull final StepContext context, @NonNull final Element mavenSpyLogsElt)
             throws IOException, InterruptedException {
 
         TaskListener listener = context.get(TaskListener.class);
@@ -142,14 +142,14 @@ public class ConcordionTestsPublisher extends MavenPublisher {
                             "\" with the following files: " + target.getReportFiles());
             HtmlPublisher.publishReports(run, workspace, listener, Collections.singletonList(target), HtmlPublisher.class);
         } catch (final Exception e) {
-            listener.error("[withMaven] concordionPublisher - exception archiving Concordion reports: " + e + ". Failing the build.");
+            listener.error("[withMaven] concordionPublisher - exception archiving Concordion reports: " + e);
             LOGGER.log(Level.WARNING, "Exception processing Concordion reports archiving", e);
-            run.setResult(Result.FAILURE);
+            throw new MavenPipelinePublisherException("concordionPublisher", "archiving Concordion reports", e);
         }
     }
 
-    @Nonnull
-    private Collection<String> findConcordionOutputDirPatterns(@Nonnull List<Element> elements) {
+    @NonNull
+    private Collection<String> findConcordionOutputDirPatterns(@NonNull List<Element> elements) {
         List<String> result = new ArrayList<>();
         for (Element element : elements) {
             Element envVars = XmlUtils.getUniqueChildElementOrNull(XmlUtils.getUniqueChildElement(element, "plugin"), "systemPropertyVariables");
@@ -168,7 +168,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
     @Symbol("concordionPublisher")
     @Extension
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Concordion Publisher";
@@ -179,7 +179,7 @@ public class ConcordionTestsPublisher extends MavenPublisher {
             return 20;
         }
 
-        @Nonnull
+        @NonNull
         @Override
         public String getSkipFileName() {
             return ".skip-publish-concordion-results";

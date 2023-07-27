@@ -1,10 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
 import static java.util.Collections.singletonMap;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -18,15 +15,15 @@ import java.util.TreeSet;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DaoHelperTest {
 
     @Mock
@@ -38,12 +35,12 @@ public class DaoHelperTest {
     @Mock
     private PipelineMavenPluginDao dao;
 
-    @Before
+    @BeforeEach
     public void configureMocks() {
         when(config.getDao()).thenReturn(dao);
     }
 
-    @After
+    @AfterEach
     public void checkMocks() {
         verify(config).getDao();
         verifyNoMoreInteractions(config, dao);
@@ -56,7 +53,7 @@ public class DaoHelperTest {
 
         List<MavenArtifact> result = helper.getGeneratedArtifacts("a job", 42);
 
-        assertThat(result, contains(artifact));
+        assertThat(result).contains(artifact);
         verify(dao).getGeneratedArtifacts("a job", 42);
     }
 
@@ -68,7 +65,7 @@ public class DaoHelperTest {
         helper.getGeneratedArtifacts("a job", 42);
         List<MavenArtifact> result = helper.getGeneratedArtifacts("a job", 42);
 
-        assertThat(result, contains(artifact));
+        assertThat(result).contains(artifact);
         verify(dao).getGeneratedArtifacts("a job", 42);
     }
 
@@ -81,7 +78,9 @@ public class DaoHelperTest {
 
         Map<MavenArtifact, SortedSet<String>> result = helper.listDownstreamJobsByArtifact("a job", 42);
 
-        assertThat(result, hasEntry(is(artifact), contains("upstream")));
+        TreeSet<String> values = new TreeSet<>();
+        values.add("upstream");
+        assertThat(result).containsEntry(artifact, values);
         verify(dao).listDownstreamJobsByArtifact("a job", 42);
     }
 
@@ -95,7 +94,9 @@ public class DaoHelperTest {
         helper.listDownstreamJobsByArtifact("a job", 42);
         Map<MavenArtifact, SortedSet<String>> result = helper.listDownstreamJobsByArtifact("a job", 42);
 
-        assertThat(result, hasEntry(is(artifact), contains("upstream")));
+        TreeSet<String> values = new TreeSet<>();
+        values.add("upstream");
+        assertThat(result).containsEntry(artifact, values);
         verify(dao).listDownstreamJobsByArtifact("a job", 42);
     }
 }

@@ -24,14 +24,13 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import org.h2.jdbcx.JdbcConnectionPool;
-import org.hamcrest.Matchers;
-import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.sql.DataSource;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.h2.jdbcx.JdbcConnectionPool;
+import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -66,15 +65,17 @@ public class PipelineMavenPluginMySqlDaoTest extends PipelineMavenPluginDaoAbstr
     @Test
     public void test_mariadb_version_parsing_JENKINS_55378() {
         String actual = PipelineMavenPluginMySqlDao.extractMariaDbVersion("5.5.5-10.2.20-MariaDB");
-        assertThat(actual, Matchers.is("10.2.20"));
+        assertThat(actual).isEqualTo("10.2.20");
     }
 
     /**
-     * docker run  -e MYSQL_ROOT_PASSWORD=mypass -e MYSQL_DATABASE=jenkins -e MYSQL_USER=jenkins -e MYSQL_PASSWORD=jenkins -p 3307:3306 -d mariadb/server:latest
+     * docker run -e MYSQL_ROOT_PASSWORD=mypass -e MYSQL_DATABASE=jenkins -e
+     * MYSQL_USER=jenkins -e MYSQL_PASSWORD=jenkins -p 3307:3306 -d
+     * mariadb/server:latest
      */
     @Test
     public void test_mariadb_version_parsing_mariadb_as_docker_container() {
         String actual = PipelineMavenPluginMySqlDao.extractMariaDbVersion("5.5.5-10.3.11-MariaDB-1:10.3.11+maria~bionic");
-        assertThat(actual, Matchers.is("10.3.11"));
+        assertThat(actual).isEqualTo("10.3.11");
     }
 }

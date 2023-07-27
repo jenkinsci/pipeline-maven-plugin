@@ -37,8 +37,8 @@ import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import javax.sql.DataSource;
 import java.io.Closeable;
 import java.io.IOException;
@@ -75,13 +75,13 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     private static final int OPTIMIZATION_MAX_RECURSION_DEPTH = Integer.getInteger("org.jenkinsci.plugins.pipeline.PipelineMavenPluginDao.OPTIMIZATION_MAX_RECURSION_DEPTH",3);
     protected final Logger LOGGER = Logger.getLogger(getClass().getName());
 
-    @Nonnull
+    @NonNull
     private transient DataSource ds;
 
     @Nullable
     private transient Long jenkinsMasterPrimaryKey;
 
-    public AbstractPipelineMavenPluginDao(@Nonnull DataSource ds) {
+    public AbstractPipelineMavenPluginDao(@NonNull DataSource ds) {
         ds.getClass(); // check non null
 
         this.ds = ds;
@@ -115,9 +115,9 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         }
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public List<MavenDependency> listDependencies(@Nonnull String jobFullName, int buildNumber) {
+    public List<MavenDependency> listDependencies(@NonNull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
         String dependenciesSql = "SELECT DISTINCT MAVEN_ARTIFACT.group_id, MAVEN_ARTIFACT.artifact_id, MAVEN_ARTIFACT.version, MAVEN_ARTIFACT.type, MAVEN_ARTIFACT.classifier,  MAVEN_DEPENDENCY.scope " +
                 " FROM MAVEN_ARTIFACT " +
@@ -159,7 +159,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     }
 
     @Override
-    public void recordParentProject(@Nonnull String jobFullName, int buildNumber, @Nonnull String parentGroupId, @Nonnull String parentArtifactId, @Nonnull String parentVersion, boolean ignoreUpstreamTriggers) {
+    public void recordParentProject(@NonNull String jobFullName, int buildNumber, @NonNull String parentGroupId, @NonNull String parentArtifactId, @NonNull String parentVersion, boolean ignoreUpstreamTriggers) {
         LOGGER.log(Level.FINE, "recordParentProject({0}#{1}, {2}:{3} ignoreUpstreamTriggers:{5}})",
                 new Object[]{jobFullName, buildNumber, parentGroupId, parentArtifactId, parentVersion, ignoreUpstreamTriggers});
         long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
@@ -353,7 +353,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         }
     }
 
-    protected long getOrCreateBuildPrimaryKey(String jobFullName, int buildNumber) {
+    protected synchronized long getOrCreateBuildPrimaryKey(String jobFullName, int buildNumber) {
         try (Connection cnn = ds.getConnection()) {
             cnn.setAutoCommit(false);
 
@@ -413,7 +413,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         return jobPrimaryKey;
     }
 
-    protected long getOrCreateArtifactPrimaryKey(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nullable String classifier) {
+    protected long getOrCreateArtifactPrimaryKey(@NonNull String groupId, @NonNull String artifactId, @NonNull String version, @NonNull String type, @Nullable String classifier) {
         try (Connection cnn = ds.getConnection()) {
             cnn.setAutoCommit(false);
             // get or create build record
@@ -602,10 +602,10 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         }
     }
 
-    @Nonnull
+    @NonNull
     @Override
     @Deprecated
-    public List<String> listDownstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+    public List<String> listDownstreamJobs(@NonNull String jobFullName, int buildNumber) {
         List<String> downstreamJobs = listDownstreamPipelinesBasedOnMavenDependencies(jobFullName, buildNumber);
         downstreamJobs.addAll(listDownstreamPipelinesBasedOnParentProjectDependencies(jobFullName, buildNumber));
 
@@ -614,9 +614,9 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         return downstreamJobs;
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@Nonnull String jobFullName, int buildNumber) {
+    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@NonNull String jobFullName, int buildNumber) {
         Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactBasedOnMavenDependencies = listDownstreamJobsByArtifactBasedOnMavenDependencies(jobFullName, buildNumber);
         LOGGER.log(Level.FINER, "Got downstreamJobsByArtifactBasedOnMavenDependencies for job named {0} and build #{1}: {2}", new Object[]{jobFullName, buildNumber, downstreamJobsByArtifactBasedOnMavenDependencies});
         Map<MavenArtifact, SortedSet<String>> downstreamJobsByArtifactBasedOnParentProjectDependencies = listDownstreamJobsByArtifactBasedOnParentProjectDependencies(jobFullName, buildNumber);
@@ -651,13 +651,13 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         return results;
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public SortedSet<String> listDownstreamJobs(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nullable String baseVersion, @Nonnull String type, @Nullable String classifier) {
+    public SortedSet<String> listDownstreamJobs(@NonNull String groupId, @NonNull String artifactId, @NonNull String version, @Nullable String baseVersion, @NonNull String type, @Nullable String classifier) {
         return listDownstreamPipelinesBasedOnMavenDependencies(groupId, artifactId, (baseVersion == null ? version : baseVersion), type, classifier);
     }
 
-    protected SortedSet<String> listDownstreamPipelinesBasedOnMavenDependencies(@Nonnull String groupId, @Nonnull String artifactId, @Nonnull String version, @Nonnull String type, @Nullable String classifier) {
+    protected SortedSet<String> listDownstreamPipelinesBasedOnMavenDependencies(@NonNull String groupId, @NonNull String artifactId, @NonNull String version, @NonNull String type, @Nullable String classifier) {
         LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnMavenDependencies({0}:{1}:{2}:{3}:{4})", new Object[]{groupId, artifactId, version, type, classifier});
 
         String sql = "select distinct downstream_job.full_name \n" +
@@ -698,7 +698,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     }
 
         @Deprecated
-    protected List<String> listDownstreamPipelinesBasedOnMavenDependencies(@Nonnull String jobFullName, int buildNumber) {
+    protected List<String> listDownstreamPipelinesBasedOnMavenDependencies(@NonNull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamJobs({0}, {1})", new Object[]{jobFullName, buildNumber});
 
         String sql = "select distinct downstream_job.full_name \n" +
@@ -734,7 +734,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         return downstreamJobsFullNames;
     }
 
-    protected Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifactBasedOnMavenDependencies(@Nonnull String jobFullName, int buildNumber) {
+    protected Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifactBasedOnMavenDependencies(@NonNull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamJobsByArtifactBasedOnMavenDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
 
 
@@ -785,7 +785,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
 
 
     @Deprecated
-    protected List<String> listDownstreamPipelinesBasedOnParentProjectDependencies(@Nonnull String jobFullName, int buildNumber) {
+    protected List<String> listDownstreamPipelinesBasedOnParentProjectDependencies(@NonNull String jobFullName, int buildNumber) {
         LOGGER.log(Level.FINER, "listDownstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{jobFullName, buildNumber});
         String sql = "select distinct downstream_job.full_name \n" +
                 "from JENKINS_JOB as upstream_job \n" +
@@ -869,9 +869,9 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         return results;
     }
 
-    @Nonnull
+    @NonNull
     @Override
-    public Map<String, Integer> listUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+    public Map<String, Integer> listUpstreamJobs(@NonNull String jobFullName, int buildNumber) {
         Map<String, Integer> upstreamJobs = listUpstreamPipelinesBasedOnMavenDependencies(jobFullName, buildNumber);
         upstreamJobs.putAll(listUpstreamPipelinesBasedOnParentProjectDependencies(jobFullName, buildNumber));
 
@@ -887,7 +887,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
      * @param downstreamBuildNumber
      * @return
      */
-    protected Map<String, Integer> listUpstreamPipelinesBasedOnMavenDependencies(@Nonnull String downstreamJobFullName, int downstreamBuildNumber) {
+    protected Map<String, Integer> listUpstreamPipelinesBasedOnMavenDependencies(@NonNull String downstreamJobFullName, int downstreamBuildNumber) {
         LOGGER.log(Level.FINER, "listUpstreamPipelinesBasedOnMavenDependencies({0}, {1})", new Object[]{downstreamJobFullName, downstreamBuildNumber});
 
         // if we join JENKINS_JOB to the listUpstreamPipelinesBasedOnMavenDependencies query we get performance problems 
@@ -961,7 +961,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         return upstreamJobsFullNames;
     }
 
-    protected Map<String, Integer> listUpstreamPipelinesBasedOnParentProjectDependencies(@Nonnull String downstreamJobFullName, int downstreamBuildNumber) {
+    protected Map<String, Integer> listUpstreamPipelinesBasedOnParentProjectDependencies(@NonNull String downstreamJobFullName, int downstreamBuildNumber) {
         LOGGER.log(Level.FINER, "listUpstreamPipelinesBasedOnParentProjectDependencies({0}, {1})", new Object[]{downstreamJobFullName, downstreamBuildNumber});
 
         String sql = "select distinct upstream_job.full_name, upstream_build.number\n" +
@@ -997,18 +997,18 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         return upstreamJobsFullNames;
     }
 
-    @Nonnull
-    public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber) {
+    @NonNull
+    public Map<String, Integer> listTransitiveUpstreamJobs(@NonNull String jobFullName, int buildNumber) {
             UpstreamMemory upstreamMemory = new UpstreamMemory();
         return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<>(), 0, upstreamMemory);
     }
 
-    @Nonnull
-    public Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, UpstreamMemory upstreamMemory) {
+    @NonNull
+    public Map<String, Integer> listTransitiveUpstreamJobs(@NonNull String jobFullName, int buildNumber, UpstreamMemory upstreamMemory) {
         return listTransitiveUpstreamJobs(jobFullName, buildNumber, new HashMap<>(), 0, upstreamMemory);
     }
 
-    private Map<String, Integer> listTransitiveUpstreamJobs(@Nonnull String jobFullName, int buildNumber, Map<String, Integer> transitiveUpstreamBuilds, int recursionDepth, UpstreamMemory upstreamMemory) {
+    private Map<String, Integer> listTransitiveUpstreamJobs(@NonNull String jobFullName, int buildNumber, Map<String, Integer> transitiveUpstreamBuilds, int recursionDepth, UpstreamMemory upstreamMemory) {
         Map<String, Integer> upstreamBuilds = upstreamMemory.listUpstreamJobs(this, jobFullName, buildNumber);
         for (Entry<String, Integer> upstreamBuild : upstreamBuilds.entrySet()) {
             String upstreamJobFullName = upstreamBuild.getKey();
@@ -1032,8 +1032,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
      * @param buildNumber see {@link Run#getNumber()}
      * @return list of artifact details stored as maps ("gav", "type", "skip_downstream_triggers")
      */
-    @Nonnull
-    public List<MavenArtifact> getGeneratedArtifacts(@Nonnull String jobFullName, @Nonnull int buildNumber) {
+    @NonNull
+    public List<MavenArtifact> getGeneratedArtifacts(@NonNull String jobFullName, @NonNull int buildNumber) {
         LOGGER.log(Level.FINER, "getGeneratedArtifacts({0}, {1})", new Object[]{jobFullName, buildNumber});
         String generatedArtifactsSql = "SELECT DISTINCT MAVEN_ARTIFACT.group_id, MAVEN_ARTIFACT.artifact_id, MAVEN_ARTIFACT.type, MAVEN_ARTIFACT.classifier, MAVEN_ARTIFACT.version as base_version, " +
                 "GENERATED_MAVEN_ARTIFACT.version as version, GENERATED_MAVEN_ARTIFACT.repository_url, GENERATED_MAVEN_ARTIFACT.extension" +
@@ -1084,7 +1084,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         return results;
     }
 
-    @Nonnull
+    @NonNull
     public synchronized Long getJenkinsMasterPrimaryKey(Connection cnn) throws SQLException {
         if (this.jenkinsMasterPrimaryKey == null) {
             String jenkinsMasterLegacyInstanceId = getJenkinsDetails().getMasterLegacyInstanceId();
@@ -1179,7 +1179,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     }
 
     @Override
-    public void updateBuildOnCompletion(@Nonnull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
+    public void updateBuildOnCompletion(@NonNull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
         LOGGER.log(Level.FINE, "updateBuildOnCompletion({0}, {1}, result: {2}, startTime): {3}, duration: {4}",
                 new Object[]{jobFullName, buildNumber, buildResultOrdinal, startTimeInMillis, durationInMillis});
         long buildPrimaryKey = getOrCreateBuildPrimaryKey(jobFullName, buildNumber);
@@ -1231,7 +1231,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         }
     }
 
-    @Nonnull
+    @NonNull
     protected DataSource getDataSource() {
         return ds;
     }

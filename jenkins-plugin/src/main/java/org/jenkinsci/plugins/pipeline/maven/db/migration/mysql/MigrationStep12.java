@@ -2,7 +2,7 @@ package org.jenkinsci.plugins.pipeline.maven.db.migration.mysql;
 
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -14,7 +14,7 @@ public class MigrationStep12 implements MigrationStep {
     private final static Logger LOGGER = Logger.getLogger(MigrationStep12.class.getName());
 
     @Override
-    public void execute(@Nonnull Connection cnn, @Nonnull JenkinsDetails jenkinsDetails) throws SQLException {
+    public void execute(@NonNull Connection cnn, @NonNull JenkinsDetails jenkinsDetails) throws SQLException {
 
         try (Statement stmt = cnn.createStatement()) {
             stmt.execute("ALTER TABLE MAVEN_ARTIFACT MODIFY COLUMN VERSION varchar(100)");

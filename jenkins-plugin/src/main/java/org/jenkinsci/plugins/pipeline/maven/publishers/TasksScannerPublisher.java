@@ -16,7 +16,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
     </ExecutionEvent>
      */
     @Override
-    public void process(@Nonnull StepContext context, @Nonnull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
         TaskListener listener = context.get(TaskListener.class);
         if (listener == null) {
             LOGGER.warning("TaskListener is NULL, default to stderr");
@@ -170,9 +170,9 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
         try {
             tasksPublisher.perform(run, workspace, launcher, listener);
         } catch (Exception e) {
-            listener.error("[withMaven] openTasksPublisher - exception scanning tasks in " + pattern + ": " + e + ". Failing the build.");
+            listener.error("[withMaven] openTasksPublisher - exception scanning tasks in " + pattern + ": " + e);
             LOGGER.log(Level.WARNING, "Exception scanning tasks in  " + pattern, e);
-            run.setResult(Result.FAILURE);
+            throw new MavenPipelinePublisherException("openTasksPublisher", "scanning tasks in " + pattern, e);
         }
     }
 
@@ -242,7 +242,7 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
     @Symbol("openTasksPublisher")
     @Extension
     public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
-        @Nonnull
+        @NonNull
         @Override
         public String getDisplayName() {
             return "Open Task Scanner Publisher";
@@ -253,7 +253,7 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
             return 100;
         }
 
-        @Nonnull
+        @NonNull
         @Override
         public String getSkipFileName() {
             return ".skip-task-scanner";

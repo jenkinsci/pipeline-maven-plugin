@@ -24,18 +24,18 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import org.h2.jdbcx.JdbcConnectionPool;
-import org.hamcrest.Matchers;
-import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.annotation.Nonnull;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.h2.jdbcx.JdbcConnectionPool;
+import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
+import org.junit.jupiter.api.Test;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -72,13 +72,13 @@ public class PipelineMavenPluginH2DaoInitializationTest {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {
-                    @Nonnull
+                    @NonNull
                     @Override
                     public String getMasterLegacyInstanceId() {
                         return "123456";
                     }
 
-                    @Nonnull
+                    @NonNull
                     @Override
                     public String getMasterRootUrl() {
                         return "";
@@ -87,15 +87,16 @@ public class PipelineMavenPluginH2DaoInitializationTest {
             }
         };
 
-        // VERIFY THAT THE JENKINS_MASTER TABLE IS INITIALIZED WITH AN JENKINS_MASTER.URL = ""
+        // VERIFY THAT THE JENKINS_MASTER TABLE IS INITIALIZED WITH AN
+        // JENKINS_MASTER.URL = ""
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             Long jenkinsMasterPrimaryKey = daoWithEmptyJenkinsUrl.getJenkinsMasterPrimaryKey(cnn);
 
             try (PreparedStatement stmt = cnn.prepareStatement("SELECT URL FROM JENKINS_MASTER WHERE ID = ?")) {
                 stmt.setLong(1, jenkinsMasterPrimaryKey);
-                try(ResultSet rst = stmt.executeQuery()) {
+                try (ResultSet rst = stmt.executeQuery()) {
                     rst.next();
-                    assertThat(rst.getString("URL"), Matchers.is(""));
+                    assertThat(rst.getString("URL")).isEqualTo("");
                 }
             }
         }
@@ -104,13 +105,13 @@ public class PipelineMavenPluginH2DaoInitializationTest {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {
-                    @Nonnull
+                    @NonNull
                     @Override
                     public String getMasterLegacyInstanceId() {
                         return "123456";
                     }
 
-                    @Nonnull
+                    @NonNull
                     @Override
                     public String getMasterRootUrl() {
                         return "http://jenkins.mycompany.com";
@@ -119,15 +120,16 @@ public class PipelineMavenPluginH2DaoInitializationTest {
             }
         };
 
-        // VERIFY THAT THE JENKINS_MASTER TABLE IS UPDATE WITH AN JENKINS_MASTER.URL = "http://jenkins.mycompany.com"
+        // VERIFY THAT THE JENKINS_MASTER TABLE IS UPDATE WITH AN JENKINS_MASTER.URL =
+        // "http://jenkins.mycompany.com"
         try (Connection cnn = jdbcConnectionPool.getConnection()) {
             Long jenkinsMasterPrimaryKey = daoWithValidJenkinsUrl.getJenkinsMasterPrimaryKey(cnn);
 
             try (PreparedStatement stmt = cnn.prepareStatement("SELECT URL FROM JENKINS_MASTER WHERE ID = ?")) {
                 stmt.setLong(1, jenkinsMasterPrimaryKey);
-                try(ResultSet rst = stmt.executeQuery()) {
+                try (ResultSet rst = stmt.executeQuery()) {
                     rst.next();
-                    assertThat(rst.getString("URL"), Matchers.is("http://jenkins.mycompany.com"));
+                    assertThat(rst.getString("URL")).isEqualTo("http://jenkins.mycompany.com");
                 }
             }
         }

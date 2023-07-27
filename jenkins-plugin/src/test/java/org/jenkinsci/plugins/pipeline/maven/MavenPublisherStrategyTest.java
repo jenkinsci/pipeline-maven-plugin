@@ -1,7 +1,13 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import hudson.util.StreamTaskListener;
-import org.hamcrest.CoreMatchers;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.ByteArrayOutputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
@@ -13,48 +19,41 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import java.io.ByteArrayOutputStream;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import hudson.util.StreamTaskListener;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
+@WithJenkins
 public class MavenPublisherStrategyTest {
 
-    @Rule
-    public JenkinsRule jenkinsRule = new JenkinsRule();
-
     @Test
-    public void listMavenPublishers() throws Exception {
+    public void listMavenPublishers(JenkinsRule r) throws Exception {
+        assertThat(r.jenkins).isNotNull();
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         List<MavenPublisher> mavenPublishers = MavenPublisherStrategy.IMPLICIT.buildPublishersList(Collections.emptyList(), new StreamTaskListener(baos));
-        assertThat(mavenPublishers.size(), CoreMatchers.is(12));
+        assertThat(mavenPublishers).hasSize(12);
 
         Map<String, MavenPublisher> reportersByDescriptorId = new HashMap<>();
-        for(MavenPublisher mavenPublisher : mavenPublishers) {
+        for (MavenPublisher mavenPublisher : mavenPublishers) {
             reportersByDescriptorId.put(mavenPublisher.getDescriptor().getId(), mavenPublisher);
         }
-        assertThat(reportersByDescriptorId.containsKey(new GeneratedArtifactsPublisher.DescriptorImpl().getId()), is(true));
-        assertThat(reportersByDescriptorId.containsKey(new FindbugsAnalysisPublisher.DescriptorImpl().getId()), is(true));
-        assertThat(reportersByDescriptorId.containsKey(new SpotBugsAnalysisPublisher.DescriptorImpl().getId()), is(true));
-        assertThat(reportersByDescriptorId.containsKey(new JunitTestsPublisher.DescriptorImpl().getId()), is(true));
-        assertThat(reportersByDescriptorId.containsKey(new TasksScannerPublisher.DescriptorImpl().getId()), is(true));
-        assertThat(reportersByDescriptorId.containsKey(new PipelineGraphPublisher.DescriptorImpl().getId()), is(true));
-        assertThat(reportersByDescriptorId.containsKey(new InvokerRunsPublisher.DescriptorImpl().getId()), is(true));
-        assertThat(reportersByDescriptorId.containsKey(new ConcordionTestsPublisher.DescriptorImpl().getId()), is(true));
-        assertThat(reportersByDescriptorId.containsKey(new JGivenTestsPublisher.DescriptorImpl().getId()), is(true));
-        assertThat(reportersByDescriptorId.containsKey(new MavenLinkerPublisher2.DescriptorImpl().getId()), is(true));
-        assertThat(reportersByDescriptorId.containsKey(new JacocoReportPublisher.DescriptorImpl().getId()), is(true));
+        assertThat(reportersByDescriptorId).containsKey(new GeneratedArtifactsPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new FindbugsAnalysisPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new SpotBugsAnalysisPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new JunitTestsPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new TasksScannerPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new PipelineGraphPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new InvokerRunsPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new ConcordionTestsPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new JGivenTestsPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new MavenLinkerPublisher2.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new JacocoReportPublisher.DescriptorImpl().getId());
     }
 }

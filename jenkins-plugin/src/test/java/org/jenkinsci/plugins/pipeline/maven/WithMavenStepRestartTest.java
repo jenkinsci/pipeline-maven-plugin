@@ -23,53 +23,85 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runAfterMethod;
+import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runBeforeMethod;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+
+import org.apache.commons.io.FileUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.jenkinsci.plugins.workflow.test.steps.SemaphoreStep;
-import org.jenkinsci.test.acceptance.docker.DockerRule;
-import org.jenkinsci.test.acceptance.docker.fixtures.JavaContainer;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.runners.model.Statement;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer.OrderAnnotation;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.Issue;
-import org.jvnet.hudson.test.RestartableJenkinsRule;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.TemporaryDirectoryAllocator;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
+@WithJenkins
+@TestMethodOrder(OrderAnnotation.class)
 public class WithMavenStepRestartTest {
 
-    @ClassRule
-    public static BuildWatcher buildWatcher = new BuildWatcher();
+    public static BuildWatcher buildWatcher;
 
-    @Rule
-    public RestartableJenkinsRule rr = new RestartableJenkinsRule();
+    private static File home;
 
-    @Rule
-    public DockerRule<JavaContainer> slaveRule = new DockerRule<>(JavaContainer.class);
+    public JenkinsRule jenkinsRule;
+
+    @BeforeAll
+    public static void setupWatcher() throws IOException {
+        buildWatcher = new BuildWatcher();
+        runBeforeMethod(buildWatcher);
+
+        home = new TemporaryDirectoryAllocator().allocate();
+    }
+
+    @BeforeEach
+    public void configureJenkins(JenkinsRule r) throws Throwable {
+        r.after();
+        r.with(() -> home);
+        r.before();
+        jenkinsRule = r;
+    }
+
+    @AfterAll
+    public static void stopWatcher() {
+        runAfterMethod(buildWatcher);
+    }
 
     @Issue("JENKINS-39134")
     @Test
-    public void resume() throws Exception {
-        rr.addStep(new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                WorkflowJob p = rr.j.createProject(WorkflowJob.class, "p");
-                p.setDefinition(new CpsFlowDefinition("node {withMaven {semaphore 'wait'}}", true));
-                WorkflowRun b = p.scheduleBuild2(0).waitForStart();
-                SemaphoreStep.waitForStart("wait/1", b);
-            }
-        });
-        rr.addStep(new Statement() {
-            @Override
-            public void evaluate() throws Throwable {
-                WorkflowJob p = rr.j.jenkins.getItemByFullName("p", WorkflowJob.class);
-                WorkflowRun b = p.getBuildByNumber(1);
-                SemaphoreStep.success("wait/1", null);
-                rr.j.assertBuildStatusSuccess(rr.j.waitForCompletion(b));
-                SemaphoreStep.success("wait/2", null);
-                rr.j.buildAndAssertSuccess(p);
-            }
-        });
+    @Order(1)
+    public void configure() throws Throwable {
+        WorkflowJob p = jenkinsRule.createProject(WorkflowJob.class, "p");
+        p.setDefinition(new CpsFlowDefinition("node {withMaven {semaphore 'wait'}}", true));
+        WorkflowRun b = p.scheduleBuild2(0).waitForStart();
+        SemaphoreStep.waitForStart("wait/1", b);
+    }
+
+    @Issue("JENKINS-39134")
+    @Test
+    @Order(2)
+    public void resume() throws Throwable {
+        WorkflowJob p = jenkinsRule.jenkins.getItemByFullName("p", WorkflowJob.class);
+        WorkflowRun b = p.getBuildByNumber(1);
+        @SuppressWarnings("deprecation")
+        Class<?> deprecatedClass = org.jenkinsci.plugins.workflow.support.pickles.FilePathPickle.class;
+        assertThat(FileUtils.readFileToString(new File(b.getRootDir(), "program.dat"), StandardCharsets.ISO_8859_1)).doesNotContain(deprecatedClass.getName());
+        SemaphoreStep.success("wait/1", null);
+        jenkinsRule.assertBuildStatusSuccess(jenkinsRule.waitForCompletion(b));
+        SemaphoreStep.success("wait/2", null);
+        jenkinsRule.buildAndAssertSuccess(p);
     }
 }

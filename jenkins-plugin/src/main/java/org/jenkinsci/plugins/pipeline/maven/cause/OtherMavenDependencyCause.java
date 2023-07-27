@@ -2,8 +2,8 @@ package org.jenkinsci.plugins.pipeline.maven.cause;
 
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 
@@ -12,12 +12,12 @@ import java.util.Objects;
  */
 public class OtherMavenDependencyCause extends MavenDependencyAbstractCause {
     final String shortDescription;
-    public OtherMavenDependencyCause(@Nonnull String shortDescription) {
+    public OtherMavenDependencyCause(@NonNull String shortDescription) {
         super();
         this.shortDescription = Objects.requireNonNull(shortDescription);
     }
 
-    public OtherMavenDependencyCause(@Nonnull String shortDescription, @Nullable List<MavenArtifact> mavenArtifacts) {
+    public OtherMavenDependencyCause(@NonNull String shortDescription, @Nullable List<MavenArtifact> mavenArtifacts) {
         super(mavenArtifacts);
         this.shortDescription = Objects.requireNonNull(shortDescription);
     }

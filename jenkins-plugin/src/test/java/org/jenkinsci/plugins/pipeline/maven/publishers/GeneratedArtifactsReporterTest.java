@@ -1,20 +1,21 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
-import hudson.FilePath;
-import org.hamcrest.CoreMatchers;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import hudson.FilePath;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -31,9 +32,10 @@ public class GeneratedArtifactsReporterTest {
      * generated on Windows
      */
     Document mavenSpyLogsOnWindows;
+
     GeneratedArtifactsPublisher generatedArtifactsReporter = new GeneratedArtifactsPublisher();
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         {
             String mavenSpyLogsOnMacOSXPath = "org/jenkinsci/plugins/pipeline/maven/maven-spy.xml";
@@ -52,12 +54,12 @@ public class GeneratedArtifactsReporterTest {
     public void testListArtifactsMacOSX() throws Exception {
         List<MavenArtifact> mavenArtifacts = XmlUtils.listGeneratedArtifacts(this.mavenSpyLogsOnMacOSX.getDocumentElement(), false);
         System.out.println(mavenArtifacts);
-        assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
+        assertThat(mavenArtifacts).hasSize(2);
 
         MavenArtifact pomArtifact = mavenArtifacts.get(0);
-        assertThat(pomArtifact.getArtifactId(), CoreMatchers.is("spring-petclinic"));
-        assertThat(pomArtifact.getFile(), CoreMatchers.is("/path/to/spring-petclinic/pom.xml"));
-        assertThat(pomArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".pom"));
+        assertThat(pomArtifact.getArtifactId()).isEqualTo("spring-petclinic");
+        assertThat(pomArtifact.getFile()).isEqualTo("/path/to/spring-petclinic/pom.xml");
+        assertThat(pomArtifact.getFileName()).isEqualTo("spring-petclinic-" + PETCLINIC_VERSION + ".pom");
 
         Element projectStartedElt = XmlUtils.getExecutionEvents(this.mavenSpyLogsOnMacOSX.getDocumentElement(), "ProjectStarted").get(0);
         String workspace = XmlUtils.getUniqueChildElement(projectStartedElt, "project").getAttribute("baseDir");
@@ -66,22 +68,22 @@ public class GeneratedArtifactsReporterTest {
         System.out.println("workspace: " + workspace);
         System.out.println("pomPathInWorkspace: " + pomPathInWorkspace);
 
-
         MavenArtifact mavenArtifact = mavenArtifacts.get(1);
-        assertThat(mavenArtifact.getArtifactId(), CoreMatchers.is("spring-petclinic"));
-        assertThat(mavenArtifact.getFile(), CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
-        assertThat(mavenArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".jar"));    }
+        assertThat(mavenArtifact.getArtifactId()).isEqualTo("spring-petclinic");
+        assertThat(mavenArtifact.getFile()).isEqualTo("/path/to/spring-petclinic/target/spring-petclinic-" + PETCLINIC_VERSION + ".jar");
+        assertThat(mavenArtifact.getFileName()).isEqualTo("spring-petclinic-" + PETCLINIC_VERSION + ".jar");
+    }
 
     @Test
     public void testListArtifactsWindows() throws Exception {
         List<MavenArtifact> mavenArtifacts = XmlUtils.listGeneratedArtifacts(this.mavenSpyLogsOnWindows.getDocumentElement(), false);
         System.out.println(mavenArtifacts);
-        assertThat(mavenArtifacts.size(), CoreMatchers.is(2));
+        assertThat(mavenArtifacts).hasSize(2);
 
         MavenArtifact pomArtifact = mavenArtifacts.get(0);
-        assertThat(pomArtifact.getArtifactId(), CoreMatchers.is("spring-petclinic"));
-        assertThat(pomArtifact.getFile(), CoreMatchers.is("C:\\path\\to\\spring-petclinic\\pom.xml"));
-        assertThat(pomArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".pom"));
+        assertThat(pomArtifact.getArtifactId()).isEqualTo("spring-petclinic");
+        assertThat(pomArtifact.getFile()).isEqualTo("C:\\path\\to\\spring-petclinic\\pom.xml");
+        assertThat(pomArtifact.getFileName()).isEqualTo("spring-petclinic-" + PETCLINIC_VERSION + ".pom");
 
         Element projectStartedElt = XmlUtils.getExecutionEvents(this.mavenSpyLogsOnWindows.getDocumentElement(), "ProjectStarted").get(0);
         String workspace = XmlUtils.getUniqueChildElement(projectStartedElt, "project").getAttribute("baseDir");
@@ -90,33 +92,32 @@ public class GeneratedArtifactsReporterTest {
         System.out.println("workspace: " + workspace);
         System.out.println("pomPathInWorkspace: " + pomPathInWorkspace);
 
-
         MavenArtifact mavenArtifact = mavenArtifacts.get(1);
-        assertThat(mavenArtifact.getArtifactId(), CoreMatchers.is("spring-petclinic"));
-        assertThat(mavenArtifact.getFile(), CoreMatchers.is("C:\\path\\to\\spring-petclinic\\target\\spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
-        assertThat(mavenArtifact.getFileName(), CoreMatchers.is("spring-petclinic-" + PETCLINIC_VERSION + ".jar"));
+        assertThat(mavenArtifact.getArtifactId()).isEqualTo("spring-petclinic");
+        assertThat(mavenArtifact.getFile()).isEqualTo("C:\\path\\to\\spring-petclinic\\target\\spring-petclinic-" + PETCLINIC_VERSION + ".jar");
+        assertThat(mavenArtifact.getFileName()).isEqualTo("spring-petclinic-" + PETCLINIC_VERSION + ".jar");
     }
 
     @Test
     public void testListAttachedArtifactsMacOSX() throws Exception {
         List<MavenArtifact> mavenArtifacts = XmlUtils.listGeneratedArtifacts(this.mavenSpyLogsOnMacOSX.getDocumentElement(), true);
-        assertThat(mavenArtifacts.size(), CoreMatchers.is(3));
+        assertThat(mavenArtifacts).hasSize(3);
         MavenArtifact mavenArtifact = mavenArtifacts.get(2); // 1st is pom, 2nd is jar, 3rd is sources
         System.out.println(mavenArtifacts);
-        assertThat(mavenArtifact.getArtifactId(), CoreMatchers.is("spring-petclinic"));
-        assertThat(mavenArtifact.getClassifier(), CoreMatchers.is("sources"));
-        assertThat(mavenArtifact.getFile(), CoreMatchers.is("/path/to/spring-petclinic/target/spring-petclinic-" + PETCLINIC_VERSION + "-sources.jar"));
+        assertThat(mavenArtifact.getArtifactId()).isEqualTo("spring-petclinic");
+        assertThat(mavenArtifact.getClassifier()).isEqualTo("sources");
+        assertThat(mavenArtifact.getFile()).isEqualTo("/path/to/spring-petclinic/target/spring-petclinic-" + PETCLINIC_VERSION + "-sources.jar");
     }
 
     @Test
     public void testListAttachedArtifactsWindows() throws Exception {
         List<MavenArtifact> mavenArtifacts = XmlUtils.listGeneratedArtifacts(this.mavenSpyLogsOnWindows.getDocumentElement(), true);
-        assertThat(mavenArtifacts.size(), CoreMatchers.is(3));
+        assertThat(mavenArtifacts).hasSize(3);
         MavenArtifact mavenArtifact = mavenArtifacts.get(2); // 1st is pom, 2nd is jar, 3rd is sources
         System.out.println(mavenArtifacts);
-        assertThat(mavenArtifact.getArtifactId(), CoreMatchers.is("spring-petclinic"));
-        assertThat(mavenArtifact.getClassifier(), CoreMatchers.is("sources"));
-        assertThat(mavenArtifact.getFile(), CoreMatchers.is("C:\\path\\to\\spring-petclinic\\target\\spring-petclinic-" + PETCLINIC_VERSION + "-sources.jar"));
+        assertThat(mavenArtifact.getArtifactId()).isEqualTo("spring-petclinic");
+        assertThat(mavenArtifact.getClassifier()).isEqualTo("sources");
+        assertThat(mavenArtifact.getFile()).isEqualTo("C:\\path\\to\\spring-petclinic\\target\\spring-petclinic-" + PETCLINIC_VERSION + "-sources.jar");
     }
 
 }

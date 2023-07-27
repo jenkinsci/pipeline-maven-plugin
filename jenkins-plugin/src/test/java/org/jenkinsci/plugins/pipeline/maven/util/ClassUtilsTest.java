@@ -1,8 +1,9 @@
 package org.jenkinsci.plugins.pipeline.maven.util;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.jenkinsci.plugins.pipeline.maven.util.ClassUtils.getResourceAsStream;
 
-import java.io.InputStream;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -10,9 +11,7 @@ import java.io.InputStream;
 public class ClassUtilsTest {
 
     @Test
-    public void testGetResource(){
-        InputStream in = ClassUtils.getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/util/classutils-test-1.txt");
-
-
+    public void testGetResource() {
+        assertThat(getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/util/classutils-test-1.txt")).isNotNull();
     }
 }

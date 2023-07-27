@@ -58,9 +58,9 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.verb.POST;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
@@ -93,6 +93,8 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
     private transient PipelineTriggerService pipelineTriggerService;
 
+    private boolean globalTraceability = false;
+
     private boolean triggerDownstreamUponResultSuccess = true;
     private boolean triggerDownstreamUponResultUnstable;
     private boolean triggerDownstreamUponResultFailure;
@@ -123,6 +125,15 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     @DataBoundSetter
     public void setPublisherOptions(List<MavenPublisher> publisherOptions) {
         this.publisherOptions = publisherOptions;
+    }
+
+    public boolean isGlobalTraceability() {
+        return globalTraceability;
+    }
+
+    @DataBoundSetter
+    public void setGlobalTraceability(boolean globalTraceability) {
+        this.globalTraceability = globalTraceability;
     }
 
     public boolean isTriggerDownstreamUponResultSuccess() {
@@ -221,7 +232,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         return dao != null;
     }
 
-    @Nonnull
+    @NonNull
     public synchronized PipelineMavenPluginDao getDao() {
         Jenkins j = Jenkins.getInstanceOrNull();
         if (j == null) {
@@ -327,7 +338,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         return dao;
     }
 
-    @Nonnull
+    @NonNull
     public synchronized PipelineTriggerService getPipelineTriggerService() {
         if (pipelineTriggerService == null) {
             pipelineTriggerService = new PipelineTriggerService(this);
@@ -335,7 +346,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         return pipelineTriggerService;
     }
 
-    @Nonnull
+    @NonNull
     public Set<Result> getTriggerDownstreamBuildsResultsCriteria() {
         Set<Result> result = new HashSet<>(5);
         if (this.triggerDownstreamUponResultSuccess)

@@ -2,24 +2,24 @@ package org.jenkinsci.plugins.pipeline.maven.db.migration;
 
 import jenkins.model.Jenkins;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Objects;
 
 public interface MigrationStep {
-    void execute(@Nonnull Connection cnn, @Nonnull JenkinsDetails jenkinsDetails) throws SQLException;
+    void execute(@NonNull Connection cnn, @NonNull JenkinsDetails jenkinsDetails) throws SQLException;
 
     /**
      * for unit tests outside of Jenkins
      */
     class JenkinsDetails {
-        @Nonnull
+        @NonNull
         public String getMasterLegacyInstanceId() {
             return Jenkins.get().getLegacyInstanceId();
         }
 
-        @Nonnull
+        @NonNull
         public String getMasterRootUrl(){
             return Objects.toString(Jenkins.get().getRootUrl(), "");
         }

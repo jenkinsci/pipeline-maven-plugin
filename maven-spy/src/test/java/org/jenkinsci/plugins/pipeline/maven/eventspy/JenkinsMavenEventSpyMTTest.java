@@ -24,20 +24,9 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy;
 
-import org.apache.maven.eventspy.EventSpy;
-import org.apache.maven.execution.DefaultMavenExecutionRequest;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
-import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.util.FileUtils;
-import org.hamcrest.CoreMatchers;
-import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.FileMavenEventReporter;
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -47,14 +36,25 @@ import java.util.Vector;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.maven.eventspy.EventSpy;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.FileUtils;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.FileMavenEventReporter;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class JenkinsMavenEventSpyMTTest {
 
     MavenProject project;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         System.setProperty("org.jenkinsci.plugins.pipeline.maven.reportsFolder", "target");
     }
@@ -79,7 +79,7 @@ public class JenkinsMavenEventSpyMTTest {
         MavenXpp3Reader mavenXpp3Reader = new MavenXpp3Reader();
         InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/eventspy/pom.xml");
 
-        assertThat(in, CoreMatchers.notNullValue());
+        assertThat(in).isNotNull();
         Model model = mavenXpp3Reader.read(in);
         project = new MavenProject(model);
         project.setGroupId(model.getGroupId());
@@ -89,24 +89,25 @@ public class JenkinsMavenEventSpyMTTest {
         return spy;
     }
 
-    @Test //Issue JENKINS-46579
+    @Test // Issue JENKINS-46579
     public void testMavenExecutionMTSpyReporters() throws Exception {
         int numThreads = 100;
-        final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1); //we need to also stop the test thread (current)
+        final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1); // we need to also stop the test thread (current)
         final AtomicInteger counter = new AtomicInteger(0);
         final ExceptionHolder exceptionHolder = new ExceptionHolder();
 
         final Vector<JenkinsMavenEventSpy> spyList = new Vector<JenkinsMavenEventSpy>(numThreads);
 
-        //Test some concurrency around persisted state. Launch 100 threads from which 1/3 will try to change the
-        //persisted state, the rest will read it a couple of times.
+        // Test some concurrency around persisted state. Launch 100 threads from which
+        // 1/3 will try to change the
+        // persisted state, the rest will read it a couple of times.
         for (int i = 0; i < numThreads; i++) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         barrier.await();
-                        //Thread.sleep(RandomUtils.nextInt(0, 500));
+                        // Thread.sleep(RandomUtils.nextInt(0, 500));
                         JenkinsMavenEventSpy spy = createSpy();
                         spyList.add(spy);
                         DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
@@ -132,7 +133,7 @@ public class JenkinsMavenEventSpyMTTest {
             int c = counter.get();
             long finish = System.currentTimeMillis();
             if ((finish - start) > 2000L) { // 2 seconds is the limit
-                //ThreadDumps.threadDumpModern(System.out); //FIXME
+                // ThreadDumps.threadDumpModern(System.out); //FIXME
                 fail("Threads taking too long to finish " + (finish - start) + "ms");
             }
 
@@ -155,29 +156,30 @@ public class JenkinsMavenEventSpyMTTest {
             File outFile = ((FileMavenEventReporter) spy.getReporter()).getFinalFile();
             System.out.println("Generated file: " + outFile);
             String actual = FileUtils.fileRead(outFile);
-            assertThat(actual, CoreMatchers.containsString("MavenExecutionRequest"));
+            assertThat(actual).contains("MavenExecutionRequest");
             validateXMLDocument(outFile);
         }
     }
 
-    @Test //Issue JENKINS-46579
+    @Test // Issue JENKINS-46579
     public void testMavenExecutionMTRequestsSingleSpyReporter() throws Exception {
         int numThreads = 100;
-        final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1); //we need to also stop the test thread (current)
+        final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1); // we need to also stop the test thread (current)
         final AtomicInteger counter = new AtomicInteger(0);
         final ExceptionHolder exceptionHolder = new ExceptionHolder();
 
         final JenkinsMavenEventSpy spy = createSpy();
 
-        //Test some concurrency around persisted state. Launch 100 threads from which 1/3 will try to change the
-        //persisted state, the rest will read it a couple of times.
+        // Test some concurrency around persisted state. Launch 100 threads from which
+        // 1/3 will try to change the
+        // persisted state, the rest will read it a couple of times.
         for (int i = 0; i < numThreads; i++) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         barrier.await();
-                        //Thread.sleep(RandomUtils.nextInt(0, 500));
+                        // Thread.sleep(RandomUtils.nextInt(0, 500));
 
                         DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
                         request.setPom(new File("path/to/pom.xml"));
@@ -201,7 +203,7 @@ public class JenkinsMavenEventSpyMTTest {
             int c = counter.get();
             long finish = System.currentTimeMillis();
             if ((finish - start) > 2000L) { // 2 seconds is the limit
-                //ThreadDumps.threadDumpModern(System.out); //FIXME
+                // ThreadDumps.threadDumpModern(System.out); //FIXME
                 fail("Threads taking too long to finish " + (finish - start) + "ms");
             }
 
@@ -223,7 +225,7 @@ public class JenkinsMavenEventSpyMTTest {
         File outFile = ((FileMavenEventReporter) spy.getReporter()).getFinalFile();
         System.out.println("Generated file: " + outFile);
         String actual = FileUtils.fileRead(outFile);
-        assertThat(actual, CoreMatchers.containsString("MavenExecutionRequest"));
+        assertThat(actual).contains("MavenExecutionRequest");
         validateXMLDocument(outFile);
     }
 
