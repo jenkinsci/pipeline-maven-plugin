@@ -637,8 +637,10 @@
             <configuration>
               <rules combine.children="append">
                 <RestrictImports>
-                  <bannedImport>org.apache.commons.lang3.**</bannedImport>
-                  <bannedImport>javax.annotation.**</bannedImport>
+                  <bannedImports>
+                    <bannedImport>org.apache.commons.lang3.**</bannedImport>
+                    <bannedImport>javax.annotation.**</bannedImport>
+                  </bannedImports>
                 </RestrictImports>
               </rules>
             </configuration>
