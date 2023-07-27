@@ -1,6 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.File;
 import java.io.InputStream;
@@ -10,9 +10,8 @@ import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -56,7 +55,7 @@ public class InvokerRunsPublisherInternalTest {
                 invokerRunSucceededEvents.add(invokerRunEvent);
             }
         }
-        assertThat(invokerRunSucceededEvents.size(), Matchers.is(1));
+        assertThat(invokerRunSucceededEvents).hasSize(1);
         Element invokerRunSucceedEvent = invokerRunSucceededEvents.get(0);
 
         Element projectElt = XmlUtils.getUniqueChildElement(invokerRunSucceedEvent, "project");
@@ -67,13 +66,13 @@ public class InvokerRunsPublisherInternalTest {
 
         String reportsDirectory = invokerRunsPublisher.expandAndRelativize(reportsDirectoryElt, "reportsDirectory", invokerRunSucceedEvent, projectElt,
                 workspace, listener);
-        assertThat(reportsDirectory, Matchers.is("target/invoker-reports"));
+        assertThat(reportsDirectory).isEqualTo("target/invoker-reports");
         String projectsDirectory = invokerRunsPublisher.expandAndRelativize(projectsDirectoryElt, "projectsDirectory", invokerRunSucceedEvent, projectElt,
                 workspace, listener);
-        assertThat(projectsDirectory, Matchers.is("src/it"));
+        assertThat(projectsDirectory).isEqualTo("src/it");
         String cloneProjectsTo = invokerRunsPublisher.expandAndRelativize(cloneProjectsToElt, "cloneProjectsTo", invokerRunSucceedEvent, projectElt, workspace,
                 listener);
-        assertThat(cloneProjectsTo, Matchers.is("target/it"));
+        assertThat(cloneProjectsTo).isEqualTo("target/it");
     }
 
 }

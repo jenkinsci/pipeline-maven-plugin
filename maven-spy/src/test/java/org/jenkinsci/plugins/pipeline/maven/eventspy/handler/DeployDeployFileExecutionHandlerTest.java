@@ -1,6 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -16,11 +16,10 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.hamcrest.Matchers;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.OutputStreamEventReporter;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author <a href="mailto:r.schleuse@gmail.com">René Schleusner</a>
@@ -32,7 +31,7 @@ public class DeployDeployFileExecutionHandlerTest {
     ByteArrayOutputStream eventReportOutputStream;
     OutputStreamEventReporter reporter;
 
-    @Before
+    @BeforeEach
     public void before() throws Exception {
         eventReportOutputStream = new ByteArrayOutputStream();
         reporter = new OutputStreamEventReporter(eventReportOutputStream);
@@ -40,7 +39,7 @@ public class DeployDeployFileExecutionHandlerTest {
         project = this.createTestMavenProject();
     }
 
-    @After
+    @AfterEach
     public void after() throws IOException {
         this.eventReportOutputStream.close();
     }
@@ -57,7 +56,7 @@ public class DeployDeployFileExecutionHandlerTest {
         Xpp3Dom executionReport = report.getChild("ExecutionEvent");
         Xpp3Dom plugin = executionReport.getChild("plugin");
 
-        assertThat(plugin.getAttribute("lifecyclePhase"), Matchers.equalTo("install"));
+        assertThat(plugin.getAttribute("lifecyclePhase")).isEqualTo("install");
     }
 
     @Test
@@ -71,7 +70,7 @@ public class DeployDeployFileExecutionHandlerTest {
         Xpp3Dom executionReport = report.getChild("ExecutionEvent");
         Xpp3Dom plugin = executionReport.getChild("plugin");
 
-        assertThat(plugin.getAttribute("lifecyclePhase"), Matchers.equalTo("deploy"));
+        assertThat(plugin.getAttribute("lifecyclePhase")).isEqualTo("deploy");
     }
 
     @Test
@@ -86,7 +85,7 @@ public class DeployDeployFileExecutionHandlerTest {
         Xpp3Dom executionReport = report.getChild("ExecutionEvent");
         Xpp3Dom plugin = executionReport.getChild("plugin");
 
-        assertThat(plugin.getAttribute("lifecyclePhase"), Matchers.equalTo("deploy"));
+        assertThat(plugin.getAttribute("lifecyclePhase")).isEqualTo("deploy");
     }
 
     @Test
@@ -101,12 +100,13 @@ public class DeployDeployFileExecutionHandlerTest {
         Xpp3Dom executionReport = report.getChild("ExecutionEvent");
         Xpp3Dom plugin = executionReport.getChild("plugin");
 
-        assertThat(plugin.getAttribute("lifecyclePhase"), Matchers.equalTo("deploy"));
+        assertThat(plugin.getAttribute("lifecyclePhase")).isEqualTo("deploy");
     }
 
     /**
-     * Creates a ExecutionEvent which describes a successfull
-     * invocation of passed MojoExecution on a dummy-project
+     * Creates a ExecutionEvent which describes a successfull invocation of passed
+     * MojoExecution on a dummy-project
+     *
      * @param mojoExecution
      * @return
      */
@@ -141,6 +141,7 @@ public class DeployDeployFileExecutionHandlerTest {
 
     /**
      * Create a dummy Maven-Projet
+     *
      * @return
      * @throws IOException
      * @throws XmlPullParserException
@@ -161,8 +162,8 @@ public class DeployDeployFileExecutionHandlerTest {
     }
 
     /**
-     * Creates a MojoDescriptor for an invocation
-     * of maven-deploy-plugin:deploy-file
+     * Creates a MojoDescriptor for an invocation of maven-deploy-plugin:deploy-file
+     *
      * @return
      */
     private MojoDescriptor createTestingMojoDescriptor() {
@@ -179,8 +180,8 @@ public class DeployDeployFileExecutionHandlerTest {
     }
 
     /**
-     * Closes the reporter and returns the resulting
-     * report as a Xpp3Dom object
+     * Closes the reporter and returns the resulting report as a Xpp3Dom object
+     *
      * @return
      * @throws XmlPullParserException
      * @throws IOException

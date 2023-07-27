@@ -1,10 +1,9 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import org.hamcrest.Matchers;
-import org.junit.Test;
-import org.jvnet.hudson.test.Issue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.Issue;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -13,18 +12,23 @@ public class WithMavenStepExecution2Test {
 
     @Test
     @Issue("JENKINS-57324")
-    public void testEscapeWindowsBatchChars(){
+    public void testEscapeWindowsBatchChars() {
 
-        String mavenConfig ="--batch-mode --show-version " +
-                "--settings \"e:\\folder\\branches%2Ftest\\workspace@tmp\\withMaven94865076\\settings.xml\" " +
-                "--global-settings \"e:\\folder\\branches%2Ftest\\workspace@tmp\\withMaven94865076\\globalSettings.xml\"";
+        //@formatter:off
+        String mavenConfig = "--batch-mode --show-version " +
+            "--settings \"e:\\folder\\branches%2Ftest\\workspace@tmp\\withMaven94865076\\settings.xml\" " +
+            "--global-settings \"e:\\folder\\branches%2Ftest\\workspace@tmp\\withMaven94865076\\globalSettings.xml\"";
+        //@formatter:on
 
-       String actualEscapedMavenConfig = mavenConfig.replace("%", "%%");
+        String actualEscapedMavenConfig = mavenConfig.replace("%", "%%");
+       //@formatter:off
        String expectedEscapedMavenConfig = "--batch-mode --show-version " +
-               "--settings \"e:\\folder\\branches%%2Ftest\\workspace@tmp\\withMaven94865076\\settings.xml\" " +
-               "--global-settings \"e:\\folder\\branches%%2Ftest\\workspace@tmp\\withMaven94865076\\globalSettings.xml\"";
-        System.out.println("Expected escaped mavenConfig: " + expectedEscapedMavenConfig);
-        assertThat(actualEscapedMavenConfig, Matchers.is(expectedEscapedMavenConfig));
+           "--settings \"e:\\folder\\branches%%2Ftest\\workspace@tmp\\withMaven94865076\\settings.xml\" " +
+           "--global-settings \"e:\\folder\\branches%%2Ftest\\workspace@tmp\\withMaven94865076\\globalSettings.xml\"";
+       //formatter:on
 
+       System.out.println("Expected escaped mavenConfig: " + expectedEscapedMavenConfig);
+
+       assertThat(actualEscapedMavenConfig).isEqualTo(expectedEscapedMavenConfig);
     }
 }

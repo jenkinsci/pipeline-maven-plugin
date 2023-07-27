@@ -1,9 +1,8 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import org.hamcrest.Matchers;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -24,9 +23,7 @@ public class MavenArtifactTest {
         actualMavenArtifact.setVersion("1.0-SNAPSHOT");
         actualMavenArtifact.setType("jar");
 
-        assertThat(actualMavenArtifact.hashCode(), Matchers.is(expectedMavenArtifact.hashCode()));
-        assertThat(actualMavenArtifact, Matchers.is(expectedMavenArtifact));
-
-
+        assertThat(actualMavenArtifact.hashCode()).isEqualTo(expectedMavenArtifact.hashCode());
+        assertThat(actualMavenArtifact).isEqualTo(expectedMavenArtifact);
     }
 }

@@ -27,8 +27,9 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 import javax.sql.DataSource;
 
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-import org.junit.ClassRule;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -36,16 +37,15 @@ import com.zaxxer.hikari.HikariDataSource;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
+@Testcontainers
 public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
 
-    @ClassRule
+    @Container
     public static PostgreSQLContainer<?> DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE);
 
     @Override
     public DataSource before_newDataSource() throws Exception {
-
         Class.forName("org.postgresql.Driver");
-
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(DB.getJdbcUrl());
         config.setUsername(DB.getUsername());

@@ -15,16 +15,15 @@ import org.jenkinsci.plugins.workflow.flow.FlowExecutionOwner;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import hudson.model.Result;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class DatabaseSyncRunListenerTest {
 
     @InjectMocks
@@ -51,11 +50,6 @@ public class DatabaseSyncRunListenerTest {
     @Mock
     private FlowNode flowNode;
 
-    @Before
-    public void configureMocks() {
-        when(config.getDao()).thenReturn(dao);
-    }
-
     @Test
     public void test_abort_when_step_not_run() throws Exception {
         when(build.asFlowExecutionOwner()).thenReturn(flowExecutionOwner);
@@ -78,6 +72,7 @@ public class DatabaseSyncRunListenerTest {
         when(build.getNumber()).thenReturn(42);
         long startTime = System.currentTimeMillis() + 1000;
         when(build.getStartTimeInMillis()).thenReturn(startTime);
+        when(config.getDao()).thenReturn(dao);
 
         listener.onCompleted(build, null);
 
@@ -96,6 +91,7 @@ public class DatabaseSyncRunListenerTest {
         long startTime = System.currentTimeMillis() + 1000;
         when(build.getStartTimeInMillis()).thenReturn(startTime);
         when(build.getResult()).thenReturn(Result.UNSTABLE);
+        when(config.getDao()).thenReturn(dao);
 
         listener.onCompleted(build, null);
 
@@ -107,6 +103,7 @@ public class DatabaseSyncRunListenerTest {
         when(build.getParent()).thenReturn(job);
         when(job.getFullName()).thenReturn("the job");
         when(build.getNumber()).thenReturn(42);
+        when(config.getDao()).thenReturn(dao);
 
         listener.onDeleted(build);
 

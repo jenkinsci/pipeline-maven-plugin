@@ -1,17 +1,15 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import hudson.model.Fingerprint;
-import hudson.model.Result;
-import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Hashtable;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import org.junit.jupiter.api.Test;
+
+import hudson.model.Fingerprint;
+import hudson.model.Result;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -19,8 +17,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest {
 
     /**
-     * Two (2) pipeline maven jobs consume the same commons-lang3-3.5.jar dependency.
-     * Verify that withMaven fingerprints commons-lang3-3.5.jar on each build
+     * Two (2) pipeline maven jobs consume the same commons-lang3-3.5.jar
+     * dependency. Verify that withMaven fingerprints commons-lang3-3.5.jar on each
+     * build
+     *
      * @throws Exception
      */
     @Test
@@ -28,12 +28,14 @@ public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest 
 
         loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
 
+        //@formatter:off
         String pipelineScript = "node() {\n" +
-                "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                "    withMaven(options:[dependenciesFingerprintPublisher(includeReleaseVersions:true)]) {\n" +
-                "        sh 'mvn package'\n" +
-                "    }\n" +
-                "}";
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven(options:[dependenciesFingerprintPublisher(includeReleaseVersions:true)]) {\n" +
+            "        sh 'mvn package'\n" +
+            "    }\n" +
+            "}";
+        //@formatter:on
 
         String commonsLang3version35Md5 = "780b5a8b72eebe6d0dbff1c11b5658fa";
 
@@ -44,14 +46,14 @@ public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest 
             jenkinsRule.assertBuildStatus(Result.SUCCESS, firstPipeline.scheduleBuild2(0));
 
             Fingerprint fingerprint = jenkinsRule.jenkins.getFingerprintMap().get(commonsLang3version35Md5);
-            assertThat(fingerprint, not(nullValue()));
+            assertThat(fingerprint).isNotNull();
 
-            assertThat(fingerprint.getFileName(), is("org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar"));
+            assertThat(fingerprint.getFileName()).isEqualTo("org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar");
             Fingerprint.BuildPtr original = fingerprint.getOriginal();
-            assertThat(original, is(nullValue()));
+            assertThat(original).isNull();
             Hashtable<String, Fingerprint.RangeSet> usages = fingerprint.getUsages();
-            assertThat(usages.size(), is(1));
-            assertThat(usages.containsKey(firstPipeline.getName()), is(true));
+            assertThat(usages).hasSize(1);
+            assertThat(usages).containsKey(firstPipeline.getName());
         }
         { // second job using commons-lang3:3.5
             WorkflowJob secondPipeline = jenkinsRule.createProject(WorkflowJob.class, "build-mono-dependency-maven-project-2");
@@ -59,11 +61,11 @@ public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest 
             jenkinsRule.assertBuildStatus(Result.SUCCESS, secondPipeline.scheduleBuild2(0));
 
             Fingerprint fingerprint = jenkinsRule.jenkins.getFingerprintMap().get(commonsLang3version35Md5);
-            assertThat(fingerprint, not(nullValue()));
+            assertThat(fingerprint).isNotNull();
             Hashtable<String, Fingerprint.RangeSet> usages = fingerprint.getUsages();
-            assertThat(usages.size(), is(2));
-            assertThat(usages.containsKey(firstPipeline.getName()), is(true));
-            assertThat(usages.containsKey(secondPipeline.getName()), is(true));
+            assertThat(usages).hasSize(2);
+            assertThat(usages).containsKey(firstPipeline.getName());
+            assertThat(usages).containsKey(secondPipeline.getName());
         }
 
     }

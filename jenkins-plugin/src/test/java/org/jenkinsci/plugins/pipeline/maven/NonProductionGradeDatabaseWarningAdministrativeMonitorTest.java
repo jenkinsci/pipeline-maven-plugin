@@ -1,21 +1,20 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class NonProductionGradeDatabaseWarningAdministrativeMonitorTest {
 
     @InjectMocks
@@ -34,7 +33,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorTest {
             when(config.getJdbcUrl()).thenReturn(null);
             when(config.isDaoInitialized()).thenReturn(false);
 
-            assertThat(monitor.isActivated(), is(false));
+            assertThat(monitor.isActivated()).isFalse();
 
             verify(config).getJdbcUrl();
             verify(config).isDaoInitialized();
@@ -49,7 +48,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorTest {
             when(config.getJdbcUrl()).thenReturn("");
             when(config.isDaoInitialized()).thenReturn(false);
 
-            assertThat(monitor.isActivated(), is(false));
+            assertThat(monitor.isActivated()).isFalse();
 
             verify(config).getJdbcUrl();
             verify(config).isDaoInitialized();
@@ -66,7 +65,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorTest {
             when(config.getDao()).thenReturn(dao);
             when(dao.isEnoughProductionGradeForTheWorkload()).thenReturn(false);
 
-            assertThat(monitor.isActivated(), is(true));
+            assertThat(monitor.isActivated()).isTrue();
 
             verify(config).getJdbcUrl();
             verify(config).getDao();
@@ -85,7 +84,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorTest {
             when(config.getDao()).thenReturn(dao);
             when(dao.isEnoughProductionGradeForTheWorkload()).thenReturn(false);
 
-            assertThat(monitor.isActivated(), is(true));
+            assertThat(monitor.isActivated()).isTrue();
 
             verify(config).getJdbcUrl();
             verify(config).getDao();
@@ -104,7 +103,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorTest {
             when(config.getDao()).thenReturn(dao);
             when(dao.isEnoughProductionGradeForTheWorkload()).thenReturn(true);
 
-            assertThat(monitor.isActivated(), is(false));
+            assertThat(monitor.isActivated()).isFalse();
 
             verify(config).getJdbcUrl();
             verify(config).getDao();
@@ -123,7 +122,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorTest {
             when(config.getDao()).thenReturn(dao);
             when(dao.isEnoughProductionGradeForTheWorkload()).thenReturn(true);
 
-            assertThat(monitor.isActivated(), is(false));
+            assertThat(monitor.isActivated()).isFalse();
 
             verify(config).getJdbcUrl();
             verify(config).getDao();
@@ -139,7 +138,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorTest {
             c.when(GlobalPipelineMavenConfig::get).thenReturn(config);
             when(config.getJdbcUrl()).thenReturn("jdbc:h2:some url");
 
-            assertThat(monitor.isActivated(), is(true));
+            assertThat(monitor.isActivated()).isTrue();
 
             verify(config).getJdbcUrl();
             verifyNoMoreInteractions(config, dao);
@@ -152,7 +151,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorTest {
             c.when(GlobalPipelineMavenConfig::get).thenReturn(config);
             when(config.getJdbcUrl()).thenReturn("jdbc:mysql:some url");
 
-            assertThat(monitor.isActivated(), is(false));
+            assertThat(monitor.isActivated()).isFalse();
 
             verify(config).getJdbcUrl();
             verifyNoMoreInteractions(config, dao);
@@ -165,7 +164,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorTest {
             c.when(GlobalPipelineMavenConfig::get).thenReturn(config);
             when(config.getJdbcUrl()).thenReturn("jdbc:postgresql:some url");
 
-            assertThat(monitor.isActivated(), is(false));
+            assertThat(monitor.isActivated()).isFalse();
 
             verify(config).getJdbcUrl();
             verifyNoMoreInteractions(config, dao);
