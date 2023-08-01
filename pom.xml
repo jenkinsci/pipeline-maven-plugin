@@ -28,8 +28,8 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.54</version>
-    <relativePath/>
+    <version>4.71</version>
+    <relativePath />
   </parent>
 
   <artifactId>pipeline-maven-parent</artifactId>

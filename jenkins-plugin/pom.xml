@@ -191,12 +191,44 @@
           <artifactId>guice</artifactId>
         </exclusion>
         <exclusion>
+          <groupId>com.google.protobuf</groupId>
+          <artifactId>protobuf-java</artifactId>
+        </exclusion>
+        <exclusion>
           <groupId>commons-net</groupId>
           <artifactId>commons-net</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>apache-httpcomponents-client-4-api</artifactId>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-artifact</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-compat</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-core</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-embedder</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-model</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-model-builder</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.maven</groupId>
+          <artifactId>maven-repository-metadata</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.apache.maven.doxia</groupId>
@@ -207,40 +239,8 @@
           <artifactId>wagon-webdav-jackrabbit</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-repository-metadata</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-model</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-artifact</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-model-builder</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-compat</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven</groupId>
-          <artifactId>maven-embedder</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-lang3</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.google.protobuf</groupId>
-          <artifactId>protobuf-java</artifactId>
+          <groupId>org.jenkins-ci.plugins</groupId>
+          <artifactId>apache-httpcomponents-client-4-api</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -334,20 +334,20 @@
           <artifactId>guice</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.maven.doxia</groupId>
-          <artifactId>doxia-core</artifactId>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.apache.maven.doxia</groupId>
-          <artifactId>doxia-site-renderer</artifactId>
+          <artifactId>doxia-core</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.apache.maven.doxia</groupId>
           <artifactId>doxia-sink-api</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-lang3</artifactId>
+          <groupId>org.apache.maven.doxia</groupId>
+          <artifactId>doxia-site-renderer</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.sonatype.sisu</groupId>
@@ -383,16 +383,16 @@
           <artifactId>asm</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.jvnet.hudson.plugins.findbugs</groupId>
-          <artifactId>library</artifactId>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.jenkins-ci</groupId>
           <artifactId>SECURITY-144-compat</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-lang3</artifactId>
+          <groupId>org.jvnet.hudson.plugins.findbugs</groupId>
+          <artifactId>library</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -401,6 +401,12 @@
       <artifactId>tasks</artifactId>
       <version>${jenkins-plugin-tasks.version}</version>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -517,6 +523,12 @@
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${testcontainers.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
       <artifactId>mysql</artifactId>
       <version>${testcontainers.version}</version>
       <scope>test</scope>
@@ -531,18 +543,6 @@
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
       <version>${testcontainers.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>junit-jupiter</artifactId>
-      <version>${testcontainers.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>${logback.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
