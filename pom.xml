@@ -106,11 +106,11 @@
     <jenkins-tools-bom.version>1798.vc671fe94856f</jenkins-tools-bom.version>
     <jenkins.version>2.361.4</jenkins.version>
     <joda-time.version>2.12.5</joda-time.version>
-    <junit.version>5.9.3</junit.version>
+    <junit.version>5.10.0</junit.version>
     <logback.version>1.4.8</logback.version>
     <maven-compat.version>3.3.9</maven-compat.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
-    <maven-plugin-sortpom.version>3.2.1</maven-plugin-sortpom.version>
+    <maven-plugin-sortpom.version>3.3.0</maven-plugin-sortpom.version>
     <maven-plugin-surefire.version>3.1.2</maven-plugin-surefire.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.8.7</maven.version>
