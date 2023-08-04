@@ -105,6 +105,8 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     private String jdbcCredentialsId;
     private String properties;
 
+    private boolean noDataStorage;
+
     @DataBoundConstructor
     public GlobalPipelineMavenConfig() {
         load();
@@ -181,6 +183,15 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         this.triggerDownstreamUponResultAborted = triggerDownstreamUponResultAborted;
     }
 
+    public boolean isNoDataStorage() {
+        return noDataStorage;
+    }
+
+    @DataBoundSetter
+    public void setNoDataStorage(boolean noDataStorage) {
+        this.noDataStorage = noDataStorage;
+    }
+
     public synchronized String getJdbcUrl() {
         return jdbcUrl;
     }
@@ -241,6 +252,10 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
             throw new IllegalStateException("Request to get DAO whilst Jenkins is terminating");
         }
         if (dao == null) {
+            if(noDataStorage || Boolean.getBoolean("PipelineMavenPluginDao.noDataStorage")) {
+                dao = new PipelineMavenPluginNullDao();
+                return dao;
+            }
             try {
                 String jdbcUrl, jdbcUserName, jdbcPassword;
                 if (StringUtils.isBlank(this.jdbcUrl)) {

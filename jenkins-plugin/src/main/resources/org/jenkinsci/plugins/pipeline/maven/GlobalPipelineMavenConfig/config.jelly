@@ -30,6 +30,9 @@ THE SOFTWARE.
         <f:entry title="${%DAO}">
             <pre><code>${instance.dao.toPrettyString()}</code></pre>
         </f:entry>
+        <f:entry title="${%No Data Storage}">
+            <f:checkbox title="${%Do not store any data}" field="noDataStorage"/>
+        </f:entry>
         <f:entry title="${%Database Configuration}">
             <f:entry title="${%JDBC URL}" field="jdbcUrl"
                      description="JDBC URL. For production workloads, use MySQL (incl. Amazon Aurora for MySQL, MariaDB...) or PostgreSQL. If empty, then a non production grade H2 embedded database will be used.">
