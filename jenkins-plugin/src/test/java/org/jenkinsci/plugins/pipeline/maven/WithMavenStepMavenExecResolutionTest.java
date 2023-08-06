@@ -30,8 +30,10 @@ import java.util.Collections;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.junit.Rule;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
+import org.jvnet.hudson.test.LoggerRule;
 import org.testcontainers.containers.GenericContainer;
 
 import com.cloudbees.plugins.credentials.Credentials;
@@ -51,6 +53,9 @@ import hudson.tools.InstallSourceProperty;
 
 @Issue("JENKINS-43651")
 public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTest {
+
+    @Rule
+    public final LoggerRule loggerRule = new LoggerRule();
 
     private static final String SSH_CREDENTIALS_ID = "test";
     private static final String AGENT_NAME = "remote";
