@@ -48,13 +48,19 @@ import org.testcontainers.utility.DockerImageName;
 @WithJenkins
 public abstract class AbstractIntegrationTest {
 
+//    To build the parent image
+//    sha1sum jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/SshdContainer/Dockerfile
+//    docker build -f jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/SshdContainer/Dockerfile jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/ -t olamy/pipeline-maven-plugin:SshdContainer-32edfdd581112ff75ef6bbd6b0e576371f0089e3
+//    docker push olamy/pipeline-maven-plugin:SshdContainer-32edfdd581112ff75ef6bbd6b0e576371f0089e3
+
+
 //    To build this image
 //    sha1sum jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/Dockerfile
-//    docker build -f jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/Dockerfile jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/ -t olamy/pipeline-maven-plugin:JavaGitContainer-19c965b94d49ac3af6bb58fcb7a3d9c2f480e9e7
-//    docker push olamy/pipeline-maven-plugin:JavaGitContainer-19c965b94d49ac3af6bb58fcb7a3d9c2f480e9e7
+//    docker build -f jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/Dockerfile jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/ -t olamy/pipeline-maven-plugin:JavaGitContainer-fe3065996fcbb067d17b078f414020db1d63afcc
+//    docker push olamy/pipeline-maven-plugin:JavaGitContainer-fe3065996fcbb067d17b078f414020db1d63afcc
     @Container
     public GenericContainer<?> javaGitContainerRule =
-            new GenericContainer<>(DockerImageName.parse("olamy/pipeline-maven-plugin:JavaGitContainer-19c965b94d49ac3af6bb58fcb7a3d9c2f480e9e7"))
+            new GenericContainer<>(DockerImageName.parse("olamy/pipeline-maven-plugin:JavaGitContainer-fe3065996fcbb067d17b078f414020db1d63afcc"))
                 .withExposedPorts(22);
 
 //    to run from classpath file
@@ -62,10 +68,10 @@ public abstract class AbstractIntegrationTest {
 //    public GenericContainer<?> javaGitContainerRule = new GenericContainer<>(new ImageFromDockerfile("jenkins/pipeline-maven-java-git", true)
 //            .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/Dockerfile")).withExposedPorts(22);
 
-    // To build this image
+//    To build this image
 //    sha1sum jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile
-//    docker build -f jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/ -t olamy/pipeline-maven-plugin:NonMavenJavaContainer-b13715c6c45cf3c01bc8a9340abd4017396e30bb
-//    docker push olamy/pipeline-maven-plugin:NonMavenJavaContainer-b13715c6c45cf3c01bc8a9340abd4017396e30bb
+//    docker build -f jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/ -t olamy/pipeline-maven-plugin:NonMavenJavaContainer-4810152e3b5d42b3ea25bfc7dc08cdd4da6aaf51
+//    docker push olamy/pipeline-maven-plugin:NonMavenJavaContainer-4810152e3b5d42b3ea25bfc7dc08cdd4da6aaf51
     @Container
     public GenericContainer<?> nonMavenContainerRule =
             new GenericContainer<>(DockerImageName.parse("olamy/pipeline-maven-plugin:NonMavenJavaContainer-b13715c6c45cf3c01bc8a9340abd4017396e30bb"))
@@ -78,8 +84,8 @@ public abstract class AbstractIntegrationTest {
 
 //    To build this image
 //    sha1sum jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/MavenWithMavenHomeJavaContainer/Dockerfile
-//    docker build -f jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/MavenWithMavenHomeJavaContainer/Dockerfile jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/ -t olamy/pipeline-maven-plugin:MavenWithMavenHomeJavaContainer-e3e86a51761591f6036c6d5daf19d13284b5f205
-//    docker push olamy/pipeline-maven-plugin:MavenWithMavenHomeJavaContainer-e3e86a51761591f6036c6d5daf19d13284b5f205
+//    docker build -f jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/MavenWithMavenHomeJavaContainer/Dockerfile jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/ -t olamy/pipeline-maven-plugin:MavenWithMavenHomeJavaContainer-8883e396ed7837d2b712865ffd460ef190dee600
+//    docker push olamy/pipeline-maven-plugin:MavenWithMavenHomeJavaContainer-8883e396ed7837d2b712865ffd460ef190dee600
 
     @Container
     public GenericContainer<?> mavenWithMavenHomeContainerRule =
