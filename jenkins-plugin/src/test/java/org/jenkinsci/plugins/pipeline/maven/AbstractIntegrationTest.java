@@ -64,11 +64,11 @@ public abstract class AbstractIntegrationTest {
 
     // To build this image
 //    sha1sum jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile
-//    docker build -f jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/ -t olamy/pipeline-maven-plugin:NonMavenJavaContainer-b570d89a92b2403d493a3e557083219b0522e25c
-//    docker push olamy/pipeline-maven-plugin:NonMavenJavaContainer-b570d89a92b2403d493a3e557083219b0522e25c
+//    docker build -f jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile jenkins-plugin/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/ -t olamy/pipeline-maven-plugin:NonMavenJavaContainer-b13715c6c45cf3c01bc8a9340abd4017396e30bb
+//    docker push olamy/pipeline-maven-plugin:NonMavenJavaContainer-b13715c6c45cf3c01bc8a9340abd4017396e30bb
     @Container
     public GenericContainer<?> nonMavenContainerRule =
-            new GenericContainer<>(DockerImageName.parse("olamy/pipeline-maven-plugin:NonMavenJavaContainer-b570d89a92b2403d493a3e557083219b0522e25c"))
+            new GenericContainer<>(DockerImageName.parse("olamy/pipeline-maven-plugin:NonMavenJavaContainer-b13715c6c45cf3c01bc8a9340abd4017396e30bb"))
                     .withExposedPorts(22);
 //    to run from classpath file
 //    public GenericContainer<?> nonMavenContainerRule =

@@ -1,16 +1,12 @@
+#
+# Runs sshd and allow the 'test' user to login
+#
+
 FROM ubuntu:bionic
 
-RUN apt-get update && \
-    apt-get install --no-install-recommends -y \
-        software-properties-common \
-        openjdk-11-jdk-headless \
-        curl \
-        ant \
-        maven \
-        git
-
 # install SSHD
-RUN apt-get install -y \
+RUN apt-get update -y && \
+    apt-get install -y \
         openssh-server \
         locales
 RUN mkdir -p /var/run/sshd
@@ -28,10 +24,15 @@ RUN useradd test -d /home/test && \
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
     update-locale LANG=en_US.UTF-8
+ENV LANG en_US.UTF-8
 
-RUN apt-get remove maven -y
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+        software-properties-common \
+        openjdk-11-jdk-headless \
+        curl \
+        ant
 
 # run SSHD in the foreground with error messages to stderr
 ENTRYPOINT ["/usr/sbin/sshd", "-D", "-e"]
-
 

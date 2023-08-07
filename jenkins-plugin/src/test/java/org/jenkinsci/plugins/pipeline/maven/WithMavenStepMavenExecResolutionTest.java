@@ -26,6 +26,7 @@ package org.jenkinsci.plugins.pipeline.maven;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collections;
+import java.util.logging.Level;
 
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -69,6 +70,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
     @Test
     public void testMavenGlobalToolRecognizedInScriptedPipeline() throws Exception {
+        loggerRule.record("hudson.plugins.sshslaves", Level.FINEST);
         registerAgentForContainer(nonMavenContainerRule);
         String version = registerLatestMavenVersionAsGlobalTool();
 
