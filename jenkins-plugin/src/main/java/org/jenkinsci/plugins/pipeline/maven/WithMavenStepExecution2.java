@@ -87,6 +87,7 @@ import org.springframework.util.ClassUtils;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import hudson.Functions;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -1107,8 +1108,14 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         @Override
         protected void finished(StepContext context) throws Exception {
+            TaskListener listener = context.get(TaskListener.class);
             if (tempBinDir == null) { // normal case
-                tempBinDir = context.get(FilePath.class).child(tempBinDirPath);
+                FilePath ws = context.get(FilePath.class);
+                if (ws == null) {
+                    listener.getLogger().println("Missing agent to clean up " + tempBinDirPath);
+                    return;
+                }
+                tempBinDir = ws.child(tempBinDirPath);
             } // else resuming old build
 
             mavenSpyLogProcessor.processMavenSpyLogs(context, tempBinDir, options, mavenPublisherStrategy);
@@ -1116,12 +1123,11 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             try {
                 tempBinDir.deleteRecursive();
             } catch (IOException | InterruptedException e) {
-                BuildListener listener = context.get(BuildListener.class);
                 try {
                     if (e instanceof IOException) {
                         Util.displayIOException((IOException) e, listener); // Better IOException display on windows
                     }
-                    e.printStackTrace(listener.fatalError("Error deleting temporary files"));
+                    Functions.printStackTrace(e, listener.fatalError("Error deleting temporary files"));
                 } catch (Throwable t) {
                     t.printStackTrace();
                 }
