@@ -113,7 +113,7 @@
     <jenkins.version>2.346.3</jenkins.version>
     <joda-time.version>2.12.5</joda-time.version>
     <junit.version>5.10.0</junit.version>
-    <logback.version>1.4.8</logback.version>
+    <logback.version>1.4.9</logback.version>
     <maven-compat.version>3.3.9</maven-compat.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
     <maven-plugin-sortpom.version>3.3.0</maven-plugin-sortpom.version>
