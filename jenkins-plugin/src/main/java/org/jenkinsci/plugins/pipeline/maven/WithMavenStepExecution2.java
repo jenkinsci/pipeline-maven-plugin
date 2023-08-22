@@ -1214,10 +1214,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             StandardUsernameCredentials credentials = entry.getValue();
             return "[" +
                     "mavenServerId: '" + mavenServerId + "', " +
-                    "jenkinsCredentials: '" + credentials.getId() + "', " +
-                    "username: '" + credentials.getUsername() + "', " +
-                    "type: '" + ClassUtils.getShortName(credentials.getClass()) +
-                    "']";
+                    "jenkinsCredentials: '" + credentials.getId() + "'" +
+                    "]";
         }
     }
 
@@ -1230,13 +1228,9 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             String result = ClassUtils.getShortName(credentials.getClass()) + "[";
             if (credentials instanceof IdCredentials) {
                 IdCredentials idCredentials = (IdCredentials) credentials;
-                result += "id: " + idCredentials.getId() + ",";
+                result += "id: " + idCredentials.getId();
             }
 
-            if (credentials instanceof UsernameCredentials) {
-                UsernameCredentials usernameCredentials = (UsernameCredentials) credentials;
-                result += "username: " + usernameCredentials.getUsername() + "";
-            }
             result += "]";
             return result;
         }

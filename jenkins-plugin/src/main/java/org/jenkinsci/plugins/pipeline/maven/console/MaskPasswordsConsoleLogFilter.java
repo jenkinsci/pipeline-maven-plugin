@@ -3,6 +3,8 @@ package org.jenkinsci.plugins.pipeline.maven.console;
 import com.cloudbees.jenkins.plugins.sshcredentials.SSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.common.PasswordCredentials;
+import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
+
 import hudson.console.ConsoleLogFilter;
 import hudson.model.Run;
 import hudson.util.Secret;
@@ -50,7 +52,13 @@ public class MaskPasswordsConsoleLogFilter extends ConsoleLogFilter implements S
     protected static Collection<String> toString(@NonNull Iterable<Credentials> credentials) {
         List<String> result = new ArrayList<>();
         for (Credentials creds : credentials) {
-            if (creds instanceof PasswordCredentials) {
+            if (creds instanceof UsernamePasswordCredentials) {
+                UsernamePasswordCredentials usernamePasswordCredentials = (UsernamePasswordCredentials) creds;
+                if (usernamePasswordCredentials.isUsernameSecret()) {
+                    result.add(usernamePasswordCredentials.getUsername());
+                }
+                result.add(usernamePasswordCredentials.getPassword().getPlainText());
+            } else if (creds instanceof PasswordCredentials) {
                 PasswordCredentials passwordCredentials = (PasswordCredentials) creds;
                 result.add(passwordCredentials.getPassword().getPlainText());
             } else if (creds instanceof SSHUserPrivateKey) {
