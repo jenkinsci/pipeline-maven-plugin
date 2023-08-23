@@ -30,8 +30,8 @@ THE SOFTWARE.
         <f:entry title="${%DAO}">
             <pre><code>${instance.dao.toPrettyString()}</code></pre>
         </f:entry>
-        <f:entry title="${%No Data Storage}">
-            <f:checkbox title="${%Do not store any data}" field="noDataStorage"/>
+        <f:entry title="${%No Data Storage}" field="noDataStorage">
+            <f:checkbox title="${%Do not store any data}" />
         </f:entry>
         <f:entry title="${%Database Configuration}">
             <f:entry title="${%JDBC URL}" field="jdbcUrl"
