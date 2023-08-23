@@ -251,6 +251,10 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         } else if (j.isTerminating()) {
             throw new IllegalStateException("Request to get DAO whilst Jenkins is terminating");
         }
+
+        if (dao != null) {
+            return dao;
+        }
         // if there is no dao and no jdbc url we use NullDao as we do not want to force users
         // to use jdbc driver with possible security issues
         if (dao == null && StringUtils.isBlank(jdbcUrl)) {

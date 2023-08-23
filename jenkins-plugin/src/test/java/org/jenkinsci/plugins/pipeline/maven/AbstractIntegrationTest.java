@@ -11,8 +11,18 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Map;
 
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.CredentialsScope;
+import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.domains.Domain;
+import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
+import hudson.ExtensionList;
+import hudson.security.ACL;
+import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -71,11 +81,26 @@ public abstract class AbstractIntegrationTest {
     public static void setupWatcher() {
         buildWatcher = new BuildWatcher();
         runBeforeMethod(buildWatcher);
+
     }
 
     @BeforeEach
     public void setup(JenkinsRule r) throws Exception {
+
         jenkinsRule = r;
+
+        if (StringUtils.isBlank(GlobalPipelineMavenConfig.get().getJdbcUrl())) {
+            File databaseRootDir = new File("target", "h2-test");
+            String jdbcUrl = "jdbc:h2:file:" + new File(databaseRootDir, "jenkins-jobs").getAbsolutePath() + ";" +
+                    "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
+            GlobalPipelineMavenConfig.get().setJdbcUrl(jdbcUrl);
+
+            String credsId = "jdbcCredsId";
+            UsernamePasswordCredentialsImpl c =
+                    new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, credsId, "sample", "sa", "sa");
+            CredentialsProvider.lookupStores(jenkinsRule.getInstance()).iterator().next().addCredentials(Domain.global(), c);
+            GlobalPipelineMavenConfig.get().setJdbcCredentialsId(credsId);
+        }
 
         gitRepoRule = new GitSampleRepoRule();
         runBeforeMethod(gitRepoRule);

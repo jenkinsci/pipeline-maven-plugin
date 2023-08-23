@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runAfterMethod;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runBeforeMethod;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -50,6 +51,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
             publisherOptions = new ArrayList<>();
             GlobalPipelineMavenConfig.get().setPublisherOptions(publisherOptions);
         }
+
         publisherOptions.add(publisher);
     }
 
