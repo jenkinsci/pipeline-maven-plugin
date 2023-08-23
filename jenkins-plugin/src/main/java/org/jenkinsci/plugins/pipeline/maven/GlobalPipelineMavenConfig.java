@@ -251,104 +251,105 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         } else if (j.isTerminating()) {
             throw new IllegalStateException("Request to get DAO whilst Jenkins is terminating");
         }
-        if (dao == null) {
-            if(noDataStorage || Boolean.getBoolean("PipelineMavenPluginDao.noDataStorage")) {
-                dao = new PipelineMavenPluginNullDao();
-                return dao;
+        // if there is no dao and no jdbc url we use NullDao as we do not want to force users
+        // to use jdbc driver with possible security issues
+        if (dao == null && StringUtils.isBlank(jdbcUrl)) {
+            dao = new PipelineMavenPluginNullDao();
+            return dao;
+        }
+
+        try {
+            String jdbcUrl, jdbcUserName, jdbcPassword;
+            if (StringUtils.isBlank(this.jdbcUrl)) {
+                // default embedded H2 database
+                File databaseRootDir = new File(j.getRootDir(), "jenkins-jobs");
+                if (!databaseRootDir.exists()) {
+                    boolean created = databaseRootDir.mkdirs();
+                    if (!created) {
+                        throw new IllegalStateException("Failure to create database root dir " + databaseRootDir);
+                    }
+                }
+                jdbcUrl = "jdbc:h2:file:" + new File(databaseRootDir, "jenkins-jobs").getAbsolutePath() + ";" +
+                        "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
+                jdbcUserName = "sa";
+                jdbcPassword = "sa";
+            } else {
+                jdbcUrl = this.jdbcUrl;
+                if (this.jdbcCredentialsId == null)
+                    throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
+
+                UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
+                        CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, j,
+                                ACL.SYSTEM, Collections.EMPTY_LIST),
+                        CredentialsMatchers.withId(this.jdbcCredentialsId));
+                if (jdbcCredentials == null) {
+                    throw new IllegalStateException("Credentials '" + jdbcCredentialsId + "' defined for JDBC URL '" + jdbcUrl + "' NOT found");
+                }
+                jdbcUserName = jdbcCredentials.getUsername();
+                jdbcPassword = Secret.toString(jdbcCredentials.getPassword());
+            }
+
+            HikariConfig dsConfig = createHikariConfig(properties, jdbcUrl, jdbcUserName, jdbcPassword);
+            dsConfig.setAutoCommit(false);
+
+            // TODO cleanup this quick fix for JENKINS-54587, we should have a better solution with the JDBC driver loaded by the DAO itself
+            try {
+                DriverManager.getDriver(jdbcUrl);
+            } catch (SQLException e) {
+                if ("08001".equals(e.getSQLState()) && 0 == e.getErrorCode()) {
+                    // if it's a "No suitable driver" exception, we try to load the jdbc driver and retry
+                    if (jdbcUrl.startsWith("jdbc:h2:")) {
+                        try {
+                            Class.forName("org.h2.Driver");
+                        } catch (ClassNotFoundException cnfe) {
+                            throw new IllegalStateException("H2 driver should be bundled with this plugin");
+                        }
+                    } else if (jdbcUrl.startsWith("jdbc:mysql:")) {
+                        try {
+                            Class.forName("com.mysql.cj.jdbc.Driver");
+                        } catch (ClassNotFoundException cnfe) {
+                            throw new RuntimeException("MySql driver 'com.mysql.cj.jdbc.Driver' not found. Please install the 'MySQL Database Plugin' to install the MySql driver");
+                        }
+                    } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
+                        try {
+                            Class.forName("org.postgresql.Driver");
+                        } catch (ClassNotFoundException cnfe) {
+                            throw new RuntimeException("PostgreSQL driver 'org.postgresql.Driver' not found. Please install the 'PostgreSQL Database Plugin' to install the PostgreSQL driver");
+                        }
+                    } else {
+                        throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
+                    }
+                    DriverManager.getDriver(jdbcUrl);
+                } else {
+                    throw e;
+                }
+            }
+
+            LOGGER.log(Level.INFO, "Connect to database {0} with username {1}", new Object[]{jdbcUrl, jdbcUserName});
+            DataSource ds = new HikariDataSource(dsConfig);
+
+            Class<? extends PipelineMavenPluginDao> daoClass;
+            if (jdbcUrl.startsWith("jdbc:h2:")) {
+                daoClass = PipelineMavenPluginH2Dao.class;
+            } else if (jdbcUrl.startsWith("jdbc:mysql:")) {
+                daoClass = PipelineMavenPluginMySqlDao.class;
+            } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
+                daoClass = PipelineMavenPluginPostgreSqlDao.class;
+            } else {
+                throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
             }
             try {
-                String jdbcUrl, jdbcUserName, jdbcPassword;
-                if (StringUtils.isBlank(this.jdbcUrl)) {
-                    // default embedded H2 database
-                    File databaseRootDir = new File(j.getRootDir(), "jenkins-jobs");
-                    if (!databaseRootDir.exists()) {
-                        boolean created = databaseRootDir.mkdirs();
-                        if (!created) {
-                            throw new IllegalStateException("Failure to create database root dir " + databaseRootDir);
-                        }
-                    }
-                    jdbcUrl = "jdbc:h2:file:" + new File(databaseRootDir, "jenkins-jobs").getAbsolutePath() + ";" +
-                            "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
-                    jdbcUserName = "sa";
-                    jdbcPassword = "sa";
-                } else {
-                    jdbcUrl = this.jdbcUrl;
-                    if (this.jdbcCredentialsId == null)
-                        throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
-
-                    UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
-                            CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, j,
-                                    ACL.SYSTEM, Collections.EMPTY_LIST),
-                            CredentialsMatchers.withId(this.jdbcCredentialsId));
-                    if (jdbcCredentials == null) {
-                        throw new IllegalStateException("Credentials '" + jdbcCredentialsId + "' defined for JDBC URL '" + jdbcUrl + "' NOT found");
-                    }
-                    jdbcUserName = jdbcCredentials.getUsername();
-                    jdbcPassword = Secret.toString(jdbcCredentials.getPassword());
-                }
-
-                HikariConfig dsConfig = createHikariConfig(properties, jdbcUrl, jdbcUserName, jdbcPassword);
-                dsConfig.setAutoCommit(false);
-
-                // TODO cleanup this quick fix for JENKINS-54587, we should have a better solution with the JDBC driver loaded by the DAO itself
-                try {
-                    DriverManager.getDriver(jdbcUrl);
-                } catch (SQLException e) {
-                    if ("08001".equals(e.getSQLState()) && 0 == e.getErrorCode()) {
-                        // if it's a "No suitable driver" exception, we try to load the jdbc driver and retry
-                        if (jdbcUrl.startsWith("jdbc:h2:")) {
-                            try {
-                                Class.forName("org.h2.Driver");
-                            } catch (ClassNotFoundException cnfe) {
-                                throw new IllegalStateException("H2 driver should be bundled with this plugin");
-                            }
-                        } else if (jdbcUrl.startsWith("jdbc:mysql:")) {
-                            try {
-                                Class.forName("com.mysql.cj.jdbc.Driver");
-                            } catch (ClassNotFoundException cnfe) {
-                                throw new RuntimeException("MySql driver 'com.mysql.cj.jdbc.Driver' not found. Please install the 'MySQL Database Plugin' to install the MySql driver");
-                            }
-                        } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
-                            try {
-                                Class.forName("org.postgresql.Driver");
-                            } catch (ClassNotFoundException cnfe) {
-                                throw new RuntimeException("PostgreSQL driver 'org.postgresql.Driver' not found. Please install the 'PostgreSQL Database Plugin' to install the PostgreSQL driver");
-                            }
-                        } else {
-                            throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
-                        }
-                        DriverManager.getDriver(jdbcUrl);
-                    } else {
-                        throw e;
-                    }
-                }
-
-                LOGGER.log(Level.INFO, "Connect to database {0} with username {1}", new Object[]{jdbcUrl, jdbcUserName});
-                DataSource ds = new HikariDataSource(dsConfig);
-
-                Class<? extends PipelineMavenPluginDao> daoClass;
-                if (jdbcUrl.startsWith("jdbc:h2:")) {
-                    daoClass = PipelineMavenPluginH2Dao.class;
-                } else if (jdbcUrl.startsWith("jdbc:mysql:")) {
-                    daoClass = PipelineMavenPluginMySqlDao.class;
-                } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
-                    daoClass = PipelineMavenPluginPostgreSqlDao.class;
-                } else {
-                    throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
-                }
-                try {
-                    dao = new MonitoringPipelineMavenPluginDaoDecorator(new CustomTypePipelineMavenPluginDaoDecorator(daoClass.getConstructor(DataSource.class).newInstance(ds)));
-                } catch (Exception e) {
-                    throw new SQLException(
-                            "Exception connecting to '" + this.jdbcUrl + "' with credentials '" + this.jdbcCredentialsId + "' (" +
-                                    jdbcUserName + "/***) and DAO " + daoClass.getSimpleName(), e);
-                }
-
-
-            } catch (RuntimeException | SQLException e) {
-                LOGGER.log(Level.WARNING, "Exception creating database dao, skip", e);
-                dao = new PipelineMavenPluginNullDao();
+                dao = new MonitoringPipelineMavenPluginDaoDecorator(new CustomTypePipelineMavenPluginDaoDecorator(daoClass.getConstructor(DataSource.class).newInstance(ds)));
+            } catch (Exception e) {
+                throw new SQLException(
+                        "Exception connecting to '" + this.jdbcUrl + "' with credentials '" + this.jdbcCredentialsId + "' (" +
+                                jdbcUserName + "/***) and DAO " + daoClass.getSimpleName(), e);
             }
+
+
+        } catch (RuntimeException | SQLException e) {
+            LOGGER.log(Level.WARNING, "Exception creating database dao, skip", e);
+            dao = new PipelineMavenPluginNullDao();
         }
         return dao;
     }

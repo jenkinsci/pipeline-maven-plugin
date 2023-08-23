@@ -187,6 +187,7 @@
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>h2-api</artifactId>
       <version>${jenkins-plugin-h2.version}</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
