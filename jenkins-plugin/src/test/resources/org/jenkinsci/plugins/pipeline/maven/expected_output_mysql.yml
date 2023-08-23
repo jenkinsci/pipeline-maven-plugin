@@ -1,5 +1,6 @@
 globalTraceability: false
 jdbcUrl: "jdbc:mysql://dbserver/jenkinsdb"
+noDataStorage: false
 properties: |
   dataSource.cachePrepStmts=true
   dataSource.prepStmtCacheSize=250

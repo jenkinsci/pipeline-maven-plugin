@@ -1,4 +1,5 @@
 globalTraceability: false
+noDataStorage: false
 publisherOptions:
 - mavenLinkerPublisher:
     disabled: true
