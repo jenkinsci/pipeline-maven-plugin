@@ -130,7 +130,6 @@ pipeline {
     stage("Build") {
       steps {
         git url: 'https://github.com/cyrille-leclerc/multi-module-maven-project'
-
         withMaven(
             // Maven installation declared in the Jenkins "Global Tool Configuration"
             maven: 'maven-3', // <1>
@@ -142,11 +141,10 @@ pipeline {
             // or globally to the entire master navigating to  "Manage Jenkins / Global Tools Configuration"
             mavenSettingsConfig: 'my-maven-settings' // <3>
         ) {
-
           // Run the maven build
           sh "mvn clean verify"
-
         } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe & FindBugs & SpotBugs reports...
+      }
     }
   }
 }
@@ -221,18 +219,9 @@ Apache Maven 3.3.9 (bb52d8502b132ec0a5a3f4c09453c07478323dc5; 2015-11-10T16:41:4
 [withMaven] use Maven settings.xml 'maven-settings-for-supply-chain-build-job' with Maven servers credentials provided by Jenkins (replaceAll: true): [mavenServerId: 'nexus.beescloud.com', jenkinsCredentials: 'beescloud-nexus-deployment-credentials', username: 'deployment', ...]
 ----
 
-.Pipeline snippet
+.Declarative pipeline snippet
 [source,groovy]
 ----
-node {
-  stage ('Build') {
-    withMaven(traceability: true) {
-      ...
-    }
-  }
-}
-
-
 pipeline {
   agent any
   stages {
@@ -245,7 +234,18 @@ pipeline {
     }
   }
 }
+----
 
+.Scripted pipeline snippet
+[source,groovy]
+----
+node {
+  stage ('Build') {
+    withMaven(traceability: true) {
+      ...
+    }
+  }
+}
 ----
 
 .Logs sample
