@@ -84,22 +84,26 @@ public abstract class AbstractIntegrationTest {
 
     }
 
+    public static void initializeH2(Jenkins jenkins) throws Exception {
+        File databaseRootDir = new File("target", "h2-test");
+        String jdbcUrl = "jdbc:h2:file:" + new File(databaseRootDir, "jenkins-jobs").getAbsolutePath() + ";" +
+                "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
+        GlobalPipelineMavenConfig.get().setJdbcUrl(jdbcUrl);
+
+        String credsId = "jdbcCredsId";
+        UsernamePasswordCredentialsImpl c =
+                new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, credsId, "sample", "sa", "sa");
+        CredentialsProvider.lookupStores(jenkins).iterator().next().addCredentials(Domain.global(), c);
+        GlobalPipelineMavenConfig.get().setJdbcCredentialsId(credsId);
+    }
+
     @BeforeEach
     public void setup(JenkinsRule r) throws Exception {
 
         jenkinsRule = r;
 
         if (StringUtils.isBlank(GlobalPipelineMavenConfig.get().getJdbcUrl())) {
-            File databaseRootDir = new File("target", "h2-test");
-            String jdbcUrl = "jdbc:h2:file:" + new File(databaseRootDir, "jenkins-jobs").getAbsolutePath() + ";" +
-                    "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
-            GlobalPipelineMavenConfig.get().setJdbcUrl(jdbcUrl);
-
-            String credsId = "jdbcCredsId";
-            UsernamePasswordCredentialsImpl c =
-                    new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, credsId, "sample", "sa", "sa");
-            CredentialsProvider.lookupStores(jenkinsRule.getInstance()).iterator().next().addCredentials(Domain.global(), c);
-            GlobalPipelineMavenConfig.get().setJdbcCredentialsId(credsId);
+            initializeH2(jenkinsRule.getInstance());
         }
 
         gitRepoRule = new GitSampleRepoRule();

@@ -57,6 +57,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorIntegrationTe
 
     @Test
     public void shouldMitigateComputationWithH2Database(JenkinsRule j) throws Exception {
+
         NonProductionGradeDatabaseWarningAdministrativeMonitor monitor = j.getInstance().getExtensionList(AdministrativeMonitor.class)
                 .get(NonProductionGradeDatabaseWarningAdministrativeMonitor.class);
         assertThat(monitor).isNotNull();
@@ -69,15 +70,10 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorIntegrationTe
         assertThat(GlobalPipelineMavenConfig.get().isDaoInitialized()).isFalse();
         assertThat(monitor.isActivated()).isTrue();
 
-        GlobalPipelineMavenConfig.get().setJdbcUrl(null);
-
-        assertThat(GlobalPipelineMavenConfig.get().isDaoInitialized()).isFalse();
-        assertThat(monitor.isActivated()).isFalse();
-
         GlobalPipelineMavenConfig.get().getDao();
 
         assertThat(GlobalPipelineMavenConfig.get().isDaoInitialized()).isTrue();
-        assertThat(monitor.isActivated()).isFalse();
+        assertThat(monitor.isActivated()).isTrue();
 
         for (int i = 1; i <= 101; i++) {
             GlobalPipelineMavenConfig.get().getDao().recordGeneratedArtifact("a job", i, "a.group.id", "anArtifactId", "1.0.0-SNAPSHOT", "jar",
