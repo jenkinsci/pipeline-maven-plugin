@@ -15,6 +15,7 @@ import org.jenkinsci.plugins.pipeline.maven.dao.MonitoringPipelineMavenPluginDao
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginMySqlDao;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginPostgreSqlDao;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -79,14 +80,9 @@ public class GlobalPipelineMavenConfigTest {
     private GlobalPipelineMavenConfig config = new GlobalPipelineMavenConfig();
 
     @Test
-    public void shouldBuildH2Dao() throws Exception {
+    public void shouldBuildPipelineMavenPluginNullDao() throws Exception {
         PipelineMavenPluginDao dao = config.getDao();
-
-        assertThat(dao).isInstanceOf(MonitoringPipelineMavenPluginDaoDecorator.class);
-        Object innerDao = getField(dao, "delegate");
-        assertThat(innerDao).isInstanceOf(CustomTypePipelineMavenPluginDaoDecorator.class);
-        innerDao = getField(innerDao, "delegate");
-        assertThat(innerDao).isInstanceOf(PipelineMavenPluginH2Dao.class);
+        assertThat(dao).isInstanceOf(PipelineMavenPluginNullDao.class);
     }
 
     @Test
