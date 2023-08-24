@@ -37,6 +37,8 @@ The **<<feature-default-configuration>> can be defined globally or at the folder
 
 This plugin allows transitioning smoothly from the legacy https://plugins.jenkins.io/maven-plugin/[Maven Integration] job type by allowing to reuse **<<feature-maven-integration-global-settings>>** and by proposing the **<<feature-trigger-downstream>>**.
 
+Please note per default some features will not be available and you will have to change/configure a database storage which suits your environment.
+
 toc::[]
 
 [#installation]
@@ -46,8 +48,8 @@ The plugin can be found under the name `Pipeline Maven Integration Plugin` in th
 
 **For tests purposes only**, pre-releases (beta) versions are available in the https://updates.jenkins.io/#experimental-plugin-site[Experimental Plugin Site] and development versions (incremental releases) are archived on every successful build on https://ci.jenkins.io/job/Plugins/job/pipeline-maven-plugin/[our CI environment].
 
-CAUTION: **If you use the feature <<feature-trigger-downstream>> it is critical to <<db-setup,setup a real production database>>** instead of the default embedded H2 instance.
-**If you don't do it, it might degrade your environment stability** (The H2 database is running in your instance JVM and could request too many resources).
+CAUTION: **If you want to use the feature <<feature-trigger-downstream>> it is critical to <<db-setup,setup a database>>** as per default it's not anymore H2.
+**Using H2 might degrade your environment stability** (The H2 database is running in your instance JVM and could request too many resources).
 
 [#changelog]
 == Changelog
