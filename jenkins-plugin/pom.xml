@@ -88,11 +88,11 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- move the related test to pipeline-maven-jdbc and remove this dependency
+    <!-- move the related test to pipeline-maven-database and remove this dependency
     -->
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>pipeline-maven-jdbc</artifactId>
+      <artifactId>pipeline-maven-database</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

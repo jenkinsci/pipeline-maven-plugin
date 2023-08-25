@@ -6,8 +6,8 @@
     <artifactId>pipeline-maven-parent</artifactId>
     <version>${changelist}</version>
   </parent>
-  <artifactId>pipeline-maven-jdbc</artifactId>
-  <name>Pipeline Maven Plugin JDBC DAO</name>
+  <artifactId>pipeline-maven-database</artifactId>
+  <name>Pipeline Maven Plugin Database DAO</name>
 
   <dependencies>
     <dependency>

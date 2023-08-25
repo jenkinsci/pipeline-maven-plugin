@@ -73,7 +73,7 @@
 
   <modules>
     <module>pipeline-maven-api</module>
-    <module>pipeline-maven-jdbc</module>
+    <module>pipeline-maven-database</module>
     <module>maven-spy</module>
     <module>jenkins-plugin</module>
   </modules>
