@@ -25,6 +25,8 @@
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import com.mysql.cj.exceptions.MysqlErrorNumbers;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hudson.Extension;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
 
@@ -41,7 +43,19 @@ import java.util.logging.Level;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
+@Extension
 public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao {
+
+    @SuppressFBWarnings("NP_NONNULL_PARAM_VIOLATION")
+    public PipelineMavenPluginMySqlDao() {
+        //TODO cleanup needed because of annotation
+        super(null);
+    }
+
+    @Override
+    public String getDescription() {
+        return "Pipeline Maven Plugin storage using MySql";
+    }
 
     /**
      * Extract the MariaDB server version from {@link DatabaseMetaData#getDatabaseProductVersion()}

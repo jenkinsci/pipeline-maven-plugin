@@ -1,7 +1,5 @@
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import static org.jenkinsci.plugins.pipeline.maven.dao.MonitoringPipelineMavenPluginDaoDecorator.registerCacheStatsSupplier;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,7 +20,7 @@ public class UpstreamMemory {
     private static final AtomicInteger MISSES = new AtomicInteger();
 
     static {
-        registerCacheStatsSupplier(() -> new CacheStats("listUpstreamJobs", HITS.get(), MISSES.get()));
+        MonitoringPipelineMavenPluginDaoDecorator.registerCacheStatsSupplier(() -> new CacheStats("listUpstreamJobs", HITS.get(), MISSES.get()));
     }
 
     // remember the already known upstreams

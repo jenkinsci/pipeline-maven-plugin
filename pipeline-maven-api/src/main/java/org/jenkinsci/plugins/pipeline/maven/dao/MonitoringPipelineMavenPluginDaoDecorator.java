@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
-import org.jenkinsci.plugins.pipeline.maven.listeners.DaoHelper;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -31,6 +30,8 @@ public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineM
     private final AtomicInteger findCount = new AtomicInteger();
     private final AtomicLong writeDurationInNanos = new AtomicLong();
     private final AtomicInteger writeCount = new AtomicInteger();
+
+
 
     public MonitoringPipelineMavenPluginDaoDecorator(@NonNull PipelineMavenPluginDao delegate) {
         super(delegate);

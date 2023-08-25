@@ -5,6 +5,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,11 @@ public abstract class AbstractPipelineMavenPluginDaoDecorator implements Pipelin
 
     public AbstractPipelineMavenPluginDaoDecorator(@NonNull PipelineMavenPluginDao delegate) {
         this.delegate = delegate;
+    }
+
+    @Override
+    public String getDescription() {
+        return delegate.getDescription();
     }
 
     @Override

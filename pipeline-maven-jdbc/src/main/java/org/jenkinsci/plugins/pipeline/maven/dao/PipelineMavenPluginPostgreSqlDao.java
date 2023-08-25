@@ -24,6 +24,8 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hudson.Extension;
 import org.postgresql.util.PSQLState;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -39,10 +41,23 @@ import java.util.logging.Level;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
+@Extension
 public class PipelineMavenPluginPostgreSqlDao extends AbstractPipelineMavenPluginDao {
+
+    @SuppressFBWarnings("NP_NONNULL_PARAM_VIOLATION")
+    public PipelineMavenPluginPostgreSqlDao() {
+        //TODO cleanup needed because of annotation
+        super(null);
+    }
 
     public PipelineMavenPluginPostgreSqlDao(@NonNull DataSource ds) {
         super(ds);
+    }
+
+
+    @Override
+    public String getDescription() {
+        return "Pipeline Maven Plugin storage using Postgres";
     }
 
     @Override

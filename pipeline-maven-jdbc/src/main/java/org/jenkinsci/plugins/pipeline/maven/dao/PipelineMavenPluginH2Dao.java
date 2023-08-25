@@ -24,6 +24,8 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hudson.Extension;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -39,10 +41,22 @@ import java.util.logging.Level;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
+@Extension
 public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
+
+    @SuppressFBWarnings("NP_NONNULL_PARAM_VIOLATION")
+    public PipelineMavenPluginH2Dao() {
+        //TODO cleanup needed because of annotation
+        super(null);
+    }
 
     public PipelineMavenPluginH2Dao(@NonNull DataSource ds) {
         super(ds);
+    }
+
+    @Override
+    public String getDescription() {
+        return "Pipeline Maven Plugin storage using H2";
     }
 
     public PipelineMavenPluginH2Dao(@NonNull File rootDir) {

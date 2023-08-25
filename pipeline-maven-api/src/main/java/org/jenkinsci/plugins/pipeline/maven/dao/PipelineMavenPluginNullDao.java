@@ -28,6 +28,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
@@ -44,8 +45,12 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     private static Logger LOGGER = Logger.getLogger(PipelineMavenPluginNullDao.class.getName());
 
     @Override
+    public String getDescription() {
+        return "Pipeline Maven Plugin not storage mode";
+    }
+    @Override
     public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope, boolean ignoreUpstreamTriggers, String classifier) {
-        LOGGER.log(Level.INFO, "recordDependency({0}#{1}, {2}:{3}:{4}:{5}, {6}, ignoreUpstreamTriggers:{7}})",
+        LOGGER.log(Level.FINEST, "NOT recordDependency({0}#{1}, {2}:{3}:{4}:{5}, {6}, ignoreUpstreamTriggers:{7}})",
                 new Object[]{jobFullName, buildNumber, groupId, artifactId, version, type, scope, ignoreUpstreamTriggers});
     }
 
@@ -57,39 +62,39 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
 
     @Override
     public void recordParentProject(@NonNull String jobFullName, int buildNumber, @NonNull String parentGroupId, @NonNull String parentArtifactId, @NonNull String parentVersion, boolean ignoreUpstreamTriggers) {
-        LOGGER.log(Level.INFO, "recordParentProject({0}#{1}, {2}:{3} ignoreUpstreamTriggers:{5}})",
+        LOGGER.log(Level.FINEST, "NOT recordParentProject({0}#{1}, {2}:{3} ignoreUpstreamTriggers:{5}})",
                 new Object[]{jobFullName, buildNumber, parentGroupId, parentArtifactId, parentVersion, ignoreUpstreamTriggers});
 
     }
 
     @Override
     public void recordGeneratedArtifact(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String baseVersion, String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier) {
-        LOGGER.log(Level.INFO, "recordGeneratedArtifact({0}#{1}, {2}:{3}:{4}:{5}, version:{6}, repositoryUrl:{7}, skipDownstreamTriggers:{8})",
+        LOGGER.log(Level.FINEST, "NOT recordGeneratedArtifact({0}#{1}, {2}:{3}:{4}:{5}, version:{6}, repositoryUrl:{7}, skipDownstreamTriggers:{8})",
                 new Object[]{jobFullName, buildNumber, groupId, artifactId, baseVersion, type, version, repositoryUrl, skipDownstreamTriggers});
 
     }
 
     @Override
     public void recordBuildUpstreamCause(String upstreamJobName, int upstreamBuildNumber, String downstreamJobName, int downstreamBuildNumber) {
-        LOGGER.log(Level.INFO, "recordBuildUpstreamCause(upstreamBuild: {0}#{1}, downstreamBuild: {2}#{3})",
+        LOGGER.log(Level.FINEST, "NOT recordBuildUpstreamCause(upstreamBuild: {0}#{1}, downstreamBuild: {2}#{3})",
                 new Object[]{upstreamJobName, upstreamBuildNumber, downstreamJobName, downstreamBuildNumber});
     }
 
     @Override
     public void renameJob(String oldFullName, String newFullName) {
-        LOGGER.log(Level.INFO, "renameJob({0}, {1})", new Object[]{oldFullName, newFullName});
+        LOGGER.log(Level.FINEST, "NOT renameJob({0}, {1})", new Object[]{oldFullName, newFullName});
 
     }
 
     @Override
     public void deleteJob(String jobFullName) {
-        LOGGER.log(Level.INFO, "deleteJob({0})", new Object[]{jobFullName});
+        LOGGER.log(Level.FINEST, "NOT deleteJob({0})", new Object[]{jobFullName});
 
     }
 
     @Override
     public void deleteBuild(String jobFullName, int buildNumber) {
-        LOGGER.log(Level.INFO, "deleteBuild({0}#{1})", new Object[]{jobFullName, buildNumber});
+        LOGGER.log(Level.FINEST, "NOT deleteBuild({0}#{1})", new Object[]{jobFullName, buildNumber});
 
     }
 
@@ -133,7 +138,7 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
 
     @Override
     public void cleanup() {
-        LOGGER.log(Level.INFO, "cleanup()");
+        LOGGER.log(Level.FINEST, "cleanup()");
     }
 
     @NonNull
@@ -144,7 +149,7 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
 
     @Override
     public void updateBuildOnCompletion(@NonNull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
-        LOGGER.log(Level.INFO, "updateBuildOnCompletion({0}, {1}, result: {2}, startTime): {3}, duration: {4}",
+        LOGGER.log(Level.FINEST, "NOOT updateBuildOnCompletion({0}, {1}, result: {2}, startTime): {3}, duration: {4}",
                 new Object[]{jobFullName, buildNumber, buildResultOrdinal, startTimeInMillis, durationInMillis});
     }
 

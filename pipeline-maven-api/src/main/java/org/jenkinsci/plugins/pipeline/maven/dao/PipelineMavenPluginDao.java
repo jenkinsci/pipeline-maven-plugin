@@ -29,7 +29,6 @@ import hudson.model.Run;
 import org.apache.maven.artifact.Artifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
-import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
@@ -261,6 +260,8 @@ public interface PipelineMavenPluginDao extends Closeable {
      * Human readable toString
      */
     String toPrettyString();
+
+    String getDescription();
 
 
     /**
