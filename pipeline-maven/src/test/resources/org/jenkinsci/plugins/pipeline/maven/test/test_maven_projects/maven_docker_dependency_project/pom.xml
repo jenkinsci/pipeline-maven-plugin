@@ -5,6 +5,14 @@
     <artifactId>maven_docker_dependency_project</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>com.spotify</groupId>
@@ -33,6 +41,7 @@
         </extensions>
     </build>
     <properties>
+        <maven.compiler.release>11</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 </project>

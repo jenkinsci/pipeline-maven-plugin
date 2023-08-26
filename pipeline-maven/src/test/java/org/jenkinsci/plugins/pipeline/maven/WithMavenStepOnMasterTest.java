@@ -596,9 +596,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven(traceability: true) {\n" +
             "        if (isUnix()) {\n" +
-            "            sh 'mvn package'\n" +
+            "            sh 'mvn -P!might-produce-incrementals package'\n" +
             "        } else {\n" +
-            "            bat 'mvn package'\n" +
+            "            bat 'mvn -P!might-produce-incrementals package'\n" +
             "        }\n" +
             "    }\n" +
             "}";
