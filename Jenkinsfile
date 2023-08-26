@@ -1,4 +1,10 @@
 /*
-* `buildPlugin` step provided by: https://github.com/jenkins-infra/pipeline-library
-*/
-buildPlugin(platforms: ['linux'], jdkVersions: ['11'])
+ * `buildPlugin` step provided by: https://github.com/jenkins-infra/pipeline-library
+ */
+buildPlugin(
+  // cannot use this with Docker tests
+  useContainerAgent: false,
+  configurations: [
+    [ platform: "linux", jdk: "11" ]
+  ]
+)
