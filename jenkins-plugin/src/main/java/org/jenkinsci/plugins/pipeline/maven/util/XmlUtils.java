@@ -353,17 +353,19 @@ public class XmlUtils {
 
         if (StringUtils.startsWithIgnoreCase(sanitizedAbsoluteFilePath, sanitizedWorkspaceRemote)) {
             // OK
-        } else if (sanitizedWorkspaceRemote.contains("/workspace/") && sanitizedAbsoluteFilePath.contains("/workspace/")) {
+        } else if (sanitizedWorkspaceRemote.contains(File.separator +"workspace" + File.separator)
+                && sanitizedAbsoluteFilePath.contains(File.separator + "workspace" + File.separator)
+        ) {
             // workaround JENKINS-46084
             // sanitizedAbsoluteFilePath = '/app/Jenkins/home/workspace/testjob/pom.xml'
             // sanitizedWorkspaceRemote = '/var/lib/jenkins/workspace/testjob'
-            sanitizedAbsoluteFilePath = "/workspace/" + StringUtils.substringAfter(sanitizedAbsoluteFilePath, "/workspace/");
-            sanitizedWorkspaceRemote = "/workspace/" + StringUtils.substringAfter(sanitizedWorkspaceRemote, "/workspace/");
-        } else if (sanitizedWorkspaceRemote.endsWith("/workspace") && sanitizedAbsoluteFilePath.contains("/workspace/")) {
+            sanitizedAbsoluteFilePath = File.separator + "workspace" + File.separator + StringUtils.substringAfter(sanitizedAbsoluteFilePath, File.separator + "workspace" + File.separator);
+            sanitizedWorkspaceRemote = File.separator + "workspace" + File.separator + StringUtils.substringAfter(sanitizedWorkspaceRemote, File.separator + "workspace" + File.separator);
+        } else if (sanitizedWorkspaceRemote.endsWith(File.separator + "workspace") && sanitizedAbsoluteFilePath.contains(File.separator + "workspace" + File.separator)) {
             // workspace = "/var/lib/jenkins/jobs/Test-Pipeline/workspace";
             // absolutePath = "/storage/jenkins/jobs/Test-Pipeline/workspace/pom.xml";
-            sanitizedAbsoluteFilePath = "workspace/" + StringUtils.substringAfter(sanitizedAbsoluteFilePath, "/workspace/");
-            sanitizedWorkspaceRemote = "workspace/";
+            sanitizedAbsoluteFilePath = "workspace" + File.separator + StringUtils.substringAfter(sanitizedAbsoluteFilePath, File.separator + "workspace" + File.separator);
+            sanitizedWorkspaceRemote = "workspace" + File.separator;
         } else {
             throw new IllegalArgumentException("Cannot relativize '" + absoluteFilePath + "' relatively to '" + workspace.getRemote() + "'");
         }

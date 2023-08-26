@@ -125,9 +125,7 @@ public class XmlUtilsTest {
         Throwable ex = catchThrowable(() -> {
             String workspace = "/path/to/spring-petclinic";
             String absolutePath = "/different/path/to/spring-petclinic/pom.xml";
-            String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
-            String expected = "pom.xml";
-            assertThat(actual).isEqualTo(expected);
+            XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         });
         assertThat(ex).isNotNull();
         assertThat(ex).isInstanceOf(IllegalArgumentException.class);
