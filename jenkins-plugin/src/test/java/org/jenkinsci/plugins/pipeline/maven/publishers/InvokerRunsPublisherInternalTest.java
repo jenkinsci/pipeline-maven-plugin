@@ -66,13 +66,13 @@ public class InvokerRunsPublisherInternalTest {
 
         String reportsDirectory = invokerRunsPublisher.expandAndRelativize(reportsDirectoryElt, "reportsDirectory", invokerRunSucceedEvent, projectElt,
                 workspace, listener);
-        assertThat(reportsDirectory).isEqualTo("target/invoker-reports");
+        assertThat(reportsDirectory).isEqualTo("target" + File.separator + "invoker-reports");
         String projectsDirectory = invokerRunsPublisher.expandAndRelativize(projectsDirectoryElt, "projectsDirectory", invokerRunSucceedEvent, projectElt,
                 workspace, listener);
-        assertThat(projectsDirectory).isEqualTo("src/it");
+        assertThat(projectsDirectory).isEqualTo("src" + File.separator + "it");
         String cloneProjectsTo = invokerRunsPublisher.expandAndRelativize(cloneProjectsToElt, "cloneProjectsTo", invokerRunSucceedEvent, projectElt, workspace,
                 listener);
-        assertThat(cloneProjectsTo).isEqualTo("target/it");
+        assertThat(cloneProjectsTo).isEqualTo("target" + File.separator + "it");
     }
 
 }

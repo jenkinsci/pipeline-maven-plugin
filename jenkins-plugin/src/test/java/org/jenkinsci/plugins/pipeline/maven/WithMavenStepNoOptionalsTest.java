@@ -64,7 +64,11 @@ public class WithMavenStepNoOptionalsTest {
             String pipelineScript = "node('mock') {\n" +
                 "    git($/" + repoUrl + "/$)\n" +
                 "    withMaven() {\n" +
-                "        sh 'mvn verify -Dmaven.test.failure.ignore=true'\n" +
+                "        if (isUnix()) {\n" +
+                "            sh 'mvn verify -Dmaven.test.failure.ignore=true'\n" +
+                "        } else {\n" +
+                "            bat 'mvn verify -Dmaven.test.failure.ignore=true'\n" +
+                "        }\n" +
                 "    }\n" +
                 "}";
             //@formatter:on

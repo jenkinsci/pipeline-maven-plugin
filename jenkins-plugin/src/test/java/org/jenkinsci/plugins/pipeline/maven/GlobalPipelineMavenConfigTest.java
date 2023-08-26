@@ -38,7 +38,7 @@ import hudson.ExtensionList;
 import hudson.model.ItemGroup;
 import jenkins.model.Jenkins;
 
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 @WithJenkins
 public class GlobalPipelineMavenConfigTest {
 

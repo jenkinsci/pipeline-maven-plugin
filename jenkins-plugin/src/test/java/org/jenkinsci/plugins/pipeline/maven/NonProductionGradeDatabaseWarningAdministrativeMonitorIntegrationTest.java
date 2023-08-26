@@ -24,7 +24,7 @@ import hudson.ExtensionList;
 import hudson.model.AdministrativeMonitor;
 import hudson.model.ItemGroup;
 
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 @WithJenkins
 public class NonProductionGradeDatabaseWarningAdministrativeMonitorIntegrationTest {
 
