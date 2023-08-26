@@ -105,7 +105,6 @@
     <jenkins-symbol.version>1.24</jenkins-symbol.version>
     <jenkins-tools-bom.version>1798.vc671fe94856f</jenkins-tools-bom.version>
     <jenkins.version>2.361.4</jenkins.version>
-    <joda-time.version>2.12.5</joda-time.version>
     <junit.version>5.10.0</junit.version>
     <logback.version>1.4.11</logback.version>
     <maven-compat.version>3.3.9</maven-compat.version>
