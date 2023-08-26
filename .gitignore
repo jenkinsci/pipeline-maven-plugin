@@ -14,6 +14,7 @@ buildNumber.properties
 
 # Maven - Jenkins plugin development
 .sdkmanrc
+.tools-versions
 work/
 
 # IntelliJ project files
