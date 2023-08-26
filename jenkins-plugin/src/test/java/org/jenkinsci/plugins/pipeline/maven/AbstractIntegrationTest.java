@@ -42,7 +42,7 @@ import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 @WithJenkins
 public abstract class AbstractIntegrationTest {
 

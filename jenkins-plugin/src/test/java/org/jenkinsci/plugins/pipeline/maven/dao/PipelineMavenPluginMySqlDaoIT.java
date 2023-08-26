@@ -37,7 +37,7 @@ import com.zaxxer.hikari.HikariDataSource;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
 
     @Container
