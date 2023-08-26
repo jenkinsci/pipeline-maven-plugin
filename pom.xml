@@ -86,12 +86,9 @@
   <properties>
     <assertj.version>3.24.2</assertj.version>
     <changelist>999999-SNAPSHOT</changelist>
-    <findbugs-annotation.version>3.0.1</findbugs-annotation.version>
-    <groovy.version>2.4.21</groovy.version>
     <gson.version>2.10.1</gson.version>
     <hikaricp.version>4.0.3</hikaricp.version>
     <jansi.version>2.4.0</jansi.version>
-    <jenkins-annotation-indexer.version>1.17</jenkins-annotation-indexer.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-flaky-test.version>1.2.2</jenkins-plugin-flaky-test.version>
     <jenkins-plugin-h2.version>1.4.199</jenkins-plugin-h2.version>
@@ -102,16 +99,12 @@
     <jenkins-plugin-mysql.version>8.0.16</jenkins-plugin-mysql.version>
     <jenkins-plugin-postgresql.version>42.3.3</jenkins-plugin-postgresql.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
-    <jenkins-symbol.version>1.24</jenkins-symbol.version>
     <jenkins-tools-bom.version>1798.vc671fe94856f</jenkins-tools-bom.version>
     <jenkins.version>2.361.4</jenkins.version>
     <junit.version>5.10.0</junit.version>
     <logback.version>1.4.11</logback.version>
-    <maven-compat.version>3.3.9</maven-compat.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
     <maven-plugin-sortpom.version>3.3.0</maven-plugin-sortpom.version>
-    <maven-plugin-surefire.version>3.1.2</maven-plugin-surefire.version>
-    <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.8.7</maven.version>
     <plexus-utils.version>3.5.1</plexus-utils.version>
     <slf4j.version>2.0.7</slf4j.version>
@@ -187,10 +180,6 @@
             <sortPlugins>groupId,artifactId</sortPlugins>
             <sortProperties>true</sortProperties>
           </configuration>
-        </plugin>
-        <plugin>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>${maven-plugin-surefire.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
