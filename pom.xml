@@ -108,7 +108,7 @@
     <maven.version>3.8.8</maven.version>
     <plexus-utils.version>3.5.1</plexus-utils.version>
     <slf4j.version>2.0.7</slf4j.version>
-    <testcontainers.version>1.18.3</testcontainers.version>
+    <testcontainers.version>1.19.0</testcontainers.version>
   </properties>
 
   <dependencyManagement>
