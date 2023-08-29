@@ -283,4 +283,52 @@ public interface PipelineMavenPluginDao extends Closeable {
      * @return {@code false} if the underlying database is not production grade enough for the workload
      */
     boolean isEnoughProductionGradeForTheWorkload();
+
+    interface Builder {
+        class Config {
+            private String jdbcUrl;
+
+            private String credentialsId;
+
+            private String properties;
+
+            public String getJdbcUrl() {
+                return jdbcUrl;
+            }
+
+            public Config jdbcUrl(String jdbcUrl) {
+                this.jdbcUrl = jdbcUrl;
+                return this;
+            }
+
+            public String getCredentialsId() {
+                return this.credentialsId;
+            }
+
+            public Config credentialsId(String credentialsId) {
+                this.credentialsId = credentialsId;
+                return this;
+            }
+
+            public String getProperties() {
+                return this.properties;
+            }
+
+            public Config properties(String properties) {
+                this.properties = properties;
+                return this;
+            }
+
+            public Config() {
+                //
+            }
+        }
+
+        PipelineMavenPluginDao build(Config config);
+
+    }
+
+    Builder getBuilder();
+
+
 }

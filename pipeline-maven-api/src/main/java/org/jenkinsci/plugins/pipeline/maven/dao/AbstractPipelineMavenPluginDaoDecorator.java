@@ -25,6 +25,11 @@ public abstract class AbstractPipelineMavenPluginDaoDecorator implements Pipelin
     }
 
     @Override
+    public Builder getBuilder() {
+        return delegate.getBuilder();
+    }
+
+    @Override
     public void recordDependency(@NonNull String jobFullName, int buildNumber, @NonNull String groupId, @NonNull String artifactId, @NonNull String version, @NonNull String type, @NonNull String scope, boolean ignoreUpstreamTriggers, String classifier) {
         delegate.recordDependency(jobFullName, buildNumber, groupId, artifactId, version, type, scope, ignoreUpstreamTriggers, classifier);
     }

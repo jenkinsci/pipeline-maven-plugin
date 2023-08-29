@@ -57,6 +57,7 @@ public class PipelineMavenPluginPostgreSqlDao extends AbstractPipelineMavenPlugi
 
     @Override
     public String getDescription() {
+        // TODO i18n
         return "Pipeline Maven Plugin storage using Postgres";
     }
 

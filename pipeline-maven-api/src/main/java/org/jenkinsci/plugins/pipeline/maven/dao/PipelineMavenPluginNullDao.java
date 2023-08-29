@@ -24,6 +24,7 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
+import hudson.Extension;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 
@@ -41,13 +42,21 @@ import java.util.logging.Logger;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
+@Extension
 public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
     private static Logger LOGGER = Logger.getLogger(PipelineMavenPluginNullDao.class.getName());
 
     @Override
     public String getDescription() {
-        return "Pipeline Maven Plugin not storage mode";
+        // TODO i18n
+        return "Pipeline Maven Plugin no storage mode";
     }
+
+    @Override
+    public PipelineMavenPluginDao.Builder getBuilder() {
+        return config -> new PipelineMavenPluginNullDao();
+    }
+
     @Override
     public void recordDependency(String jobFullName, int buildNumber, String groupId, String artifactId, String version, String type, String scope, boolean ignoreUpstreamTriggers, String classifier) {
         LOGGER.log(Level.FINEST, "NOT recordDependency({0}#{1}, {2}:{3}:{4}:{5}, {6}, ignoreUpstreamTriggers:{7}})",

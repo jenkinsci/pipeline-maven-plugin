@@ -24,9 +24,17 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import hudson.model.Item;
 import hudson.model.Result;
 import hudson.model.Run;
+import hudson.security.ACL;
+import hudson.util.Secret;
+import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.h2.api.ErrorCode;
@@ -41,11 +49,14 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import javax.sql.DataSource;
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -62,6 +73,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Level;
@@ -89,6 +101,150 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         registerJdbcDriver();
         initializeDatabase();
         testDatabase();
+    }
+
+    @Override
+    public Builder getBuilder() {
+        return config -> {
+
+            Jenkins j = Jenkins.get();
+            PipelineMavenPluginDao dao;
+            try {
+                String jdbcUrl = config.getJdbcUrl();
+                String jdbcUserName, jdbcPassword;
+                if (StringUtils.isBlank(jdbcUrl)) {
+                    // default embedded H2 database
+                    File databaseRootDir = new File(j.getRootDir(), "jenkins-jobs");
+                    if (!databaseRootDir.exists()) {
+                        boolean created = databaseRootDir.mkdirs();
+                        if (!created) {
+                            throw new IllegalStateException("Failure to create database root dir " + databaseRootDir);
+                        }
+                    }
+                    jdbcUrl = "jdbc:h2:file:" + new File(databaseRootDir, "jenkins-jobs").getAbsolutePath() + ";" +
+                            "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
+                    jdbcUserName = "sa";
+                    jdbcPassword = "sa";
+                } else {
+                    if (StringUtils.isBlank(config.getCredentialsId()))
+                        throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
+
+                    UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
+                            CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, j,
+                                    ACL.SYSTEM, Collections.EMPTY_LIST),
+                            CredentialsMatchers.withId(config.getCredentialsId()));
+                    if (jdbcCredentials == null) {
+                        throw new IllegalStateException("Credentials '" + config.getCredentialsId() + "' defined for JDBC URL '" + jdbcUrl + "' NOT found");
+                    }
+                    jdbcUserName = jdbcCredentials.getUsername();
+                    jdbcPassword = Secret.toString(jdbcCredentials.getPassword());
+                }
+
+                HikariConfig dsConfig = createHikariConfig(config.getProperties(), jdbcUrl, jdbcUserName, jdbcPassword);
+                dsConfig.setAutoCommit(false);
+
+                // TODO cleanup this quick fix for JENKINS-54587, we should have a better solution with the JDBC driver loaded by the DAO itself
+                try {
+                    DriverManager.getDriver(jdbcUrl);
+                } catch (SQLException e) {
+                    if ("08001".equals(e.getSQLState()) && 0 == e.getErrorCode()) {
+                        // if it's a "No suitable driver" exception, we try to load the jdbc driver and retry
+                        if (jdbcUrl.startsWith("jdbc:h2:")) {
+                            try {
+                                Class.forName("org.h2.Driver");
+                            } catch (ClassNotFoundException cnfe) {
+                                throw new IllegalStateException("H2 driver should be bundled with this plugin");
+                            }
+                        } else if (jdbcUrl.startsWith("jdbc:mysql:")) {
+                            try {
+                                Class.forName("com.mysql.cj.jdbc.Driver");
+                            } catch (ClassNotFoundException cnfe) {
+                                throw new RuntimeException("MySql driver 'com.mysql.cj.jdbc.Driver' not found. Please install the 'MySQL Database Plugin' to install the MySql driver");
+                            }
+                        } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
+                            try {
+                                Class.forName("org.postgresql.Driver");
+                            } catch (ClassNotFoundException cnfe) {
+                                throw new RuntimeException("PostgreSQL driver 'org.postgresql.Driver' not found. Please install the 'PostgreSQL Database Plugin' to install the PostgreSQL driver");
+                            }
+                        } else {
+                            throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
+                        }
+                        DriverManager.getDriver(jdbcUrl);
+                    } else {
+                        throw e;
+                    }
+                }
+
+                LOGGER.log(Level.INFO, "Connect to database {0} with username {1}", new Object[]{jdbcUrl, jdbcUserName});
+                DataSource ds = new HikariDataSource(dsConfig);
+
+                Class<? extends PipelineMavenPluginDao> daoClass;
+                if (jdbcUrl.startsWith("jdbc:h2:")) {
+                    daoClass = PipelineMavenPluginH2Dao.class;
+                } else if (jdbcUrl.startsWith("jdbc:mysql:")) {
+                    daoClass = PipelineMavenPluginMySqlDao.class;
+                } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
+                    daoClass = PipelineMavenPluginPostgreSqlDao.class;
+                } else {
+                    throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
+                }
+                try {
+                    dao = new MonitoringPipelineMavenPluginDaoDecorator(new CustomTypePipelineMavenPluginDaoDecorator(daoClass.getConstructor(DataSource.class).newInstance(ds)));
+                } catch (Exception e) {
+                    throw new SQLException(
+                            "Exception connecting to '" + jdbcUrl + "' with credentials '" + config.getCredentialsId() + "' (" +
+                                    jdbcUserName + "/***) and DAO " + daoClass.getSimpleName(), e);
+                }
+
+
+            } catch (RuntimeException | SQLException e) {
+                LOGGER.log(Level.WARNING, "Exception creating database dao, skip", e);
+                dao = new PipelineMavenPluginNullDao();
+            }
+            return dao;
+        };
+    }
+
+    private HikariConfig createHikariConfig(String properties, String jdbcUrl, String jdbcUserName, String jdbcPassword) {
+        Properties p = new Properties();
+        // todo refactor the DAO to inject config defaults in the DAO
+        if (jdbcUrl.startsWith("jdbc:mysql")) {
+            // https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby
+            // https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration
+            p.setProperty("dataSource.cachePrepStmts", "true");
+            p.setProperty("dataSource.prepStmtCacheSize", "250");
+            p.setProperty("dataSource.prepStmtCacheSqlLimit", "2048");
+            p.setProperty("dataSource.useServerPrepStmts", "true");
+            p.setProperty("dataSource.useLocalSessionState", "true");
+            p.setProperty("dataSource.rewriteBatchedStatements", "true");
+            p.setProperty("dataSource.cacheResultSetMetadata", "true");
+            p.setProperty("dataSource.cacheServerConfiguration", "true");
+            p.setProperty("dataSource.elideSetAutoCommits", "true");
+            p.setProperty("dataSource.maintainTimeStats", "false");
+        } else if (jdbcUrl.startsWith("jdbc:postgresql")) {
+            // no tuning recommendations found for postgresql
+        } else if (jdbcUrl.startsWith("jdbc:h2")) {
+            // dsConfig.setDataSourceClassName("org.h2.jdbcx.JdbcDataSource"); don't specify the datasource due to a classloading issue
+        } else {
+            // unsupported config
+        }
+
+        if (StringUtils.isNotBlank(properties)) {
+            try {
+                p.load(new StringReader(properties));
+            } catch (IOException e) {
+                throw new IllegalStateException("Failed to read properties.", e);
+            }
+        }
+        LOGGER.log(Level.INFO, "Applied pool properties {0}", p);
+        HikariConfig dsConfig = new HikariConfig(p);
+        dsConfig.setJdbcUrl(jdbcUrl);
+        dsConfig.setUsername(jdbcUserName);
+        dsConfig.setPassword(jdbcPassword);
+        // to mimic the old behaviour pre JENKINS-69375 fix
+        dsConfig.setDataSourceProperties(p);
+        return dsConfig;
     }
 
     protected abstract void registerJdbcDriver();
