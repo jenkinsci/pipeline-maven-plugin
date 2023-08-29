@@ -51,7 +51,7 @@ public interface PipelineMavenPluginDao extends Closeable {
      * @param version                Maven dependency version
      * @param type                   Maven dependency type (e.g. "jar", "war", "pom", hpi"...)
      * @param scope                  Maven dependency scope ("compile", "test", "provided"...)
-     * @param ignoreUpstreamTriggers see {@link PipelineGraphPublisher#isIgnoreUpstreamTriggers()} ()}
+     * @param ignoreUpstreamTriggers see PipelineGraphPublisher#isIgnoreUpstreamTriggers()
      * @param classifier             Maven dependency classifier
      */
     void recordDependency(@NonNull String jobFullName, int buildNumber,
@@ -66,7 +66,7 @@ public interface PipelineMavenPluginDao extends Closeable {
      * @param parentGroupId                Maven dependency groupId
      * @param parentArtifactId             Maven dependency artifactId
      * @param parentVersion                Maven dependency version
-     * @param ignoreUpstreamTriggers see {@link PipelineGraphPublisher#isIgnoreUpstreamTriggers()} ()}
+     * @param ignoreUpstreamTriggers see  PipelineGraphPublisher#isIgnoreUpstreamTriggers()
      */
     void recordParentProject(@NonNull String jobFullName, int buildNumber,
                              @NonNull String parentGroupId, @NonNull String parentArtifactId, @NonNull String parentVersion,
@@ -84,7 +84,7 @@ public interface PipelineMavenPluginDao extends Closeable {
 *                               (e.g. baseVersion is "1.1-SNAPSHOT" for a "1.1-SNAPSHOT" artifact that has been deployed to a repo and expanded
 *                               to "1.1-20170808.155524-66")
      * @param repositoryUrl          URL of the Maven repository on which the artifact is deployed ("mvn deploy"). {@code null} if the artifact was not deployed
-     * @param skipDownstreamTriggers see {@link PipelineGraphPublisher#isSkipDownstreamTriggers()}
+     * @param skipDownstreamTriggers see PipelineGraphPublisher#isSkipDownstreamTriggers()
      * @param extension
      * @param classifier
      */
@@ -93,7 +93,7 @@ public interface PipelineMavenPluginDao extends Closeable {
                                  @Nullable String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier);
 
     /**
-     * TODO add {@link MavenArtifact} as {@link org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause} gives these details
+     * TODO add {@link MavenArtifact} as org.jenkinsci.plugins.pipeline.maven.cause.MavenDependencyUpstreamCause gives these details
      * @param upstreamJobName Job that triggered the build. See {@link Item#getFullName()}.
      * @param upstreamBuildNumber Job that triggered the build. See {@link Run#getNumber()}.
      * @param downstreamJobName Job that is triggered. See {@link Item#getFullName()}.
