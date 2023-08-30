@@ -8,6 +8,7 @@
   </parent>
   <artifactId>pipeline-maven-api</artifactId>
   <name>Pipeline Maven Plugin API</name>
+  <packaging>hpi</packaging>
 
   <dependencies>
     <dependency>
