@@ -364,6 +364,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
         StringBuilder mavenConfig = new StringBuilder();
         mavenConfig.append("--batch-mode ");
+        ifTraceabilityDisabled(() -> mavenConfig.append("--no-transfer-progress "));
         ifTraceabilityEnabled(() -> mavenConfig.append("--show-version "));
         if (StringUtils.isNotEmpty(settingsFilePath)) {
             // JENKINS-57324 escape '%' as '%%'. See
@@ -1219,6 +1220,12 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                             .collect(Collectors.joining(", ")));
         }
         return mavenServerIdToCredentials;
+    }
+
+    private void ifTraceabilityDisabled(Runnable runnable) {
+        if (!computeTraceability()) {
+            runnable.run();
+        }
     }
 
     private void ifTraceabilityEnabled(Runnable runnable) {
