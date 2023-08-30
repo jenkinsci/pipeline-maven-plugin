@@ -220,6 +220,10 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+        if(!StringUtils.equals(json.getString("daoClass"), daoClass)) {
+            closeDatasource();
+            this.dao = null;
+        }
         req.bindJSON(this, json);
         // stapler oddity, empty lists coming from the HTTP request are not set on bean by  "req.bindJSON(this, json)"
         this.publisherOptions = req.bindJSONToList(MavenPublisher.class, json.get("publisherOptions"));

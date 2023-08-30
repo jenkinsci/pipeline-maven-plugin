@@ -116,8 +116,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
             try {
                 String jdbcUrl = config.getJdbcUrl();
                 String jdbcUserName, jdbcPassword;
-                if (StringUtils.isBlank(jdbcUrl)) {
-                    // default embedded H2 database
+                if (StringUtils.isBlank(jdbcUrl) && getClass() == PipelineMavenPluginH2Dao.class) {
+                    //  embedded H2 database accept empty jdbc url
                     File databaseRootDir = new File(j.getRootDir(), "jenkins-jobs");
                     if (!databaseRootDir.exists()) {
                         boolean created = databaseRootDir.mkdirs();
@@ -183,22 +183,13 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 LOGGER.log(Level.INFO, "Connect to database {0} with username {1}", new Object[]{jdbcUrl, jdbcUserName});
                 DataSource ds = new HikariDataSource(dsConfig);
 
-                Class<? extends PipelineMavenPluginDao> daoClass;
-                if (jdbcUrl.startsWith("jdbc:h2:")) {
-                    daoClass = PipelineMavenPluginH2Dao.class;
-                } else if (jdbcUrl.startsWith("jdbc:mysql:")) {
-                    daoClass = PipelineMavenPluginMySqlDao.class;
-                } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
-                    daoClass = PipelineMavenPluginPostgreSqlDao.class;
-                } else {
-                    throw new IllegalArgumentException("Unsupported database type in JDBC URL " + jdbcUrl);
-                }
+                Class<? extends PipelineMavenPluginDao> daoClass = getClass();
                 try {
-                    dao = new MonitoringPipelineMavenPluginDaoDecorator(new CustomTypePipelineMavenPluginDaoDecorator(daoClass.getConstructor(DataSource.class).newInstance(ds)));
+                    dao = new MonitoringPipelineMavenPluginDaoDecorator(new CustomTypePipelineMavenPluginDaoDecorator(getClass().getConstructor(DataSource.class).newInstance(ds)));
                 } catch (Exception e) {
                     throw new SQLException(
                             "Exception connecting to '" + jdbcUrl + "' with credentials '" + config.getCredentialsId() + "' (" +
-                                    jdbcUserName + "/***) and DAO " + daoClass.getSimpleName(), e);
+                                    jdbcUserName + "/***) and DAO " + getClass().getSimpleName(), e);
                 }
 
 
