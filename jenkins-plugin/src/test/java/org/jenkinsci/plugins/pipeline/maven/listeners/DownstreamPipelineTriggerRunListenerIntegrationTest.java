@@ -6,11 +6,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
+import hudson.ExtensionList;
 import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
@@ -34,6 +36,7 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
 
     @BeforeEach
     public void setup() throws Exception {
+        ExtensionList.lookup(GlobalPipelineMavenConfig.class).get(0).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
         List<MavenPublisher> publisherOptions = GlobalPipelineMavenConfig.get().getPublisherOptions();
         if (publisherOptions == null) {
             publisherOptions = new ArrayList<>();
