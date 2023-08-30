@@ -80,6 +80,7 @@ public class GlobalPipelineMavenConfigTest {
 
     @Test
     public void shouldBuildH2Dao() throws Exception {
+        config.setDaoClass(PipelineMavenPluginH2Dao.class.getName());
         PipelineMavenPluginDao dao = config.getDao();
 
         assertThat(dao).isInstanceOf(MonitoringPipelineMavenPluginDaoDecorator.class);
@@ -91,6 +92,7 @@ public class GlobalPipelineMavenConfigTest {
 
     @Test
     public void shouldBuildMysqlDao() throws Exception {
+        config.setDaoClass(PipelineMavenPluginMySqlDao.class.getName());
         ExtensionList<CredentialsProvider> extensionList = Jenkins.getInstance().getExtensionList(CredentialsProvider.class);
         extensionList.add(extensionList.size(), new FakeCredentialsProvider());
         config.setJdbcUrl(MYSQL_DB.getJdbcUrl());
@@ -125,6 +127,7 @@ public class GlobalPipelineMavenConfigTest {
 
     @Test
     public void shouldBuildPostgresqlDao() throws Exception {
+        config.setDaoClass(PipelineMavenPluginPostgreSqlDao.class.getName());
         ExtensionList<CredentialsProvider> extensionList = Jenkins.getInstance().getExtensionList(CredentialsProvider.class);
         extensionList.add(extensionList.size(), new FakeCredentialsProvider());
         config.setJdbcUrl(POSTGRE_DB.getJdbcUrl());

@@ -10,7 +10,6 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 import hudson.ExtensionList;
-import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
