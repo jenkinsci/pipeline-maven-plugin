@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.acegisecurity.Authentication;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
@@ -57,6 +58,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorIntegrationTe
 
     @Test
     public void shouldMitigateComputationWithH2Database(JenkinsRule j) throws Exception {
+        ExtensionList.lookup(GlobalPipelineMavenConfig.class).get(0).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
         NonProductionGradeDatabaseWarningAdministrativeMonitor monitor = j.getInstance().getExtensionList(AdministrativeMonitor.class)
                 .get(NonProductionGradeDatabaseWarningAdministrativeMonitor.class);
         assertThat(monitor).isNotNull();
@@ -85,6 +87,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorIntegrationTe
         }
 
         assertThat(GlobalPipelineMavenConfig.get().isDaoInitialized()).isTrue();
+
         assertThat(monitor.isActivated()).isTrue();
     }
 
