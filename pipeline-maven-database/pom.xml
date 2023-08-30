@@ -8,6 +8,7 @@
   </parent>
   <artifactId>pipeline-maven-database</artifactId>
   <name>Pipeline Maven Plugin Database DAO</name>
+  <packaging>hpi</packaging>
 
   <dependencies>
     <dependency>
