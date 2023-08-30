@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
+import hudson.ExtensionList;
+import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.pipeline.maven.util.WorkflowMultibranchProjectTestsUtils;
@@ -39,6 +42,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
 
     @BeforeEach
     public void setup() throws Exception {
+        ExtensionList.lookup(GlobalPipelineMavenConfig.class).get(0).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
         downstreamArtifactRepoRule = new GitSampleRepoRule();
         runBeforeMethod(downstreamArtifactRepoRule);
 

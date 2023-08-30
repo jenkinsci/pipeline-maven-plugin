@@ -29,6 +29,7 @@ import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.model.Item;
 import hudson.model.Result;
 import hudson.model.Run;
@@ -93,11 +94,14 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
     @Nullable
     private transient Long jenkinsMasterPrimaryKey;
 
+    @SuppressFBWarnings("NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR")
+    protected AbstractPipelineMavenPluginDao() {
+        // this one is here only to help when using Extension.lookup
+    }
+
     public AbstractPipelineMavenPluginDao(@NonNull DataSource ds) {
-        ds.getClass(); // check non null
-
+        Objects.requireNonNull(ds, "Datasource cannot be null");
         this.ds = ds;
-
         registerJdbcDriver();
         initializeDatabase();
         testDatabase();

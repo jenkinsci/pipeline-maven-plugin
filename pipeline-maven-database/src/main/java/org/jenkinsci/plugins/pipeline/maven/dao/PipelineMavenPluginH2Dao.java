@@ -44,15 +44,15 @@ import java.util.logging.Level;
 @Extension
 public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
 
-    @SuppressFBWarnings("NP_NONNULL_PARAM_VIOLATION")
     public PipelineMavenPluginH2Dao() {
-        //TODO cleanup needed because of annotation
-        super(null);
+        super();
     }
 
     public PipelineMavenPluginH2Dao(@NonNull DataSource ds) {
         super(ds);
     }
+
+
 
     @Override
     public String getDescription() {
@@ -64,6 +64,8 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
         this(JdbcConnectionPool.create("jdbc:h2:file:" + new File(rootDir, "jenkins-jobs").getAbsolutePath() + ";" +
                 "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE", "sa", "sa"));
     }
+
+
 
     @Override
     protected void registerJdbcDriver() {

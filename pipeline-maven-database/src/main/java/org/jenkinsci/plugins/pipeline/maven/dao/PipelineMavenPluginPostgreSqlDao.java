@@ -44,10 +44,8 @@ import java.util.logging.Level;
 @Extension
 public class PipelineMavenPluginPostgreSqlDao extends AbstractPipelineMavenPluginDao {
 
-    @SuppressFBWarnings("NP_NONNULL_PARAM_VIOLATION")
     public PipelineMavenPluginPostgreSqlDao() {
-        //TODO cleanup needed because of annotation
-        super(null);
+        super();
     }
 
     public PipelineMavenPluginPostgreSqlDao(@NonNull DataSource ds) {

@@ -46,10 +46,8 @@ import java.util.logging.Level;
 @Extension
 public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao {
 
-    @SuppressFBWarnings("NP_NONNULL_PARAM_VIOLATION")
     public PipelineMavenPluginMySqlDao() {
-        //TODO cleanup needed because of annotation
-        super(null);
+        super();
     }
 
     @Override
