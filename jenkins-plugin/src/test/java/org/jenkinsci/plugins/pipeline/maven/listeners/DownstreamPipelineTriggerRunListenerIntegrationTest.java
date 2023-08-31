@@ -36,7 +36,7 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
 
     @BeforeEach
     public void setup() throws Exception {
-        ExtensionList.lookup(GlobalPipelineMavenConfig.class).get(0).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
+        ExtensionList.lookupSingleton(GlobalPipelineMavenConfig.class).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
         List<MavenPublisher> publisherOptions = GlobalPipelineMavenConfig.get().getPublisherOptions();
         if (publisherOptions == null) {
             publisherOptions = new ArrayList<>();

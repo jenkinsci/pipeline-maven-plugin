@@ -58,7 +58,7 @@ public class NonProductionGradeDatabaseWarningAdministrativeMonitorIntegrationTe
 
     @Test
     public void shouldMitigateComputationWithH2Database(JenkinsRule j) throws Exception {
-        ExtensionList.lookup(GlobalPipelineMavenConfig.class).get(0).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
+        ExtensionList.lookupSingleton(GlobalPipelineMavenConfig.class).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
         NonProductionGradeDatabaseWarningAdministrativeMonitor monitor = j.getInstance().getExtensionList(AdministrativeMonitor.class)
                 .get(NonProductionGradeDatabaseWarningAdministrativeMonitor.class);
         assertThat(monitor).isNotNull();

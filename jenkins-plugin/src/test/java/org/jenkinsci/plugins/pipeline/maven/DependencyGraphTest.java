@@ -41,7 +41,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
 
     @BeforeEach
     public void setup() throws Exception {
-        ExtensionList.lookup(GlobalPipelineMavenConfig.class).get(0).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
+        ExtensionList.lookupSingleton(GlobalPipelineMavenConfig.class).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
         downstreamArtifactRepoRule = new GitSampleRepoRule();
         runBeforeMethod(downstreamArtifactRepoRule);
 
