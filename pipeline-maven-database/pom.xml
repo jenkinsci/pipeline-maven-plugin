@@ -7,7 +7,7 @@
     <version>${changelist}</version>
   </parent>
   <artifactId>pipeline-maven-database</artifactId>
-  <name>Pipeline Maven Plugin Database DAO</name>
+  <name>Pipeline Maven Plugin Database</name>
   <packaging>hpi</packaging>
 
   <dependencies>
