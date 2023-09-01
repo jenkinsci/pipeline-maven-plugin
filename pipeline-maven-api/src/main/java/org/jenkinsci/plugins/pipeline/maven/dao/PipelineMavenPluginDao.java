@@ -26,6 +26,7 @@ package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import hudson.model.Item;
 import hudson.model.Run;
+import hudson.util.FormValidation;
 import org.apache.maven.artifact.Artifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
@@ -326,9 +327,13 @@ public interface PipelineMavenPluginDao extends Closeable {
 
         PipelineMavenPluginDao build(Config config);
 
+        FormValidation validateConfiguration(Config config);
+
     }
 
     Builder getBuilder();
 
-
+    default String getDefaultJdbcUrl() {
+        return null;
+    }
 }

@@ -34,6 +34,7 @@ import hudson.model.Item;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.security.ACL;
+import hudson.util.FormValidation;
 import hudson.util.Secret;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
@@ -50,7 +51,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import javax.sql.DataSource;
 import java.io.Closeable;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -65,18 +65,8 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -107,39 +97,42 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         testDatabase();
     }
 
-    @Override
-    public Builder getBuilder() {
-        return config -> {
+    protected boolean acceptNoCredentials() {
+        return false;
+    }
 
+    private class JDBCDaoBuilder implements Builder {
+        protected final Logger LOGGER = Logger.getLogger(JDBCDaoBuilder.class.getName());
+
+        private final Class<?> pipelineMavenPluginDaoClass;
+
+        public JDBCDaoBuilder(Class<?> pipelineMavenPluginDaoClass) {
+            this.pipelineMavenPluginDaoClass = pipelineMavenPluginDaoClass;
+        }
+
+        @Override
+        public PipelineMavenPluginDao build(Config config) {
             Jenkins j = Jenkins.get();
             PipelineMavenPluginDao dao;
             try {
                 String jdbcUrl = config.getJdbcUrl();
                 String jdbcUserName, jdbcPassword;
-                if (StringUtils.isBlank(jdbcUrl) && getClass() == PipelineMavenPluginH2Dao.class) {
-                    //  embedded H2 database accept empty jdbc url
-                    File databaseRootDir = new File(j.getRootDir(), "jenkins-jobs");
-                    if (!databaseRootDir.exists()) {
-                        boolean created = databaseRootDir.mkdirs();
-                        if (!created) {
-                            throw new IllegalStateException("Failure to create database root dir " + databaseRootDir);
-                        }
-                    }
-                    jdbcUrl = "jdbc:h2:file:" + new File(databaseRootDir, "jenkins-jobs").getAbsolutePath() + ";" +
-                            "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
+
+                if (StringUtils.isBlank(config.getCredentialsId()) && !AbstractPipelineMavenPluginDao.this.acceptNoCredentials())
+                    throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
+
+                UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
+                        CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, j,
+                                ACL.SYSTEM, Collections.EMPTY_LIST),
+                        CredentialsMatchers.withId(config.getCredentialsId()));
+                if (jdbcCredentials == null && pipelineMavenPluginDaoClass == PipelineMavenPluginH2Dao.class) {
                     jdbcUserName = "sa";
                     jdbcPassword = "sa";
-                } else {
-                    if (StringUtils.isBlank(config.getCredentialsId()))
-                        throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
-
-                    UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
-                            CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, j,
-                                    ACL.SYSTEM, Collections.EMPTY_LIST),
-                            CredentialsMatchers.withId(config.getCredentialsId()));
-                    if (jdbcCredentials == null) {
-                        throw new IllegalStateException("Credentials '" + config.getCredentialsId() + "' defined for JDBC URL '" + jdbcUrl + "' NOT found");
-                    }
+                }
+                else if (jdbcCredentials == null) {
+                    throw new IllegalStateException("Credentials '" + config.getCredentialsId() + "' defined for JDBC URL '" + jdbcUrl + "' NOT found");
+                }
+                else {
                     jdbcUserName = jdbcCredentials.getUsername();
                     jdbcPassword = Secret.toString(jdbcCredentials.getPassword());
                 }
@@ -183,9 +176,11 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 LOGGER.log(Level.INFO, "Connect to database {0} with username {1}", new Object[]{jdbcUrl, jdbcUserName});
                 DataSource ds = new HikariDataSource(dsConfig);
 
-                Class<? extends PipelineMavenPluginDao> daoClass = getClass();
                 try {
-                    dao = new MonitoringPipelineMavenPluginDaoDecorator(new CustomTypePipelineMavenPluginDaoDecorator(getClass().getConstructor(DataSource.class).newInstance(ds)));
+                    dao = new MonitoringPipelineMavenPluginDaoDecorator(
+                            new CustomTypePipelineMavenPluginDaoDecorator((PipelineMavenPluginDao)pipelineMavenPluginDaoClass
+                                    .getConstructor(DataSource.class)
+                                    .newInstance(ds)));
                 } catch (Exception e) {
                     throw new SQLException(
                             "Exception connecting to '" + jdbcUrl + "' with credentials '" + config.getCredentialsId() + "' (" +
@@ -198,10 +193,182 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 dao = new PipelineMavenPluginNullDao();
             }
             return dao;
-        };
+        }
+
+        @Override
+        public FormValidation validateConfiguration(Config config) {
+            String jdbcUrl = config.getJdbcUrl();
+            if (StringUtils.isBlank(jdbcUrl)) {
+                return FormValidation.ok();
+            }
+
+            String driverClass = null;
+            try {
+                if (StringUtils.isBlank(jdbcUrl)) {
+                    driverClass = "org.h2.Driver";
+                } else if (jdbcUrl.startsWith("jdbc:h2")) {
+                    driverClass = "org.h2.Driver";
+                } else if (jdbcUrl.startsWith("jdbc:mysql")) {
+                    driverClass = "com.mysql.cj.jdbc.Driver";
+                } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
+                    driverClass = "org.postgresql.Driver";
+                } else {
+                    return FormValidation.error("Unsupported database specified in JDBC url '" + jdbcUrl + "'");
+                }
+                try {
+                    Class.forName(driverClass);
+                } catch (ClassNotFoundException e) {
+                    if ("com.mysql.cj.jdbc.Driver".equals(driverClass)) {
+                        return FormValidation.error("MySQL JDBC driver '" + driverClass + "' not found, please install the Jenkins 'MySQL API Plugin'", e);
+                    } else if ("org.postgresql.Driver".equals(driverClass)) {
+                        return FormValidation.error("PostgreSQL JDBC driver '" + driverClass + "' not found, please install the Jenkins 'PostgreSQL API Plugin'" + jdbcUrl, e);
+                    } else {
+                        throw e;
+                    }
+                }
+
+                String jdbcCredentialsId = config.getCredentialsId();
+
+                String jdbcUserName, jdbcPassword;
+                if (StringUtils.isEmpty(jdbcCredentialsId)) {
+                    if (AbstractPipelineMavenPluginDao.this.acceptNoCredentials()) {
+                        // embedded database, assume OK
+                        return FormValidation.ok();
+                    } else {
+                        return FormValidation.error("No credentials specified for JDBC url '" + jdbcUrl + "'");
+                    }
+                } else {
+                    UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
+                            CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, Jenkins.get(),
+                                    ACL.SYSTEM, Collections.EMPTY_LIST),
+                            CredentialsMatchers.withId(jdbcCredentialsId));
+                    if (jdbcCredentials == null) {
+                        return FormValidation.error("Credentials '" + jdbcCredentialsId + "' defined for JDBC URL '" + jdbcUrl + "' not found");
+                    }
+                    jdbcUserName = jdbcCredentials.getUsername();
+                    jdbcPassword = Secret.toString(jdbcCredentials.getPassword());
+                }
+
+                HikariConfig dsConfig = createHikariConfig(config.getProperties(), jdbcUrl, jdbcUserName, jdbcPassword);
+
+                try (HikariDataSource ds = new HikariDataSource(dsConfig)) {
+                    try (Connection cnn = ds.getConnection()) {
+                        DatabaseMetaData metaData = cnn.getMetaData();
+                        // getDatabaseProductVersion():
+                        // * MySQL: "8.0.13"
+                        // * Amazon Aurora: "5.6.10"
+                        // * MariaDB: "5.5.5-10.2.20-MariaDB", "5.5.5-10.3.11-MariaDB-1:10.3.11+maria~bionic"
+                        String databaseVersionDescription = metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion();
+                        String databaseRequirement = "MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ or MariaDB 10.2+ or PostgreSQL 10+ is required";
+                        if ("MySQL".equals(metaData.getDatabaseProductName())) {
+                            @Nullable
+                            String amazonAuroraVersion;
+                            try (Statement stmt = cnn.createStatement()) {
+                                try (ResultSet rst = stmt.executeQuery("select AURORA_VERSION()")) {
+                                    rst.next();
+                                    amazonAuroraVersion = rst.getString(1);
+                                    databaseVersionDescription += " / Aurora " + rst.getString(1);
+                                } catch (SQLException e) {
+                                    if (e.getErrorCode() == 1305) { // com.mysql.cj.exceptions.MysqlErrorNumbers.ER_SP_DOES_NOT_EXIST
+                                        amazonAuroraVersion = null;
+                                    } else {
+                                        LOGGER.log(Level.WARNING,"Exception checking Amazon Aurora version", e);
+                                        amazonAuroraVersion = null;
+                                    }
+                                }
+                            }
+                            @Nullable
+                            String mariaDbVersion = PipelineMavenPluginMySqlDao.extractMariaDbVersion(metaData.getDatabaseProductVersion());
+
+                            switch (metaData.getDatabaseMajorVersion()) {
+                                case 8:
+                                    // OK
+                                    break;
+                                case 5:
+                                    switch (metaData.getDatabaseMinorVersion()) {
+                                        case 7:
+                                            // ok
+                                            break;
+                                        case 6:
+                                            if (amazonAuroraVersion == null) {
+                                                // see JENKINS-54784
+                                                return FormValidation.warning("Non validated MySQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
+                                            } else {
+                                                // we have successfully tested on Amazon Aurora MySQL 5.6.10a
+                                                break;
+                                            }
+                                        case 5:
+                                            if (mariaDbVersion == null) {
+                                                return FormValidation.warning("Non validated MySQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
+                                            } else {
+                                                // JENKINS-55378 have successfully tested with "5.5.5-10.2.20-MariaDB"
+                                                return FormValidation.ok("MariaDB version " + mariaDbVersion + " detected. Please ensure that your MariaDB version is at least version 10.2+");
+                                            }
+                                        default:
+                                            return FormValidation.error("Non supported MySQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
+                                    }
+                                    break;
+                                default:
+                                    return FormValidation.error("Non supported MySQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
+                            }
+                        } else if ("PostgreSQL".equals(metaData.getDatabaseProductName())) {
+                            @Nullable
+                            String amazonAuroraVersion; // https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Updates.html
+                            try (Statement stmt = cnn.createStatement()) {
+                                try (ResultSet rst = stmt.executeQuery("select AURORA_VERSION()")) {
+                                    rst.next();
+                                    amazonAuroraVersion = rst.getString(1);
+                                    databaseVersionDescription += " / Aurora " + rst.getString(1);
+                                } catch (SQLException e) {
+                                    if ("42883".equals(e.getSQLState())) { // org.postgresql.util.PSQLState.UNDEFINED_FUNCTION.getState()
+                                        amazonAuroraVersion = null;
+                                    } else {
+                                        LOGGER.log(Level.WARNING,"Exception checking Amazon Aurora version", e);
+                                        amazonAuroraVersion = null;
+                                    }
+                                }
+                            }
+                            switch (metaData.getDatabaseMajorVersion()) {
+                                case 14:
+                                case 13:
+                                case 12:
+                                case 11:
+                                case 10:
+                                case 9:
+                                case 8:
+                                    // OK
+                                    break;
+                                default:
+                                    return FormValidation.warning("Non tested PostgreSQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
+                            }
+                        } else {
+                            return FormValidation.warning("Non production grade database. For production workloads, " + databaseRequirement);
+                        }
+                        try (Statement stmt = cnn.createStatement()) {
+                            try (ResultSet rst = stmt.executeQuery("select 1")) {
+                                rst.next();
+                                // TODO more tests
+                            }
+                        }
+                        return FormValidation.ok(databaseVersionDescription + " is a supported database");
+                    } catch (SQLException e ){
+                        return FormValidation.error(e, "Failure to connect to the database " + jdbcUrl);
+                    }
+                }
+            } catch (RuntimeException e) {
+                return FormValidation.error(e, "Failed to test JDBC connection '" + jdbcUrl + "'");
+            } catch (ClassNotFoundException e) {
+                return FormValidation.error(e, "Failed to load JDBC driver '" + driverClass + "' for JDBC connection '" + jdbcUrl + "'");
+            }
+        }
     }
 
-    private HikariConfig createHikariConfig(String properties, String jdbcUrl, String jdbcUserName, String jdbcPassword) {
+    @Override
+    public Builder getBuilder() {
+        return new JDBCDaoBuilder(getClass());
+    }
+
+    private static HikariConfig createHikariConfig(String properties, String jdbcUrl, String jdbcUserName, String jdbcPassword) {
         Properties p = new Properties();
         // todo refactor the DAO to inject config defaults in the DAO
         if (jdbcUrl.startsWith("jdbc:mysql")) {
@@ -232,7 +399,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 throw new IllegalStateException("Failed to read properties.", e);
             }
         }
-        LOGGER.log(Level.INFO, "Applied pool properties {0}", p);
+        Logger.getLogger(AbstractPipelineMavenPluginDao.class.getName()).log(Level.INFO, "Applied pool properties {0}", p);
         HikariConfig dsConfig = new HikariConfig(p);
         dsConfig.setJdbcUrl(jdbcUrl);
         dsConfig.setUsername(jdbcUserName);

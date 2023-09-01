@@ -24,8 +24,8 @@
 
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
+import jenkins.model.Jenkins;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -52,7 +52,9 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
         super(ds);
     }
 
-
+    protected boolean acceptNoCredentials() {
+        return true;
+    }
 
     @Override
     public String getDescription() {
@@ -139,4 +141,17 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
         }
         super.close();
     }
+
+    public String getDefaultJdbcUrl() {
+        File databaseRootDir = new File(Jenkins.get().getRootDir(), "jenkins-jobs");
+        if (!databaseRootDir.exists()) {
+            boolean created = databaseRootDir.mkdirs();
+            if (!created) {
+                throw new IllegalStateException("Failure to create database root dir " + databaseRootDir);
+            }
+        }
+        return  "jdbc:h2:file:" + new File(databaseRootDir, "jenkins-jobs").getAbsolutePath() + ";" +
+                "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
+    }
+
 }

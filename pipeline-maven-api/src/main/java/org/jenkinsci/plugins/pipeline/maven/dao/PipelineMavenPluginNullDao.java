@@ -25,6 +25,7 @@
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
 import hudson.Extension;
+import hudson.util.FormValidation;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 
@@ -54,7 +55,17 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
 
     @Override
     public PipelineMavenPluginDao.Builder getBuilder() {
-        return config -> new PipelineMavenPluginNullDao();
+        return new Builder() {
+            @Override
+            public PipelineMavenPluginDao build(Config config) {
+                return new PipelineMavenPluginNullDao();
+            }
+
+            @Override
+            public FormValidation validateConfiguration(Config config) {
+                return FormValidation.ok();
+            }
+        };
     }
 
     @Override

@@ -109,6 +109,13 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         this.daoClass = daoClass;
     }
 
+    private Optional<PipelineMavenPluginDao> findDaoFromExtension(String daoClass) {
+        return ExtensionList.lookup(PipelineMavenPluginDao.class)
+                        .stream()
+                        .filter(pipelineMavenPluginDao -> StringUtils.equals(pipelineMavenPluginDao.getClass().getName(), daoClass))
+                        .findFirst();
+    }
+
     @Override
     public ToolConfigurationCategory getCategory() {
         return GlobalConfigurationCategory.get(ToolConfigurationCategory.class);
@@ -227,6 +234,9 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         req.bindJSON(this, json);
         // stapler oddity, empty lists coming from the HTTP request are not set on bean by  "req.bindJSON(this, json)"
         this.publisherOptions = req.bindJSONToList(MavenPublisher.class, json.get("publisherOptions"));
+        if(StringUtils.isBlank(jdbcUrl)) {
+            findDaoFromExtension(this.daoClass).ifPresent(pipelineMavenPluginDao -> jdbcUrl = pipelineMavenPluginDao.getDefaultJdbcUrl());
+        }
         save();
         return true;
     }
@@ -246,13 +256,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         } else if (j.isTerminating()) {
             throw new IllegalStateException("Request to get DAO whilst Jenkins is terminating");
         }
-
-        Optional<PipelineMavenPluginDao> optionalPipelineMavenPluginDao =
-                ExtensionList.lookup(PipelineMavenPluginDao.class)
-                    .stream()
-                    .filter(pipelineMavenPluginDao -> StringUtils.equals(pipelineMavenPluginDao.getClass().getName(), daoClass))
-                    .findFirst();
-
+        Optional<PipelineMavenPluginDao> optionalPipelineMavenPluginDao = findDaoFromExtension(getDaoClass());
         if (optionalPipelineMavenPluginDao.isPresent()) {
             PipelineMavenPluginDao.Builder.Config config = new PipelineMavenPluginDao.Builder.Config()
                     .credentialsId(jdbcCredentialsId)
@@ -315,39 +319,27 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     public FormValidation doValidateJdbcConnection(
                                      @QueryParameter String jdbcUrl,
                                      @QueryParameter String properties,
-                                     @QueryParameter String jdbcCredentialsId) {
+                                     @QueryParameter String jdbcCredentialsId,
+                                     @QueryParameter String daoClass) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
-        if (StringUtils.isBlank(jdbcUrl)) {
+        Optional<PipelineMavenPluginDao> optionalPipelineMavenPluginDao = findDaoFromExtension(daoClass);
+        if(optionalPipelineMavenPluginDao.isEmpty()) {
             return FormValidation.ok("OK");
         }
 
-        String driverClass = null;
-
         if (StringUtils.isBlank(jdbcUrl)) {
-            driverClass = "org.h2.Driver";
-        } else if (jdbcUrl.startsWith("jdbc:h2")) {
-            driverClass = "org.h2.Driver";
-        } else if (jdbcUrl.startsWith("jdbc:mysql")) {
-            driverClass = "com.mysql.cj.jdbc.Driver";
-        } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
-            driverClass = "org.postgresql.Driver";
-        } else {
-            return FormValidation.error("Unsupported database specified in JDBC url '" + jdbcUrl + "'");
+            jdbcUrl = optionalPipelineMavenPluginDao.get().getDefaultJdbcUrl();
         }
 
-        // FIXME get back some validation of jdbc connection here
         try {
-            Class.forName(driverClass);
-        } catch (ClassNotFoundException e) {
-            if ("com.mysql.cj.jdbc.Driver".equals(driverClass)) {
-                return FormValidation.error(e, "MySQL JDBC driver '" + driverClass + "' not found, please install the Jenkins 'MySQL API Plugin'" + jdbcUrl);
-            } else if ("org.postgresql.Driver".equals(driverClass)) {
-                return FormValidation.error(e, "PostgreSQL JDBC driver '" + driverClass + "' not found, please install the Jenkins 'PostgreSQL API Plugin'" + jdbcUrl);
-            } else {
-                throw new RuntimeException(e.getMessage(), e);
-            }
+            PipelineMavenPluginDao.Builder.Config config = new PipelineMavenPluginDao.Builder.Config()
+                    .credentialsId(jdbcCredentialsId)
+                    .jdbcUrl(jdbcUrl)
+                    .properties(properties);
+            return optionalPipelineMavenPluginDao.get().getBuilder().validateConfiguration(config);
+        } catch (Exception e) {
+            return FormValidation.error(e, e.getMessage());
         }
-        return FormValidation.ok("OK");
     }
 
     @Terminator

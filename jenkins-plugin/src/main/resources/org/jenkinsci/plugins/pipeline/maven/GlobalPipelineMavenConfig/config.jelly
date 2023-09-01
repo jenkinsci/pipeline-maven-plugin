@@ -52,7 +52,7 @@ THE SOFTWARE.
                 </f:entry>
             </f:advanced>
 
-            <f:validateButton title="${%Validate Database Configuration}" method="validateJdbcConnection" with="jdbcUrl,properties,jdbcCredentialsId"/>
+            <f:validateButton title="${%Validate Database Configuration}" method="validateJdbcConnection" with="jdbcUrl,properties,jdbcCredentialsId,daoClass"/>
         </f:entry>
         <f:entry title="${%Global traceability}" >
             <f:checkbox title="${%Enable traceability globally : Java/Maven versions, settings, ...}" field="globalTraceability" />
