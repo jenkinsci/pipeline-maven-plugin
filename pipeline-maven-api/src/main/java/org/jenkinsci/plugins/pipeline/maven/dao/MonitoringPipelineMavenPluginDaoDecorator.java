@@ -31,8 +31,6 @@ public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineM
     private final AtomicLong writeDurationInNanos = new AtomicLong();
     private final AtomicInteger writeCount = new AtomicInteger();
 
-
-
     public MonitoringPipelineMavenPluginDaoDecorator(@NonNull PipelineMavenPluginDao delegate) {
         super(delegate);
     }
