@@ -121,10 +121,14 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 if (StringUtils.isBlank(config.getCredentialsId()) && !AbstractPipelineMavenPluginDao.this.acceptNoCredentials())
                     throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
 
-                UsernamePasswordCredentials jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
-                        CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, j,
-                                ACL.SYSTEM, Collections.EMPTY_LIST),
-                        CredentialsMatchers.withId(config.getCredentialsId()));
+                UsernamePasswordCredentials jdbcCredentials = null;
+                if (!StringUtils.isBlank(config.getCredentialsId())) {
+                    jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
+                            CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, j,
+                                    ACL.SYSTEM, Collections.EMPTY_LIST),
+                            CredentialsMatchers.withId(config.getCredentialsId()));
+                }
+
                 if (jdbcCredentials == null && pipelineMavenPluginDaoClass == PipelineMavenPluginH2Dao.class) {
                     jdbcUserName = "sa";
                     jdbcPassword = "sa";
@@ -186,8 +190,6 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                             "Exception connecting to '" + jdbcUrl + "' with credentials '" + config.getCredentialsId() + "' (" +
                                     jdbcUserName + "/***) and DAO " + getClass().getSimpleName(), e);
                 }
-
-
             } catch (RuntimeException | SQLException e) {
                 LOGGER.log(Level.WARNING, "Exception creating database dao, skip", e);
                 dao = new PipelineMavenPluginNullDao();
