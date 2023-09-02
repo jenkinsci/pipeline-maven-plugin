@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runAfterMethod;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runBeforeMethod;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -42,6 +43,9 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
     @BeforeEach
     public void setup() throws Exception {
         ExtensionList.lookupSingleton(GlobalPipelineMavenConfig.class).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
+        String jdbcUrl = "jdbc:h2:file:" + new File("target", getClass().getName() + "-h2").getAbsolutePath() + ";" +
+                "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
+        ExtensionList.lookupSingleton(GlobalPipelineMavenConfig.class).setJdbcUrl(jdbcUrl);
         downstreamArtifactRepoRule = new GitSampleRepoRule();
         runBeforeMethod(downstreamArtifactRepoRule);
 
