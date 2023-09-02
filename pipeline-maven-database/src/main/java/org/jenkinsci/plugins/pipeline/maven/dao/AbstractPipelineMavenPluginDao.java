@@ -30,6 +30,8 @@ import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import hudson.Extension;
+import hudson.ExtensionList;
 import hudson.model.Item;
 import hudson.model.Result;
 import hudson.model.Run;
@@ -116,6 +118,17 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
             PipelineMavenPluginDao dao;
             try {
                 String jdbcUrl = config.getJdbcUrl();
+                if(StringUtils.isBlank(jdbcUrl)) {
+                    // some dao such h2 can use default jdbc ur
+                    Optional<PipelineMavenPluginDao> optionalPipelineMavenPluginDao =
+                            ExtensionList.lookup(PipelineMavenPluginDao.class)
+                                .stream()
+                                .filter(pipelineMavenPluginDao -> pipelineMavenPluginDao.getClass().getName().equals(pipelineMavenPluginDaoClass.getName()))
+                                .findFirst();
+                    if(optionalPipelineMavenPluginDao.isPresent()){
+                        jdbcUrl = optionalPipelineMavenPluginDao.get().getDefaultJdbcUrl();
+                    }
+                }
                 String jdbcUserName, jdbcPassword;
 
                 if (StringUtils.isBlank(config.getCredentialsId()) && !AbstractPipelineMavenPluginDao.this.acceptNoCredentials())

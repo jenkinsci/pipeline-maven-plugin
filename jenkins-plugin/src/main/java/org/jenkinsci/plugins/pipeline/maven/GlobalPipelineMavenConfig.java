@@ -234,9 +234,6 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         req.bindJSON(this, json);
         // stapler oddity, empty lists coming from the HTTP request are not set on bean by  "req.bindJSON(this, json)"
         this.publisherOptions = req.bindJSONToList(MavenPublisher.class, json.get("publisherOptions"));
-        if(StringUtils.isBlank(jdbcUrl)) {
-            findDaoFromExtension(this.daoClass).ifPresent(pipelineMavenPluginDao -> jdbcUrl = pipelineMavenPluginDao.getDefaultJdbcUrl());
-        }
         save();
         return true;
     }

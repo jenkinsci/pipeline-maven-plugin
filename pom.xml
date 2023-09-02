@@ -104,7 +104,6 @@
     <jenkins-tools-bom.version>2102.v854b_fec19c92</jenkins-tools-bom.version>
     <jenkins.version>2.361.4</jenkins.version>
     <junit.version>5.10.0</junit.version>
-    <logback.version>1.4.11</logback.version>
     <maven-compat.version>3.3.9</maven-compat.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
     <maven-plugin-sortpom.version>3.3.0</maven-plugin-sortpom.version>
@@ -209,7 +208,11 @@
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
