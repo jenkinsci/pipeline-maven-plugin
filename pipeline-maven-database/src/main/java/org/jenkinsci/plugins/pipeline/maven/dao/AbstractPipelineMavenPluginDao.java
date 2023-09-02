@@ -30,7 +30,6 @@ import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.Item;
 import hudson.model.Result;
