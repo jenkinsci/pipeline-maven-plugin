@@ -52,8 +52,7 @@ public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao 
 
     @Override
     public String getDescription() {
-        // TODO i18n
-        return "Pipeline Maven Plugin storage using MySql";
+        return Messages.dao_mysql_description();
     }
 
     /**

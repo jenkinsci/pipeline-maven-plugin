@@ -58,8 +58,7 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
 
     @Override
     public String getDescription() {
-        // TODO i18n
-        return "Pipeline Maven Plugin storage using H2";
+        return Messages.dao_h2_description();
     }
 
     public PipelineMavenPluginH2Dao(@NonNull File rootDir) {
