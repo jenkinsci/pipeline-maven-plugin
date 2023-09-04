@@ -24,35 +24,19 @@
 
 package org.jenkinsci.plugins.pipeline.maven.db;
 
-import javax.sql.DataSource;
-
-import org.jenkinsci.plugins.pipeline.maven.db.AbstractPipelineMavenPluginDao;
-import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginDaoAbstractTest;
-import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao;
+import org.h2.jdbcx.JdbcConnectionPool;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-@Testcontainers(disabledWithoutDocker = true)
-public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
-
-    @Container
-    public static MySQLContainer<?> DB = new MySQLContainer<>(MySQLContainer.NAME);
+public class PipelineMavenPluginPostgreSqlDaoTest extends PipelineMavenPluginDaoAbstractTest {
 
     @Override
     public DataSource before_newDataSource() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(DB.getJdbcUrl());
-        config.setUsername(DB.getUsername());
-        config.setPassword(DB.getPassword());
-        return new HikariDataSource(config);
+        return JdbcConnectionPool.create("jdbc:h2:mem:;MODE=PostgreSQL", "sa", "");
     }
 
     @Override
@@ -74,4 +58,5 @@ public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstrac
             }
         };
     }
+
 }

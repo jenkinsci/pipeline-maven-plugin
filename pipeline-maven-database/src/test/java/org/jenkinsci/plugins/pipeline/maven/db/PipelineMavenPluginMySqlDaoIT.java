@@ -26,11 +26,8 @@ package org.jenkinsci.plugins.pipeline.maven.db;
 
 import javax.sql.DataSource;
 
-import org.jenkinsci.plugins.pipeline.maven.db.AbstractPipelineMavenPluginDao;
-import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginDaoAbstractTest;
-import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginPostgreSqlDao;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -41,14 +38,13 @@ import com.zaxxer.hikari.HikariDataSource;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 @Testcontainers(disabledWithoutDocker = true)
-public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
+public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
 
     @Container
-    public static PostgreSQLContainer<?> DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE);
+    public static MySQLContainer<?> DB = new MySQLContainer<>(MySQLContainer.NAME);
 
     @Override
-    public DataSource before_newDataSource() throws Exception {
-        Class.forName("org.postgresql.Driver");
+    public DataSource before_newDataSource() {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(DB.getJdbcUrl());
         config.setUsername(DB.getUsername());
@@ -58,7 +54,7 @@ public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAb
 
     @Override
     public AbstractPipelineMavenPluginDao before_newAbstractPipelineMavenPluginDao(DataSource ds) {
-        return new PipelineMavenPluginPostgreSqlDao(ds) {
+        return new PipelineMavenPluginMySqlDao(ds) {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {
@@ -75,5 +71,4 @@ public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAb
             }
         };
     }
-
 }

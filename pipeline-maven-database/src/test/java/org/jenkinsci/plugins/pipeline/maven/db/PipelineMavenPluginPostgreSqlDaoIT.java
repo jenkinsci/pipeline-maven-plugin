@@ -24,27 +24,38 @@
 
 package org.jenkinsci.plugins.pipeline.maven.db;
 
-import org.h2.jdbcx.JdbcConnectionPool;
-import org.jenkinsci.plugins.pipeline.maven.db.AbstractPipelineMavenPluginDao;
-import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginDaoAbstractTest;
-import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao;
-import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-
 import javax.sql.DataSource;
+
+import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class PipelineMavenPluginPostgreSqlDaoTest extends PipelineMavenPluginDaoAbstractTest {
+@Testcontainers(disabledWithoutDocker = true)
+public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
+
+    @Container
+    public static PostgreSQLContainer<?> DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE);
 
     @Override
-    public DataSource before_newDataSource() {
-        return JdbcConnectionPool.create("jdbc:h2:mem:;MODE=PostgreSQL", "sa", "");
+    public DataSource before_newDataSource() throws Exception {
+        Class.forName("org.postgresql.Driver");
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(DB.getJdbcUrl());
+        config.setUsername(DB.getUsername());
+        config.setPassword(DB.getPassword());
+        return new HikariDataSource(config);
     }
 
     @Override
     public AbstractPipelineMavenPluginDao before_newAbstractPipelineMavenPluginDao(DataSource ds) {
-        return new PipelineMavenPluginMySqlDao(ds) {
+        return new PipelineMavenPluginPostgreSqlDao(ds) {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {

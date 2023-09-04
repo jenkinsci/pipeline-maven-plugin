@@ -35,9 +35,9 @@ import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
+import org.assertj.core.api.Assertions;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
-import org.jenkinsci.plugins.pipeline.maven.db.AbstractPipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.util.SqlTestsUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -91,7 +91,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", ds, System.out);
         assertThat(primaryKeySecondCall).isEqualTo(primaryKey);
 
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(1);
     }
 
     @Test
@@ -106,7 +106,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", ds, System.out);
         assertThat(primaryKeySecondCall).isEqualTo(primaryKey);
 
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(1);
     }
 
     @Test
@@ -121,7 +121,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
 
         SqlTestsUtils.dump("select * from JENKINS_BUILD", ds, System.out);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
 
     }
 
@@ -141,10 +141,10 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         SqlTestsUtils.dump("select * from JENKINS_JOB", ds, System.out);
         SqlTestsUtils.dump("select * from JENKINS_BUILD", ds, System.out);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB where FULL_NAME='my-pipeline' AND LAST_BUILD_NUMBER=2 AND LAST_SUCCESSFUL_BUILD_NUMBER=2",
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB where FULL_NAME='my-pipeline' AND LAST_BUILD_NUMBER=2 AND LAST_SUCCESSFUL_BUILD_NUMBER=2",
                 ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(2);
 
     }
 
@@ -169,7 +169,7 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         SqlTestsUtils.dump("select * from JENKINS_JOB", ds, System.out);
         SqlTestsUtils.dump("select * from JENKINS_BUILD", ds, System.out);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(3);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(3);
 
         dao.deleteBuild("my-pipeline", 1);
         // AFTER DELETE FIRST
@@ -190,10 +190,10 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", ds, System.out);
         SqlTestsUtils.dump("select * from MAVEN_DEPENDENCY", ds, System.out);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(1);
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(1);
 
         List<MavenDependency> mavenDependencies = dao.listDependencies("my-pipeline", 1);
         assertThat(mavenDependencies).hasSize(1);
@@ -216,10 +216,10 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", ds, System.out);
         SqlTestsUtils.dump("select * from MAVEN_PARENT_PROJECT", ds, System.out);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(1);
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_PARENT_PROJECT", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_PARENT_PROJECT", ds)).isEqualTo(1);
     }
 
     @Test
@@ -233,14 +233,14 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", ds, System.out);
         SqlTestsUtils.dump("select * from MAVEN_DEPENDENCY", ds, System.out);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB WHERE FULL_NAME='my-pipeline-name-2'", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB WHERE FULL_NAME='my-pipeline-name-2'", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(1);
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(1);
     }
 
     @Test
@@ -255,12 +255,12 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", ds, System.out);
         SqlTestsUtils.dump("select * from MAVEN_DEPENDENCY", ds, System.out);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(0);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(0);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(0);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(0);
 
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(2);
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(0);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(0);
     }
 
     @Test
@@ -277,12 +277,12 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", ds, System.out);
         SqlTestsUtils.dump("select * from MAVEN_DEPENDENCY", ds, System.out);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(2);
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(2);
     }
 
     @Test
@@ -295,13 +295,13 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", ds, System.out);
         SqlTestsUtils.dump("select * from MAVEN_DEPENDENCY", ds, System.out);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(1);
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB where full_name='my-new-pipeline'", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB where full_name='my-new-pipeline'", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(1);
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(1);
     }
 
     @Test
@@ -310,12 +310,12 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "1.0-SNAPSHOT", null, false, "jar", null);
         dao.recordGeneratedArtifact("my-upstream-pipeline-1", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "war", "1.0-SNAPSHOT", null, false, "war", null);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(2);
-        assertThat(SqlTestsUtils.countRows("select * from GENERATED_MAVEN_ARTIFACT", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from GENERATED_MAVEN_ARTIFACT", ds)).isEqualTo(2);
 
         List<MavenArtifact> generatedArtifacts = dao.getGeneratedArtifacts("my-upstream-pipeline-1", 1);
         assertThat(generatedArtifacts).hasSize(2);
@@ -339,12 +339,12 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         dao.recordDependency("my-pipeline", 1, "com.h2database", "h2", "1.4.196", "jar", "compile", false, null);
         dao.recordDependency("my-pipeline", 1, "com.mycompany", "core", "1.0-SNAPSHOT", "jar", "compile", false, null);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(2);
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(2);
 
         SqlTestsUtils.dump("select * from JENKINS_BUILD LEFT OUTER JOIN JENKINS_JOB ON JENKINS_BUILD.JOB_ID = JENKINS_JOB.ID", ds, System.out);
         SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", ds, System.out);
@@ -364,12 +364,12 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", ds, System.out);
         SqlTestsUtils.dump("select * from MAVEN_DEPENDENCY", ds, System.out);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(1);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(1);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(2);
 
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(2);
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(4);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(4);
 
     }
 
@@ -385,12 +385,12 @@ public abstract class PipelineMavenPluginDaoAbstractTest {
         SqlTestsUtils.dump("select * from MAVEN_ARTIFACT", ds, System.out);
         SqlTestsUtils.dump("select * from MAVEN_DEPENDENCY", ds, System.out);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_JOB", ds)).isEqualTo(2);
 
-        assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from JENKINS_BUILD", ds)).isEqualTo(2);
 
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(2);
-        assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(4);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_ARTIFACT", ds)).isEqualTo(2);
+        Assertions.assertThat(SqlTestsUtils.countRows("select * from MAVEN_DEPENDENCY", ds)).isEqualTo(4);
 
     }
 

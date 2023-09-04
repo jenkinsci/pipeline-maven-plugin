@@ -29,9 +29,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import javax.sql.DataSource;
 
 import org.h2.jdbcx.JdbcConnectionPool;
-import org.jenkinsci.plugins.pipeline.maven.db.AbstractPipelineMavenPluginDao;
-import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginDaoAbstractTest;
-import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 import org.junit.jupiter.api.Test;
 

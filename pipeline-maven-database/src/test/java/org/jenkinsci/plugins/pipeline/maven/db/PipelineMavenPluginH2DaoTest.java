@@ -25,9 +25,6 @@
 package org.jenkinsci.plugins.pipeline.maven.db;
 
 import org.h2.jdbcx.JdbcConnectionPool;
-import org.jenkinsci.plugins.pipeline.maven.db.AbstractPipelineMavenPluginDao;
-import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginDaoAbstractTest;
-import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 
 import javax.sql.DataSource;

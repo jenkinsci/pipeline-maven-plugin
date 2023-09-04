@@ -32,9 +32,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.h2.jdbcx.JdbcConnectionPool;
-import org.jenkinsci.plugins.pipeline.maven.db.AbstractPipelineMavenPluginDao;
-import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginH2Dao;
-import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 import org.junit.jupiter.api.Test;
 
@@ -43,13 +40,13 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class PipelineMavenPluginMySqlDaoInitializationTest {
+public class PipelineMavenPluginH2DaoInitializationTest {
 
     @Test
     public void initialize_database() {
-        JdbcConnectionPool jdbcConnectionPool = JdbcConnectionPool.create("jdbc:h2:mem:;MODE=MYSQL", "sa", "");
+        JdbcConnectionPool jdbcConnectionPool = JdbcConnectionPool.create("jdbc:h2:mem:", "sa", "");
 
-        AbstractPipelineMavenPluginDao dao = new PipelineMavenPluginMySqlDao(jdbcConnectionPool) {
+        PipelineMavenPluginH2Dao dao = new PipelineMavenPluginH2Dao(jdbcConnectionPool) {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {
@@ -69,9 +66,9 @@ public class PipelineMavenPluginMySqlDaoInitializationTest {
 
     @Test
     public void initialize_database_with_null_master_url() throws SQLException {
-        JdbcConnectionPool jdbcConnectionPool = JdbcConnectionPool.create("jdbc:h2:mem:;MODE=MYSQL", "sa", "");
+        JdbcConnectionPool jdbcConnectionPool = JdbcConnectionPool.create("jdbc:h2:mem:", "sa", "");
 
-        PipelineMavenPluginMySqlDao daoWithEmptyJenkinsUrl = new PipelineMavenPluginMySqlDao(jdbcConnectionPool) {
+        PipelineMavenPluginH2Dao daoWithEmptyJenkinsUrl = new PipelineMavenPluginH2Dao(jdbcConnectionPool) {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {
