@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.pipeline.maven.dao;
+package org.jenkinsci.plugins.pipeline.maven.db;
 
 import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
@@ -43,6 +43,7 @@ import org.apache.commons.lang.StringUtils;
 import org.h2.api.ErrorCode;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
+import org.jenkinsci.plugins.pipeline.maven.dao.*;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;

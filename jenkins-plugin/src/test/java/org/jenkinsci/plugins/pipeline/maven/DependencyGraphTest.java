@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 
 import hudson.ExtensionList;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
-import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
+import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.trigger.WorkflowJobDependencyTrigger;
 import org.jenkinsci.plugins.pipeline.maven.util.WorkflowMultibranchProjectTestsUtils;

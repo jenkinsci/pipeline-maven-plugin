@@ -49,8 +49,7 @@ public class PipelineMavenPluginNullDao implements PipelineMavenPluginDao {
 
     @Override
     public String getDescription() {
-        // TODO i18n
-        return "Pipeline Maven Plugin no storage mode";
+        return Messages.dao_null_description();
     }
 
     @Override

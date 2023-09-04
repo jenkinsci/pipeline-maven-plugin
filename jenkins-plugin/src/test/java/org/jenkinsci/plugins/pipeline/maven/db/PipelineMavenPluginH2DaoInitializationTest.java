@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.pipeline.maven.dao;
+package org.jenkinsci.plugins.pipeline.maven.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -32,6 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.h2.jdbcx.JdbcConnectionPool;
+import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 import org.junit.jupiter.api.Test;
 

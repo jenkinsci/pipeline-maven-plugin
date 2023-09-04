@@ -22,10 +22,9 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.pipeline.maven.dao;
+package org.jenkinsci.plugins.pipeline.maven.db;
 
 import com.mysql.cj.exceptions.MysqlErrorNumbers;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;

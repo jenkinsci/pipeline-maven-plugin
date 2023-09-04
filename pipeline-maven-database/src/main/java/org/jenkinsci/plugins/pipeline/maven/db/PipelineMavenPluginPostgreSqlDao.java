@@ -22,9 +22,8 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.pipeline.maven.dao;
+package org.jenkinsci.plugins.pipeline.maven.db;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import org.postgresql.util.PSQLState;
 

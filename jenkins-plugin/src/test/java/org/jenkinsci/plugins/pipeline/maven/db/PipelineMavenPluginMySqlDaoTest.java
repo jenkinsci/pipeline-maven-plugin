@@ -22,34 +22,27 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.pipeline.maven.dao;
+package org.jenkinsci.plugins.pipeline.maven.db;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.sql.DataSource;
 
+import org.h2.jdbcx.JdbcConnectionPool;
+import org.jenkinsci.plugins.pipeline.maven.db.AbstractPipelineMavenPluginDao;
+import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginDaoAbstractTest;
+import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-@Testcontainers(disabledWithoutDocker = true)
-public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
-
-    @Container
-    public static MySQLContainer<?> DB = new MySQLContainer<>(MySQLContainer.NAME);
+public class PipelineMavenPluginMySqlDaoTest extends PipelineMavenPluginDaoAbstractTest {
 
     @Override
     public DataSource before_newDataSource() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(DB.getJdbcUrl());
-        config.setUsername(DB.getUsername());
-        config.setPassword(DB.getPassword());
-        return new HikariDataSource(config);
+        return JdbcConnectionPool.create("jdbc:h2:mem:;MODE=MYSQL", "sa", "");
     }
 
     @Override
@@ -70,5 +63,22 @@ public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstrac
                 };
             }
         };
+    }
+
+    @Test
+    public void test_mariadb_version_parsing_JENKINS_55378() {
+        String actual = PipelineMavenPluginMySqlDao.extractMariaDbVersion("5.5.5-10.2.20-MariaDB");
+        assertThat(actual).isEqualTo("10.2.20");
+    }
+
+    /**
+     * docker run -e MYSQL_ROOT_PASSWORD=mypass -e MYSQL_DATABASE=jenkins -e
+     * MYSQL_USER=jenkins -e MYSQL_PASSWORD=jenkins -p 3307:3306 -d
+     * mariadb/server:latest
+     */
+    @Test
+    public void test_mariadb_version_parsing_mariadb_as_docker_container() {
+        String actual = PipelineMavenPluginMySqlDao.extractMariaDbVersion("5.5.5-10.3.11-MariaDB-1:10.3.11+maria~bionic");
+        assertThat(actual).isEqualTo("10.3.11");
     }
 }

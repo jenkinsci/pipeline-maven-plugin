@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.pipeline.maven.dao;
+package org.jenkinsci.plugins.pipeline.maven.db;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,6 +37,7 @@ import javax.sql.DataSource;
 
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
+import org.jenkinsci.plugins.pipeline.maven.db.AbstractPipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.util.SqlTestsUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;

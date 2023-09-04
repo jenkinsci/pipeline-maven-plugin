@@ -22,9 +22,12 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.pipeline.maven.dao;
+package org.jenkinsci.plugins.pipeline.maven.db;
 
 import org.h2.jdbcx.JdbcConnectionPool;
+import org.jenkinsci.plugins.pipeline.maven.db.AbstractPipelineMavenPluginDao;
+import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginDaoAbstractTest;
+import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 
 import javax.sql.DataSource;
@@ -32,16 +35,16 @@ import javax.sql.DataSource;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class PipelineMavenPluginH2DaoTest extends PipelineMavenPluginDaoAbstractTest {
+public class PipelineMavenPluginPostgreSqlDaoTest extends PipelineMavenPluginDaoAbstractTest {
 
     @Override
     public DataSource before_newDataSource() {
-        return JdbcConnectionPool.create("jdbc:h2:mem:", "sa", "");
+        return JdbcConnectionPool.create("jdbc:h2:mem:;MODE=PostgreSQL", "sa", "");
     }
 
     @Override
     public AbstractPipelineMavenPluginDao before_newAbstractPipelineMavenPluginDao(DataSource ds) {
-        return new PipelineMavenPluginH2Dao(ds) {
+        return new PipelineMavenPluginMySqlDao(ds) {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {
@@ -58,4 +61,5 @@ public class PipelineMavenPluginH2DaoTest extends PipelineMavenPluginDaoAbstract
             }
         };
     }
+
 }

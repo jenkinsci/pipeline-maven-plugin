@@ -22,13 +22,14 @@
  * THE SOFTWARE.
  */
 
-package org.jenkinsci.plugins.pipeline.maven.dao;
+package org.jenkinsci.plugins.pipeline.maven.db;
 
 import hudson.Extension;
 import jenkins.model.Jenkins;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
