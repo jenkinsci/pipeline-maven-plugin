@@ -1,7 +1,7 @@
-package org.jenkinsci.plugins.pipeline.maven.util;
+package org.jenkinsci.plugins.pipeline.maven.db.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.jenkinsci.plugins.pipeline.maven.util.ClassUtils.getResourceAsStream;
+import static org.jenkinsci.plugins.pipeline.maven.db.util.ClassUtils.getResourceAsStream;
 
 import org.junit.jupiter.api.Test;
 

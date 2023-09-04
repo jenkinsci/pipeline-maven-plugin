@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.pipeline.maven.util;
+package org.jenkinsci.plugins.pipeline.maven.db.util;
 
 /**
  * We prefer {@link RuntimeException} to catched exceptions.

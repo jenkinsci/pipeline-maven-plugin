@@ -38,7 +38,7 @@ import javax.sql.DataSource;
 import org.assertj.core.api.Assertions;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
-import org.jenkinsci.plugins.pipeline.maven.util.SqlTestsUtils;
+import org.jenkinsci.plugins.pipeline.maven.db.util.SqlTestsUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package org.jenkinsci.plugins.pipeline.maven.util;
+package org.jenkinsci.plugins.pipeline.maven.db.util;
 
 import java.io.PrintStream;
 import java.sql.ResultSet;

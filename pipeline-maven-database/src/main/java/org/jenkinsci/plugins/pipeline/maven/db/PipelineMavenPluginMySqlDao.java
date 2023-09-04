@@ -27,7 +27,7 @@ package org.jenkinsci.plugins.pipeline.maven.db;
 import com.mysql.cj.exceptions.MysqlErrorNumbers;
 import hudson.Extension;
 import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
+import org.jenkinsci.plugins.pipeline.maven.db.util.RuntimeSqlException;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;

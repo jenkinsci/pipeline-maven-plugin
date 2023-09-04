@@ -45,9 +45,9 @@ import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.dao.*;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-import org.jenkinsci.plugins.pipeline.maven.util.ClassUtils;
-import org.jenkinsci.plugins.pipeline.maven.util.RuntimeIoException;
-import org.jenkinsci.plugins.pipeline.maven.util.RuntimeSqlException;
+import org.jenkinsci.plugins.pipeline.maven.db.util.ClassUtils;
+import org.jenkinsci.plugins.pipeline.maven.db.util.RuntimeIoException;
+import org.jenkinsci.plugins.pipeline.maven.db.util.RuntimeSqlException;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;

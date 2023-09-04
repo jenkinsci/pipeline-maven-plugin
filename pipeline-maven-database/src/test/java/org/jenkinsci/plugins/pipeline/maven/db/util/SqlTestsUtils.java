@@ -1,8 +1,10 @@
-package org.jenkinsci.plugins.pipeline.maven.util;
+package org.jenkinsci.plugins.pipeline.maven.db.util;
 
 import org.h2.api.ErrorCode;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import org.jenkinsci.plugins.pipeline.maven.db.util.RuntimeSqlException;
+
 import javax.sql.DataSource;
 
 import static java.util.Optional.ofNullable;
