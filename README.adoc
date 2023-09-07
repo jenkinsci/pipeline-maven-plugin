@@ -504,6 +504,8 @@ We want to quickly add reporters for CheckStyle, Jacoco...
 [#db-setup]
 == Database Setup
 
+NOTE: Available since version 1332.xxxxxxxx.xxx
+
 To use a database you must first install the `Pipeline Maven Plugin Database`
 
 image::docs/images/pipeline-maven-plugin-database.png[]
@@ -516,6 +518,7 @@ The make a choice in available DAOs options:
 
 image::docs/images/dao-list-database.png[]
 
+For Configuration as Code users, this is the field to add into their yaml file `daoClass`
 
 [#db-setup-mysql]
 === Using a MySQL Database
