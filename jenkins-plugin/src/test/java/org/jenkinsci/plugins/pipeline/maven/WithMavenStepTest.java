@@ -24,16 +24,25 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
+import java.util.stream.Stream;
 
+import hudson.model.JDK;
+import hudson.tools.ToolLocationNodeProperty;
 import org.apache.commons.io.FileUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.jvnet.hudson.test.Issue;
 import org.testcontainers.containers.GenericContainer;
 
@@ -49,6 +58,7 @@ import hudson.model.Result;
 import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.slaves.DumbSlave;
 import hudson.slaves.RetentionStrategy;
+import org.testcontainers.utility.MountableFile;
 
 public class WithMavenStepTest extends AbstractIntegrationTest {
 
@@ -96,6 +106,46 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         assertFingerprintDoesNotExist(COMMONS_LANG3_FINGERPRINT);
     }
 
+    // the jdk path is configured in Dockerfile
+    private static Stream<Arguments> jdkMapProvider() {
+        return Stream.of(
+                arguments("jdk8", "/opt/java/jdk8"),
+                arguments("jdk11", "/opt/java/jdk11")
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("jdkMapProvider")
+    @Issue("JENKINS-71949")
+    public void tesWithDifferentJavasForBuild(String jdkName, String jdkPath) throws Exception {
+        loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
+        String gitRepoPath = this.gitRepoRule.toString();
+        javaGitContainerRule.copyFileToContainer(MountableFile.forHostPath(gitRepoPath), "/tmp/gitrepo");
+        javaGitContainerRule.execInContainer("chmod", "-R", "777", "/tmp/gitrepo");
+        registerAgentForContainer(javaGitContainerRule);
+        ToolLocationNodeProperty.ToolLocation toolLocation =
+                new ToolLocationNodeProperty.ToolLocation(new JDK.DescriptorImpl(), jdkName, jdkPath);
+        ToolLocationNodeProperty toolLocationNodeProperty = new ToolLocationNodeProperty(toolLocation);
+        Objects.requireNonNull(jenkinsRule.jenkins.getNode(AGENT_NAME)).getNodeProperties().add(toolLocationNodeProperty);
+
+        jenkinsRule.jenkins.getJDKs().add(new JDK(jdkName, jdkPath));
+
+        //@formatter:off
+        WorkflowRun run = runPipeline(Result.SUCCESS,
+                "node('" + AGENT_NAME + "') {\n" +
+                "  git('/tmp/gitrepo')\n" +
+                "  withMaven(jdk: '" + jdkName + "') {\n" +
+                "    sh 'mvn package'\n" +
+                "  }\n" +
+                "}");
+        //@formatter:on
+        jenkinsRule.assertLogContains("artifactsPublisher - Archive artifact target/mono-dependency-maven-project-0.1-SNAPSHOT.jar", run);
+
+        Collection<String> archives = run.pickArtifactManager().root().list("**/**.jar", "", true);
+        assertThat(archives).hasSize(1);
+        assertThat(archives.iterator().next().endsWith("mono-dependency-maven-project-0.1-SNAPSHOT.jar")).isTrue();
+    }
+
     private WorkflowRun runPipeline(Result expectedResult, String pipelineScript) throws Exception {
         WorkflowJob p = jenkinsRule.createProject(WorkflowJob.class, "project");
         p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
@@ -126,7 +176,6 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         DumbSlave agent = new DumbSlave(AGENT_NAME, SLAVE_BASE_PATH, sshLauncher);
         agent.setNumExecutors(1);
         agent.setRetentionStrategy(RetentionStrategy.INSTANCE);
-
         jenkinsRule.jenkins.addNode(agent);
     }
 
