@@ -116,6 +116,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("jdkMapProvider")
+    @Issue("JENKINS-71949")
     public void tesWithDifferentJavasForBuild(String jdkName, String jdkPath) throws Exception {
         loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
         String gitRepoPath = this.gitRepoRule.toString();
