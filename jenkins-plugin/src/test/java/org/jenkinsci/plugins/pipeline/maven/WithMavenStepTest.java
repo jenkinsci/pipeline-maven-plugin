@@ -133,7 +133,6 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         //@formatter:off
         WorkflowRun run = runPipeline(Result.SUCCESS,
                 "node('" + AGENT_NAME + "') {\n" +
-                "  sh 'ls -alrt /tmp'\n" +
                 "  git('/tmp/gitrepo')\n" +
                 "  withMaven(jdk: '" + jdkName + "') {\n" +
                 "    sh 'mvn package'\n" +
