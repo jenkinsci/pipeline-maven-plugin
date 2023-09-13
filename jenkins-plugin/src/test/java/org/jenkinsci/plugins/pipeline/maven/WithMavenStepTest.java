@@ -121,6 +121,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
         String gitRepoPath = this.gitRepoRule.toString();
         javaGitContainerRule.copyFileToContainer(MountableFile.forHostPath(gitRepoPath), "/tmp/gitrepo");
+        javaGitContainerRule.execInContainer("chmod", "-R", "777", "/tmp/gitrepo");
         registerAgentForContainer(javaGitContainerRule);
         ToolLocationNodeProperty.ToolLocation toolLocation =
                 new ToolLocationNodeProperty.ToolLocation(new JDK.DescriptorImpl(), jdkName, jdkPath);
@@ -132,7 +133,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         //@formatter:off
         WorkflowRun run = runPipeline(Result.SUCCESS,
                 "node('" + AGENT_NAME + "') {\n" +
-                "  sh 'ls -alrt /tmp/gitrepo'\n" +
+                "  sh 'ls -alrt /tmp'\n" +
                 "  git('/tmp/gitrepo')\n" +
                 "  withMaven(jdk: '" + jdkName + "') {\n" +
                 "    sh 'mvn package'\n" +
