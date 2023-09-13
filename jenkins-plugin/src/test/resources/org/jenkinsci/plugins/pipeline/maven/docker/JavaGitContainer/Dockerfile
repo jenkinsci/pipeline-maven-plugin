@@ -34,6 +34,8 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     update-locale LANG=en_US.UTF-8
 ENV LANG en_US.UTF-8
 
+COPY --from=eclipse-temurin:8u345-b01-jdk /opt/java/openjdk /opt/java/jdk8
+
 # run SSHD in the foreground with error messages to stderr
 ENTRYPOINT ["/usr/sbin/sshd", "-D", "-e"]
 
