@@ -97,9 +97,9 @@ public class ConfigurationAsCodeNeedDockerTest {
             assertThat(config.getJdbcUrl()).isEqualTo(jdbcUrl);
             assertThat(config.getDaoClass()).isEqualTo(PipelineMavenPluginPostgreSqlDao.class.getName());
 
-            // we can't really test the PipelineMavenPluginMySqlDao is used as it is plenty of layers
+            // we can't really test the PipelineMavenPluginPostgreSqlDao is used as it is plenty of layers
             // which doesn't expose the real implementation
-            assertThat(config.getDao().getClass()).isNotEqualTo(PipelineMavenPluginMySqlDao.class);
+            assertThat(config.getDao().getClass()).isNotEqualTo(PipelineMavenPluginPostgreSqlDao.class);
             assertThat(config.getDao().getClass()).isNotEqualTo(PipelineMavenPluginNullDao.class);
             assertThat(config.getDao().getClass()).isEqualTo(MonitoringPipelineMavenPluginDaoDecorator.class);
 
