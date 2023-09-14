@@ -9,11 +9,12 @@ import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.dao.MonitoringPipelineMavenPluginDaoDecorator;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao;
-import org.junit.Assume;
+import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginPostgreSqlDao;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -30,6 +31,9 @@ public class ConfigurationAsCodeNeedDockerTest {
 
     @Container
     public static MySQLContainer<?> MYSQL_DB = new MySQLContainer<>(MySQLContainer.NAME).withUsername("aUser").withPassword("aPass");
+
+    @Container
+    public static PostgreSQLContainer<?> POSTGRE_DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE).withUsername("aUser").withPassword("aPass");
 
     @Test
     public void should_support_mysql_configuration(JenkinsRule r) throws Exception {
@@ -68,6 +72,45 @@ public class ConfigurationAsCodeNeedDockerTest {
             assertThat(exported).isEqualTo(expected);
         } finally {
             MYSQL_DB.stop();
+        }
+    }
+
+    @Test
+    public void should_support_postgres_configuration(JenkinsRule r) throws Exception {
+
+        try {
+            POSTGRE_DB.start();
+            ExtensionList<CredentialsProvider> extensionList = r.jenkins.getExtensionList(CredentialsProvider.class);
+            extensionList.add(extensionList.size(), new GlobalPipelineMavenConfigTest.FakeCredentialsProvider());
+            String jdbcUrl = POSTGRE_DB.getJdbcUrl();
+
+            String yamlContent = toStringFromYamlFile(this, "configuration-as-code_postgresql.yml");
+            yamlContent = StringUtils.replace(yamlContent, "theJdbcUrl", jdbcUrl);
+
+            Path tmpYml = Files.createTempFile("pipeline-maven-plugin-test", "yml");
+            Files.write(tmpYml, yamlContent.getBytes());
+
+            ConfigurationAsCode.get().configure(singletonList(tmpYml.toFile().getAbsolutePath()));
+
+            GlobalPipelineMavenConfig config = r.jenkins.getExtensionList(GlobalPipelineMavenConfig.class).get(0);
+
+            assertThat(config.getJdbcUrl()).isEqualTo(jdbcUrl);
+            assertThat(config.getDaoClass()).isEqualTo(PipelineMavenPluginPostgreSqlDao.class.getName());
+
+            // we can't really test the PipelineMavenPluginMySqlDao is used as it is plenty of layers
+            // which doesn't expose the real implementation
+            assertThat(config.getDao().getClass()).isNotEqualTo(PipelineMavenPluginMySqlDao.class);
+            assertThat(config.getDao().getClass()).isNotEqualTo(PipelineMavenPluginNullDao.class);
+            assertThat(config.getDao().getClass()).isEqualTo(MonitoringPipelineMavenPluginDaoDecorator.class);
+
+            ConfiguratorRegistry registry = ConfiguratorRegistry.get();
+            ConfigurationContext context = new ConfigurationContext(registry);
+            String exported = toYamlString(getToolRoot(context).get("pipelineMaven"));
+            String expected = toStringFromYamlFile(this, "expected_output_postgresql.yml");
+            expected = StringUtils.replace(expected, "theJdbcUrl", jdbcUrl);
+            assertThat(exported).isEqualTo(expected);
+        } finally {
+            POSTGRE_DB.stop();
         }
     }
 

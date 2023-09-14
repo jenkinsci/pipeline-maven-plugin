@@ -85,8 +85,8 @@ public class ConfigurationAsCodeTest {
 
         GlobalPipelineMavenConfig config = r.jenkins.getExtensionList(GlobalPipelineMavenConfig.class).get(0);
 
-        assertThat(config.getJdbcUrl()).isEqualTo("jdbc:postgresql://dbserver/jenkinsdb");
-        assertThat(config.getJdbcCredentialsId()).isEqualTo("pg-creds");
+        assertThat(config.getJdbcUrl()).isEqualTo("theJdbcUrl");
+        assertThat(config.getJdbcCredentialsId()).isEqualTo("credsId");
 
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
