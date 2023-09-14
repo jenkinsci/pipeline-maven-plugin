@@ -1,5 +1,7 @@
+daoClass: "org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao"
 globalTraceability: false
-jdbcUrl: "jdbc:mysql://dbserver/jenkinsdb"
+jdbcCredentialsId: "credsId"
+jdbcUrl: "theJdbcUrl"
 properties: |
   dataSource.cachePrepStmts=true
   dataSource.prepStmtCacheSize=250

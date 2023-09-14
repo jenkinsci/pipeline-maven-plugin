@@ -55,7 +55,7 @@ public class GlobalPipelineMavenConfigTest {
 
     private static JenkinsRule j;
 
-    private static class FakeCredentialsProvider extends CredentialsProvider {
+    public static class FakeCredentialsProvider extends CredentialsProvider {
         public FakeCredentialsProvider() {
         }
 
