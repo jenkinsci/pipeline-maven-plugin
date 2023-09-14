@@ -23,12 +23,8 @@ THE SOFTWARE.
 -->
 
 <?jelly escape-by-default='true'?>
-<j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
+<j:jelly xmlns:j="jelly:core">
     <div class="alert alert-warning">
-        <form method="post" action="${rootURL}/${it.url}/act" name="${it.id}">
-                <f:submit name="yes" value="${%Configure Pipeline Maven Plugin Database}"/>
-                <f:submit name="no" value="${%Dismiss}"/>
-        </form>
-        The Pipeline Maven Plugin is currently using an embedded H2 database. A production grade database, MySQL or PostgreSQL, should be used.
+        The Pipeline Maven Plugin is currently using a jdbc url for a database but the plugin pipeline-maven-database plugin is not installed
     </div>
 </j:jelly>
