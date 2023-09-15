@@ -1,6 +1,7 @@
+daoClass: "org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginPostgreSqlDao"
 globalTraceability: false
-jdbcCredentialsId: "pg-creds"
-jdbcUrl: "jdbc:postgresql://dbserver/jenkinsdb"
+jdbcCredentialsId: "credsId"
+jdbcUrl: "theJdbcUrl"
 triggerDownstreamUponResultAborted: false
 triggerDownstreamUponResultFailure: false
 triggerDownstreamUponResultNotBuilt: false

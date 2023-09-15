@@ -13,9 +13,9 @@ import org.acegisecurity.Authentication;
 import org.jenkinsci.plugins.pipeline.maven.dao.CustomTypePipelineMavenPluginDaoDecorator;
 import org.jenkinsci.plugins.pipeline.maven.dao.MonitoringPipelineMavenPluginDaoDecorator;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
-import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginH2Dao;
-import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginMySqlDao;
-import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginPostgreSqlDao;
+import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginH2Dao;
+import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao;
+import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginPostgreSqlDao;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -55,7 +55,7 @@ public class GlobalPipelineMavenConfigTest {
 
     private static JenkinsRule j;
 
-    private static class FakeCredentialsProvider extends CredentialsProvider {
+    public static class FakeCredentialsProvider extends CredentialsProvider {
         public FakeCredentialsProvider() {
         }
 
@@ -80,6 +80,7 @@ public class GlobalPipelineMavenConfigTest {
 
     @Test
     public void shouldBuildH2Dao() throws Exception {
+        config.setDaoClass(PipelineMavenPluginH2Dao.class.getName());
         PipelineMavenPluginDao dao = config.getDao();
 
         assertThat(dao).isInstanceOf(MonitoringPipelineMavenPluginDaoDecorator.class);
@@ -91,6 +92,7 @@ public class GlobalPipelineMavenConfigTest {
 
     @Test
     public void shouldBuildMysqlDao() throws Exception {
+        config.setDaoClass(PipelineMavenPluginMySqlDao.class.getName());
         ExtensionList<CredentialsProvider> extensionList = Jenkins.getInstance().getExtensionList(CredentialsProvider.class);
         extensionList.add(extensionList.size(), new FakeCredentialsProvider());
         config.setJdbcUrl(MYSQL_DB.getJdbcUrl());
@@ -125,6 +127,7 @@ public class GlobalPipelineMavenConfigTest {
 
     @Test
     public void shouldBuildPostgresqlDao() throws Exception {
+        config.setDaoClass(PipelineMavenPluginPostgreSqlDao.class.getName());
         ExtensionList<CredentialsProvider> extensionList = Jenkins.getInstance().getExtensionList(CredentialsProvider.class);
         extensionList.add(extensionList.size(), new FakeCredentialsProvider());
         config.setJdbcUrl(POSTGRE_DB.getJdbcUrl());

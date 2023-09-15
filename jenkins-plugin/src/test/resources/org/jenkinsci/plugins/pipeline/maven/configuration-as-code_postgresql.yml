@@ -3,5 +3,6 @@ jenkins:
 
 tool:
   pipelineMaven:
-    jdbcUrl: jdbc:postgresql://dbserver/jenkinsdb
-    JdbcCredentialsId: pg-creds
+    jdbcUrl: theJdbcUrl
+    daoClass: org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginPostgreSqlDao
+    JdbcCredentialsId: credsId

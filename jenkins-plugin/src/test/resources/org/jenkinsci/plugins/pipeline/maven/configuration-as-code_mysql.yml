@@ -3,7 +3,9 @@ jenkins:
 
 tool:
   pipelineMaven:
-    jdbcUrl: jdbc:mysql://dbserver/jenkinsdb
+    jdbcUrl: theJdbcUrl
+    daoClass: org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao
+    jdbcCredentialsId: credsId
     properties: |
       dataSource.cachePrepStmts=true
       dataSource.prepStmtCacheSize=250

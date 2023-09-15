@@ -80,30 +80,13 @@ public class ConfigurationAsCodeTest {
     }
 
     @Test
-    public void should_support_mysql_configuration(JenkinsRule r) throws Exception {
-        ConfigurationAsCode.get().configure(singletonList(getClass().getResource("configuration-as-code_mysql.yml").toExternalForm()));
-
-        GlobalPipelineMavenConfig config = r.jenkins.getExtensionList(GlobalPipelineMavenConfig.class).get(0);
-
-        assertThat(config.getJdbcUrl()).isEqualTo("jdbc:mysql://dbserver/jenkinsdb");
-        assertThat(config.getProperties()).isEqualTo("dataSource.cachePrepStmts=true\ndataSource.prepStmtCacheSize=250\n");
-
-        ConfiguratorRegistry registry = ConfiguratorRegistry.get();
-        ConfigurationContext context = new ConfigurationContext(registry);
-        String exported = toYamlString(getToolRoot(context).get("pipelineMaven"));
-        String expected = toStringFromYamlFile(this, "expected_output_mysql.yml");
-
-        assertThat(exported).isEqualTo(expected);
-    }
-
-    @Test
     public void should_support_postgresql_configuration(JenkinsRule r) throws Exception {
         ConfigurationAsCode.get().configure(singletonList(getClass().getResource("configuration-as-code_postgresql.yml").toExternalForm()));
 
         GlobalPipelineMavenConfig config = r.jenkins.getExtensionList(GlobalPipelineMavenConfig.class).get(0);
 
-        assertThat(config.getJdbcUrl()).isEqualTo("jdbc:postgresql://dbserver/jenkinsdb");
-        assertThat(config.getJdbcCredentialsId()).isEqualTo("pg-creds");
+        assertThat(config.getJdbcUrl()).isEqualTo("theJdbcUrl");
+        assertThat(config.getJdbcCredentialsId()).isEqualTo("credsId");
 
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);
