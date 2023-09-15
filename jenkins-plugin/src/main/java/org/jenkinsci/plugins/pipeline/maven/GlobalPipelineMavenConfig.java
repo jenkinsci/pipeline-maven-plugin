@@ -238,8 +238,8 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
         return true;
     }
 
-    boolean isDaoInitialized() {
-        return dao != null;
+    public String getDaoPrettyString() {
+        return dao != null ? dao.toPrettyString() : "Dao Not Ready yet";
     }
 
     @NonNull
