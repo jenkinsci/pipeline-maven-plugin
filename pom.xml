@@ -110,6 +110,8 @@
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.8.8</maven.version>
     <plexus-utils.version>3.5.1</plexus-utils.version>
+    <plugin-dockerfile.version>1.4.13</plugin-dockerfile.version>
+    <plugin-exec.version>3.1.0</plugin-exec.version>
     <slf4j.version>2.0.9</slf4j.version>
     <testcontainers.version>1.19.0</testcontainers.version>
   </properties>
@@ -230,6 +232,16 @@
             <sortPlugins>groupId,artifactId</sortPlugins>
             <sortProperties>true</sortProperties>
           </configuration>
+        </plugin>
+        <plugin>
+          <groupId>com.spotify</groupId>
+          <artifactId>dockerfile-maven-plugin</artifactId>
+          <version>${plugin-dockerfile.version}</version>
+        </plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>${plugin-exec.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
