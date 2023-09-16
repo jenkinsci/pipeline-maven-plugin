@@ -88,7 +88,11 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
             String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
-                "        sh 'mvn package verify'\n" +
+                "        if (isUnix()) {\n" +
+                "            sh 'mvn package verify'\n" +
+                "        } else {\n" +
+                "            bat 'mvn package verify'\n" +
+                "        }\n" +
                 "    }\n" +
                 "}";
             //@formatter:on
@@ -150,7 +154,11 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
             String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven(options:[" + symbol + "(disabled: true)]) {\n" +
-                "        sh 'mvn package verify'\n" +
+                "        if (isUnix()) {\n" +
+                "            sh 'mvn package verify'\n" +
+                "        } else {\n" +
+                "            bat 'mvn package verify'\n" +
+                "        }\n" +
                 "    }\n" +
                 "}";
             //@formatter:on

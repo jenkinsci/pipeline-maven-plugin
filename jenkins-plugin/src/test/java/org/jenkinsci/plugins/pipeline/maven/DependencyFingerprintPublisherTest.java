@@ -32,7 +32,11 @@ public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest 
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven(options:[dependenciesFingerprintPublisher(includeReleaseVersions:true)]) {\n" +
-            "        sh 'mvn package'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on

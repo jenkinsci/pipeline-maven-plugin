@@ -39,7 +39,11 @@ public class MaskPasswordsConsoleLogFilterTest extends AbstractIntegrationTest {
         //@formatter:off
         String pipelineScript = "node() {\n" +
             "    withMaven(traceability: true, globalMavenSettingsConfig: 'maven-global-config-test') {\n" +
-            "        sh 'cat \"$GLOBAL_MVN_SETTINGS\"'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'cat \"$GLOBAL_MVN_SETTINGS\"'\n" +
+            "        } else {\n" +
+            "            bat 'type \"%GLOBAL_MVN_SETTINGS%\"'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
 

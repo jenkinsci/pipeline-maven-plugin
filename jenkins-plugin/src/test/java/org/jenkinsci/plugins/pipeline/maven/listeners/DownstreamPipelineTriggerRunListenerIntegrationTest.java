@@ -7,7 +7,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import hudson.ExtensionList;
 import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
@@ -22,6 +21,7 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import hudson.ExtensionList;
 import hudson.model.Result;
 
 /**
@@ -38,8 +38,8 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
     @BeforeEach
     public void setup() throws Exception {
         ExtensionList.lookupSingleton(GlobalPipelineMavenConfig.class).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
-        String jdbcUrl = "jdbc:h2:file:" + new File("target", getClass().getName() + "-h2").getAbsolutePath() + ";" +
-                "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
+        String jdbcUrl = "jdbc:h2:file:" + new File("target", getClass().getName() + "-h2").getAbsolutePath() + ";"
+                + "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
         ExtensionList.lookupSingleton(GlobalPipelineMavenConfig.class).setJdbcUrl(jdbcUrl);
         List<MavenPublisher> publisherOptions = GlobalPipelineMavenConfig.get().getPublisherOptions();
         if (publisherOptions == null) {
@@ -67,7 +67,11 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn install'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on

@@ -64,8 +64,6 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
             listener = new StreamBuildListener((OutputStream) System.err);
         }
         FilePath workspace = context.get(FilePath.class);
-        final String fileSeparatorOnAgent = XmlUtils.getFileSeparatorOnRemote(workspace);
-
         List<MavenArtifact> join = XmlUtils.listGeneratedArtifacts(mavenSpyLogsElt, true);
 
         Map<String, String> artifactsToArchive = new HashMap<>(); // artifactPathInArchiveZone -> artifactPathInWorkspace
@@ -88,16 +86,16 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                 }
 
                 String artifactPathInArchiveZone =
-                        mavenArtifact.getGroupId().replace(".", fileSeparatorOnAgent) + fileSeparatorOnAgent +
-                                mavenArtifact.getArtifactId() + fileSeparatorOnAgent +
-                                mavenArtifact.getBaseVersion() + fileSeparatorOnAgent +
+                        mavenArtifact.getGroupId().replace(".", "/") + "/" +
+                                mavenArtifact.getArtifactId() + "/" +
+                                mavenArtifact.getBaseVersion() + "/" +
                                 mavenArtifact.getFileNameWithBaseVersion();
 
-                String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.getFile(), workspace);
+                String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.getFile(), workspace).replace('\\', '/');
                 if (StringUtils.isEmpty(artifactPathInWorkspace)) {
                     listener.error("[withMaven] artifactsPublisher - Invalid path in the workspace (" + workspace.getRemote() + ") for artifact " + mavenArtifact);
                 } else if (Objects.equals(artifactPathInArchiveZone, mavenArtifact.getFile())) { // troubleshoot JENKINS-44088
-                    listener.error("[withMaven] artifactsPublisher - Failed to relativize '" + mavenArtifact.getFile() + "' in workspace '" + workspace.getRemote() + "' with file separator '" + fileSeparatorOnAgent + "'");
+                    listener.error("[withMaven] artifactsPublisher - Failed to relativize '" + mavenArtifact.getFile() + "' in workspace '" + workspace.getRemote() + "'");
                 } else {
                     FilePath artifactFilePath = new FilePath(workspace, artifactPathInWorkspace);
                     if (artifactFilePath.exists()) {
