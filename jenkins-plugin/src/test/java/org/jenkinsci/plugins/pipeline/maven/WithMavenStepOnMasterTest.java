@@ -24,6 +24,7 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -55,6 +56,7 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.jvnet.hudson.test.Issue;
 
 import com.cloudbees.hudson.plugins.folder.Folder;
@@ -645,6 +647,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX)
     public void maven_global_settings_path_defined_through_jenkins_global_config() throws Exception {
 
         File mavenGlobalSettingsFile = new File(jenkinsRule.jenkins.getRootDir(), "maven-global-settings.xml");
@@ -700,6 +703,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX)
     public void maven_global_settings_defined_through_jenkins_global_config_and_config_file_provider() throws Exception {
 
         //@formatter:off
@@ -760,6 +764,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX)
     public void maven_global_settings_defined_through_folder_config_and_config_file_provider() throws Exception {
 
         //@formatter:off
@@ -797,6 +802,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
+            "            bat 'echo %cd%'\n" +
+            "            bat 'dir'\n" +
+            "            bat 'set'\n" +
             "            bat 'mvn help:effective-settings'\n" +
             "        }\n" +
             "    }\n" +
@@ -827,6 +835,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX)
     public void maven_global_settings_path_defined_through_pipeline_attribute() throws Exception {
 
         //@formatter:off
@@ -874,6 +883,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
     @Issue("JENKINS-42565")
     @Test
+    @EnabledOnOs(LINUX)
     public void maven_settings_path_defined_through_pipeline_attribute() throws Exception {
 
         //@formatter:off
@@ -920,6 +930,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX)
     public void maven_settings_defined_through_jenkins_global_config() throws Exception {
 
         File mavenSettingsFile = new File(jenkinsRule.jenkins.getRootDir(), "maven-settings.xml");
@@ -975,6 +986,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX)
     public void maven_settings_defined_through_jenkins_global_config_and_config_file_provider() throws Exception {
 
         //@formatter:off
@@ -1031,6 +1043,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX)
     public void maven_settings_defined_through_folder_config_and_config_file_provider() throws Exception {
 
         //@formatter:off
@@ -1097,6 +1110,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX)
     public void maven_settings_defined_through_pipeline_attribute_and_config_file_provider() throws Exception {
 
         //@formatter:off
