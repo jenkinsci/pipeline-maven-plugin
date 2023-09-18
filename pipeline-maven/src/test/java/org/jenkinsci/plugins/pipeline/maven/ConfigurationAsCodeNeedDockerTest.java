@@ -1,15 +1,20 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import com.cloudbees.plugins.credentials.CredentialsProvider;
-import hudson.ExtensionList;
-import io.jenkins.plugins.casc.ConfigurationAsCode;
-import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.ConfiguratorRegistry;
+import static io.jenkins.plugins.casc.misc.Util.getToolRoot;
+import static io.jenkins.plugins.casc.misc.Util.toStringFromYamlFile;
+import static io.jenkins.plugins.casc.misc.Util.toYamlString;
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.dao.MonitoringPipelineMavenPluginDaoDecorator;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginPostgreSqlDao;
+import org.jenkinsci.plugins.pipeline.maven.util.FakeCredentialsProvider;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
@@ -18,12 +23,12 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
 
-import static io.jenkins.plugins.casc.misc.Util.*;
-import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
+import hudson.ExtensionList;
+import io.jenkins.plugins.casc.ConfigurationAsCode;
+import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.ConfiguratorRegistry;
 
 @WithJenkins
 @Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
@@ -41,7 +46,7 @@ public class ConfigurationAsCodeNeedDockerTest {
         try {
             MYSQL_DB.start();
             ExtensionList<CredentialsProvider> extensionList = r.jenkins.getExtensionList(CredentialsProvider.class);
-            extensionList.add(extensionList.size(), new GlobalPipelineMavenConfigTest.FakeCredentialsProvider());
+            extensionList.add(extensionList.size(), new FakeCredentialsProvider("credsId", "aUser", "aPass", false));
             String jdbcUrl = MYSQL_DB.getJdbcUrl();
 
             String yamlContent = toStringFromYamlFile(this, "configuration-as-code_mysql.yml");
@@ -58,7 +63,8 @@ public class ConfigurationAsCodeNeedDockerTest {
             assertThat(config.getProperties()).isEqualTo("dataSource.cachePrepStmts=true\ndataSource.prepStmtCacheSize=250\n");
             assertThat(config.getDaoClass()).isEqualTo(PipelineMavenPluginMySqlDao.class.getName());
 
-            // we can't really test the PipelineMavenPluginMySqlDao is used as it is plenty of layers
+            // we can't really test the PipelineMavenPluginMySqlDao is used as it is plenty
+            // of layers
             // which doesn't expose the real implementation
             assertThat(config.getDao().getClass()).isNotEqualTo(PipelineMavenPluginMySqlDao.class);
             assertThat(config.getDao().getClass()).isNotEqualTo(PipelineMavenPluginNullDao.class);
@@ -81,7 +87,7 @@ public class ConfigurationAsCodeNeedDockerTest {
         try {
             POSTGRE_DB.start();
             ExtensionList<CredentialsProvider> extensionList = r.jenkins.getExtensionList(CredentialsProvider.class);
-            extensionList.add(extensionList.size(), new GlobalPipelineMavenConfigTest.FakeCredentialsProvider());
+            extensionList.add(extensionList.size(), new FakeCredentialsProvider("credsId", "aUser", "aPass", false));
             String jdbcUrl = POSTGRE_DB.getJdbcUrl();
 
             String yamlContent = toStringFromYamlFile(this, "configuration-as-code_postgresql.yml");
@@ -97,7 +103,8 @@ public class ConfigurationAsCodeNeedDockerTest {
             assertThat(config.getJdbcUrl()).isEqualTo(jdbcUrl);
             assertThat(config.getDaoClass()).isEqualTo(PipelineMavenPluginPostgreSqlDao.class.getName());
 
-            // we can't really test the PipelineMavenPluginPostgreSqlDao is used as it is plenty of layers
+            // we can't really test the PipelineMavenPluginPostgreSqlDao is used as it is
+            // plenty of layers
             // which doesn't expose the real implementation
             assertThat(config.getDao().getClass()).isNotEqualTo(PipelineMavenPluginPostgreSqlDao.class);
             assertThat(config.getDao().getClass()).isNotEqualTo(PipelineMavenPluginNullDao.class);

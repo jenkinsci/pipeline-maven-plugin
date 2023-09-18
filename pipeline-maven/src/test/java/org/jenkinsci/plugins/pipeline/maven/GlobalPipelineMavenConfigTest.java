@@ -1,21 +1,18 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import static com.cloudbees.plugins.credentials.CredentialsScope.GLOBAL;
-import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
-import java.util.List;
 
-import org.acegisecurity.Authentication;
 import org.jenkinsci.plugins.pipeline.maven.dao.CustomTypePipelineMavenPluginDaoDecorator;
 import org.jenkinsci.plugins.pipeline.maven.dao.MonitoringPipelineMavenPluginDaoDecorator;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginPostgreSqlDao;
+import org.jenkinsci.plugins.pipeline.maven.util.FakeCredentialsProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -25,17 +22,13 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.cloudbees.plugins.credentials.domains.DomainRequirement;
-import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import com.mysql.cj.conf.RuntimeProperty;
 import com.mysql.cj.jdbc.ConnectionImpl;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariProxyConnection;
 
 import hudson.ExtensionList;
-import hudson.model.ItemGroup;
 import jenkins.model.Jenkins;
 
 @Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
@@ -55,27 +48,6 @@ public class GlobalPipelineMavenConfigTest {
 
     private static JenkinsRule j;
 
-    public static class FakeCredentialsProvider extends CredentialsProvider {
-        public FakeCredentialsProvider() {
-        }
-
-        @Override
-        public boolean isEnabled(Object context) {
-            return true;
-        }
-
-        @Override
-        public <C extends Credentials> List<C> getCredentials(Class<C> type, ItemGroup itemGroup, Authentication authentication,
-                List<DomainRequirement> domainRequirements) {
-            return (List<C>) asList(new UsernamePasswordCredentialsImpl(GLOBAL, "credsId", "", "aUser", "aPass"));
-        }
-
-        @Override
-        public <C extends Credentials> List<C> getCredentials(Class<C> type, ItemGroup itemGroup, Authentication authentication) {
-            return getCredentials(type, itemGroup, authentication, null);
-        }
-    }
-
     private GlobalPipelineMavenConfig config = new GlobalPipelineMavenConfig();
 
     @Test
@@ -94,7 +66,7 @@ public class GlobalPipelineMavenConfigTest {
     public void shouldBuildMysqlDao() throws Exception {
         config.setDaoClass(PipelineMavenPluginMySqlDao.class.getName());
         ExtensionList<CredentialsProvider> extensionList = Jenkins.getInstance().getExtensionList(CredentialsProvider.class);
-        extensionList.add(extensionList.size(), new FakeCredentialsProvider());
+        extensionList.add(extensionList.size(), new FakeCredentialsProvider("credsId", "aUser", "aPass", false));
         config.setJdbcUrl(MYSQL_DB.getJdbcUrl());
         config.setJdbcCredentialsId("credsId");
         config.setProperties("maxLifetime=42000");
@@ -129,7 +101,7 @@ public class GlobalPipelineMavenConfigTest {
     public void shouldBuildPostgresqlDao() throws Exception {
         config.setDaoClass(PipelineMavenPluginPostgreSqlDao.class.getName());
         ExtensionList<CredentialsProvider> extensionList = Jenkins.getInstance().getExtensionList(CredentialsProvider.class);
-        extensionList.add(extensionList.size(), new FakeCredentialsProvider());
+        extensionList.add(extensionList.size(), new FakeCredentialsProvider("credsId", "aUser", "aPass", false));
         config.setJdbcUrl(POSTGRE_DB.getJdbcUrl());
         config.setJdbcCredentialsId("credsId");
 
