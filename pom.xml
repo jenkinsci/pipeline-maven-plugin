@@ -74,8 +74,8 @@
   <modules>
     <module>pipeline-maven-api</module>
     <module>pipeline-maven-database</module>
-    <module>maven-spy</module>
-    <module>jenkins-plugin</module>
+    <module>pipeline-maven-spy</module>
+    <module>pipeline-maven</module>
   </modules>
 
   <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
