@@ -458,7 +458,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @EnabledOnOs(OS.LINUX)
+    @EnabledOnOs(OS.LINUX) // Docker does not work on Windows 2019 servers CI agents
     public void verify_docker_downstream_simple_pipeline_trigger() throws Exception {
         System.out.println("gitRepoRule: " + gitRepoRule);
         loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_docker_dependency_project/");

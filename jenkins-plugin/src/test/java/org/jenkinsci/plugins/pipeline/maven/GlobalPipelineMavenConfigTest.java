@@ -38,7 +38,7 @@ import hudson.ExtensionList;
 import hudson.model.ItemGroup;
 import jenkins.model.Jenkins;
 
-@Testcontainers(disabledWithoutDocker = true)
+@Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
 @WithJenkins
 public class GlobalPipelineMavenConfigTest {
 

@@ -61,7 +61,7 @@ import hudson.slaves.DumbSlave;
 import hudson.slaves.RetentionStrategy;
 import hudson.tools.ToolLocationNodeProperty;
 
-@Testcontainers(disabledWithoutDocker = true)
+@Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
 public class WithMavenStepTest extends AbstractIntegrationTest {
 
     private static final String SSH_CREDENTIALS_ID = "test";
