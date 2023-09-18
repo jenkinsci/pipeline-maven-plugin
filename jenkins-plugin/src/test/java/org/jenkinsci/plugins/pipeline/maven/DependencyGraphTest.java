@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
-import hudson.ExtensionList;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
@@ -23,7 +22,10 @@ import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 
+import hudson.ExtensionList;
 import hudson.model.Cause;
 import hudson.model.CauseAction;
 import hudson.model.Result;
@@ -43,8 +45,8 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
     @BeforeEach
     public void setup() throws Exception {
         ExtensionList.lookupSingleton(GlobalPipelineMavenConfig.class).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
-        String jdbcUrl = "jdbc:h2:file:" + new File("target", getClass().getName() + "-h2").getAbsolutePath() + ";" +
-                "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
+        String jdbcUrl = "jdbc:h2:file:" + new File("target", getClass().getName() + "-h2").getAbsolutePath() + ";"
+                + "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
         ExtensionList.lookupSingleton(GlobalPipelineMavenConfig.class).setJdbcUrl(jdbcUrl);
         downstreamArtifactRepoRule = new GitSampleRepoRule();
         runBeforeMethod(downstreamArtifactRepoRule);
@@ -79,13 +81,21 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         String mavenJarPipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn install'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         String mavenWarPipelineScript = "node() {\n" +
             "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn install'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -130,7 +140,11 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         String script = "node() {\n" +
             "    checkout scm\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn install'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -196,7 +210,11 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn package'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -242,7 +260,11 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn package'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -274,13 +296,21 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         String mavenParentPipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn install'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         String mavenJarPipelineScript = "node() {\n" +
             "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn install'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -323,13 +353,21 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         String mavenJarPipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn install'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         String mavenWarPipelineScript = "node() {\n" +
             "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn install'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -373,13 +411,21 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         String mavenNbmDependencyPipelineScript = "node() {\n"
             + "    git($/" + gitRepoRule.toString() + "/$)\n"
             + "    withMaven() {\n"
-            + "        sh 'mvn install'\n"
+            + "        if (isUnix()) {\n"
+            + "            sh 'mvn install'\n"
+            + "        } else {\n"
+            + "            bat 'mvn install'\n"
+            + "        }\n"
             + "    }\n"
             + "}";
         String mavenNbmBasePipelineScript = "node() {\n"
             + "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n"
             + "    withMaven() {\n"
-            + "        sh 'mvn install'\n"
+            + "        if (isUnix()) {\n"
+            + "            sh 'mvn install'\n"
+            + "        } else {\n"
+            + "            bat 'mvn install'\n"
+            + "        }\n"
             + "    }\n"
             + "}";
         //@formatter:on
@@ -412,6 +458,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(OS.LINUX) // Docker does not work on Windows 2019 servers CI agents
     public void verify_docker_downstream_simple_pipeline_trigger() throws Exception {
         System.out.println("gitRepoRule: " + gitRepoRule);
         loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_docker_dependency_project/");
@@ -423,13 +470,21 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         String mavenDockerDependencyPipelineScript = "node() {\n"
             + "    git($/" + gitRepoRule.toString() + "/$)\n"
             + "    withMaven() {\n"
-            + "        sh 'mvn install'\n"
+            + "        if (isUnix()) {\n"
+            + "            sh 'mvn install'\n"
+            + "        } else {\n"
+            + "            bat 'mvn install'\n"
+            + "        }\n"
             + "    }\n"
             + "}";
         String mavenDockerBasePipelineScript = "node() {\n"
             + "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n"
             + "    withMaven() {\n"
-            + "        sh 'mvn install'\n"
+            + "        if (isUnix()) {\n"
+            + "            sh 'mvn install'\n"
+            + "        } else {\n"
+            + "            bat 'mvn install'\n"
+            + "        }\n"
             + "    }\n"
             + "}";
         //@formatter:on
@@ -477,13 +532,21 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         String mavenDeployFileDependencyPipelineScript = "node() {\n"
             + "    git($/" + gitRepoRule.toString() + "/$)\n"
             + "    withMaven() {\n"
-            + "        sh 'mvn install deploy:deploy-file@deploy-file'\n"
+            + "        if (isUnix()) {\n"
+            + "            sh 'mvn install deploy:deploy-file@deploy-file'\n"
+            + "        } else {\n"
+            + "            bat 'mvn install deploy:deploy-file@deploy-file'\n"
+            + "        }\n"
             + "    }\n"
             + "}";
         String mavenDeployFileBasePipelineScript = "node() {\n"
             + "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n"
             + "    withMaven() {\n"
-            + "        sh 'mvn install'\n"
+            + "        if (isUnix()) {\n"
+            + "            sh 'mvn install'\n"
+            + "        } else {\n"
+            + "            bat 'mvn install'\n"
+            + "        }\n"
             + "    }\n"
             + "}";
         //@formatter:on

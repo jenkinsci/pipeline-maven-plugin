@@ -23,10 +23,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.images.builder.ImageFromDockerfile;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 import hudson.FilePath;
 import hudson.model.Fingerprint;
@@ -42,22 +38,8 @@ import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-@Testcontainers(disabledWithoutDocker = true)
 @WithJenkins
 public abstract class AbstractIntegrationTest {
-
-    @Container
-    public GenericContainer<?> javaGitContainerRule = new GenericContainer<>(new ImageFromDockerfile("jenkins/pipeline-maven-java-git", true)
-            .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/Dockerfile")).withExposedPorts(22);
-
-    @Container
-    public GenericContainer<?> nonMavenContainerRule = new GenericContainer<>(new ImageFromDockerfile("jenkins/pipeline-maven-non-maven", true)
-            .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/NonMavenJavaContainer/Dockerfile")).withExposedPorts(22);
-
-    @Container
-    public GenericContainer<?> mavenWithMavenHomeContainerRule = new GenericContainer<>(new ImageFromDockerfile("jenkins/pipeline-maven-java", true)
-            .withFileFromClasspath("Dockerfile", "org/jenkinsci/plugins/pipeline/maven/docker/MavenWithMavenHomeJavaContainer/Dockerfile"))
-            .withExposedPorts(22);
 
     public static BuildWatcher buildWatcher;
 

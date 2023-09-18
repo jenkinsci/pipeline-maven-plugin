@@ -28,13 +28,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+@Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
 public class JavaGitContainerTest extends AbstractIntegrationTest {
+
+    @Container
+    public GenericContainer<?> containerRule = new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22);
 
     @Test
     public void smokes() throws Exception {
-        assertThat(javaGitContainerRule.execInContainer("java", "-version").getStderr()).contains("openjdk version \"11");
-        assertThat(javaGitContainerRule.execInContainer("git", "--version").getStdout()).contains("git version 2.");
+        assertThat(containerRule.execInContainer("java", "-version").getStderr()).contains("openjdk version \"11");
+        assertThat(containerRule.execInContainer("git", "--version").getStdout()).contains("git version 2.");
     }
 
 }

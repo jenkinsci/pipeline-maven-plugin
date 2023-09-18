@@ -1,7 +1,3 @@
-#
-# Runs sshd and allow the 'test' user to login
-#
-
 FROM ubuntu:bionic
 
 # install SSHD

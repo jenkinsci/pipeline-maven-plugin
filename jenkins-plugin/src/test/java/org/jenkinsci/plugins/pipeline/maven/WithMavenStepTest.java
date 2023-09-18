@@ -33,8 +33,6 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import hudson.model.JDK;
-import hudson.tools.ToolLocationNodeProperty;
 import org.apache.commons.io.FileUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -45,6 +43,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.jvnet.hudson.test.Issue;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.MountableFile;
 
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsScope;
@@ -54,12 +54,14 @@ import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 
 import hudson.model.Fingerprint;
 import hudson.model.FingerprintMap;
+import hudson.model.JDK;
 import hudson.model.Result;
 import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.slaves.DumbSlave;
 import hudson.slaves.RetentionStrategy;
-import org.testcontainers.utility.MountableFile;
+import hudson.tools.ToolLocationNodeProperty;
 
+@Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
 public class WithMavenStepTest extends AbstractIntegrationTest {
 
     private static final String SSH_CREDENTIALS_ID = "test";
@@ -70,80 +72,85 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     @Issue("SECURITY-441")
     @Test
     public void testMavenBuildOnRemoteAgentWithSettingsFileOnMasterFails() throws Exception {
-        registerAgentForContainer(javaGitContainerRule);
+        try (GenericContainer<?> mavenContainerRule = new GenericContainer<>("localhost/pipeline-maven/java-maven-git").withExposedPorts(22)) {
+            mavenContainerRule.start();
+            registerAgentForContainer(mavenContainerRule);
 
-        File onMaster = new File(jenkinsRule.jenkins.getRootDir(), "onmaster");
-        String secret = "secret content on master";
-        FileUtils.writeStringToFile(onMaster, secret, StandardCharsets.UTF_8);
+            File onMaster = new File(jenkinsRule.jenkins.getRootDir(), "onmaster");
+            String secret = "secret content on master";
+            FileUtils.writeStringToFile(onMaster, secret, StandardCharsets.UTF_8);
 
-        //@formatter:off
-        WorkflowRun run = runPipeline(Result.FAILURE, "" +
-            "node('remote') {\n" +
-            "  withMaven(mavenSettingsFilePath: '" + onMaster + "') {\n" +
-            "    echo readFile(MVN_SETTINGS)\n" +
-            "  }\n" +
-            "}");
-        //@formatter:on
+            //@formatter:off
+            WorkflowRun run = runPipeline(Result.FAILURE, "" +
+                "node('remote') {\n" +
+                "  withMaven(mavenSettingsFilePath: '" + onMaster + "') {\n" +
+                "    echo readFile(MVN_SETTINGS)\n" +
+                "  }\n" +
+                "}");
+            //@formatter:on
 
-        jenkinsRule.assertLogNotContains(secret, run);
+            jenkinsRule.assertLogNotContains(secret, run);
+        }
     }
 
     @Test
     public void testDisableAllPublishers() throws Exception {
-        registerAgentForContainer(javaGitContainerRule);
-        loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
+        try (GenericContainer<?> mavenContainerRule = new GenericContainer<>("localhost/pipeline-maven/java-maven-git").withExposedPorts(22)) {
+            mavenContainerRule.start();
+            registerAgentForContainer(mavenContainerRule);
+            loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
 
-        //@formatter:off
-        runPipeline(Result.SUCCESS, "" +
-            "node() {\n" +
-            "  git($/" + gitRepoRule.toString() + "/$)\n" +
-            "  withMaven(publisherStrategy: 'EXPLICIT') {\n" +
-            "    sh 'mvn package'\n" +
-            "  }\n" +
-            "}");
-        //@formatter:on
+            //@formatter:off
+            runPipeline(Result.SUCCESS, "" +
+                "node() {\n" +
+                "  git($/" + gitRepoRule.toString() + "/$)\n" +
+                "  withMaven(publisherStrategy: 'EXPLICIT') {\n" +
+                "    sh 'mvn package'\n" +
+                "  }\n" +
+                "}");
+            //@formatter:on
 
-        assertFingerprintDoesNotExist(COMMONS_LANG3_FINGERPRINT);
+            assertFingerprintDoesNotExist(COMMONS_LANG3_FINGERPRINT);
+        }
     }
 
     // the jdk path is configured in Dockerfile
     private static Stream<Arguments> jdkMapProvider() {
-        return Stream.of(
-                arguments("jdk8", "/opt/java/jdk8"),
-                arguments("jdk11", "/opt/java/jdk11")
-        );
+        return Stream.of(arguments("jdk8", "/opt/java/jdk8"), arguments("jdk11", "/opt/java/jdk11"));
     }
 
     @ParameterizedTest
     @MethodSource("jdkMapProvider")
     @Issue("JENKINS-71949")
     public void tesWithDifferentJavasForBuild(String jdkName, String jdkPath) throws Exception {
-        loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
-        String gitRepoPath = this.gitRepoRule.toString();
-        javaGitContainerRule.copyFileToContainer(MountableFile.forHostPath(gitRepoPath), "/tmp/gitrepo");
-        javaGitContainerRule.execInContainer("chmod", "-R", "777", "/tmp/gitrepo");
-        registerAgentForContainer(javaGitContainerRule);
-        ToolLocationNodeProperty.ToolLocation toolLocation =
-                new ToolLocationNodeProperty.ToolLocation(new JDK.DescriptorImpl(), jdkName, jdkPath);
-        ToolLocationNodeProperty toolLocationNodeProperty = new ToolLocationNodeProperty(toolLocation);
-        Objects.requireNonNull(jenkinsRule.jenkins.getNode(AGENT_NAME)).getNodeProperties().add(toolLocationNodeProperty);
+        try (GenericContainer<?> javasContainerRule = new GenericContainer<>("localhost/pipeline-maven/javas").withExposedPorts(22)) {
+            javasContainerRule.start();
+            loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
+            String gitRepoPath = this.gitRepoRule.toString();
+            javasContainerRule.copyFileToContainer(MountableFile.forHostPath(gitRepoPath), "/tmp/gitrepo");
+            javasContainerRule.execInContainer("chmod", "-R", "777", "/tmp/gitrepo");
+            registerAgentForContainer(javasContainerRule);
+            ToolLocationNodeProperty.ToolLocation toolLocation = new ToolLocationNodeProperty.ToolLocation(new JDK.DescriptorImpl(), jdkName, jdkPath);
+            ToolLocationNodeProperty toolLocationNodeProperty = new ToolLocationNodeProperty(toolLocation);
+            Objects.requireNonNull(jenkinsRule.jenkins.getNode(AGENT_NAME)).getNodeProperties().add(toolLocationNodeProperty);
 
-        jenkinsRule.jenkins.getJDKs().add(new JDK(jdkName, jdkPath));
+            jenkinsRule.jenkins.getJDKs().add(new JDK(jdkName, jdkPath));
 
-        //@formatter:off
-        WorkflowRun run = runPipeline(Result.SUCCESS,
+            //@formatter:off
+            WorkflowRun run = runPipeline(Result.SUCCESS,
                 "node('" + AGENT_NAME + "') {\n" +
                 "  git('/tmp/gitrepo')\n" +
                 "  withMaven(jdk: '" + jdkName + "') {\n" +
                 "    sh 'mvn package'\n" +
                 "  }\n" +
                 "}");
-        //@formatter:on
-        jenkinsRule.assertLogContains("artifactsPublisher - Archive artifact target/mono-dependency-maven-project-0.1-SNAPSHOT.jar", run);
+            //@formatter:on
+            jenkinsRule.assertLogContains("artifactsPublisher - Archive artifact target/mono-dependency-maven-project-0.1-SNAPSHOT.jar", run);
 
-        Collection<String> archives = run.pickArtifactManager().root().list("**/**.jar", "", true);
-        assertThat(archives).hasSize(1);
-        assertThat(archives.iterator().next().endsWith("mono-dependency-maven-project-0.1-SNAPSHOT.jar")).isTrue();
+            Collection<String> archives = run.pickArtifactManager().root().list("**/**.jar", "", true);
+            assertThat(archives).hasSize(1);
+            assertThat(archives.iterator().next().endsWith("mono-dependency-maven-project-0.1-SNAPSHOT.jar")).isTrue();
+        }
     }
 
     private WorkflowRun runPipeline(Result expectedResult, String pipelineScript) throws Exception {

@@ -37,7 +37,7 @@ import com.zaxxer.hikari.HikariDataSource;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-@Testcontainers(disabledWithoutDocker = true)
+@Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
 public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
 
     @Container

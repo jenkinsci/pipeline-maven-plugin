@@ -24,6 +24,7 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -55,6 +56,7 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.jvnet.hudson.test.Issue;
 
 import com.cloudbees.hudson.plugins.folder.Folder;
@@ -98,7 +100,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
-            "        sh 'mvn package'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@// @formatter:on
@@ -127,7 +133,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven(maven: 'install-does-not-exist') {\n" +
-            "        sh 'mvn package'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -146,7 +156,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn package verify'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package verify'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package verify'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -209,7 +223,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn package verify'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package verify'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package verify'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@// @formatter:on
@@ -236,7 +254,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven(traceability: false) {\n" +
-            "        sh 'mvn package verify'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package verify'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package verify'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -259,7 +281,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven(traceability: true) {\n" +
-            "        sh 'mvn package verify'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package verify'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package verify'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -319,7 +345,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven(traceability: true) {\n" +
-            "        sh 'unset MAVEN_ARGS; mvn help:effective-settings'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'unset MAVEN_ARGS; mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'set MAVEN_ARGS= && mvn help:effective-settings'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
 
@@ -417,8 +447,18 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
             for (Boolean disabled : Arrays.asList(Boolean.TRUE, Boolean.FALSE)) {
-                String pipelineScript = "node() {\n" + "    git($/" + gitRepoRule.toString() + "/$)\n" + "    withMaven(options:[" + symbol + "(disabled:"
-                        + disabled + ")]) {\n" + "        sh 'mvn package verify'\n" + "    }\n" + "}";
+                //@formatter:off
+                String pipelineScript = "node() {\n" +
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven(options:[" + symbol + "(disabled:" + disabled + ")]) {\n" +
+                "        if (isUnix()) {\n" +
+                "            sh 'mvn package verify'\n" +
+                "        } else {\n" +
+                "            bat 'mvn package verify'\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+                //@formatter:on
 
                 WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-" + symbol + "-publisher-disabled-" + disabled);
                 pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
@@ -452,11 +492,15 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven(options:[openTasksPublisher(" +
-            "       disabled:false, " +
-            "       pattern:'src/main/java', excludePattern:'a/path'," +
-            "       ignoreCase:true, asRegexp:false, " +
-            "       lowPriorityTaskIdentifiers:'minor', normalPriorityTaskIdentifiers:'todo', highPriorityTaskIdentifiers:'fixme')]) {\n" +
-            "           sh 'mvn package verify'\n" +
+            "        disabled:false, " +
+            "        pattern:'src/main/java', excludePattern:'a/path'," +
+            "        ignoreCase:true, asRegexp:false, " +
+            "        lowPriorityTaskIdentifiers:'minor', normalPriorityTaskIdentifiers:'todo', highPriorityTaskIdentifiers:'fixme')]) {\n" +
+            "            if (isUnix()) {\n" +
+            "                sh 'mvn package verify'\n" +
+            "            } else {\n" +
+            "                bat 'mvn package verify'\n" +
+            "            }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -477,7 +521,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven(traceability: true) {\n" +
-            "        sh 'mvn package'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -527,7 +575,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven(traceability: true) {\n" +
-            "        sh 'mvn package'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -573,7 +625,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn test'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn test'\n" +
+            "        } else {\n" +
+            "            bat 'mvn test'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -591,6 +647,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
     public void maven_global_settings_path_defined_through_jenkins_global_config() throws Exception {
 
         File mavenGlobalSettingsFile = new File(jenkinsRule.jenkins.getRootDir(), "maven-global-settings.xml");
@@ -624,7 +681,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "</project>'''\n" +
             "\n" +
             "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
-            "        sh 'mvn help:effective-settings'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
             "    }\n" +
             "}\n";
         //@formatter:on
@@ -642,6 +703,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
     public void maven_global_settings_defined_through_jenkins_global_config_and_config_file_provider() throws Exception {
 
         //@formatter:off
@@ -676,7 +738,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "</project>'''\n" +
             "\n" +
             "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
-            "        sh 'mvn help:effective-settings'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
             "    }\n" +
             "}\n";
         //@formatter:on
@@ -698,6 +764,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
     public void maven_global_settings_defined_through_folder_config_and_config_file_provider() throws Exception {
 
         //@formatter:off
@@ -732,7 +799,14 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "</project>'''\n" +
             "\n" +
             "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
-            "        sh 'mvn help:effective-settings'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'echo %cd%'\n" +
+            "            bat 'dir'\n" +
+            "            bat 'set'\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
             "    }\n" +
             "}\n";
         //@formatter:on
@@ -761,6 +835,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
     public void maven_global_settings_path_defined_through_pipeline_attribute() throws Exception {
 
         //@formatter:off
@@ -790,7 +865,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "</project>'''\n" +
             "\n" +
             "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', globalMavenSettingsFilePath: 'maven-global-settings.xml') {\n" +
-            "        sh 'mvn help:effective-settings'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
             "    }\n" +
             "}\n";
         //@formatter:on
@@ -804,6 +883,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
     @Issue("JENKINS-42565")
     @Test
+    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
     public void maven_settings_path_defined_through_pipeline_attribute() throws Exception {
 
         //@formatter:off
@@ -833,7 +913,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "</project>'''\n" +
             "\n" +
             "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', mavenSettingsFilePath: 'maven-settings.xml') {\n" +
-            "        sh 'env && mvn help:effective-settings'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'env && mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'set && mvn help:effective-settings'\n" +
+            "        }\n" +
             "    }\n" +
             "}\n";
         //@formatter:on
@@ -846,6 +930,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
     public void maven_settings_defined_through_jenkins_global_config() throws Exception {
 
         File mavenSettingsFile = new File(jenkinsRule.jenkins.getRootDir(), "maven-settings.xml");
@@ -879,7 +964,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "</project>'''\n" +
             "\n" +
             "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
-            "        sh 'mvn help:effective-settings'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
             "    }\n" +
             "}\n";
         //@formatter:on
@@ -897,6 +986,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
     public void maven_settings_defined_through_jenkins_global_config_and_config_file_provider() throws Exception {
 
         //@formatter:off
@@ -906,9 +996,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
             "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
             "    <servers>\n" +
-            "    	<server>\n" +
-            "	        <id>id-settings-test-through-config-file-provider</id>\n" +
-            "	    </server>\n" +
+            "        <server>\n" +
+            "            <id>id-settings-test-through-config-file-provider</id>\n" +
+            "        </server>\n" +
             "    </servers>\n" +
             "</settings>\n";
         //@formatter:on
@@ -929,7 +1019,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "</project>'''\n" +
             "\n" +
             "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
-            "        sh 'mvn help:effective-settings'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
             "    }\n" +
             "}\n";
         //@formatter:on
@@ -949,6 +1043,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
     public void maven_settings_defined_through_folder_config_and_config_file_provider() throws Exception {
 
         //@formatter:off
@@ -982,7 +1077,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "</project>'''\n" +
             "\n" +
             "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
-            "        sh 'mvn help:effective-settings'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
             "    }\n" +
             "}\n";
         //@formatter:on
@@ -1011,6 +1110,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
     public void maven_settings_defined_through_pipeline_attribute_and_config_file_provider() throws Exception {
 
         //@formatter:off
@@ -1045,7 +1145,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "</project>'''\n" +
             "\n" +
             "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', mavenSettingsConfig: 'maven-config-test-from-pipeline-attribute') {\n" +
-            "        sh 'mvn help:effective-settings'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
             "    }\n" +
             "}\n";
         //@formatter:on
@@ -1076,7 +1180,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        node() {\n" +
             "            git($/" + gitRepoRule.toString() + "/$)\n" +
             "            withMaven() {\n" +
-            "                sh 'mvn package verify'\n" +
+            "                if (isUnix()) {\n" +
+            "                    sh 'mvn package verify'\n" +
+            "                } else {\n" +
+            "                    bat 'mvn package verify'\n" +
+            "                }\n" +
             "            }\n" +
             "        }\n" +
             "    },\n" +
@@ -1084,7 +1192,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        node() {\n" +
             "            git($/" + gitRepoRule.toString() + "/$)\n" +
             "            withMaven() {\n" +
-            "                sh 'mvn package verify'\n" +
+            "                if (isUnix()) {\n" +
+            "                    sh 'mvn package verify'\n" +
+            "                } else {\n" +
+            "                    bat 'mvn package verify'\n" +
+            "                }\n" +
             "            }\n" +
             "        }\n" +
             "    })\n" +

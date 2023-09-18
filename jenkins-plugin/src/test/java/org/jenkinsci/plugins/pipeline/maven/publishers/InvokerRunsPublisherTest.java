@@ -25,7 +25,11 @@ public class InvokerRunsPublisherTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn verify'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn verify'\n" +
+            "        } else {\n" +
+            "            bat 'mvn verify'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
@@ -62,7 +66,11 @@ public class InvokerRunsPublisherTest extends AbstractIntegrationTest {
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
-            "        sh 'mvn verify'\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn verify'\n" +
+            "        } else {\n" +
+            "            bat 'mvn verify'\n" +
+            "        }\n" +
             "    }\n" +
             "}";
         //@formatter:on
