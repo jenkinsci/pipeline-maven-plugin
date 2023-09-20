@@ -344,6 +344,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                                 }
                             }
                             switch (metaData.getDatabaseMajorVersion()) {
+                                case 16:
+                                case 15:
                                 case 14:
                                 case 13:
                                 case 12:

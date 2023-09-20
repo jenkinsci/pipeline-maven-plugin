@@ -561,7 +561,7 @@ By default, the Jenkins Pipeline Maven Plugin uses an H2 embedded database, but 
 Configuration steps to use a PostgreSQL:
 
 * Create an empty PostgreSQL database with a dedicated PostgreSQL user with permissions for Data Manipulation Language actions (DML) and Data Definition Language (DDL) actions
-** Tested with PostgreSQL 10.6 and 11.3
+** Tested with PostgreSQL up to 16
 * Install the Jenkins the https://plugins.jenkins.io/postgresql-api/[PostgreSQL API] plugin
 ** Navigate to `Manage Jenkins / Manage Plugins / Available`, select the `PostgreSQL API` plugin and click on `Download now and install after restart`.
 *  Configure the Pipeline Maven Plugin to use the created PostgreSQL database
