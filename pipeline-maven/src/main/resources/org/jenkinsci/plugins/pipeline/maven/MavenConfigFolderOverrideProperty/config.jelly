@@ -22,10 +22,10 @@ THE SOFTWARE.
 
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:f="/lib/form">
-<f:section title="${%Pipeline Maven Configuration}">
-      <f:optionalBlock title="${%Override global maven configuration}" field="override" inline="true">
-        <f:dropdownDescriptorSelector title="${%Settings file}"  field="settings" default="${null}"/>
-        <f:dropdownDescriptorSelector title="${%Global Settings file}" field="globalSettings"  default="${null}"/>
+<f:section title="${%plugin_configuration}">
+      <f:optionalBlock title="${%plugin_configuration_override}" field="override" inline="true">
+        <f:dropdownDescriptorSelector title="${%settings_file}"  field="settings" default="${null}"/>
+        <f:dropdownDescriptorSelector title="${%global_settings_file}" field="globalSettings"  default="${null}"/>
         </f:optionalBlock>
     </f:section>
 </j:jelly>

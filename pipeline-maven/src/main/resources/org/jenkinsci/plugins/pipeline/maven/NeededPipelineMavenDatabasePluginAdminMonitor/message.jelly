@@ -25,6 +25,6 @@ THE SOFTWARE.
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core">
     <div class="alert alert-warning">
-        The Pipeline Maven Plugin is currently using a jdbc url for a database but the plugin pipeline-maven-database plugin is not installed
+        ${%missing_database_plugin}
     </div>
 </j:jelly>

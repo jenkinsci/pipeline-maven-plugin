@@ -27,26 +27,26 @@ THE SOFTWARE.
          xmlns:f="/lib/form">
 
     <st:include page="maven-publisher" class="${descriptor.clazz}"/>
-    <f:section title="Dependencies filtering">
-        <f:entry title="${%Include versions}" field="dependenciesVersions">
-            <f:checkbox title="${%Snapshots}" field="includeSnapshotVersions" default="true"/>
-            <f:checkbox title="${%Releases}" field="includeReleaseVersions"/>
+    <f:section title="${%dependencies_filtering}">
+        <f:entry title="${%include_versions}" field="dependenciesVersions">
+            <f:checkbox title="${%snapshots}" field="includeSnapshotVersions" default="true"/>
+            <f:checkbox title="${%releases}" field="includeReleaseVersions"/>
         </f:entry>
 
-        <f:entry title="${%Include Scopes}" field="dependenciesScopes">
-            <f:checkbox title="${%Compile}" field="includeScopeCompile" default="true"/>
-            <f:checkbox title="${%Runtime}" field="includeScopeRuntime" default="true"/>
-            <f:checkbox title="${%Provided}" field="includeScopeProvided" default="true"/>
-            <f:checkbox title="${%Test}" field="includeScopeTest"/>
+        <f:entry title="${%include_scopes}" field="dependenciesScopes">
+            <f:checkbox title="${%compile}" field="includeScopeCompile" default="true"/>
+            <f:checkbox title="${%runtime}" field="includeScopeRuntime" default="true"/>
+            <f:checkbox title="${%provided}" field="includeScopeProvided" default="true"/>
+            <f:checkbox title="${%test}" field="includeScopeTest"/>
         </f:entry>
     </f:section>
-    <f:section title="${%Downstream Pipeline Triggers}">
-        <f:entry title="${%Maven lifecycle phase threshold}" field="lifecycleThreshold" description="${%Threshold to trigger downstream pipelines. Ignored if 'Skip Downstream Triggers' is activated}">
+    <f:section title="${%downstream_pipeline_triggers}">
+        <f:entry title="${%maven_lifecycle_phase_threshold}" field="lifecycleThreshold" description="${%maven_lifecycle_phase_threshold_description}">
             <f:select default="deploy" />
         </f:entry>
-        <f:entry title="${%Triggers}" field="dependenciesTriggers">
-            <f:checkbox title="${%Skip Downstream Triggers}" field="skipDownstreamTriggers" />
-            <f:checkbox title="${%Ignore Upstream Triggers}" field="ignoreUpstreamTriggers" />
+        <f:entry title="${%triggers}" field="dependenciesTriggers">
+            <f:checkbox title="${%skip_downstream_triggers}" field="skipDownstreamTriggers" />
+            <f:checkbox title="${%ignore_upstream_triggers}" field="ignoreUpstreamTriggers" />
         </f:entry>
     </f:section>
 </j:jelly>

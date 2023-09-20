@@ -28,15 +28,15 @@ THE SOFTWARE.
 
     <st:include page="maven-publisher" class="${descriptor.clazz}"/>
 
-    <f:entry title="${%Ignore Attachments}" field="ignoreAttachments">
+    <f:entry title="${%ignore_attachments}" field="ignoreAttachments">
         <f:checkbox/>
     </f:entry>
 
-    <f:entry field="healthScaleFactor" title="${%Health report amplification factor}" description="${%Between 0.0 and 10.0. 1% failing tests scores as 99% health. 5% failing tests scores as 95% health.}">
+    <f:entry field="healthScaleFactor" title="${%health_scale_factor}" description="${%health_scale_factor_description}">
         <f:number default="1.0" min="0" step="0.1" size="10" />
     </f:entry>
 
-    <f:entry field="keepLongStdio" title="${%Retain long standard output/error}">
+    <f:entry field="keepLongStdio" title="${%keep_long_stdio}">
         <f:checkbox name="keepLongStdio" title=""/>
     </f:entry>
 </j:jelly>

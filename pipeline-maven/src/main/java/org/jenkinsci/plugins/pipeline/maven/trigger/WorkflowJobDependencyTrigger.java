@@ -7,6 +7,7 @@ import hudson.triggers.TriggerDescriptor;
 import jenkins.branch.MultiBranchProject;
 import jenkins.branch.OrganizationFolder;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.workflow.flow.BlockableResume;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -29,7 +30,7 @@ public class WorkflowJobDependencyTrigger extends Trigger<Item> {
         }
 
         public String getDisplayName() {
-            return "Build whenever a SNAPSHOT dependency is built";
+            return Messages.trigger_workflow_job_dependency_description();
         }
 
     }

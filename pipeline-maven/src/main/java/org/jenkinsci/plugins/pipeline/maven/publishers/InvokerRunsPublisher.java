@@ -27,7 +27,6 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
@@ -38,6 +37,7 @@ import org.jenkinsci.plugins.maveninvoker.MavenInvokerRecorder;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
+import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.pipeline.maven.util.FileUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
@@ -284,7 +284,7 @@ public class InvokerRunsPublisher extends MavenPublisher {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Invoker Publisher";
+            return Messages.publisher_invoker_runs_description();
         }
 
         @Override

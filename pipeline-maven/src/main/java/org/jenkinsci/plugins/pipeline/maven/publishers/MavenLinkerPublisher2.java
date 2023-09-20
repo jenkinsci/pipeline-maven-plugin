@@ -4,6 +4,7 @@ import hudson.Extension;
 import hudson.model.Run;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
+import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
@@ -57,7 +58,7 @@ public class MavenLinkerPublisher2 extends MavenPublisher {
 
         @Override
         public String getDisplayName() {
-            return "Maven Linker Publisher";
+            return Messages.publisher_maven_linker_description();
         }
     }
 }

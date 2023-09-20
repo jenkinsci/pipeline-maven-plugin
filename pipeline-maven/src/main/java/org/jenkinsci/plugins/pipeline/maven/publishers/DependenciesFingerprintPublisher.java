@@ -34,6 +34,7 @@ import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
+import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -261,7 +262,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Dependencies Fingerprint Publisher";
+            return Messages.publisher_dependencies_fingerprint_description();
         }
 
         @Override

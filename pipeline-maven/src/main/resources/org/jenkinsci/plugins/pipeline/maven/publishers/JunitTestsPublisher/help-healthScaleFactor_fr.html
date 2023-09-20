@@ -1,0 +1,17 @@
+<div>
+    Coefficient de puissance à appliquer aux tests échoués lors du calcul du taux de réussite des tests,
+    intégrant l'état de santé de la construction.
+    <br />
+    Le coefficient par défaut est <code>1.0</code>
+    <ul>
+        <li>Un coefficient de <code>0.0</code> désactive le concours du taux de réussite des tests dans l'état de santé de la construction.</li>
+        <li>Un coefficient de <code>0.1</code> signifie que 10% de tests échoués va produire un résultat de santé de 99%</li>
+        <li>Un coefficient de <code>0.5</code> signifie que 10% de tests échoués va produire un résultat de santé de 95%</li>
+        <li>Un coefficient de <code>1.0</code> signifie que 10% de tests échoués va produire un résultat de santé de 90%</li>
+        <li>Un coefficient de <code>2.0</code> signifie que 10% de tests échoués va produire un résultat de santé de 80%</li>
+        <li>Un coefficient de <code>2.5</code> signifie que 10% de tests échoués va produire un résultat de santé de 75%</li>
+        <li>Un coefficient de <code>5.0</code> signifie que 10% de tests échoués va produire un résultat de santé de 50%</li>
+        <li>Un coefficient de <code>10.0</code> signifie que 10% de tests échoués va produire un résultat de santé de 0%</li>
+    </ul>
+    Ce coefficient est sauvegardé avec le résultat de la construction, le modifier ne sera donc effectif que pour les nouvelles constructions.
+</div>

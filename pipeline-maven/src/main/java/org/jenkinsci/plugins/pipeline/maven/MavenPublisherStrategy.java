@@ -21,7 +21,7 @@ import java.util.logging.Logger;
  */
 public enum MavenPublisherStrategy {
 
-    IMPLICIT("Implicit") {
+    IMPLICIT(Messages.publisher_strategy_implicit_description()) {
         /**
          * <p>Build the list of {@link MavenPublisher}s that should be invoked for the build execution of the given {@link TaskListener}
          * with the desired configuration.
@@ -102,7 +102,7 @@ public enum MavenPublisherStrategy {
         }
     },
 
-    EXPLICIT("Explicit") {
+    EXPLICIT(Messages.publisher_strategy_explicit_description()) {
         @NonNull
         @Override
         public List<MavenPublisher> buildPublishersList

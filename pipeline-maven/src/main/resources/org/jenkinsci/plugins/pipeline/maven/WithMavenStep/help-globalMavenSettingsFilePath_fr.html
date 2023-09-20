@@ -1,0 +1,23 @@
+<div>
+  Specifie le fichier de paramètres globaux Maven settings.xml. Le chemin précisé peut être absolu ou relatif à l'espace de travail.
+  Le remplacement de variable d'environnement de type Shell est possible, en utilisant la syntaxe <code>${VARIABLE}</code>.
+  Le fichier sera tout d'abord recherché sur l'agent chargé de la construction. S'il n'y est pas trouvé, celui du contrôleur sera utilisé à la place.
+
+  L'élément settings dans le fichier <code>settings.xml</code> contient les éléments utilisés
+  pour définir des valeurs qui configurent l'exécution Maven de plusieurs façons, comme le <code>pom.xml</code>,
+  mais qui ne devraient pas être embarquées dans un projet spécifique, ou distribuées publiquement.
+  Ces valeurs incluent l'emplacement du mirroir local, un serveur distant alternatif et des identifiants de connexion.
+  <br>
+  Le fichier <code>settings.xml</code> peut se trouver à deux endroits par défaut :
+
+  <ul>
+    <li>L'installation Maven - par défaut: <code>$M2_HOME/conf/settings.xml</code></li>
+    <li>Spécifique à l'utilisateur - par défaut: <code>${user.home}/.m2/settings.xml</code></li>
+  </ul>
+
+  Le premier est aussi appelé paramètres globaux, le second est désigné comme les paramètres
+  spécifiques à l'utilisateur. Si les deux existent, leurs contenus est fusionné, la partie
+  spécifique utilisateur étant prédominante.
+  <p>
+  Voir aussi : la <a href="http://maven.apache.org/settings.html">reference</a> <code>settings.xml</code>
+</div>

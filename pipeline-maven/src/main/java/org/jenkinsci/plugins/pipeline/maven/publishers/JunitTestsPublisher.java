@@ -34,6 +34,7 @@ import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
+import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -366,7 +367,7 @@ public class JunitTestsPublisher extends MavenPublisher {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Junit Publisher";
+            return Messages.publisher_junit_tests_description();
         }
 
         @Override

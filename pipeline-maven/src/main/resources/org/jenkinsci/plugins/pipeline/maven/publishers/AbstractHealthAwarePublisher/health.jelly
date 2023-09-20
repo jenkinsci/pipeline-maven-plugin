@@ -28,7 +28,7 @@ THE SOFTWARE.
         <!--
         See analysis-core-1.86.jar!/util/health.jelly
         -->
-        <f:entry title="Health thresholds" description="Configure the thresholds for the build health. If left empty then no health report is created. If the actual number of warnings is between the provided thresholds then the build health is interpolated.">
+        <f:entry title="${%health_thresholds}" description="${%health_thresholds_description}">
             <table>
                 <tbody>
                     <tr>
@@ -53,10 +53,10 @@ THE SOFTWARE.
                 </tbody>
             </table>
         </f:entry>
-        <f:entry title="Health priorities" description="Determines which warning priorities should be considered when evaluating the build health.">
-            <f:radio name="thresholdLimit" value="high" checked="${instance.thresholdLimit == 'high'}" title="Only priority high"/>
-            <f:radio name="thresholdLimit" value="normal" checked="${instance.thresholdLimit == 'normal'}" title="Priorities high and normal"/>
-            <f:radio name="thresholdLimit" value="low" checked="${(instance == null) ? 'true' : instance.thresholdLimit == 'low'}" title="All priorities"/>
+        <f:entry title="${%health_priorities}" description="${%health_priorities}">
+            <f:radio name="thresholdLimit" value="high" checked="${instance.thresholdLimit == 'high'}" title="${%health_priority_high}"/>
+            <f:radio name="thresholdLimit" value="normal" checked="${instance.thresholdLimit == 'normal'}" title="${%health_priority_normal}"/>
+            <f:radio name="thresholdLimit" value="low" checked="${(instance == null) ? 'true' : instance.thresholdLimit == 'low'}" title="${%health_priority_all}"/>
         </f:entry>
     </f:advanced>
 </j:jelly>

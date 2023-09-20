@@ -27,7 +27,6 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.jacoco.JacocoPublisher;
@@ -35,6 +34,7 @@ import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
+import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -42,8 +42,6 @@ import org.w3c.dom.Element;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -252,7 +250,7 @@ public class JacocoReportPublisher extends MavenPublisher {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Jacoco Publisher";
+            return Messages.publisher_jacoco_report_description();
         }
 
         @Override

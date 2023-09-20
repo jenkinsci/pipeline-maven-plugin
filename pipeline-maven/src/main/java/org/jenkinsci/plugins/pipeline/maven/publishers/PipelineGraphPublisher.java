@@ -9,6 +9,7 @@ import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
+import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -317,7 +318,7 @@ public class PipelineGraphPublisher extends MavenPublisher {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Pipeline Graph Publisher";
+            return Messages.publisher_pipeline_graph_description();
         }
 
         @Override
