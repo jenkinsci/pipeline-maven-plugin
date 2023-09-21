@@ -105,7 +105,7 @@
     <jenkins.version>2.361.4</jenkins.version>
     <junit.version>5.10.0</junit.version>
     <mariadb-client.version>3.2.0</mariadb-client.version>
-    <maven-compat.version>3.3.9</maven-compat.version>
+    <maven-compat.version>3.8.1</maven-compat.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
     <maven-plugin-sortpom.version>3.3.0</maven-plugin-sortpom.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
