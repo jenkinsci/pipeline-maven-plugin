@@ -24,15 +24,34 @@
 
 package org.jenkinsci.plugins.pipeline.maven.db;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+import static org.testcontainers.images.PullPolicy.alwaysPull;
+
+import java.util.Collections;
+
 import javax.sql.DataSource;
 
+import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import com.cloudbees.plugins.credentials.CredentialsMatchers;
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
+import hudson.security.ACL;
+import hudson.util.FormValidation;
+import hudson.util.Secret;
+import jenkins.model.Jenkins;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -41,7 +60,7 @@ import com.zaxxer.hikari.HikariDataSource;
 public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
 
     @Container
-    public static MySQLContainer<?> DB = new MySQLContainer<>(MySQLContainer.NAME);
+    public static MySQLContainer<?> DB = new MySQLContainer<>(MySQLContainer.NAME).withImagePullPolicy(alwaysPull());
 
     @Override
     public DataSource before_newDataSource() {
@@ -70,5 +89,28 @@ public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstrac
                 };
             }
         };
+    }
+
+    @Test
+    public void ensureValidateConfiguration() throws Exception {
+        try (MockedStatic<Jenkins> j = mockStatic(Jenkins.class);
+                MockedStatic<CredentialsMatchers> m = mockStatic(CredentialsMatchers.class);
+                MockedStatic<CredentialsProvider> c = mockStatic(CredentialsProvider.class)) {
+            PipelineMavenPluginDao.Builder.Config config = new PipelineMavenPluginDao.Builder.Config().jdbcUrl(DB.getJdbcUrl()).credentialsId("credsId");
+            UsernamePasswordCredentials credentials = mock(UsernamePasswordCredentials.class);
+            Secret password = Secret.fromString(DB.getPassword());
+            String version = DB.createConnection("").getMetaData().getDatabaseProductVersion();
+            j.when(Jenkins::get).thenReturn(null);
+            m.when(() -> CredentialsMatchers.withId("credsId")).thenReturn(null);
+            c.when(() -> CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class, (Jenkins) null, ACL.SYSTEM, Collections.EMPTY_LIST))
+                    .thenReturn(null);
+            c.when(() -> CredentialsMatchers.firstOrNull(null, null)).thenReturn(credentials);
+            when(credentials.getUsername()).thenReturn(DB.getUsername());
+            when(credentials.getPassword()).thenReturn(password);
+
+            FormValidation result = dao.getBuilder().validateConfiguration(config);
+
+            assertThat(result.toString()).isEqualTo("OK: MySQL " + version + " is a supported database");
+        }
     }
 }

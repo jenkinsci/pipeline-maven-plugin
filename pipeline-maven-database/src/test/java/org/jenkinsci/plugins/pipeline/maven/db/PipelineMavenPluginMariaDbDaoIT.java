@@ -38,7 +38,7 @@ import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -57,14 +57,13 @@ import jenkins.model.Jenkins;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 @Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
-public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
+public class PipelineMavenPluginMariaDbDaoIT extends PipelineMavenPluginDaoAbstractTest {
 
     @Container
-    public static PostgreSQLContainer<?> DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE).withImagePullPolicy(alwaysPull());
+    public static MariaDBContainer<?> DB = new MariaDBContainer<>(MariaDBContainer.NAME).withImagePullPolicy(alwaysPull());
 
     @Override
-    public DataSource before_newDataSource() throws Exception {
-        Class.forName("org.postgresql.Driver");
+    public DataSource before_newDataSource() {
         HikariConfig config = new HikariConfig();
         config.setJdbcUrl(DB.getJdbcUrl());
         config.setUsername(DB.getUsername());
@@ -74,7 +73,7 @@ public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAb
 
     @Override
     public AbstractPipelineMavenPluginDao before_newAbstractPipelineMavenPluginDao(DataSource ds) {
-        return new PipelineMavenPluginPostgreSqlDao(ds) {
+        return new PipelineMavenPluginMySqlDao(ds) {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {
@@ -111,7 +110,7 @@ public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAb
 
             FormValidation result = dao.getBuilder().validateConfiguration(config);
 
-            assertThat(result.toString()).isEqualTo("OK: PostgreSQL " + version + " is a supported database");
+            assertThat(result.toString()).isEqualTo("OK: MariaDB " + version + " is a supported database");
         }
     }
 }

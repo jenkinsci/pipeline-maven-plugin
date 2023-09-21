@@ -223,7 +223,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                     driverClass = "org.h2.Driver";
                 } else if (jdbcUrl.startsWith("jdbc:h2")) {
                     driverClass = "org.h2.Driver";
-                } else if (jdbcUrl.startsWith("jdbc:mysql")) {
+                } else if (jdbcUrl.startsWith("jdbc:mysql") || jdbcUrl.startsWith("jdbc:mariadb")) {
                     driverClass = "com.mysql.cj.jdbc.Driver";
                 } else if (jdbcUrl.startsWith("jdbc:postgresql:")) {
                     driverClass = "org.postgresql.Driver";
@@ -274,8 +274,15 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                         // * Amazon Aurora: "5.6.10"
                         // * MariaDB: "5.5.5-10.2.20-MariaDB", "5.5.5-10.3.11-MariaDB-1:10.3.11+maria~bionic"
                         String databaseVersionDescription = metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion();
-                        String databaseRequirement = "MySQL Server version 5.7+ or Amazon Aurora MySQL 5.6+ or MariaDB 10.2+ or PostgreSQL 10+ is required";
-                        if ("MySQL".equals(metaData.getDatabaseProductName())) {
+                        LOGGER.log(Level.INFO, "Checking JDBC connection against " + databaseVersionDescription);
+                        String databaseRequirement = "MySQL Server up to 8.1 or Amazon Aurora MySQL 5.6+ or MariaDB up to 11.1 or PostgreSQL up to 16 is required";
+                        if ("MariaDB".equals(metaData.getDatabaseProductName())) {
+                            @Nullable
+                            String mariaDbVersion = PipelineMavenPluginMySqlDao.extractMariaDbVersion(metaData.getDatabaseProductVersion());
+                            if (mariaDbVersion == null || !mariaDbVersion.matches("^(10|11)\\..*")) {
+                                return FormValidation.warning("Non tested MariaDB version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
+                            }
+                        } else if ("MySQL".equals(metaData.getDatabaseProductName())) {
                             @Nullable
                             String amazonAuroraVersion;
                             try (Statement stmt = cnn.createStatement()) {
@@ -327,19 +334,15 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                                     return FormValidation.error("Non supported MySQL version " + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
                             }
                         } else if ("PostgreSQL".equals(metaData.getDatabaseProductName())) {
-                            @Nullable
-                            String amazonAuroraVersion; // https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Updates.html
                             try (Statement stmt = cnn.createStatement()) {
                                 try (ResultSet rst = stmt.executeQuery("select AURORA_VERSION()")) {
                                     rst.next();
-                                    amazonAuroraVersion = rst.getString(1);
+                                    // https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/AuroraPostgreSQL.Updates.html
                                     databaseVersionDescription += " / Aurora " + rst.getString(1);
                                 } catch (SQLException e) {
-                                    if ("42883".equals(e.getSQLState())) { // org.postgresql.util.PSQLState.UNDEFINED_FUNCTION.getState()
-                                        amazonAuroraVersion = null;
-                                    } else {
+                                    // org.postgresql.util.PSQLState.UNDEFINED_FUNCTION.getState()
+                                    if (!"42883".equals(e.getSQLState())) {
                                         LOGGER.log(Level.WARNING,"Exception checking Amazon Aurora version", e);
-                                        amazonAuroraVersion = null;
                                     }
                                 }
                             }
