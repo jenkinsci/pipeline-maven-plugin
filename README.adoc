@@ -504,7 +504,7 @@ We want to quickly add reporters for CheckStyle, Jacoco...
 [#db-setup]
 == Database Setup
 
-NOTE: Available since version 1332.xxxxxxxx.xxx
+NOTE: Available since version 1333.v333b_b_f053972
 
 To use a database you must first install the `Pipeline Maven Plugin Database`
 
@@ -532,7 +532,7 @@ By default, the Jenkins Pipeline Maven Plugin uses an H2 embedded database, but 
 Configuration steps to use a MySQL:
 
 * Create an empty MySQL database with a dedicated MySQL user with permissions for Data Manipulation Language actions (DML) and Data Definition Language (DDL) actions
-** Tested with MySQL 8.0, with MariaDB 10.2 and 10.3 and with Amazon Aurora MySQL 5.6
+** Tested with MySQL up to 8.1, with MariaDB up to 11.1 and with Amazon Aurora MySQL 5.6
 * Install the Jenkins `MySQL Database` plugin
 ** Navigate to `Manage Jenkins / Manage Plugins / Available`, select the `MySQL Database` plugin and click on `Download now and install after restart`
 *  Configure the Pipeline Maven Plugin to use the created MySQL database
