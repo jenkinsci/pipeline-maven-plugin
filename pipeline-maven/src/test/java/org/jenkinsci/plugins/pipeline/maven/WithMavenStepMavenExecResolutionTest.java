@@ -139,7 +139,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
                 "}");
             //@formatter:on
 
-            jenkinsRule.assertLogContains("Apache Maven 3.6.0", run);
+            jenkinsRule.assertLogContains("Apache Maven 3.6.3", run);
             jenkinsRule.assertLogContains("using Maven installation provided by the build agent with executable /usr/bin/mvn", run);
         }
     }
@@ -160,7 +160,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
                 "}");
             //@formatter:on
 
-            jenkinsRule.assertLogContains("Apache Maven 3.6.0", run);
+            jenkinsRule.assertLogContains("Apache Maven 3.6.3", run);
             jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/usr/share/maven",
                     run);
         }

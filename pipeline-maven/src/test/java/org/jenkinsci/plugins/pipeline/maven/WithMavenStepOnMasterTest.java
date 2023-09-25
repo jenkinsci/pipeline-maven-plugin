@@ -99,7 +99,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         //@// @formatter:off
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn package'\n" +
             "        } else {\n" +
@@ -114,7 +114,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
         // verify provided Maven is used
-        jenkinsRule.assertLogContains("using Maven installation 'apache-maven-3.6.3'", build);
+        jenkinsRule.assertLogContains("using Maven installation 'apache-maven-3'", build);
 
         // verify .pom is archived and fingerprinted
         // "[withMaven] Archive ... under
@@ -680,7 +680,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -737,7 +737,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -798,7 +798,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -864,7 +864,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', globalMavenSettingsFilePath: 'maven-global-settings.xml') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3', globalMavenSettingsFilePath: 'maven-global-settings.xml') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -912,7 +912,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', mavenSettingsFilePath: 'maven-settings.xml') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3', mavenSettingsFilePath: 'maven-settings.xml') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'env && mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -963,7 +963,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -1018,7 +1018,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -1076,7 +1076,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -1144,7 +1144,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', mavenSettingsConfig: 'maven-config-test-from-pipeline-attribute') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3', mavenSettingsConfig: 'maven-config-test-from-pipeline-attribute') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +

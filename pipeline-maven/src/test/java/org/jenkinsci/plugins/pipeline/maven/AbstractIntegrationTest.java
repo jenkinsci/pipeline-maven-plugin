@@ -64,7 +64,7 @@ public abstract class AbstractIntegrationTest {
 
         Maven.MavenInstallation mvn = configureDefaultMaven("3.8.8", Maven.MavenInstallation.MAVEN_30);
 
-        Maven.MavenInstallation m3 = new Maven.MavenInstallation("apache-maven-3.8.8", mvn.getHome(), JenkinsRule.NO_PROPERTIES);
+        Maven.MavenInstallation m3 = new Maven.MavenInstallation("apache-maven-3", mvn.getHome(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(m3);
         mavenInstallationName = mvn.getName();
 
