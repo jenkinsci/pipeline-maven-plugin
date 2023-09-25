@@ -33,6 +33,7 @@ import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.jgiven.JgivenReportGenerator;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
+import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
@@ -40,7 +41,6 @@ import org.w3c.dom.Element;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
@@ -129,7 +129,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "JGiven Publisher";
+            return Messages.publisher_jgiven_tests_description();
         }
 
         @Override

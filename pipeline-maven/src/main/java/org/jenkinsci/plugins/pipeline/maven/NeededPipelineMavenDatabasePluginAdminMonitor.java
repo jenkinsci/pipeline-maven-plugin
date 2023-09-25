@@ -52,7 +52,7 @@ public class NeededPipelineMavenDatabasePluginAdminMonitor extends Administrativ
 
     @Override
     public String getDisplayName() {
-        return "Pipeline Maven Integration - Need Pipeline Maven Database";
+        return Messages.admin_monitor_needed_pipeline_maven_database_plugin_description();
     }
 
 }

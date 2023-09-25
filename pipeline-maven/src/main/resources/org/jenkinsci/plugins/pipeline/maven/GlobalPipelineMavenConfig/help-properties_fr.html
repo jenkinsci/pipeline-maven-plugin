@@ -1,0 +1,22 @@
+<div>
+    <p>Ajouter une propriété (paire nom/valeur) qui sera utilisée pour configurer le <code>DataSource</code> Hikari CP / le <code>Driver</code> JDBC.
+    </p>
+    <p>Pour le cas du <code>DataSource</code>, les noms de propriété doivent être préfixés par <code>dataSource.</code>, ces propriétés
+        seront traduites en setters Java selon la convention de nommage Java Bean.
+        Par exemple, la propriété <code>dataSource.cachePrepStmts</code> sera traduite en <code>setCachePrepStmts()</code>
+        avec la <code>value</code> passée comme paramètre. Voir les détails sur
+        <a href="https://github.com/brettwooldridge/HikariCP#configuration-knobs-baby">Hikari CP</a>.
+    </p>
+    <p>
+        Dans le cas du <code>Driver</code>, la propriété sera ajoutée à une instance <code>Properties</code> qui sera
+        passée au pilote durant les appels </code>java.sql.Driver#connect(String, Properties)</code>.
+    </p>
+    <p>
+        Pour une connexion MySQL/MariaDB, le plugin Pipeline Maven utilisera par défaut les paramètres recommandés dans la
+        <a href="https://github.com/brettwooldridge/HikariCP/wiki/MySQL-Configuration">configuration Hikari CP / MySQL</a>.
+        Pour surcharger ces paramètres, il suffit de les ajouter dans le champ de configuration, avec des valeurs différentes.
+    </p>
+    <p>
+        Pour les bases autres que MySQL/MariaDB, le plugin utilise les <a href="https://github.com/brettwooldridge/HikariCP#frequently-used">paramètres par défaut du data source Hikari CP.</a>
+    </p>
+</div>

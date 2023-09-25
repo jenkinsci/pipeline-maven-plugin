@@ -2,7 +2,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:t="/lib/hudson">
 <j:if test="${!empty it.deployedArtifacts}">
   <t:summary icon="/plugin/pipeline-maven/images/48x48/maven-repository.png">
-      Deployed Artifacts
+      ${%deployed_artifacts}
     <ul>
       <j:forEach var="artifact" items="${it.deployedArtifacts}">
         <li><a href="${artifact.url}">${artifact.fileName}</a> (type: ${artifact.type})</li>

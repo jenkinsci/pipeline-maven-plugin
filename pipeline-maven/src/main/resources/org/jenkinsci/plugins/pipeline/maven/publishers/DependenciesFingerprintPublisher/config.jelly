@@ -27,13 +27,13 @@ THE SOFTWARE.
          xmlns:f="/lib/form">
 
     <st:include page="maven-publisher" class="${descriptor.clazz}"/>
-    <f:section title="Dependencies filtering">
-        <f:entry title="${%Include versions}">
+    <f:section title="${%dependencies_filtering}">
+        <f:entry title="${%include_versions}">
             <f:checkbox title="${%Snapshots}" field="includeSnapshotVersions" default="true"/>
             <f:checkbox title="${%Releases}" field="includeReleaseVersions"/>
         </f:entry>
 
-        <f:entry title="${%Include Scopes}">
+        <f:entry title="${%include_scopes}">
             <f:checkbox title="${%Compile}" field="includeScopeCompile" default="true"/>
             <f:checkbox title="${%Runtime}" field="includeScopeRuntime" default="true"/>
             <f:checkbox title="${%Provided}" field="includeScopeProvided" default="true"/>

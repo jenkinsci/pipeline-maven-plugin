@@ -219,7 +219,7 @@ public class WithMavenStep extends Step {
 
         @Override
         public String getDisplayName() {
-            return "Provide Maven environment";
+            return Messages.step_with_maven_description();
         }
 
         @Override
@@ -248,7 +248,7 @@ public class WithMavenStep extends Step {
                 return r; // it's empty
             }
             item.checkPermission(Item.EXTENDED_READ);
-            r.add("--- Use system default Maven ---", "");
+            r.add("--- " + Messages.settings_default_maven_description() + " ---", "");
             for (MavenInstallation installation : getMavenDescriptor().getInstallations()) {
                 r.add(installation.getName());
             }
@@ -266,7 +266,7 @@ public class WithMavenStep extends Step {
                 return r; // it's empty
             }
             item.checkPermission(Item.EXTENDED_READ);
-            r.add("--- Use system default JDK ---", "");
+            r.add("--- " + Messages.settings_default_jdk_description() + " ---", "");
             for (JDK installation : getJDKDescriptor().getInstallations()) {
                 r.add(installation.getName());
             }
@@ -280,7 +280,7 @@ public class WithMavenStep extends Step {
                 return r; // it's empty
             }
             item.checkPermission(Item.EXTENDED_READ);
-            r.add("--- Use system default settings or file path ---", "");
+            r.add("--- " + Messages.settings_default_settings_description() + " ---", "");
             for (Config config : ConfigFiles.getConfigsInContext(context, MavenSettingsConfigProvider.class)) {
                 r.add(config.name, config.id);
             }
@@ -294,7 +294,7 @@ public class WithMavenStep extends Step {
                 return r; // it's empty
             }
             item.checkPermission(Item.EXTENDED_READ);
-            r.add("--- Use system default settings or file path ---", "");
+            r.add("--- " + Messages.settings_default_settings_description() + " ---", "");
             for (Config config : ConfigFiles.getConfigsInContext(context, GlobalMavenSettingsConfigProvider.class)) {
                 r.add(config.name, config.id);
             }

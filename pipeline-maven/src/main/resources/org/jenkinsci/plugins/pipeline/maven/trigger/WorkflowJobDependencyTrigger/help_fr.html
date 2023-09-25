@@ -1,0 +1,11 @@
+<div>
+  Déclencher une construction de ce pipeline quand une dépendance Maven SNAPSHOT est construite par cette instance Jenkins.
+
+  Jenkins découvre toutes les dépendances des constructions Maven de ce pipeline lorsqu'exécutées à l'intérieur d'une étape
+  <code>withMaven(){...}</code> et déclenche une construction si l'une de ces dépendances a été reconstruite
+  (typiquement une version SNAPSHOT).
+
+  Ce cas d'utilisation est pertient pour assurer une intégration continue. Jenkins va vérifier la dépendance snapshot à partir
+  de l'élément <code>&lt;dependency&gt;</code> dans le POM.
+
+</div>

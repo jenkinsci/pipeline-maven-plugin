@@ -1,0 +1,24 @@
+<div>
+    <p>
+        Seuil pour déclencher les constructions avals, basé sur la phase atteinte du <a href="https://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html">cycle de vie Maven</a>
+        pendant l'exécution Maven.
+    </p>
+    <p>
+        Si l'option "install" est selectionnée, alors les constructions avals seront déclenchées lors d'un "<code>mvn clean install</code>" ou "<code>mvn clean deploy</code>"
+        mais pas lors d'un "<code>mvn clean verify</code>" ou "<code>mvn clean package</code>".
+    </p>
+
+    <h2>Exemple</h2>
+    <p>Configurer un projet Jenkins multi-branches avec
+    <ul>
+        <li>Seuil : "<code>deploy</code>"</li>
+        <li>exécution de "<code>mvn clean deploy</code>" sur les branches (incluant master) et exécution de "<code>mvn clean
+            verify</code> sur les demandes d'intégration</li>
+    </ul>
+    Ce qui donnera :
+    <ul>
+        <li>Les constructions des branches (incluant "master") vont générer des fichiers jar/war qui seront envoyés dans le dépôt Maven d'entreprise et déclencheront les constructions avals</li>
+        <li>Les constructions des demandes d'intégration vont uniquement générer le livrable mais qui ne sera pas envoyé dans le dépôt Maven, et les constructions avals ne seront donc pas déclenchées</li>
+    </ul>
+    </p>
+</div>

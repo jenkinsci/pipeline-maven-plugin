@@ -11,6 +11,7 @@ import org.acegisecurity.AccessDeniedException;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
+import org.jenkinsci.plugins.pipeline.maven.Messages;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
@@ -167,7 +168,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
     @CheckForNull
     @Override
     public String getDisplayName() {
-        return "Maven";
+        return Messages.report_maven_description();
     }
 
     @CheckForNull

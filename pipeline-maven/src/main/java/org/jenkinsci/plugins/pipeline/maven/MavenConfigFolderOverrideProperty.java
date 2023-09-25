@@ -75,7 +75,7 @@ public class MavenConfigFolderOverrideProperty extends AbstractFolderProperty<Ab
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Override Maven Settings";
+            return Messages.property_maven_config_folder_override_description();
         }
     }
 }

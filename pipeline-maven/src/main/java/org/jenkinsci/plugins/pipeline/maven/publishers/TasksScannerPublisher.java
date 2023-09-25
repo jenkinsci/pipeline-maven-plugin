@@ -3,13 +3,13 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -245,7 +245,7 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "Open Task Scanner Publisher";
+            return Messages.publisher_tasks_scanner_description();
         }
 
         @Override

@@ -1,0 +1,29 @@
+<div>
+  Specifie le chemin personnalisé vers un dépôt local.
+  Le remplacement de variable d'environnement de type Shell est possible, en utilisant la syntaxe <code>${VARIABLE}</code>.
+
+  En principe, Jenkins utilise le dépôt local Maven défini par Maven, par défaut <code>~/.m2/repository</code> ce qui peut être modifié par l'élément
+  &lt;localRepository> dans le fichier <code>~/.m2/settings.xml</code> (voir <a href="https://maven.apache.org/guides/mini/guide-configuring-maven.html#Configuring_your_Local_Repository">Configurer son dépôt local</a>))
+
+  <p>
+  Ce "en principe" signifie que toutes les constructions exécutées par un même agent partage un même dépôt Maven.
+  L'avantage est le gain d'espace disque, l'inconvénient est que ce dépôt n'est pas prévu pour être multi thread, et peut donc être corrompu en cas de constructions concurrentes.
+  De plus, les constructions peuvent interférer entre elles en partageant des livrables incorrects ou partiels. Il est par exemple possible d'aboutir à des constructions réussiées,
+  simplement parce que toutes leurs dépendances sont dans le dépôt local, malgré le fait qu'elles ne soient pas dans les dépôts spécifiés dans le POM.
+  repositories in POM might have them.
+
+  <p>
+  Avec cette option, Jenkins va configuration Maven pour qu'il utilise un dépôt local spécifique en utilisant l'option <code>-Dmaven.repo.local</code>
+  <br>
+
+  Si un chemin relatif est indiqué, il sera résolu par rapport à la racine de l'espace de travail et non par rapport au répertoire courant.
+  <br>
+  ie. si <code>.repository</code> est indiqué, alors <code>$WORKSPACE/.repository</code> sera utilisé.
+
+  <p>
+  Ceci signifie que chaque construction peut avoir son propre dépôt Maven local isolé. Ceci corrige les problèmes évoqués ci dessus,
+  mais consomme plus d'espace disque.
+
+  <p>
+  Si vous utilisez cette option, envisagez l'utilisation d'un gestionnaire de livrable Maven, afin de limiter les appels aux dépôts distants.
+</div>

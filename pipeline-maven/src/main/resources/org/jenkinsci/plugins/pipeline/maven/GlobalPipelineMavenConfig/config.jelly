@@ -26,8 +26,8 @@ THE SOFTWARE.
 <j:jelly xmlns:j="jelly:core"
          xmlns:f="/lib/form" xmlns:c="/lib/credentials">
 
-    <f:section title="${%Pipeline Maven Configuration}">
-        <f:entry title="DAO class">
+    <f:section title="${%config_title}">
+        <f:entry title="${%dao}">
             <select name="daoClass">
             <j:forEach var="dao" items="${instance.getPipelineMavenPluginDaos()}">
                 <f:option value="${dao.getClass().getName()}" selected="${dao.getClass().getName()==instance.getDaoClass()}">
@@ -36,40 +36,40 @@ THE SOFTWARE.
             </j:forEach>
             </select>
         </f:entry>
-        <f:entry title="${%DAO}">
+        <f:entry title="${%dao_diag}">
             <pre><code>${instance.getDaoPrettyString()}</code></pre>
         </f:entry>
-        <f:entry title="${%Database Configuration}">
-            <f:entry title="${%JDBC URL}" field="jdbcUrl"
-                     description="JDBC URL. For production workloads, use MySQL (incl. Amazon Aurora for MySQL, MariaDB...) or PostgreSQL. If empty, then a non production grade H2 embedded database will be used.">
+        <f:entry title="${%database_configuration}">
+            <f:entry title="${%jdbc_url}" field="jdbcUrl"
+                     description="${%jdbc_description}">
                 <f:textbox/>
             </f:entry>
-            <f:entry title="${%JDBC Credentials}" field="jdbcCredentialsId">
+            <f:entry title="${%jdbc_credentials}" field="jdbcCredentialsId">
                 <c:select/>
             </f:entry>
 
-            <f:advanced title="${%Advanced Database Configuration}">
-                <f:entry title="${%DataSource Properties}" field="properties"
-                         description="DateSource and driver properties">
+            <f:advanced title="${%database_configuration_advanced}">
+                <f:entry title="${%datasource_properties}" field="properties"
+                         description="${%datasource_properties_description}">
                     <f:textarea/>
                 </f:entry>
             </f:advanced>
 
-            <f:validateButton title="${%Validate Database Configuration}" method="validateJdbcConnection" with="jdbcUrl,properties,jdbcCredentialsId,daoClass"/>
+            <f:validateButton title="${%database_configuration_validate}" method="validateJdbcConnection" with="jdbcUrl,properties,jdbcCredentialsId,daoClass"/>
         </f:entry>
-        <f:entry title="${%Global traceability}" >
-            <f:checkbox title="${%Enable traceability globally : Java/Maven versions, settings, ...}" field="globalTraceability" />
+        <f:entry title="${%traceability}" >
+            <f:checkbox title="${%traceability_title}" field="globalTraceability" />
         </f:entry>
-        <f:entry title="${%Trigger downstream upon result}" field="triggerDownstreamUponResult" >
-            <f:checkbox title="${%Success}" field="triggerDownstreamUponResultSuccess" default="true" />
-            <f:checkbox title="${%Unstable}" field="triggerDownstreamUponResultUnstable" />
-            <f:checkbox title="${%Failure}" field="triggerDownstreamUponResultFailure" />
-            <f:checkbox title="${%Not Built}" field="triggerDownstreamUponResultNotBuilt" />
-            <f:checkbox title="${%Aborted}" field="triggerDownstreamUponResultAborted" />
+        <f:entry title="${%downstream_trigger}" field="triggerDownstreamUponResult" >
+            <f:checkbox title="${%success}" field="triggerDownstreamUponResultSuccess" default="true" />
+            <f:checkbox title="${%unstable}" field="triggerDownstreamUponResultUnstable" />
+            <f:checkbox title="${%failure}" field="triggerDownstreamUponResultFailure" />
+            <f:checkbox title="${%not_built}" field="triggerDownstreamUponResultNotBuilt" />
+            <f:checkbox title="${%aborted}" field="triggerDownstreamUponResultAborted" />
         </f:entry>
-        <f:entry title="${%Options}">
+        <f:entry title="${%options}">
             <f:repeatableHeteroProperty field="publisherOptions" targetType="org.jenkinsci.plugins.pipeline.maven.MavenPublisher"
-                                        addCaption="${%Add Publisher Options}" hasHeader="true" oneEach="true" honorOrder="true"/>
+                                        addCaption="${%options_add}" hasHeader="true" oneEach="true" honorOrder="true"/>
         </f:entry>
     </f:section>
 

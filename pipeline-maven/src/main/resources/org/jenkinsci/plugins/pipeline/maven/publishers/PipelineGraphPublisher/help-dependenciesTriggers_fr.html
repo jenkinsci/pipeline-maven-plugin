@@ -1,0 +1,11 @@
+<div>
+    <p>
+        <strong>Ne pas déclencher en aval</strong> : Ne pas déclencher les constructions dépendantes si un livrable Maven est modifié au sein du block withMaven,
+        même si ces projets ont un déclencheur basé sur le changement des dépendances SNAPSHOT.<br/>
+        Cette option permet d'éviter une tempête de constructions lors de la modification d'un livrable Maven très largement mutualisé.
+    </p>
+    <p>
+        <strong>Ignorer les déclenchements amonts</strong> : Ne pas déclencher cette construction si une dépendance Maven a été modifiée dans sa propre construction,
+        même si ce projet a un déclencheur basé sur le changement des dépendances SNAPSHOT.
+    </p>
+</div>

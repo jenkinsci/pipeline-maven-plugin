@@ -27,13 +27,13 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.findbugs.FindBugsPublisher;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
+import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -250,7 +250,7 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
         @NonNull
         @Override
         public String getDisplayName() {
-            return "SpotBugs Publisher";
+            return Messages.publisher_spotbugs_analysis_description();
         }
 
         @Override

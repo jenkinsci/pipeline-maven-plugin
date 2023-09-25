@@ -1,11 +1,11 @@
 <div>
     <p>
-        <strong>Skip Downstream Triggers:</strong>Don't trigger this pipeline if a maven dependency declared in the withMaven block has changed,
-        even if the pipeline has registered a trigger on SNAPSHOT dependencies changes.<br/>
+        <strong>Skip Downstream Triggers</strong>: Don't trigger dependent pipelines if a maven artifact declared in the withMaven block has changed,
+        even if those pipelines have registered a trigger on SNAPSHOT dependencies changes.<br/>
         This flag is convenient to prevent storms of pipeline builds when modifying a widely mutualized maven artifact.
     </p>
     <p>
-        <strong>Ignore Upstream Triggers:</strong>Don't trigger this pipeline if a maven dependency declared in the withMaven block has changed,
-        even if the pipeline has registered a trigger on SNAPSHOT dependencies changes.
+        <strong>Ignore Upstream Triggers</strong>: Don't trigger this pipeline if a maven dependency has changed by its own pipeline,
+        even if this pipeline has registered a trigger on SNAPSHOT dependencies changes.
     </p>
 </div>
