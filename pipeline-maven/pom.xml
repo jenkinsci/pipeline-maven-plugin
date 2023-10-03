@@ -508,6 +508,17 @@
             </configuration>
             <executions>
               <execution>
+                <id>build-first-sshd-image</id>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+                <phase>process-test-resources</phase>
+                <configuration>
+                  <contextDirectory>src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/SshdContainer/</contextDirectory>
+                  <repository>localhost/pipeline-maven/sshd</repository>
+                </configuration>
+              </execution>
+              <execution>
                 <id>build-java-git-image</id>
                 <goals>
                   <goal>build</goal>
@@ -549,17 +560,6 @@
                 <configuration>
                   <contextDirectory>src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/JavaMavenWithMavenHomeContainer/</contextDirectory>
                   <repository>localhost/pipeline-maven/maven-home</repository>
-                </configuration>
-              </execution>
-              <execution>
-                <id>build-sshd-image</id>
-                <goals>
-                  <goal>build</goal>
-                </goals>
-                <phase>process-test-resources</phase>
-                <configuration>
-                  <contextDirectory>src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/SshdContainer/</contextDirectory>
-                  <repository>localhost/pipeline-maven/sshd</repository>
                 </configuration>
               </execution>
             </executions>
