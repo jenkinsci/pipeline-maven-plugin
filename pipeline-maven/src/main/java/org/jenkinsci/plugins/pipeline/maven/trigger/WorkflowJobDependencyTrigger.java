@@ -17,21 +17,20 @@ import org.kohsuke.stapler.DataBoundConstructor;
 public class WorkflowJobDependencyTrigger extends Trigger<Item> {
 
     @DataBoundConstructor
-    public WorkflowJobDependencyTrigger(){
-
-    }
+    public WorkflowJobDependencyTrigger() {}
 
     @Symbol("snapshotDependencies")
     @Extension
     public static class DescriptorImpl extends TriggerDescriptor {
         @Override
         public boolean isApplicable(Item item) {
-            return item instanceof BlockableResume || item instanceof MultiBranchProject || item instanceof OrganizationFolder;
+            return item instanceof BlockableResume
+                    || item instanceof MultiBranchProject
+                    || item instanceof OrganizationFolder;
         }
 
         public String getDisplayName() {
             return Messages.trigger_workflow_job_dependency_description();
         }
-
     }
 }

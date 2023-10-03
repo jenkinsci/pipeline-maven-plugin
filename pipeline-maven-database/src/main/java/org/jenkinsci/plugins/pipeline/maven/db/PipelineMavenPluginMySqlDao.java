@@ -25,19 +25,18 @@
 package org.jenkinsci.plugins.pipeline.maven.db;
 
 import com.mysql.cj.exceptions.MysqlErrorNumbers;
-import hudson.Extension;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.pipeline.maven.db.util.RuntimeSqlException;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import javax.sql.DataSource;
+import hudson.Extension;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
+import javax.sql.DataSource;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.pipeline.maven.db.util.RuntimeSqlException;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -61,24 +60,23 @@ public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao 
      * @return {@code null} if this is not a MariaDB version, the MariaDB server version (e.g. "10.2.20", "10.3.11") if parsed, the entire {@link DatabaseMetaData#getDatabaseProductVersion()} if the parsing oof the MariaDB server version failed
      */
     @Nullable
-    public  static String extractMariaDbVersion(@Nullable String jdbcDatabaseProductVersion) {
+    public static String extractMariaDbVersion(@Nullable String jdbcDatabaseProductVersion) {
         if (jdbcDatabaseProductVersion == null) {
             return null;
         }
 
-        if(!jdbcDatabaseProductVersion.contains("MariaDB")) {
+        if (!jdbcDatabaseProductVersion.contains("MariaDB")) {
             return null;
         }
 
         String mariaDbVersion = StringUtils.substringBetween(jdbcDatabaseProductVersion, "-", "-MariaDB");
 
         if (mariaDbVersion == null) { // MariaDB version format has changed.
-           return jdbcDatabaseProductVersion;
+            return jdbcDatabaseProductVersion;
         } else {
             return mariaDbVersion;
         }
     }
-
 
     public PipelineMavenPluginMySqlDao(@NonNull DataSource ds) {
         super(ds);
@@ -91,7 +89,7 @@ public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao 
 
     @Override
     protected void handleDatabaseInitialisationException(SQLException e) {
-        if ( MysqlErrorNumbers.SQL_STATE_ILLEGAL_ARGUMENT.equals(e.getSQLState())) {
+        if (MysqlErrorNumbers.SQL_STATE_ILLEGAL_ARGUMENT.equals(e.getSQLState())) {
             LOGGER.log(Level.FINE, "Ignore sql exception " + e.getErrorCode() + " - " + e.getSQLState(), e);
         } else if (MysqlErrorNumbers.ER_EMPTY_QUERY == e.getErrorCode()) {
             LOGGER.log(Level.FINE, "Ignore sql exception " + e.getErrorCode() + " - " + e.getSQLState(), e);
@@ -108,7 +106,8 @@ public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao 
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("MySql driver 'com.mysql.cj.jdbc.Driver' not found. Please install the 'MySQL Database Plugin' to install the MySql driver");
+            throw new RuntimeException(
+                    "MySql driver 'com.mysql.cj.jdbc.Driver' not found. Please install the 'MySQL Database Plugin' to install the MySql driver");
         }
     }
 
@@ -116,7 +115,7 @@ public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao 
     protected String getDatabaseDescription() {
         try (Connection cnn = getDataSource().getConnection()) {
             DatabaseMetaData metaData = cnn.getMetaData();
-            String version = metaData. getDatabaseProductName() + " " + metaData.getDatabaseProductVersion();
+            String version = metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion();
             try (Statement stmt = cnn.createStatement()) {
                 try (ResultSet rst = stmt.executeQuery("select AURORA_VERSION()")) {
                     rst.next();

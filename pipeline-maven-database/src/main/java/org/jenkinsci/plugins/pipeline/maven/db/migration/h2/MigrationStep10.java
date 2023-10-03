@@ -1,20 +1,19 @@
 package org.jenkinsci.plugins.pipeline.maven.db.migration.h2;
 
-import hudson.model.Run;
-import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import hudson.model.Run;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 
 public class MigrationStep10 implements MigrationStep {
 
-    private final static Logger LOGGER = Logger.getLogger(MigrationStep10.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MigrationStep10.class.getName());
 
     @Override
     public void execute(@NonNull Connection cnn, @NonNull JenkinsDetails jenkinsDetails) throws SQLException {
@@ -25,9 +24,9 @@ public class MigrationStep10 implements MigrationStep {
             try (ResultSet rst = stmt.executeQuery()) {
                 while (rst.next()) {
                     count++;
-                    if ((count < 100 && (count % 10) == 0) ||
-                            (count < 500 && (count % 20) == 0) ||
-                            ((count % 50) == 0)) {
+                    if ((count < 100 && (count % 10) == 0)
+                            || (count < 500 && (count % 20) == 0)
+                            || ((count % 50) == 0)) {
                         LOGGER.log(Level.INFO, "#" + count + " - " + rst.getString("FULL_NAME") + "...");
                     }
 
@@ -42,11 +41,12 @@ public class MigrationStep10 implements MigrationStep {
             }
         }
         LOGGER.info("Successfully upgraded table JENKINS_JOB, " + count + " records upgraded");
-
     }
 
-    protected void updateJenkinsJobRecord(@NonNull Connection cnn, long jenkinsJobPrimaryKey, int lastBuildNumber) throws SQLException {
-        try (PreparedStatement stmt = cnn.prepareStatement("UPDATE JENKINS_JOB set LAST_BUILD_NUMBER = ?, LAST_SUCCESSFUL_BUILD_NUMBER = ? where ID = ?")) {
+    protected void updateJenkinsJobRecord(@NonNull Connection cnn, long jenkinsJobPrimaryKey, int lastBuildNumber)
+            throws SQLException {
+        try (PreparedStatement stmt = cnn.prepareStatement(
+                "UPDATE JENKINS_JOB set LAST_BUILD_NUMBER = ?, LAST_SUCCESSFUL_BUILD_NUMBER = ? where ID = ?")) {
             stmt.setInt(1, lastBuildNumber);
             // TRICK we assume that the last build is successful
             stmt.setInt(2, lastBuildNumber);
@@ -60,7 +60,8 @@ public class MigrationStep10 implements MigrationStep {
      */
     @Nullable
     protected Integer findLastBuildNumber(@NonNull Connection cnn, long jobPrimaryKey) throws SQLException {
-        try (PreparedStatement stmt2 = cnn.prepareStatement("SELECT * FROM JENKINS_BUILD WHERE JOB_ID = ? ORDER BY JENKINS_BUILD.NUMBER DESC LIMIT 1")) {
+        try (PreparedStatement stmt2 = cnn.prepareStatement(
+                "SELECT * FROM JENKINS_BUILD WHERE JOB_ID = ? ORDER BY JENKINS_BUILD.NUMBER DESC LIMIT 1")) {
             stmt2.setLong(1, jobPrimaryKey);
             try (ResultSet rst2 = stmt2.executeQuery()) {
                 if (rst2.next()) {

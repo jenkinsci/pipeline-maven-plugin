@@ -28,8 +28,6 @@ import hudson.tasks._maven.Maven3MojoNote;
 import hudson.tasks._maven.MavenErrorNote;
 import hudson.tasks._maven.MavenMojoNote;
 import hudson.tasks._maven.MavenWarningNote;
-import jenkins.util.JenkinsJVM;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,6 +35,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.stream.Stream;
+import jenkins.util.JenkinsJVM;
 
 // adapted from version in hudson.tasks._maven
 
@@ -47,15 +46,17 @@ class MavenConsoleAnnotator extends LineTransformationOutputStream {
 
     static byte[][] createNotes() {
         JenkinsJVM.checkJenkinsJVM();
-        return Stream.of(new MavenMojoNote(), new Maven3MojoNote(), new MavenWarningNote(), new MavenErrorNote()).map(note -> {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-                note.encodeTo(baos);
-            } catch (IOException x) { // should be impossible
-                throw new RuntimeException(x);
-            }
-            return baos.toByteArray();
-        }).toArray(byte[][]::new);
+        return Stream.of(new MavenMojoNote(), new Maven3MojoNote(), new MavenWarningNote(), new MavenErrorNote())
+                .map(note -> {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    try {
+                        note.encodeTo(baos);
+                    } catch (IOException x) { // should be impossible
+                        throw new RuntimeException(x);
+                    }
+                    return baos.toByteArray();
+                })
+                .toArray(byte[][]::new);
     }
 
     private final OutputStream out;
@@ -96,7 +97,7 @@ class MavenConsoleAnnotator extends LineTransformationOutputStream {
             out.write(notes[3]);
         }
 
-        out.write(b,0,len);
+        out.write(b, 0, len);
     }
 
     @Override
@@ -109,5 +110,4 @@ class MavenConsoleAnnotator extends LineTransformationOutputStream {
         super.close();
         out.close();
     }
-
 }

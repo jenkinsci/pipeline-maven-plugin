@@ -1,9 +1,19 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
+import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listParentProjects;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.util.ListBoxModel;
+import java.io.IOException;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
@@ -16,17 +26,6 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.IOException;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
-import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listParentProjects;
 
 /**
  * Fingerprint the dependencies of the maven project.
@@ -67,19 +66,16 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
     protected Set<String> getIncludedScopes() {
         Set<String> includedScopes = new TreeSet<>();
-        if (includeScopeCompile)
-            includedScopes.add("compile");
-        if (includeScopeRuntime)
-            includedScopes.add("runtime");
-        if (includeScopeProvided)
-            includedScopes.add("provided");
-        if (includeScopeTest)
-            includedScopes.add("test");
+        if (includeScopeCompile) includedScopes.add("compile");
+        if (includeScopeRuntime) includedScopes.add("runtime");
+        if (includeScopeProvided) includedScopes.add("provided");
+        if (includeScopeTest) includedScopes.add("test");
         return includedScopes;
     }
 
     @Override
-    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt)
+            throws IOException, InterruptedException {
         Run run = context.get(Run.class);
         TaskListener listener = context.get(TaskListener.class);
 
@@ -90,30 +86,39 @@ public class PipelineGraphPublisher extends MavenPublisher {
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogsElt, true);
         List<String> executedLifecyclePhases = XmlUtils.getExecutedLifecyclePhases(mavenSpyLogsElt);
 
-        recordParentProject(parentProjects, run,listener, dao);
+        recordParentProject(parentProjects, run, listener, dao);
         recordDependencies(dependencies, generatedArtifacts, run, listener, dao);
         recordGeneratedArtifacts(generatedArtifacts, executedLifecyclePhases, run, listener, dao);
     }
 
-    protected void recordParentProject(List<MavenArtifact> parentProjects,
-                                       @NonNull Run run, @NonNull TaskListener listener, @NonNull PipelineMavenPluginDao dao) {
+    protected void recordParentProject(
+            List<MavenArtifact> parentProjects,
+            @NonNull Run run,
+            @NonNull TaskListener listener,
+            @NonNull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
-            listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordParentProject - filter: " +
-                    "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "]");
+            listener.getLogger()
+                    .println("[withMaven] pipelineGraphPublisher - recordParentProject - filter: "
+                            + "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: "
+                            + isIncludeReleaseVersions() + "]");
         }
 
         for (MavenArtifact parentProject : parentProjects) {
             if (parentProject.isSnapshot()) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording snapshot parent project: " + parentProject.getId());
+                        listener.getLogger()
+                                .println("[withMaven] pipelineGraphPublisher - Skip recording snapshot parent project: "
+                                        + parentProject.getId());
                     }
                     continue;
                 }
             } else {
                 if (!includeReleaseVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording release parent project: " + parentProject.getId());
+                        listener.getLogger()
+                                .println("[withMaven] pipelineGraphPublisher - Skip recording release parent project: "
+                                        + parentProject.getId());
                     }
                     continue;
                 }
@@ -121,64 +126,94 @@ public class PipelineGraphPublisher extends MavenPublisher {
 
             try {
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record parent project: " + parentProject.getId() + ", ignoreUpstreamTriggers: " + ignoreUpstreamTriggers);
+                    listener.getLogger()
+                            .println("[withMaven] pipelineGraphPublisher - Record parent project: "
+                                    + parentProject.getId() + ", ignoreUpstreamTriggers: " + ignoreUpstreamTriggers);
                 }
 
-                dao.recordParentProject(run.getParent().getFullName(), run.getNumber(),
-                        parentProject.getGroupId(), parentProject.getArtifactId(), parentProject.getVersion(),
+                dao.recordParentProject(
+                        run.getParent().getFullName(),
+                        run.getNumber(),
+                        parentProject.getGroupId(),
+                        parentProject.getArtifactId(),
+                        parentProject.getVersion(),
                         this.ignoreUpstreamTriggers);
 
             } catch (RuntimeException e) {
-                listener.error("[withMaven] pipelineGraphPublisher - WARNING: Exception recording parent project " + parentProject.getId() + " on build, skip");
+                listener.error("[withMaven] pipelineGraphPublisher - WARNING: Exception recording parent project "
+                        + parentProject.getId() + " on build, skip");
                 e.printStackTrace(listener.getLogger());
                 listener.getLogger().flush();
             }
         }
-
     }
 
-    protected void recordDependencies(List<MavenDependency> dependencies, List<MavenArtifact> generatedArtifacts,
-                                      @NonNull Run run, @NonNull TaskListener listener, @NonNull PipelineMavenPluginDao dao) {
+    protected void recordDependencies(
+            List<MavenDependency> dependencies,
+            List<MavenArtifact> generatedArtifacts,
+            @NonNull Run run,
+            @NonNull TaskListener listener,
+            @NonNull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
-            listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordDependencies - filter: " +
-                    "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "], " +
-                    "scopes:" + getIncludedScopes());
+            listener.getLogger()
+                    .println(
+                            "[withMaven] pipelineGraphPublisher - recordDependencies - filter: " + "versions[snapshot: "
+                                    + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "], "
+                                    + "scopes:"
+                                    + getIncludedScopes());
         }
 
         for (MavenDependency dependency : dependencies) {
             if (dependency.isSnapshot()) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording snapshot dependency: " + dependency.getId());
+                        listener.getLogger()
+                                .println("[withMaven] pipelineGraphPublisher - Skip recording snapshot dependency: "
+                                        + dependency.getId());
                     }
                     continue;
                 }
             } else {
                 if (!includeReleaseVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording release dependency: " + dependency.getId());
+                        listener.getLogger()
+                                .println("[withMaven] pipelineGraphPublisher - Skip recording release dependency: "
+                                        + dependency.getId());
                     }
                     continue;
                 }
             }
             if (!getIncludedScopes().contains(dependency.getScope())) {
                 if (LOGGER.isLoggable(Level.FINER)) {
-                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Skip recording dependency with ignored scope: " + dependency.getId());
+                    listener.getLogger()
+                            .println(
+                                    "[withMaven] pipelineGraphPublisher - Skip recording dependency with ignored scope: "
+                                            + dependency.getId());
                 }
                 continue;
             }
 
             try {
                 if (LOGGER.isLoggable(Level.FINE)) {
-                    listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record dependency: " + dependency.getId() + ", ignoreUpstreamTriggers: " + ignoreUpstreamTriggers);
+                    listener.getLogger()
+                            .println("[withMaven] pipelineGraphPublisher - Record dependency: " + dependency.getId()
+                                    + ", ignoreUpstreamTriggers: " + ignoreUpstreamTriggers);
                 }
 
-                dao.recordDependency(run.getParent().getFullName(), run.getNumber(),
-                        dependency.getGroupId(), dependency.getArtifactId(), dependency.getBaseVersion(), dependency.getType(), dependency.getScope(),
-                        this.ignoreUpstreamTriggers, dependency.getClassifier());
+                dao.recordDependency(
+                        run.getParent().getFullName(),
+                        run.getNumber(),
+                        dependency.getGroupId(),
+                        dependency.getArtifactId(),
+                        dependency.getBaseVersion(),
+                        dependency.getType(),
+                        dependency.getScope(),
+                        this.ignoreUpstreamTriggers,
+                        dependency.getClassifier());
 
             } catch (RuntimeException e) {
-                listener.error("[withMaven] pipelineGraphPublisher - WARNING: Exception recording " + dependency.getId() + " on build, skip");
+                listener.error("[withMaven] pipelineGraphPublisher - WARNING: Exception recording " + dependency.getId()
+                        + " on build, skip");
                 e.printStackTrace(listener.getLogger());
                 listener.getLogger().flush();
             }
@@ -192,43 +227,66 @@ public class PipelineGraphPublisher extends MavenPublisher {
      * @param listener
      * @param dao
      */
-    protected void recordGeneratedArtifacts(List<MavenArtifact> generatedArtifacts, List<String> executedLifecyclePhases, @NonNull Run run, @NonNull TaskListener listener, @NonNull PipelineMavenPluginDao dao) {
+    protected void recordGeneratedArtifacts(
+            List<MavenArtifact> generatedArtifacts,
+            List<String> executedLifecyclePhases,
+            @NonNull Run run,
+            @NonNull TaskListener listener,
+            @NonNull PipelineMavenPluginDao dao) {
         if (LOGGER.isLoggable(Level.FINE)) {
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - recordGeneratedArtifacts...");
         }
         for (MavenArtifact artifact : generatedArtifacts) {
-            boolean skipDownstreamPipelines = this.skipDownstreamTriggers ||
-                    (!executedLifecyclePhases.contains(this.lifecycleThreshold));
+            boolean skipDownstreamPipelines =
+                    this.skipDownstreamTriggers || (!executedLifecyclePhases.contains(this.lifecycleThreshold));
 
             if (LOGGER.isLoggable(Level.FINE)) {
-                LOGGER.log(Level.FINE, "Build {0}#{1} - record generated {2}:{3}, version:{4}, " +
-                                "executedLifecyclePhases: {5}, " +
-                                "skipDownstreamTriggers:{6}, lifecycleThreshold: {7}",
-                        new Object[]{run.getParent().getFullName(), run.getNumber(),
-                                artifact.getId(), artifact.getType(), artifact.getVersion(),
-                                executedLifecyclePhases,
-                                skipDownstreamTriggers, lifecycleThreshold});
-                listener.getLogger().println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact.getId() + ", version: " + artifact.getVersion() +
-                        ", executedLifecyclePhases: " + executedLifecyclePhases +
-                        ", skipDownstreamTriggers: " + skipDownstreamTriggers + ", lifecycleThreshold:" + lifecycleThreshold +
-                        ", file: " + artifact.getFile());
+                LOGGER.log(
+                        Level.FINE,
+                        "Build {0}#{1} - record generated {2}:{3}, version:{4}, " + "executedLifecyclePhases: {5}, "
+                                + "skipDownstreamTriggers:{6}, lifecycleThreshold: {7}",
+                        new Object[] {
+                            run.getParent().getFullName(),
+                            run.getNumber(),
+                            artifact.getId(),
+                            artifact.getType(),
+                            artifact.getVersion(),
+                            executedLifecyclePhases,
+                            skipDownstreamTriggers,
+                            lifecycleThreshold
+                        });
+                listener.getLogger()
+                        .println("[withMaven] pipelineGraphPublisher - Record generated artifact: " + artifact.getId()
+                                + ", version: " + artifact.getVersion() + ", executedLifecyclePhases: "
+                                + executedLifecyclePhases + ", skipDownstreamTriggers: "
+                                + skipDownstreamTriggers + ", lifecycleThreshold:" + lifecycleThreshold + ", file: "
+                                + artifact.getFile());
             }
-            dao.recordGeneratedArtifact(run.getParent().getFullName(), run.getNumber(),
-                    artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), artifact.getType(), artifact.getBaseVersion(),
-                    artifact.getRepositoryUrl(), skipDownstreamPipelines, artifact.getExtension(), artifact.getClassifier());
+            dao.recordGeneratedArtifact(
+                    run.getParent().getFullName(),
+                    run.getNumber(),
+                    artifact.getGroupId(),
+                    artifact.getArtifactId(),
+                    artifact.getVersion(),
+                    artifact.getType(),
+                    artifact.getBaseVersion(),
+                    artifact.getRepositoryUrl(),
+                    skipDownstreamPipelines,
+                    artifact.getExtension(),
+                    artifact.getClassifier());
         }
     }
 
     @Override
     public String toString() {
-        return getClass().getName() + "[" +
-                "disabled=" + isDisabled() + ", " +
-                "scopes=" + getIncludedScopes() + ", " +
-                "versions={snapshot:" + isIncludeSnapshotVersions() + ", release:" + isIncludeReleaseVersions() + "}, " +
-                "skipDownstreamTriggers=" + isSkipDownstreamTriggers() + ", " +
-                "lifecycleThreshold=" + getLifecycleThreshold() + ", " +
-                "ignoreUpstreamTriggers=" + isIgnoreUpstreamTriggers() +
-                ']';
+        return getClass().getName() + "[" + "disabled="
+                + isDisabled() + ", " + "scopes="
+                + getIncludedScopes() + ", " + "versions={snapshot:"
+                + isIncludeSnapshotVersions() + ", release:" + isIncludeReleaseVersions() + "}, "
+                + "skipDownstreamTriggers="
+                + isSkipDownstreamTriggers() + ", " + "lifecycleThreshold="
+                + getLifecycleThreshold() + ", " + "ignoreUpstreamTriggers="
+                + isIgnoreUpstreamTriggers() + ']';
     }
 
     public boolean isIncludeSnapshotVersions() {

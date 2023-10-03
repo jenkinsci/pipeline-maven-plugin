@@ -2,8 +2,8 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import hudson.model.Result;
 import java.util.Collection;
-
 import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
 import org.jenkinsci.plugins.pipeline.maven.TestUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
@@ -12,43 +12,51 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 
-import hudson.model.Result;
-
 public class InvokerRunsPublisherTest extends AbstractIntegrationTest {
 
     @Issue("JENKINS-70561")
     @Test
     public void maven_build_maven_plugin_project_on_master_succeeds() throws Exception {
-        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_plugin_project/");
+        loadSourceCodeInGitRepository(
+                this.gitRepoRule,
+                "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_plugin_project/");
 
-        //@formatter:off
-        String pipelineScript = "node() {\n" +
-            "    git($/" + gitRepoRule.toString() + "/$)\n" +
-            "    withMaven() {\n" +
-            "        if (isUnix()) {\n" +
-            "            sh 'mvn verify'\n" +
-            "        } else {\n" +
-            "            bat 'mvn verify'\n" +
-            "        }\n" +
-            "    }\n" +
-            "}";
-        //@formatter:on
+        // @formatter:off
+        String pipelineScript = "node() {\n" + "    git($/"
+                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
+                + "        if (isUnix()) {\n"
+                + "            sh 'mvn verify'\n"
+                + "        } else {\n"
+                + "            bat 'mvn verify'\n"
+                + "        }\n"
+                + "    }\n"
+                + "}";
+        // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
         // verify .pom is archived and fingerprinted
-        jenkinsRule.assertLogContains("under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom", build);
+        jenkinsRule.assertLogContains(
+                "under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom", build);
 
         // verify .jar is archived and fingerprinted
-        jenkinsRule.assertLogContains("under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.jar", build);
+        jenkinsRule.assertLogContains(
+                "under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.jar", build);
 
         Collection<String> artifactsFileNames = TestUtils.artifactsToArtifactsFileNames(build.getArtifacts());
-        assertThat(artifactsFileNames).contains("hello-maven-plugin-1.0-SNAPSHOT.pom", "hello-maven-plugin-1.0-SNAPSHOT.jar");
+        assertThat(artifactsFileNames)
+                .contains("hello-maven-plugin-1.0-SNAPSHOT.pom", "hello-maven-plugin-1.0-SNAPSHOT.jar");
 
-        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.jar");
-        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom");
+        verifyFileIsFingerPrinted(
+                pipeline,
+                build,
+                "jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.jar");
+        verifyFileIsFingerPrinted(
+                pipeline,
+                build,
+                "jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom");
 
         // verify Invoker Archiver is called
         jenkinsRule.assertLogContains(
@@ -59,42 +67,50 @@ public class InvokerRunsPublisherTest extends AbstractIntegrationTest {
     @Issue("JENKINS-70561")
     @Test
     public void maven_build_maven_plugin_project_with_invoker_as_junit_on_master_succeeds() throws Exception {
-        loadSourceCodeInGitRepository(this.gitRepoRule,
+        loadSourceCodeInGitRepository(
+                this.gitRepoRule,
                 "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_plugin_project_with_invoker_as_junit/");
 
-        //@formatter:off
-        String pipelineScript = "node() {\n" +
-            "    git($/" + gitRepoRule.toString() + "/$)\n" +
-            "    withMaven() {\n" +
-            "        if (isUnix()) {\n" +
-            "            sh 'mvn verify'\n" +
-            "        } else {\n" +
-            "            bat 'mvn verify'\n" +
-            "        }\n" +
-            "    }\n" +
-            "}";
-        //@formatter:on
+        // @formatter:off
+        String pipelineScript = "node() {\n" + "    git($/"
+                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
+                + "        if (isUnix()) {\n"
+                + "            sh 'mvn verify'\n"
+                + "        } else {\n"
+                + "            bat 'mvn verify'\n"
+                + "        }\n"
+                + "    }\n"
+                + "}";
+        // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
         // verify .pom is archived and fingerprinted
-        jenkinsRule.assertLogContains("under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom", build);
+        jenkinsRule.assertLogContains(
+                "under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom", build);
 
         // verify .jar is archived and fingerprinted
-        jenkinsRule.assertLogContains("under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.jar", build);
+        jenkinsRule.assertLogContains(
+                "under jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.jar", build);
 
         Collection<String> artifactsFileNames = TestUtils.artifactsToArtifactsFileNames(build.getArtifacts());
-        assertThat(artifactsFileNames).contains("hello-maven-plugin-1.0-SNAPSHOT.pom", "hello-maven-plugin-1.0-SNAPSHOT.jar");
+        assertThat(artifactsFileNames)
+                .contains("hello-maven-plugin-1.0-SNAPSHOT.pom", "hello-maven-plugin-1.0-SNAPSHOT.jar");
 
-        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.jar");
-        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom");
+        verifyFileIsFingerPrinted(
+                pipeline,
+                build,
+                "jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.jar");
+        verifyFileIsFingerPrinted(
+                pipeline,
+                build,
+                "jenkins/mvn/test/hello-maven-plugin/1.0-SNAPSHOT/hello-maven-plugin-1.0-SNAPSHOT.pom");
 
         // verify Invoker Archiver is called
         jenkinsRule.assertLogContains(
                 "[withMaven] invokerPublisher - Archive test results for Maven artifact jenkins.mvn.test:hello-maven-plugin:maven-plugin:1.0-SNAPSHOT generated by",
                 build);
     }
-
 }

@@ -9,17 +9,11 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
  */
 public class DevNullMavenEventReporter implements MavenEventReporter {
     @Override
-    public void print(Object message) {
-
-    }
+    public void print(Object message) {}
 
     @Override
-    public void print(Xpp3Dom element) {
-
-    }
+    public void print(Xpp3Dom element) {}
 
     @Override
-    public void close() {
-
-    }
+    public void close() {}
 }

@@ -18,6 +18,7 @@
 
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import htmlpublisher.HtmlPublisher;
 import htmlpublisher.HtmlPublisherTarget;
 import hudson.Extension;
@@ -25,15 +26,6 @@ import hudson.FilePath;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
-import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
-import org.jenkinsci.plugins.pipeline.maven.Messages;
-import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
-import org.jenkinsci.plugins.workflow.steps.StepContext;
-import org.kohsuke.stapler.DataBoundConstructor;
-import org.w3c.dom.Element;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -45,6 +37,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
+import org.jenkinsci.plugins.pipeline.maven.Messages;
+import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.kohsuke.stapler.DataBoundConstructor;
+import org.w3c.dom.Element;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -60,23 +59,21 @@ public class ConcordionTestsPublisher extends MavenPublisher {
     private static final long serialVersionUID = 1L;
 
     @DataBoundConstructor
-    public ConcordionTestsPublisher() {
-
-    }
+    public ConcordionTestsPublisher() {}
 
     /*
-<ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-08-04 22:09:34.205">
-    <project baseDir="/path/to/spring-petclinic" file="/path/to/spring-petclinic/pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
-      <build directory="/path/to/spring-petclinic/target"/>
-    </project>
-    <plugin executionId="default" goal="integration-test" groupId="org.apache.maven.plugins" artifactId="maven-failsafe-plugin" version="2.19.1">
-      <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
-      <systemPropertyVariables>
-        <concordion.output.dir>target/concordion-reports</concordion.output.dir>
-      </systemPropertyVariables>
-    </plugin>
-  </ExecutionEvent>
-     */
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-08-04 22:09:34.205">
+        <project baseDir="/path/to/spring-petclinic" file="/path/to/spring-petclinic/pom.xml" groupId="org.springframework.samples" name="petclinic" artifactId="spring-petclinic" version="1.5.1">
+          <build directory="/path/to/spring-petclinic/target"/>
+        </project>
+        <plugin executionId="default" goal="integration-test" groupId="org.apache.maven.plugins" artifactId="maven-failsafe-plugin" version="2.19.1">
+          <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
+          <systemPropertyVariables>
+            <concordion.output.dir>target/concordion-reports</concordion.output.dir>
+          </systemPropertyVariables>
+        </plugin>
+      </ExecutionEvent>
+         */
     @Override
     public void process(@NonNull final StepContext context, @NonNull final Element mavenSpyLogsElt)
             throws IOException, InterruptedException {
@@ -91,12 +88,15 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         final Run run = context.get(Run.class);
 
         Set<String> concordionOutputDirPatterns = new HashSet<>();
-        concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL, "MojoSucceeded", "MojoFailed")));
-        concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL, "MojoSucceeded", "MojoFailed")));
+        concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt, GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL, "MojoSucceeded", "MojoFailed")));
+        concordionOutputDirPatterns.addAll(findConcordionOutputDirPatterns(XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt, GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL, "MojoSucceeded", "MojoFailed")));
 
         if (concordionOutputDirPatterns.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println("[withMaven] concordionPublisher - No concordion output dir pattern given, skip.");
+                listener.getLogger()
+                        .println("[withMaven] concordionPublisher - No concordion output dir pattern given, skip.");
             }
             return;
         }
@@ -107,22 +107,23 @@ public class ConcordionTestsPublisher extends MavenPublisher {
         }
         if (paths.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println(
-                        "[withMaven] concordionPublisher - Did not found any Concordion reports directory, skip.");
+                listener.getLogger()
+                        .println(
+                                "[withMaven] concordionPublisher - Did not found any Concordion reports directory, skip.");
             }
             return;
         }
 
-        listener.getLogger().println(
-                "[withMaven] concordionPublisher - Found " + paths.size() + " file(s) in Concordion reports directory.");
-
+        listener.getLogger()
+                .println("[withMaven] concordionPublisher - Found " + paths.size()
+                        + " file(s) in Concordion reports directory.");
 
         try {
             Class.forName("htmlpublisher.HtmlPublisher");
         } catch (final ClassNotFoundException e) {
             listener.getLogger().print("[withMaven] concordionPublisher - Jenkins ");
-            listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/HTML+Publisher+Plugin",
-                    "HTML Publisher Plugin");
+            listener.hyperlink(
+                    "https://wiki.jenkins.io/display/JENKINS/HTML+Publisher+Plugin", "HTML Publisher Plugin");
             listener.getLogger().println(" not found, do not archive concordion reports.");
             return;
         }
@@ -132,14 +133,15 @@ public class ConcordionTestsPublisher extends MavenPublisher {
             files.add(XmlUtils.getPathInWorkspace(path.getRemote(), workspace));
         }
 
-        final HtmlPublisherTarget target = new HtmlPublisherTarget("Concordion reports", ".",
-                XmlUtils.join(files, ","), true, true, true);
+        final HtmlPublisherTarget target =
+                new HtmlPublisherTarget("Concordion reports", ".", XmlUtils.join(files, ","), true, true, true);
 
         try {
-            listener.getLogger().println(
-                    "[withMaven] concordionPublisher - Publishing HTML reports named \"" + target.getReportName()  +
-                            "\" with the following files: " + target.getReportFiles());
-            HtmlPublisher.publishReports(run, workspace, listener, Collections.singletonList(target), HtmlPublisher.class);
+            listener.getLogger()
+                    .println("[withMaven] concordionPublisher - Publishing HTML reports named \""
+                            + target.getReportName() + "\" with the following files: " + target.getReportFiles());
+            HtmlPublisher.publishReports(
+                    run, workspace, listener, Collections.singletonList(target), HtmlPublisher.class);
         } catch (final Exception e) {
             listener.error("[withMaven] concordionPublisher - exception archiving Concordion reports: " + e);
             LOGGER.log(Level.WARNING, "Exception processing Concordion reports archiving", e);
@@ -151,7 +153,8 @@ public class ConcordionTestsPublisher extends MavenPublisher {
     private Collection<String> findConcordionOutputDirPatterns(@NonNull List<Element> elements) {
         List<String> result = new ArrayList<>();
         for (Element element : elements) {
-            Element envVars = XmlUtils.getUniqueChildElementOrNull(XmlUtils.getUniqueChildElement(element, "plugin"), "systemPropertyVariables");
+            Element envVars = XmlUtils.getUniqueChildElementOrNull(
+                    XmlUtils.getUniqueChildElement(element, "plugin"), "systemPropertyVariables");
             if (envVars != null) {
                 Element concordionOutputDir = XmlUtils.getUniqueChildElementOrNull(envVars, "concordion.output.dir");
                 if (concordionOutputDir != null) {

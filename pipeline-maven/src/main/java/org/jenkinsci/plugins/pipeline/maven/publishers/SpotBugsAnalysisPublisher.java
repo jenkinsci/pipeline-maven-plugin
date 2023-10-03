@@ -24,12 +24,17 @@
 
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.plugins.findbugs.FindBugsPublisher;
+import java.io.IOException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
@@ -38,12 +43,6 @@ import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.IOException;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * handle {@code mvn spotbugs:spotbugs} invocations.
@@ -56,9 +55,7 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
     private static final long serialVersionUID = 1L;
 
     @DataBoundConstructor
-    public SpotBugsAnalysisPublisher() {
-
-    }
+    public SpotBugsAnalysisPublisher() {}
 
     /*
     <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2018-06-04 09:32:13.205">
@@ -163,14 +160,21 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
     </ExecutionEvent>
          */
     @Override
-    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt)
+            throws IOException, InterruptedException {
 
         TaskListener listener = context.get(TaskListener.class);
         FilePath workspace = context.get(FilePath.class);
         Run run = context.get(Run.class);
         Launcher launcher = context.get(Launcher.class);
 
-         List<Element> spotbugsEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, "com.github.spotbugs", "spotbugs-maven-plugin", "spotbugs", "MojoSucceeded", "MojoFailed");
+        List<Element> spotbugsEvents = XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt,
+                "com.github.spotbugs",
+                "spotbugs-maven-plugin",
+                "spotbugs",
+                "MojoSucceeded",
+                "MojoFailed");
 
         if (spotbugsEvents.isEmpty()) {
             LOGGER.log(Level.FINE, "No com.github.spotbugs:spotbugs-maven-plugin:spotbugs execution found");
@@ -181,7 +185,9 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
         } catch (ClassNotFoundException e) {
             listener.getLogger().print("[withMaven] Jenkins ");
             listener.hyperlink("https://wiki.jenkins-ci.org/display/JENKINS/FindBugs+Plugin", "FindBugs Plugin");
-            listener.getLogger().println(" not found, don't display com.github.spotbugs:spotbugs-maven-plugin:spotbugs results in pipeline screen.");
+            listener.getLogger()
+                    .println(
+                            " not found, don't display com.github.spotbugs:spotbugs-maven-plugin:spotbugs results in pipeline screen.");
             return;
         }
 
@@ -198,14 +204,18 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
             MavenSpyLogProcessor.PluginInvocation pluginInvocation = XmlUtils.newPluginInvocation(pluginElt);
 
             if (xmlOutputDirectoryElt == null) {
-                listener.getLogger().println("[withMaven] No <xmlOutputDirectoryElt> element found for <plugin> in " + XmlUtils.toString(findBugsTestEvent));
+                listener.getLogger()
+                        .println("[withMaven] No <xmlOutputDirectoryElt> element found for <plugin> in "
+                                + XmlUtils.toString(findBugsTestEvent));
                 continue;
             }
             String xmlOutputDirectory = xmlOutputDirectoryElt.getTextContent().trim();
             if (xmlOutputDirectory.contains("${project.build.directory}")) {
                 String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
                 if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
-                    listener.getLogger().println("[withMaven] '${project.build.directory}' found for <project> in " + XmlUtils.toString(findBugsTestEvent));
+                    listener.getLogger()
+                            .println("[withMaven] '${project.build.directory}' found for <project> in "
+                                    + XmlUtils.toString(findBugsTestEvent));
                     continue;
                 }
 
@@ -214,7 +224,9 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
             } else if (xmlOutputDirectory.contains("${basedir}")) {
                 String baseDir = projectElt.getAttribute("baseDir");
                 if (baseDir.isEmpty()) {
-                    listener.getLogger().println("[withMaven] '${basedir}' found for <project> in " + XmlUtils.toString(findBugsTestEvent));
+                    listener.getLogger()
+                            .println("[withMaven] '${basedir}' found for <project> in "
+                                    + XmlUtils.toString(findBugsTestEvent));
                     continue;
                 }
 
@@ -224,8 +236,10 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
             xmlOutputDirectory = XmlUtils.getPathInWorkspace(xmlOutputDirectory, workspace);
 
             String findBugsResultsFile = xmlOutputDirectory + "/spotbugsXml.xml";
-            listener.getLogger().println("[withMaven] SpotBugsPublisher - Archive SpotBugs analysis results for Maven artifact " + mavenArtifact.toString() + " generated by " +
-                    pluginInvocation + ": " + findBugsResultsFile);
+            listener.getLogger()
+                    .println("[withMaven] SpotBugsPublisher - Archive SpotBugs analysis results for Maven artifact "
+                            + mavenArtifact.toString() + " generated by " + pluginInvocation + ": "
+                            + findBugsResultsFile);
             FindBugsPublisher findBugsPublisher = new FindBugsPublisher();
 
             findBugsPublisher.setPattern(findBugsResultsFile);
@@ -235,11 +249,15 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
             try {
                 findBugsPublisher.perform(run, workspace, launcher, listener);
             } catch (Exception e) {
-                listener.error("[withMaven] SpotBugsPublisher - exception archiving FindBugs results for Maven artifact " + mavenArtifact.toString() + " generated by " +
-                        pluginInvocation + ": " + e);
+                listener.error(
+                        "[withMaven] SpotBugsPublisher - exception archiving FindBugs results for Maven artifact "
+                                + mavenArtifact.toString() + " generated by " + pluginInvocation + ": " + e);
                 LOGGER.log(Level.WARNING, "Exception processing " + XmlUtils.toString(findBugsTestEvent), e);
-                throw new MavenPipelinePublisherException("SpotBugsPublisher",
-                        "archiving FindBugs results for Maven artifact " + mavenArtifact.getId() + " generated by " + pluginInvocation.getId(), e);
+                throw new MavenPipelinePublisherException(
+                        "SpotBugsPublisher",
+                        "archiving FindBugs results for Maven artifact " + mavenArtifact.getId() + " generated by "
+                                + pluginInvocation.getId(),
+                        e);
             }
         }
     }

@@ -27,7 +27,6 @@ package org.jenkinsci.plugins.pipeline.maven.db;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import javax.sql.DataSource;
-
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 import org.junit.jupiter.api.Test;
@@ -75,7 +74,8 @@ public class PipelineMavenPluginMySqlDaoTest extends PipelineMavenPluginDaoAbstr
      */
     @Test
     public void test_mariadb_version_parsing_mariadb_as_docker_container() {
-        String actual = PipelineMavenPluginMySqlDao.extractMariaDbVersion("5.5.5-10.3.11-MariaDB-1:10.3.11+maria~bionic");
+        String actual =
+                PipelineMavenPluginMySqlDao.extractMariaDbVersion("5.5.5-10.3.11-MariaDB-1:10.3.11+maria~bionic");
         assertThat(actual).isEqualTo("10.3.11");
     }
 }

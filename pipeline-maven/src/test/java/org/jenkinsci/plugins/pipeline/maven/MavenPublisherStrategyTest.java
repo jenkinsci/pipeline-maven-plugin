@@ -2,12 +2,12 @@ package org.jenkinsci.plugins.pipeline.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import hudson.util.StreamTaskListener;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
@@ -23,8 +23,6 @@ import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import hudson.util.StreamTaskListener;
-
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
@@ -37,7 +35,8 @@ public class MavenPublisherStrategyTest {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        List<MavenPublisher> mavenPublishers = MavenPublisherStrategy.IMPLICIT.buildPublishersList(Collections.emptyList(), new StreamTaskListener(baos));
+        List<MavenPublisher> mavenPublishers = MavenPublisherStrategy.IMPLICIT.buildPublishersList(
+                Collections.emptyList(), new StreamTaskListener(baos));
         assertThat(mavenPublishers).hasSize(12);
 
         Map<String, MavenPublisher> reportersByDescriptorId = new HashMap<>();

@@ -24,10 +24,9 @@
 
 package org.jenkinsci.plugins.pipeline.maven.service;
 
-import hudson.model.Item;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import hudson.model.Item;
 import java.io.PrintStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,6 +40,7 @@ public class ServiceLoggerImpl implements ServiceLogger {
 
     @NonNull
     private final PrintStream stdOut, stdErr;
+
     @Nullable
     String prefix;
 
@@ -61,7 +61,7 @@ public class ServiceLoggerImpl implements ServiceLogger {
             return;
         }
         StringBuilder messageToWrite = new StringBuilder();
-        if (prefix != null && ! prefix.isEmpty()) {
+        if (prefix != null && !prefix.isEmpty()) {
             messageToWrite.append(prefix).append(" ");
         }
         messageToWrite.append(level).append(" ").append(message);

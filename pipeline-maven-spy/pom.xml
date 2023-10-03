@@ -48,16 +48,16 @@
       <artifactId>maven-core</artifactId>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.sonatype.aether</groupId>
-      <artifactId>aether-api</artifactId>
-      <version>1.13.1</version>
-    </dependency>
 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.sonatype.aether</groupId>
+      <artifactId>aether-api</artifactId>
+      <version>1.13.1</version>
     </dependency>
   </dependencies>
 

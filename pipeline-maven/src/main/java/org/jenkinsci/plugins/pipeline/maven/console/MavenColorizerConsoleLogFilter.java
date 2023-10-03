@@ -2,7 +2,6 @@ package org.jenkinsci.plugins.pipeline.maven.console;
 
 import hudson.console.ConsoleLogFilter;
 import hudson.model.Run;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -28,8 +27,7 @@ public class MavenColorizerConsoleLogFilter extends ConsoleLogFilter implements 
     }
 
     @Override
-    public OutputStream decorateLogger(Run run, final OutputStream logger)
-            throws IOException, InterruptedException {
+    public OutputStream decorateLogger(Run run, final OutputStream logger) throws IOException, InterruptedException {
         return new MavenConsoleAnnotator(logger, Charset.forName(charset), notes);
     }
 }

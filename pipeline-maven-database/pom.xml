@@ -7,18 +7,10 @@
     <version>${changelist}</version>
   </parent>
   <artifactId>pipeline-maven-database</artifactId>
-  <name>Pipeline Maven Plugin Database</name>
   <packaging>hpi</packaging>
+  <name>Pipeline Maven Plugin Database</name>
 
   <dependencies>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>pipeline-maven-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>credentials</artifactId>
-    </dependency>
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
@@ -55,14 +47,22 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>pipeline-maven-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.mariadb.jdbc</groupId>
       <artifactId>mariadb-java-client</artifactId>
       <version>${mariadb-client.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
     </dependency>
   </dependencies>
 

@@ -1,9 +1,8 @@
 package org.jenkinsci.plugins.pipeline.maven.db.util;
 
-import java.io.InputStream;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.io.InputStream;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -18,5 +17,4 @@ public class ClassUtils {
         }
         return result;
     }
-
 }

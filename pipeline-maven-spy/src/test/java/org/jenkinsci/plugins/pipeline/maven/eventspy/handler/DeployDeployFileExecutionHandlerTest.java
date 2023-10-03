@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;

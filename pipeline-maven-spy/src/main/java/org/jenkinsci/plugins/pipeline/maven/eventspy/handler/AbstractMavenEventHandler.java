@@ -24,6 +24,8 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -31,7 +33,6 @@ import java.io.StringWriter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.regex.Pattern;
-
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.model.Build;
@@ -43,9 +44,6 @@ import org.jenkinsci.plugins.pipeline.maven.eventspy.RuntimeIOException;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -61,11 +59,9 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
      */
     private static final Pattern ANSI_PATTERN = Pattern.compile("\\x1b\\[[0-9;]*m");
 
-
     protected AbstractMavenEventHandler(MavenEventReporter reporter) {
         this.reporter = reporter;
     }
-
 
     @Override
     public boolean handle(Object event) {
@@ -87,7 +83,6 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
     public String toString() {
         return getClass().getName() + "[type=" + getSupportedType() + "]";
     }
-
 
     public Xpp3Dom newElement(String name, String value) {
         Xpp3Dom element = new Xpp3Dom(name);
@@ -124,27 +119,34 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
                 throw new RuntimeIOException(e);
             }
 
-            if (absolutePath.endsWith(File.separator + "pom.xml") || absolutePath.endsWith(File.separator + ".flattened-pom.xml")) {
+            if (absolutePath.endsWith(File.separator + "pom.xml")
+                    || absolutePath.endsWith(File.separator + ".flattened-pom.xml")) {
                 // JENKINS-43616: flatten-maven-plugin replaces the original pom as artifact with a .flattened-pom.xml
                 // no tweak
             } else if (absolutePath.endsWith(File.separator + "dependency-reduced-pom.xml")) {
                 // JENKINS-42302: maven-shade-plugin creates a temporary project file dependency-reduced-pom.xml
                 // TODO see if there is a better way to implement this "workaround"
-                absolutePath = absolutePath.replace(File.separator + "dependency-reduced-pom.xml", File.separator + "pom.xml");
+                absolutePath =
+                        absolutePath.replace(File.separator + "dependency-reduced-pom.xml", File.separator + "pom.xml");
             } else if (absolutePath.endsWith(File.separator + ".git-versioned-pom.xml")) {
-                // JENKINS-56666 maven-git-versioning-extension causes warnings due to temporary pom.xml file name '.git-versioned-pom.xml'
+                // JENKINS-56666 maven-git-versioning-extension causes warnings due to temporary pom.xml file name
+                // '.git-versioned-pom.xml'
                 // https://github.com/qoomon/maven-git-versioning-extension/blob/v4.1.0/src/main/java/me/qoomon/maven/gitversioning/VersioningMojo.java#L39
                 // TODO see if there is a better way to implement this "workaround"
-                absolutePath = absolutePath.replace(File.separator + ".git-versioned-pom.xml", File.separator + "pom.xml");
+                absolutePath =
+                        absolutePath.replace(File.separator + ".git-versioned-pom.xml", File.separator + "pom.xml");
             } else {
                 String flattenedPomFilename = getMavenFlattenPluginFlattenedPomFilename(project);
                 if (flattenedPomFilename == null) {
-                    logger.warn("[jenkins-event-spy] Unexpected Maven project file name '" + projectFile.getName() + "', problems may occur");
+                    logger.warn("[jenkins-event-spy] Unexpected Maven project file name '" + projectFile.getName()
+                            + "', problems may occur");
                 } else {
                     if (absolutePath.endsWith(File.separator + flattenedPomFilename)) {
-                        absolutePath = absolutePath.replace(File.separator + flattenedPomFilename, File.separator + "pom.xml");
+                        absolutePath =
+                                absolutePath.replace(File.separator + flattenedPomFilename, File.separator + "pom.xml");
                     } else {
-                        logger.warn("[jenkins-event-spy] Unexpected Maven project file name '" + projectFile.getName() + "', problems may occur");
+                        logger.warn("[jenkins-event-spy] Unexpected Maven project file name '" + projectFile.getName()
+                                + "', problems may occur");
                     }
                 }
             }
@@ -177,10 +179,10 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
      */
     @Nullable
     protected String getMavenFlattenPluginFlattenedPomFilename(@NonNull MavenProject project) {
-        for(Plugin buildPlugin : project.getBuildPlugins()) {
+        for (Plugin buildPlugin : project.getBuildPlugins()) {
             if ("org.codehaus.mojo:flatten-maven-plugin".equals(buildPlugin.getKey())) {
                 String mavenConfigurationElement = "flattenedPomFilename";
-                for(PluginExecution execution: buildPlugin.getExecutions()) {
+                for (PluginExecution execution : buildPlugin.getExecutions()) {
                     if (execution.getGoals().contains("flatten")) {
                         if (execution.getConfiguration() instanceof Xpp3Dom) {
                             Xpp3Dom configuration = (Xpp3Dom) execution.getConfiguration();
@@ -204,12 +206,12 @@ public abstract class AbstractMavenEventHandler<E> implements MavenEventHandler<
     }
 
     private static String removeAnsiColor(String input) {
-    	if (input!=null) {
-    		input = ANSI_PATTERN.matcher(input).replaceAll("");
-    	}
-    	return input;
+        if (input != null) {
+            input = ANSI_PATTERN.matcher(input).replaceAll("");
+        }
+        return input;
     }
-    
+
     public Xpp3Dom newElement(@NonNull String name, @Nullable Throwable t) {
         Xpp3Dom rootElt = new Xpp3Dom(name);
         if (t == null) {

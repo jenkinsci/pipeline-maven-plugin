@@ -3,16 +3,13 @@ package org.jenkinsci.plugins.pipeline.maven.util;
 import static com.cloudbees.plugins.credentials.CredentialsScope.GLOBAL;
 import static java.util.Arrays.asList;
 
-import java.util.List;
-
-import org.acegisecurity.Authentication;
-
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.DomainRequirement;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
-
 import hudson.model.ItemGroup;
+import java.util.List;
+import org.acegisecurity.Authentication;
 
 public class FakeCredentialsProvider extends CredentialsProvider {
 
@@ -34,7 +31,10 @@ public class FakeCredentialsProvider extends CredentialsProvider {
     }
 
     @Override
-    public <C extends Credentials> List<C> getCredentials(Class<C> type, ItemGroup itemGroup, Authentication authentication,
+    public <C extends Credentials> List<C> getCredentials(
+            Class<C> type,
+            ItemGroup itemGroup,
+            Authentication authentication,
             List<DomainRequirement> domainRequirements) {
         UsernamePasswordCredentialsImpl creds = new UsernamePasswordCredentialsImpl(GLOBAL, id, "", username, password);
         creds.setUsernameSecret(usernameIsSecret);
@@ -42,8 +42,8 @@ public class FakeCredentialsProvider extends CredentialsProvider {
     }
 
     @Override
-    public <C extends Credentials> List<C> getCredentials(Class<C> type, ItemGroup itemGroup, Authentication authentication) {
+    public <C extends Credentials> List<C> getCredentials(
+            Class<C> type, ItemGroup itemGroup, Authentication authentication) {
         return getCredentials(type, itemGroup, authentication, null);
     }
-
 }

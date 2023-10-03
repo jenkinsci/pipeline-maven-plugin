@@ -40,22 +40,20 @@
   <url>https://github.com/jenkinsci/pipeline-maven-plugin/</url>
 
   <properties>
-    <hpi.pluginChangelogUrl>https://github.com/jenkinsci/pipeline-maven-plugin/releases</hpi.pluginChangelogUrl>
     <hpi.compatibleSinceVersion>1333</hpi.compatibleSinceVersion>
+    <hpi.pluginChangelogUrl>https://github.com/jenkinsci/pipeline-maven-plugin/releases</hpi.pluginChangelogUrl>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>pipeline-maven-api</artifactId>
-    </dependency>
 
-    <!-- move the related test to pipeline-maven-database and remove this dependency
-    -->
     <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>pipeline-maven-database</artifactId>
-      <version>${project.version}</version>
+      <groupId>io.jenkins</groupId>
+      <artifactId>configuration-as-code</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.configuration-as-code</groupId>
+      <artifactId>test-harness</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -174,6 +172,23 @@
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>git</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>git</artifactId>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>htmlpublisher</artifactId>
       <optional>true</optional>
     </dependency>
@@ -211,6 +226,13 @@
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>junit</artifactId>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>junit</artifactId>
+      <version>1217.v4297208a_a_b_ce</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
@@ -260,91 +282,15 @@
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>script-security</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins.workflow</groupId>
-      <artifactId>workflow-step-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jvnet.hudson.plugins</groupId>
-      <artifactId>findbugs</artifactId>
-      <version>${jenkins-plugin-findbugs.version}</version>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>asm</groupId>
-          <artifactId>asm</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-lang3</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jenkins-ci</groupId>
-          <artifactId>SECURITY-144-compat</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jvnet.hudson.plugins.findbugs</groupId>
-          <artifactId>library</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>xercesImpl</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jvnet.hudson.plugins</groupId>
-      <artifactId>tasks</artifactId>
-      <version>${jenkins-plugin-tasks.version}</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
+      <artifactId>pipeline-maven-api</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>io.jenkins</groupId>
-      <artifactId>configuration-as-code</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.jenkins.configuration-as-code</groupId>
-      <artifactId>test-harness</artifactId>
-      <scope>test</scope>
-    </dependency>
+    <!-- move the related test to pipeline-maven-database and remove this dependency
+    -->
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>git</artifactId>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpclient</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>git</artifactId>
-      <classifier>tests</classifier>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>junit</artifactId>
-      <version>1217.v4297208a_a_b_ce</version>
-      <classifier>tests</classifier>
+      <artifactId>pipeline-maven-database</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -360,6 +306,10 @@
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>script-security</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>ssh-slaves</artifactId>
       <scope>test</scope>
       <exclusions>
@@ -368,6 +318,10 @@
           <artifactId>protobuf-java</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
@@ -401,6 +355,10 @@
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins.workflow</groupId>
+      <artifactId>workflow-step-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins.workflow</groupId>
       <artifactId>workflow-support</artifactId>
       <scope>test</scope>
     </dependency>
@@ -414,6 +372,48 @@
       <groupId>org.jenkinsci.plugins</groupId>
       <artifactId>pipeline-model-definition</artifactId>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson.plugins</groupId>
+      <artifactId>findbugs</artifactId>
+      <version>${jenkins-plugin-findbugs.version}</version>
+      <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>asm</groupId>
+          <artifactId>asm</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jenkins-ci</groupId>
+          <artifactId>SECURITY-144-compat</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.jvnet.hudson.plugins.findbugs</groupId>
+          <artifactId>library</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>xercesImpl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.hudson.plugins</groupId>
+      <artifactId>tasks</artifactId>
+      <version>${jenkins-plugin-tasks.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
     </dependency>
   </dependencies>
 
@@ -503,18 +503,10 @@
           <plugin>
             <groupId>com.spotify</groupId>
             <artifactId>dockerfile-maven-plugin</artifactId>
+            <configuration>
+              <pullNewerImage>false</pullNewerImage>
+            </configuration>
             <executions>
-              <execution>
-                <id>build-sshd-image</id>
-                <goals>
-                  <goal>build</goal>
-                </goals>
-                <phase>process-test-resources</phase>
-                <configuration>
-                  <contextDirectory>src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/SshdContainer/</contextDirectory>
-                  <repository>localhost/pipeline-maven/sshd</repository>
-                </configuration>
-              </execution>
               <execution>
                 <id>build-java-git-image</id>
                 <goals>
@@ -559,10 +551,18 @@
                   <repository>localhost/pipeline-maven/maven-home</repository>
                 </configuration>
               </execution>
+              <execution>
+                <id>build-sshd-image</id>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+                <phase>process-test-resources</phase>
+                <configuration>
+                  <contextDirectory>src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/SshdContainer/</contextDirectory>
+                  <repository>localhost/pipeline-maven/sshd</repository>
+                </configuration>
+              </execution>
             </executions>
-            <configuration>
-              <pullNewerImage>false</pullNewerImage>
-            </configuration>
           </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>

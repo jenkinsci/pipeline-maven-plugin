@@ -36,12 +36,14 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class JavaGitContainerTest extends AbstractIntegrationTest {
 
     @Container
-    public GenericContainer<?> containerRule = new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22);
+    public GenericContainer<?> containerRule =
+            new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22);
 
     @Test
     public void smokes() throws Exception {
-        assertThat(containerRule.execInContainer("java", "-version").getStderr()).contains("openjdk version \"11");
-        assertThat(containerRule.execInContainer("git", "--version").getStdout()).contains("git version 2.");
+        assertThat(containerRule.execInContainer("java", "-version").getStderr())
+                .contains("openjdk version \"11");
+        assertThat(containerRule.execInContainer("git", "--version").getStdout())
+                .contains("git version 2.");
     }
-
 }

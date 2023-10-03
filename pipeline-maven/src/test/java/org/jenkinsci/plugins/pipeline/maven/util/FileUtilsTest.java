@@ -31,6 +31,7 @@ public class FileUtilsTest {
 
     @Test
     public void test_isAbsolutePath_with_windows_unc_absolute_path() {
-        assertThat(FileUtils.isAbsolutePath("\\\\myserver\\jenkins\\workspace\\")).isTrue();
+        assertThat(FileUtils.isAbsolutePath("\\\\myserver\\jenkins\\workspace\\"))
+                .isTrue();
     }
 }

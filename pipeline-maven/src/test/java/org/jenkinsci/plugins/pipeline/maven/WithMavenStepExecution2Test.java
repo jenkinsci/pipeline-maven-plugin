@@ -14,21 +14,21 @@ public class WithMavenStepExecution2Test {
     @Issue("JENKINS-57324")
     public void testEscapeWindowsBatchChars() {
 
-        //@formatter:off
-        String mavenConfig = "--batch-mode --show-version " +
-            "--settings \"e:\\folder\\branches%2Ftest\\workspace@tmp\\withMaven94865076\\settings.xml\" " +
-            "--global-settings \"e:\\folder\\branches%2Ftest\\workspace@tmp\\withMaven94865076\\globalSettings.xml\"";
-        //@formatter:on
+        // @formatter:off
+        String mavenConfig = "--batch-mode --show-version "
+                + "--settings \"e:\\folder\\branches%2Ftest\\workspace@tmp\\withMaven94865076\\settings.xml\" "
+                + "--global-settings \"e:\\folder\\branches%2Ftest\\workspace@tmp\\withMaven94865076\\globalSettings.xml\"";
+        // @formatter:on
 
         String actualEscapedMavenConfig = mavenConfig.replace("%", "%%");
-       //@formatter:off
-       String expectedEscapedMavenConfig = "--batch-mode --show-version " +
-           "--settings \"e:\\folder\\branches%%2Ftest\\workspace@tmp\\withMaven94865076\\settings.xml\" " +
-           "--global-settings \"e:\\folder\\branches%%2Ftest\\workspace@tmp\\withMaven94865076\\globalSettings.xml\"";
-       //formatter:on
+        // @formatter:off
+        String expectedEscapedMavenConfig = "--batch-mode --show-version "
+                + "--settings \"e:\\folder\\branches%%2Ftest\\workspace@tmp\\withMaven94865076\\settings.xml\" "
+                + "--global-settings \"e:\\folder\\branches%%2Ftest\\workspace@tmp\\withMaven94865076\\globalSettings.xml\"";
+        // formatter:on
 
-       System.out.println("Expected escaped mavenConfig: " + expectedEscapedMavenConfig);
+        System.out.println("Expected escaped mavenConfig: " + expectedEscapedMavenConfig);
 
-       assertThat(actualEscapedMavenConfig).isEqualTo(expectedEscapedMavenConfig);
+        assertThat(actualEscapedMavenConfig).isEqualTo(expectedEscapedMavenConfig);
     }
 }

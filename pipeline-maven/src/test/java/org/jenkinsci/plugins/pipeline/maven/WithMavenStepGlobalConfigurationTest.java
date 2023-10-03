@@ -23,10 +23,10 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
+import hudson.model.Result;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
@@ -37,8 +37,6 @@ import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.Test;
 
-import hudson.model.Result;
-
 /**
  * TODO migrate to {@link WithMavenStepTest} once we have implemented a
  * GitRepoRule that can be used on remote agents
@@ -47,25 +45,31 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
 
     @Test
     public void maven_build_jar_project_on_master_disable_globally_findbugs_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(new FindbugsAnalysisPublisher.DescriptorImpl());
+        maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(
+                new FindbugsAnalysisPublisher.DescriptorImpl());
     }
 
     @Test
     public void maven_build_jar_project_on_master_disable_globally_tasks_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(new TasksScannerPublisher.DescriptorImpl());
+        maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(
+                new TasksScannerPublisher.DescriptorImpl());
     }
 
     @Test
     public void maven_build_jar_project_on_master_disable_globally_junit_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(new JunitTestsPublisher.DescriptorImpl());
+        maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(
+                new JunitTestsPublisher.DescriptorImpl());
     }
 
     @Test
-    public void maven_build_jar_project_on_master_disable_globally_generated_artifacts_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(new GeneratedArtifactsPublisher.DescriptorImpl());
+    public void maven_build_jar_project_on_master_disable_globally_generated_artifacts_publisher_succeeds()
+            throws Exception {
+        maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(
+                new GeneratedArtifactsPublisher.DescriptorImpl());
     }
 
-    private void maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(MavenPublisher.DescriptorImpl descriptor) throws Exception {
+    private void maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(
+            MavenPublisher.DescriptorImpl descriptor) throws Exception {
 
         MavenPublisher publisher = descriptor.clazz.newInstance();
         publisher.setDisabled(true);
@@ -84,20 +88,20 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
 
             loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-            //@formatter:off
-            String pipelineScript = "node() {\n" +
-                "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                "    withMaven() {\n" +
-                "        if (isUnix()) {\n" +
-                "            sh 'mvn package verify'\n" +
-                "        } else {\n" +
-                "            bat 'mvn package verify'\n" +
-                "        }\n" +
-                "    }\n" +
-                "}";
-            //@formatter:on
+            // @formatter:off
+            String pipelineScript = "node() {\n" + "    git($/"
+                    + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
+                    + "        if (isUnix()) {\n"
+                    + "            sh 'mvn package verify'\n"
+                    + "        } else {\n"
+                    + "            bat 'mvn package verify'\n"
+                    + "        }\n"
+                    + "    }\n"
+                    + "}";
+            // @formatter:on
 
-            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-" + symbol + "-publisher-globally-disabled");
+            WorkflowJob pipeline = jenkinsRule.createProject(
+                    WorkflowJob.class, "build-on-master-" + symbol + "-publisher-globally-disabled");
             pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
             WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
@@ -110,22 +114,33 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
     }
 
     @Test
-    public void maven_build_jar_project_on_master_with_findbugs_publisher_configured_both_globally_and_on_the_pipeline_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(new FindbugsAnalysisPublisher.DescriptorImpl());
+    public void
+            maven_build_jar_project_on_master_with_findbugs_publisher_configured_both_globally_and_on_the_pipeline_succeeds()
+                    throws Exception {
+        maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(
+                new FindbugsAnalysisPublisher.DescriptorImpl());
     }
 
     @Test
-    public void maven_build_jar_project_on_master_with_task_scanner_publisher_configured_both_globally_and_on_the_pipeline_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(new TasksScannerPublisher.DescriptorImpl());
+    public void
+            maven_build_jar_project_on_master_with_task_scanner_publisher_configured_both_globally_and_on_the_pipeline_succeeds()
+                    throws Exception {
+        maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(
+                new TasksScannerPublisher.DescriptorImpl());
     }
 
     @Test
-    public void maven_build_jar_project_on_master_with_junit_publisher_configured_both_globally_and_on_the_pipeline_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(new JunitTestsPublisher.DescriptorImpl());
+    public void
+            maven_build_jar_project_on_master_with_junit_publisher_configured_both_globally_and_on_the_pipeline_succeeds()
+                    throws Exception {
+        maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(
+                new JunitTestsPublisher.DescriptorImpl());
     }
 
     @Test
-    public void maven_build_jar_project_on_master_with_generated_artifacts_publisher_configured_both_globally_and_on_the_pipeline_succeeds() throws Exception {
+    public void
+            maven_build_jar_project_on_master_with_generated_artifacts_publisher_configured_both_globally_and_on_the_pipeline_succeeds()
+                    throws Exception {
         maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(
                 new GeneratedArtifactsPublisher.DescriptorImpl());
     }
@@ -150,21 +165,20 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
 
             loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-            //@formatter:off
-            String pipelineScript = "node() {\n" +
-                "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                "    withMaven(options:[" + symbol + "(disabled: true)]) {\n" +
-                "        if (isUnix()) {\n" +
-                "            sh 'mvn package verify'\n" +
-                "        } else {\n" +
-                "            bat 'mvn package verify'\n" +
-                "        }\n" +
-                "    }\n" +
-                "}";
-            //@formatter:on
+            // @formatter:off
+            String pipelineScript = "node() {\n" + "    git($/"
+                    + gitRepoRule.toString() + "/$)\n" + "    withMaven(options:["
+                    + symbol + "(disabled: true)]) {\n" + "        if (isUnix()) {\n"
+                    + "            sh 'mvn package verify'\n"
+                    + "        } else {\n"
+                    + "            bat 'mvn package verify'\n"
+                    + "        }\n"
+                    + "    }\n"
+                    + "}";
+            // @formatter:on
 
-            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class,
-                    "build-on-master-" + symbol + "-publisher-defined-globally-and-in-the-pipeline");
+            WorkflowJob pipeline = jenkinsRule.createProject(
+                    WorkflowJob.class, "build-on-master-" + symbol + "-publisher-defined-globally-and-in-the-pipeline");
             pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
             WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
@@ -178,5 +192,4 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
             globalPipelineMavenConfig.setPublisherOptions(null);
         }
     }
-
 }

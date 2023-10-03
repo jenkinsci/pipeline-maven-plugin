@@ -5,7 +5,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -35,7 +34,8 @@ public class CustomTypePipelineMavenPluginDaoDecoratorTest {
 
     @ParameterizedTest
     @MethodSource
-    public void testHandlingOfCustomJarTypes(String type, String extension, List<String> additionalExpectedReportedTypes) {
+    public void testHandlingOfCustomJarTypes(
+            String type, String extension, List<String> additionalExpectedReportedTypes) {
         recordGeneratedArtifact(type, extension);
 
         verifyRecordGeneratedArtifactCalled(type, extension);
@@ -49,21 +49,29 @@ public class CustomTypePipelineMavenPluginDaoDecoratorTest {
     static Stream<Arguments> testHandlingOfCustomJarTypes() {
         return Stream.of(
                 // simple cases
-                createTestParameters("pom", "pom"), createTestParameters("jar", "jar"), createTestParameters("war", "war"), createTestParameters("ear", "ear"),
+                createTestParameters("pom", "pom"),
+                createTestParameters("jar", "jar"),
+                createTestParameters("war", "war"),
+                createTestParameters("ear", "ear"),
                 createTestParameters("rar", "rar"),
 
                 // known types with different extension
-                createTestParameters("test-jar", "jar"), createTestParameters("maven-plugin", "jar"), createTestParameters("ejb", "jar"),
-                createTestParameters("ejb-client", "jar"), createTestParameters("java-source", "jar"), createTestParameters("javadoc", "jar"),
+                createTestParameters("test-jar", "jar"),
+                createTestParameters("maven-plugin", "jar"),
+                createTestParameters("ejb", "jar"),
+                createTestParameters("ejb-client", "jar"),
+                createTestParameters("java-source", "jar"),
+                createTestParameters("javadoc", "jar"),
 
                 // unknown types with different extension
                 createTestParameters("nbm", "jar", "jar"), // JENKINS-52303
                 createTestParameters("bundle", "jar", "jar"), // JENKINS-47069
                 createTestParameters("docker-info", "jar", "jar") // JENKINS-59500
-        );
+                );
     }
 
-    private static Arguments createTestParameters(String type, String extension, String... additionalExpectedReportedTypes) {
+    private static Arguments createTestParameters(
+            String type, String extension, String... additionalExpectedReportedTypes) {
         return Arguments.of(type, extension, Arrays.asList(additionalExpectedReportedTypes));
     }
 
@@ -76,8 +84,17 @@ public class CustomTypePipelineMavenPluginDaoDecoratorTest {
     }
 
     private void recordGeneratedArtifact(PipelineMavenPluginDao dao, String type, String extension) {
-        dao.recordGeneratedArtifact(JOB_FULL_NAME, BUILD_NUMBER, GROUP_ID, ARTIFACT_ID, VERSION, type, BASE_VERSION, REPOSITORY_URL, SKIP_DOWNSTREAM_TRIGGERS,
-                extension, CLASSIFIER);
+        dao.recordGeneratedArtifact(
+                JOB_FULL_NAME,
+                BUILD_NUMBER,
+                GROUP_ID,
+                ARTIFACT_ID,
+                VERSION,
+                type,
+                BASE_VERSION,
+                REPOSITORY_URL,
+                SKIP_DOWNSTREAM_TRIGGERS,
+                extension,
+                CLASSIFIER);
     }
-
 }

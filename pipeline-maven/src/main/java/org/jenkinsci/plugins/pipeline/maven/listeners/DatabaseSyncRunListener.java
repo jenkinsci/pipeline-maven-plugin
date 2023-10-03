@@ -1,14 +1,13 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.Cause;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
 import javax.inject.Inject;
+import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -28,16 +27,21 @@ public class DatabaseSyncRunListener extends AbstractWorkflowRunListener {
     public void onInitialize(Run<?, ?> run) {
         super.onInitialize(run);
 
-        for (Cause cause: run.getCauses()) {
+        for (Cause cause : run.getCauses()) {
             if (cause instanceof Cause.UpstreamCause) {
                 Cause.UpstreamCause upstreamCause = (Cause.UpstreamCause) cause;
 
                 String upstreamJobName = upstreamCause.getUpstreamProject();
                 int upstreamBuildNumber = upstreamCause.getUpstreamBuild();
-                globalPipelineMavenConfig.getDao().recordBuildUpstreamCause(upstreamJobName, upstreamBuildNumber, run.getParent().getFullName(), run.getNumber());
+                globalPipelineMavenConfig
+                        .getDao()
+                        .recordBuildUpstreamCause(
+                                upstreamJobName,
+                                upstreamBuildNumber,
+                                run.getParent().getFullName(),
+                                run.getNumber());
             }
         }
-
     }
 
     /*
@@ -56,11 +60,15 @@ public class DatabaseSyncRunListener extends AbstractWorkflowRunListener {
         if (result == null) {
             result = Result.SUCCESS; // FIXME more elegant handling
         }
-        globalPipelineMavenConfig.getDao().updateBuildOnCompletion(
-                workflowRun.getParent().getFullName(),
-                workflowRun.getNumber(),
-                result.ordinal,
-                workflowRun.getStartTimeInMillis(),
-                 Math.max(System.currentTimeMillis() - workflowRun.getStartTimeInMillis(), 0)); // @see HUDSON-5844
+        globalPipelineMavenConfig
+                .getDao()
+                .updateBuildOnCompletion(
+                        workflowRun.getParent().getFullName(),
+                        workflowRun.getNumber(),
+                        result.ordinal,
+                        workflowRun.getStartTimeInMillis(),
+                        Math.max(
+                                System.currentTimeMillis() - workflowRun.getStartTimeInMillis(),
+                                0)); // @see HUDSON-5844
     }
 }

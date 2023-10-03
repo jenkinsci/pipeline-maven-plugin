@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.junit.jupiter.api.Test;
 
@@ -19,8 +18,8 @@ public class MavenDependencyCauseHelperTest {
         MavenArtifact firstArtifact = new MavenArtifact("com.example:my-jar:jar:1.0-SNAPSHOT");
         MavenArtifact secondArtifact = new MavenArtifact("com.example:my-jar:jar:1.0-SNAPSHOT");
 
-        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(new MavenDependencyTestCause(firstArtifact),
-                new MavenDependencyTestCause(secondArtifact));
+        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(
+                new MavenDependencyTestCause(firstArtifact), new MavenDependencyTestCause(secondArtifact));
 
         assertThat(matchingArtifacts).isEmpty();
     }
@@ -30,8 +29,8 @@ public class MavenDependencyCauseHelperTest {
         MavenArtifact firstArtifact = new MavenArtifact("com.example:my-jar:jar:1.0-SNAPSHOT");
         MavenArtifact secondArtifact = new MavenArtifact("com.example:my-jar:jar:1.1-SNAPSHOT");
 
-        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(new MavenDependencyTestCause(firstArtifact),
-                new MavenDependencyTestCause(secondArtifact));
+        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(
+                new MavenDependencyTestCause(firstArtifact), new MavenDependencyTestCause(secondArtifact));
 
         assertThat(matchingArtifacts).isEmpty();
     }
@@ -43,8 +42,8 @@ public class MavenDependencyCauseHelperTest {
         MavenArtifact secondArtifact = new MavenArtifact("com.example:my-jar:jar:1.0-20100529-1213-1");
         secondArtifact.setBaseVersion("1.0-SNAPSHOT");
 
-        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(new MavenDependencyTestCause(firstArtifact),
-                new MavenDependencyTestCause(secondArtifact));
+        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(
+                new MavenDependencyTestCause(firstArtifact), new MavenDependencyTestCause(secondArtifact));
 
         assertThat(matchingArtifacts).isNotEmpty();
     }
@@ -56,8 +55,8 @@ public class MavenDependencyCauseHelperTest {
         MavenArtifact secondArtifact = new MavenArtifact("com.example:my-jar:jar:1.0-20100530-2101-3");
         secondArtifact.setBaseVersion("1.0-SNAPSHOT");
 
-        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(new MavenDependencyTestCause(firstArtifact),
-                new MavenDependencyTestCause(secondArtifact));
+        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(
+                new MavenDependencyTestCause(firstArtifact), new MavenDependencyTestCause(secondArtifact));
 
         assertThat(matchingArtifacts).isEmpty();
     }
@@ -68,8 +67,8 @@ public class MavenDependencyCauseHelperTest {
         firstArtifact.setBaseVersion("1.0-SNAPSHOT");
         MavenArtifact secondArtifact = new MavenArtifact("com.example:my-jar:jar:1.0-20100530-2101-1");
 
-        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(new MavenDependencyTestCause(firstArtifact),
-                new MavenDependencyTestCause(secondArtifact));
+        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(
+                new MavenDependencyTestCause(firstArtifact), new MavenDependencyTestCause(secondArtifact));
 
         assertThat(matchingArtifacts).isEmpty();
     }
@@ -85,7 +84,8 @@ public class MavenDependencyCauseHelperTest {
         MavenArtifact secondArtifact = new MavenArtifact("com.example:my-jar:jar:1.0-20100529-1213-1");
         secondArtifact.setBaseVersion("1.0-SNAPSHOT");
 
-        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(new MavenDependencyTestCause(firstArtifact, firstArtifactSources),
+        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(
+                new MavenDependencyTestCause(firstArtifact, firstArtifactSources),
                 new MavenDependencyTestCause(secondArtifact));
 
         assertThat(matchingArtifacts).isNotEmpty();
@@ -102,7 +102,8 @@ public class MavenDependencyCauseHelperTest {
         secondArtifactSources.setBaseVersion("1.0-SNAPSHOT");
         secondArtifactSources.setClassifier("sources");
 
-        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(new MavenDependencyTestCause(firstArtifact),
+        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(
+                new MavenDependencyTestCause(firstArtifact),
                 new MavenDependencyTestCause(secondArtifact, secondArtifactSources));
 
         assertThat(matchingArtifacts).isNotEmpty();
@@ -123,7 +124,8 @@ public class MavenDependencyCauseHelperTest {
         sameAsFirstArtifact.setBaseVersion("1.0-SNAPSHOT");
 
         List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(
-                new MavenDependencyTestCause(firstArtifact, firstArtifactSources, secondArtifact), new MavenDependencyTestCause(sameAsFirstArtifact));
+                new MavenDependencyTestCause(firstArtifact, firstArtifactSources, secondArtifact),
+                new MavenDependencyTestCause(sameAsFirstArtifact));
 
         assertThat(matchingArtifacts).isNotEmpty();
     }
@@ -143,7 +145,8 @@ public class MavenDependencyCauseHelperTest {
         sameAsFirstArtifactSources.setBaseVersion("1.0-SNAPSHOT");
         sameAsFirstArtifactSources.setClassifier("sources");
 
-        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(new MavenDependencyTestCause(firstArtifact),
+        List<MavenArtifact> matchingArtifacts = MavenDependencyCauseHelper.isSameCause(
+                new MavenDependencyTestCause(firstArtifact),
                 new MavenDependencyTestCause(sameAsFirstArtifact, sameAsFirstArtifactSources, secondArtifact));
 
         assertThat(matchingArtifacts).isNotEmpty();

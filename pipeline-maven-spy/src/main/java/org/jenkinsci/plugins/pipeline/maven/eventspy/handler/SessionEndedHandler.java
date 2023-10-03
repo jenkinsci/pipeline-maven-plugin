@@ -24,14 +24,12 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.apache.maven.execution.ExecutionEvent;
-import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import java.util.Collections;
+import java.util.List;
+import org.apache.maven.execution.ExecutionEvent;
+import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 
 /**
  * Don't generate an entry in the report for

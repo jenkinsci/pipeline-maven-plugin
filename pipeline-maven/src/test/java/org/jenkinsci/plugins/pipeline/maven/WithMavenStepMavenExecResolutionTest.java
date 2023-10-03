@@ -25,22 +25,11 @@ package org.jenkinsci.plugins.pipeline.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.Collections;
-
-import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
-import org.jenkinsci.plugins.workflow.job.WorkflowJob;
-import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.jupiter.api.Test;
-import org.jvnet.hudson.test.Issue;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.junit.jupiter.Testcontainers;
-
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.CredentialsScope;
 import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
 import com.cloudbees.plugins.credentials.domains.Domain;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
-
 import hudson.model.DownloadService;
 import hudson.model.Result;
 import hudson.plugins.sshslaves.SSHLauncher;
@@ -49,6 +38,14 @@ import hudson.slaves.RetentionStrategy;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
 import hudson.tools.InstallSourceProperty;
+import java.util.Collections;
+import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
+import org.jenkinsci.plugins.workflow.job.WorkflowJob;
+import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.Issue;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
 @Issue("JENKINS-43651")
@@ -61,107 +58,113 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
     @Test
     public void testMavenNotInstalledInDockerImage() throws Exception {
-        try (GenericContainer<?> nonMavenContainerRule = new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22)) {
+        try (GenericContainer<?> nonMavenContainerRule =
+                new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22)) {
             nonMavenContainerRule.start();
-            assertThat(nonMavenContainerRule.execInContainer("mvn", "--version").getStdout()).contains("exec: \"mvn\": executable file not found in $PATH");
+            assertThat(nonMavenContainerRule.execInContainer("mvn", "--version").getStdout())
+                    .contains("exec: \"mvn\": executable file not found in $PATH");
         }
     }
 
     @Test
     public void testMavenGlobalToolRecognizedInScriptedPipeline() throws Exception {
-        try (GenericContainer<?> nonMavenContainerRule = new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22)) {
+        try (GenericContainer<?> nonMavenContainerRule =
+                new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22)) {
             nonMavenContainerRule.start();
             registerAgentForContainer(nonMavenContainerRule);
             String version = registerLatestMavenVersionAsGlobalTool();
 
-            //@formatter:off
-            WorkflowRun run = runPipeline("" +
-                "node('" + AGENT_NAME + "') {\n" +
-                "  def mavenHome = tool '" + MAVEN_GLOBAL_TOOL_NAME + "'\n" +
-                "  withEnv([\"MAVEN_HOME=${mavenHome}\"]) {\n" +
-                "    withMaven(traceability: true) {\n" +
-                "      sh \"mvn --version\"\n" +
-                "    }\n" +
-                "  }\n" +
-                "}");
-            //@formatter:on
+            // @formatter:off
+            WorkflowRun run = runPipeline("" + "node('"
+                    + AGENT_NAME + "') {\n" + "  def mavenHome = tool '"
+                    + MAVEN_GLOBAL_TOOL_NAME + "'\n" + "  withEnv([\"MAVEN_HOME=${mavenHome}\"]) {\n"
+                    + "    withMaven(traceability: true) {\n"
+                    + "      sh \"mvn --version\"\n"
+                    + "    }\n"
+                    + "  }\n"
+                    + "}");
+            // @formatter:on
 
             jenkinsRule.assertLogContains("Apache Maven " + version, run);
-            jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/home/test/slave",
+            jenkinsRule.assertLogContains(
+                    "using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/home/test/slave",
                     run);
         }
     }
 
     @Test
     public void testMavenGlobalToolRecognizedInDeclarativePipeline() throws Exception {
-        try (GenericContainer<?> nonMavenContainerRule = new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22)) {
+        try (GenericContainer<?> nonMavenContainerRule =
+                new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22)) {
             nonMavenContainerRule.start();
             registerAgentForContainer(nonMavenContainerRule);
             String version = registerLatestMavenVersionAsGlobalTool();
 
-            //@formatter:off
-            WorkflowRun run = runPipeline("" +
-                "pipeline {\n" +
-                "  agent { label '" + AGENT_NAME + "' }\n" +
-                "  tools {\n" +
-                "    maven '" + MAVEN_GLOBAL_TOOL_NAME + "'\n" +
-                "  }\n" +
-                "  stages {\n" +
-                "    stage('Build') {\n" +
-                "      steps {\n" +
-                "        withMaven(traceability: true) {\n" +
-                "          sh \"mvn --version\"\n" +
-                "        }\n" +
-                "      }\n" +
-                "    }\n" +
-                "  }\n" +
-                "}");
-            //@formatter:on
+            // @formatter:off
+            WorkflowRun run = runPipeline("" + "pipeline {\n"
+                    + "  agent { label '"
+                    + AGENT_NAME + "' }\n" + "  tools {\n"
+                    + "    maven '"
+                    + MAVEN_GLOBAL_TOOL_NAME + "'\n" + "  }\n"
+                    + "  stages {\n"
+                    + "    stage('Build') {\n"
+                    + "      steps {\n"
+                    + "        withMaven(traceability: true) {\n"
+                    + "          sh \"mvn --version\"\n"
+                    + "        }\n"
+                    + "      }\n"
+                    + "    }\n"
+                    + "  }\n"
+                    + "}");
+            // @formatter:on
 
             jenkinsRule.assertLogContains("Apache Maven " + version, run);
-            jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/home/test/slave",
+            jenkinsRule.assertLogContains(
+                    "using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/home/test/slave",
                     run);
         }
     }
 
     @Test
     public void testPreInstalledMavenRecognizedWithoutMavenHome() throws Exception {
-        try (GenericContainer<?> javaMavenGitContainerRule = new GenericContainer<>("localhost/pipeline-maven/java-maven-git").withExposedPorts(22)) {
+        try (GenericContainer<?> javaMavenGitContainerRule =
+                new GenericContainer<>("localhost/pipeline-maven/java-maven-git").withExposedPorts(22)) {
             javaMavenGitContainerRule.start();
             registerAgentForContainer(javaMavenGitContainerRule);
 
-            //@formatter:off
-            WorkflowRun run = runPipeline("" +
-                "node('" + AGENT_NAME + "') {\n" +
-                "  withMaven(traceability: true) {\n" +
-                "    sh \"mvn --version\"\n" +
-                "  }\n" +
-                "}");
-            //@formatter:on
+            // @formatter:off
+            WorkflowRun run = runPipeline("" + "node('"
+                    + AGENT_NAME + "') {\n" + "  withMaven(traceability: true) {\n"
+                    + "    sh \"mvn --version\"\n"
+                    + "  }\n"
+                    + "}");
+            // @formatter:on
 
             jenkinsRule.assertLogContains("Apache Maven 3.6.0", run);
-            jenkinsRule.assertLogContains("using Maven installation provided by the build agent with executable /usr/bin/mvn", run);
+            jenkinsRule.assertLogContains(
+                    "using Maven installation provided by the build agent with executable /usr/bin/mvn", run);
         }
     }
 
     @Test
     public void testPreInstalledMavenRecognizedWithMavenHome() throws Exception {
-        try (GenericContainer<?> mavenWithMavenHomeContainerRule = new GenericContainer<>("localhost/pipeline-maven/maven-home").withExposedPorts(22)) {
+        try (GenericContainer<?> mavenWithMavenHomeContainerRule =
+                new GenericContainer<>("localhost/pipeline-maven/maven-home").withExposedPorts(22)) {
             mavenWithMavenHomeContainerRule.start();
             registerAgentForContainer(mavenWithMavenHomeContainerRule);
 
-            //@formatter:off
-            WorkflowRun run = runPipeline("" +
-                "node('" + AGENT_NAME + "') {\n" +
-                "  sh 'echo $MAVEN_HOME'\n" +
-                "  withMaven(traceability: true) {\n" +
-                "    sh \"mvn --version\"\n" +
-                "  }\n" +
-                "}");
-            //@formatter:on
+            // @formatter:off
+            WorkflowRun run = runPipeline("" + "node('"
+                    + AGENT_NAME + "') {\n" + "  sh 'echo $MAVEN_HOME'\n"
+                    + "  withMaven(traceability: true) {\n"
+                    + "    sh \"mvn --version\"\n"
+                    + "  }\n"
+                    + "}");
+            // @formatter:on
 
             jenkinsRule.assertLogContains("Apache Maven 3.6.0", run);
-            jenkinsRule.assertLogContains("using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/usr/share/maven",
+            jenkinsRule.assertLogContains(
+                    "using Maven installation provided by the build agent with the environment variable MAVEN_HOME=/usr/share/maven",
                     run);
         }
     }
@@ -179,13 +182,17 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
     }
 
     private void addTestSshCredentials() {
-        Credentials credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, SSH_CREDENTIALS_ID, null, "test", "test");
+        Credentials credentials =
+                new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, SSH_CREDENTIALS_ID, null, "test", "test");
 
-        SystemCredentialsProvider.getInstance().getDomainCredentialsMap().put(Domain.global(), Collections.singletonList(credentials));
+        SystemCredentialsProvider.getInstance()
+                .getDomainCredentialsMap()
+                .put(Domain.global(), Collections.singletonList(credentials));
     }
 
     private void registerAgentForSlaveContainer(GenericContainer<?> slaveContainer) throws Exception {
-        SSHLauncher sshLauncher = new SSHLauncher(slaveContainer.getHost(), slaveContainer.getMappedPort(22), SSH_CREDENTIALS_ID);
+        SSHLauncher sshLauncher =
+                new SSHLauncher(slaveContainer.getHost(), slaveContainer.getMappedPort(22), SSH_CREDENTIALS_ID);
 
         DumbSlave agent = new DumbSlave(AGENT_NAME, SLAVE_BASE_PATH, sshLauncher);
         agent.setNumExecutors(1);
@@ -208,7 +215,11 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
     }
 
     private String getLatestMavenVersion() throws Exception {
-        return getMavenDownloadable().getData().getJSONArray("list").getJSONObject(0).getString("id");
+        return getMavenDownloadable()
+                .getData()
+                .getJSONArray("list")
+                .getJSONObject(0)
+                .getString("id");
     }
 
     private DownloadService.Downloadable getMavenDownloadable() {
@@ -218,9 +229,10 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
     private void registerMavenVersionAsGlobalTool(String version) throws Exception {
         String mavenHome = "maven-" + version.replace(".", "-");
 
-        InstallSourceProperty installSourceProperty = new InstallSourceProperty(Collections.singletonList(new Maven.MavenInstaller(version)));
-        MavenInstallation mavenInstallation = new MavenInstallation(MAVEN_GLOBAL_TOOL_NAME, mavenHome, Collections.singletonList(installSourceProperty));
+        InstallSourceProperty installSourceProperty =
+                new InstallSourceProperty(Collections.singletonList(new Maven.MavenInstaller(version)));
+        MavenInstallation mavenInstallation = new MavenInstallation(
+                MAVEN_GLOBAL_TOOL_NAME, mavenHome, Collections.singletonList(installSourceProperty));
         jenkinsRule.jenkins.getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
     }
-
 }

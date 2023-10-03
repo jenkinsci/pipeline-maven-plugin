@@ -32,7 +32,6 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionEvent;
@@ -74,7 +73,9 @@ public class JenkinsMavenEventSpyTest {
         });
 
         MavenXpp3Reader mavenXpp3Reader = new MavenXpp3Reader();
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/eventspy/pom.xml");
+        InputStream in = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/eventspy/pom.xml");
 
         assertThat(in).isNotNull();
         Model model = mavenXpp3Reader.read(in);

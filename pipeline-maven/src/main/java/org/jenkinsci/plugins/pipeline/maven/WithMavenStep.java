@@ -38,6 +38,9 @@ import hudson.model.TaskListener;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
 import hudson.util.ListBoxModel;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import jenkins.model.Jenkins;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.mvn.SettingsProvider;
@@ -54,10 +57,6 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Configures maven environment to use within a pipeline job by calling <code>sh mvn</code> or <code>bat mvn</code>.
@@ -79,8 +78,7 @@ public class WithMavenStep extends Step {
     private Boolean traceability = null;
 
     @DataBoundConstructor
-    public WithMavenStep() {
-    }
+    public WithMavenStep() {}
 
     public String getTempBinDir() {
         return tempBinDir;
@@ -272,9 +270,10 @@ public class WithMavenStep extends Step {
             }
             return r;
         }
-        
+
         @Restricted(NoExternalUse.class) // Only for UI calls
-        public ListBoxModel doFillMavenSettingsConfigItems(@AncestorInPath Item item, @AncestorInPath ItemGroup context) {
+        public ListBoxModel doFillMavenSettingsConfigItems(
+                @AncestorInPath Item item, @AncestorInPath ItemGroup context) {
             ListBoxModel r = new ListBoxModel();
             if (item == null) {
                 return r; // it's empty
@@ -288,7 +287,8 @@ public class WithMavenStep extends Step {
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
-        public ListBoxModel doFillGlobalMavenSettingsConfigItems(@AncestorInPath Item item, @AncestorInPath ItemGroup context) {
+        public ListBoxModel doFillGlobalMavenSettingsConfigItems(
+                @AncestorInPath Item item, @AncestorInPath ItemGroup context) {
             ListBoxModel r = new ListBoxModel();
             if (item == null) {
                 return r; // it's empty
@@ -308,7 +308,7 @@ public class WithMavenStep extends Step {
                 return r; // it's empty
             }
             item.checkPermission(Item.EXTENDED_READ);
-            for(MavenPublisherStrategy publisherStrategy: MavenPublisherStrategy.values()) {
+            for (MavenPublisherStrategy publisherStrategy : MavenPublisherStrategy.values()) {
                 r.add(publisherStrategy.getDescription(), publisherStrategy.name());
             }
             return r;
@@ -320,6 +320,5 @@ public class WithMavenStep extends Step {
         public DescriptorExtensionList<MavenPublisher, MavenPublisher.DescriptorImpl> getOptionsDescriptors() {
             return Jenkins.get().getDescriptorList(MavenPublisher.class);
         }
-
     }
 }

@@ -1,19 +1,17 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
-import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
-import org.w3c.dom.Element;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
+import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
+import org.w3c.dom.Element;
 
 /**
  * List dependencies from the spy log.
@@ -27,30 +25,30 @@ public class DependenciesLister {
      * @return list of {@link MavenArtifact}
      */
     @NonNull
-    public static List<MavenDependency> listDependencies(final Element mavenSpyLogs,
-                                                         final Logger logger) {
+    public static List<MavenDependency> listDependencies(final Element mavenSpyLogs, final Logger logger) {
 
         final Set<MavenDependency> result = new HashSet<>();
 
-        for (final Element dependencyResolutionResult : XmlUtils.getChildrenElements(mavenSpyLogs,
-                "DependencyResolutionResult")) {
-            final Element resolvedDependenciesElt = XmlUtils.getUniqueChildElementOrNull(
-                    dependencyResolutionResult, "resolvedDependencies");
+        for (final Element dependencyResolutionResult :
+                XmlUtils.getChildrenElements(mavenSpyLogs, "DependencyResolutionResult")) {
+            final Element resolvedDependenciesElt =
+                    XmlUtils.getUniqueChildElementOrNull(dependencyResolutionResult, "resolvedDependencies");
 
             if (resolvedDependenciesElt == null) {
                 continue;
             }
 
-            for (final Element dependencyElt : XmlUtils.getChildrenElements(resolvedDependenciesElt,
-                    "dependency")) {
-                final MavenDependency dependencyArtifact = XmlUtils.newMavenDependency(
-                        dependencyElt);
+            for (final Element dependencyElt : XmlUtils.getChildrenElements(resolvedDependenciesElt, "dependency")) {
+                final MavenDependency dependencyArtifact = XmlUtils.newMavenDependency(dependencyElt);
 
                 final Element fileElt = XmlUtils.getUniqueChildElementOrNull(dependencyElt, "file");
-                if (fileElt == null || fileElt.getTextContent() == null
+                if (fileElt == null
+                        || fileElt.getTextContent() == null
                         || fileElt.getTextContent().isEmpty()) {
-                    logger.log(Level.WARNING, "listDependencies: no associated file found for "
-                            + dependencyArtifact + " in " + XmlUtils.toString(dependencyElt));
+                    logger.log(
+                            Level.WARNING,
+                            "listDependencies: no associated file found for " + dependencyArtifact + " in "
+                                    + XmlUtils.toString(dependencyElt));
                 } else {
                     dependencyArtifact.setFile(StringUtils.trim(fileElt.getTextContent()));
                 }
@@ -67,15 +65,13 @@ public class DependenciesLister {
      * @return list of {@link MavenArtifact}
      */
     @NonNull
-    public static List<MavenArtifact> listParentProjects(final Element mavenSpyLogs,
-                                                         final Logger logger) {
+    public static List<MavenArtifact> listParentProjects(final Element mavenSpyLogs, final Logger logger) {
 
         final Set<MavenArtifact> result = new HashSet<>();
 
-        for (final Element dependencyResolutionResult : XmlUtils.getExecutionEvents(mavenSpyLogs,
-                "ProjectStarted")) {
-            final Element parentProjectElt = XmlUtils.getUniqueChildElementOrNull(
-                    dependencyResolutionResult, "parentProject");
+        for (final Element dependencyResolutionResult : XmlUtils.getExecutionEvents(mavenSpyLogs, "ProjectStarted")) {
+            final Element parentProjectElt =
+                    XmlUtils.getUniqueChildElementOrNull(dependencyResolutionResult, "parentProject");
 
             if (parentProjectElt == null) {
                 continue;
@@ -93,5 +89,4 @@ public class DependenciesLister {
 
         return new ArrayList<>(result);
     }
-
 }

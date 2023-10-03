@@ -23,12 +23,23 @@
  */
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
+
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.FingerprintMap;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.tasks.Fingerprinter;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jenkins.model.Jenkins;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
@@ -39,18 +50,6 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
-import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
 
 /**
  * Fingerprint the dependencies of the maven project.
@@ -81,19 +80,16 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
 
     protected Set<String> getIncludedScopes() {
         Set<String> includedScopes = new TreeSet<>();
-        if (includeScopeCompile)
-            includedScopes.add("compile");
-        if (includeScopeRuntime)
-            includedScopes.add("runtime");
-        if (includeScopeProvided)
-            includedScopes.add("provided");
-        if (includeScopeTest)
-            includedScopes.add("test");
+        if (includeScopeCompile) includedScopes.add("compile");
+        if (includeScopeRuntime) includedScopes.add("runtime");
+        if (includeScopeProvided) includedScopes.add("provided");
+        if (includeScopeTest) includedScopes.add("test");
         return includedScopes;
     }
 
     @Override
-    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt)
+            throws IOException, InterruptedException {
         Run run = context.get(Run.class);
         TaskListener listener = context.get(TaskListener.class);
 
@@ -102,9 +98,11 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
         List<MavenDependency> dependencies = listDependencies(mavenSpyLogsElt, LOGGER);
 
         if (LOGGER.isLoggable(Level.FINE)) {
-            listener.getLogger().println("[withMaven] dependenciesFingerprintPublisher - filter: " +
-                    "versions[snapshot: " + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "], " +
-                    "scopes:" + getIncludedScopes());
+            listener.getLogger()
+                    .println("[withMaven] dependenciesFingerprintPublisher - filter: " + "versions[snapshot: "
+                            + isIncludeSnapshotVersions() + ", release: " + isIncludeReleaseVersions() + "], "
+                            + "scopes:"
+                            + getIncludedScopes());
         }
 
         Map<String, String> artifactsToFingerPrint = new HashMap<>(); // artifactPathInFingerprintZone -> artifactMd5
@@ -112,21 +110,24 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
             if (dependency.isSnapshot()) {
                 if (!includeSnapshotVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] Skip fingerprinting snapshot dependency: " + dependency);
+                        listener.getLogger()
+                                .println("[withMaven] Skip fingerprinting snapshot dependency: " + dependency);
                     }
                     continue;
                 }
             } else {
                 if (!includeReleaseVersions) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] Skip fingerprinting release dependency: " + dependency);
+                        listener.getLogger()
+                                .println("[withMaven] Skip fingerprinting release dependency: " + dependency);
                     }
                     continue;
                 }
             }
             if (!getIncludedScopes().contains(dependency.getScope())) {
                 if (LOGGER.isLoggable(Level.FINER)) {
-                    listener.getLogger().println("[withMaven] Skip fingerprinting dependency with ignored scope: " + dependency);
+                    listener.getLogger()
+                            .println("[withMaven] Skip fingerprinting dependency with ignored scope: " + dependency);
                 }
                 continue;
             }
@@ -134,7 +135,9 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
             try {
                 if (StringUtils.isEmpty(dependency.getFile())) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        listener.getLogger().println("[withMaven] Can't fingerprint maven dependency with no file attached: " + dependency);
+                        listener.getLogger()
+                                .println("[withMaven] Can't fingerprint maven dependency with no file attached: "
+                                        + dependency);
                     }
                     continue;
                 }
@@ -144,28 +147,32 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
                 if (!(dependency.getFile().endsWith("." + dependency.getExtension()))) {
                     if (dependencyFilePath.isDirectory()) {
                         if (LOGGER.isLoggable(Level.FINE)) {
-                            listener.getLogger().println("[withMaven] Skip fingerprinting of maven dependency of type directory " + dependency);
+                            listener.getLogger()
+                                    .println("[withMaven] Skip fingerprinting of maven dependency of type directory "
+                                            + dependency);
                         }
                         continue;
                     }
                 }
 
                 String dependencyMavenRepoStyleFilePath =
-                        dependency.getGroupId().replace('.', '/') + "/" +
-                                dependency.getArtifactId() + "/" +
-                                dependency.getBaseVersion() + "/" +
-                                dependency.getFileNameWithBaseVersion();
-
+                        dependency.getGroupId().replace('.', '/') + "/" + dependency.getArtifactId()
+                                + "/" + dependency.getBaseVersion()
+                                + "/" + dependency.getFileNameWithBaseVersion();
 
                 if (dependencyFilePath.exists()) {
-                    // the subsequent call to digest could test the existence but we don't want to prematurely optimize performances
+                    // the subsequent call to digest could test the existence but we don't want to prematurely optimize
+                    // performances
                     if (LOGGER.isLoggable(Level.FINE)) {
-                        listener.getLogger().println("[withMaven] Fingerprint dependency " + dependencyMavenRepoStyleFilePath);
+                        listener.getLogger()
+                                .println("[withMaven] Fingerprint dependency " + dependencyMavenRepoStyleFilePath);
                     }
                     String artifactDigest = dependencyFilePath.digest();
                     artifactsToFingerPrint.put(dependencyMavenRepoStyleFilePath, artifactDigest);
                 } else {
-                    listener.getLogger().println("[withMaven] FAILURE to fingerprint " + dependencyMavenRepoStyleFilePath + ", file not found");
+                    listener.getLogger()
+                            .println("[withMaven] FAILURE to fingerprint " + dependencyMavenRepoStyleFilePath
+                                    + ", file not found");
                 }
 
             } catch (IOException | RuntimeException e) {
@@ -181,7 +188,9 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
         for (Map.Entry<String, String> artifactToFingerprint : artifactsToFingerPrint.entrySet()) {
             String artifactPathInFingerprintZone = artifactToFingerprint.getKey();
             String artifactMd5 = artifactToFingerprint.getValue();
-            fingerprintMap.getOrCreate(null, artifactPathInFingerprintZone, artifactMd5).addFor(run);
+            fingerprintMap
+                    .getOrCreate(null, artifactPathInFingerprintZone, artifactMd5)
+                    .addFor(run);
         }
 
         // add action
@@ -195,11 +204,10 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
 
     @Override
     public String toString() {
-        return getClass().getName() + "[" +
-                "disabled=" + isDisabled() + ", " +
-                "scopes=" + getIncludedScopes() + ", " +
-                "versions={snapshot:" + isIncludeSnapshotVersions() + ", release:" + isIncludeReleaseVersions() + "}" +
-                ']';
+        return getClass().getName() + "[" + "disabled="
+                + isDisabled() + ", " + "scopes="
+                + getIncludedScopes() + ", " + "versions={snapshot:"
+                + isIncludeSnapshotVersions() + ", release:" + isIncludeReleaseVersions() + "}" + ']';
     }
 
     public boolean isIncludeSnapshotVersions() {

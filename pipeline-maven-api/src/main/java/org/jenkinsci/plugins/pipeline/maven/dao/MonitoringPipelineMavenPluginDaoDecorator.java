@@ -1,13 +1,9 @@
 package org.jenkinsci.plugins.pipeline.maven.dao;
 
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
+import static java.util.Optional.ofNullable;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-
-import static java.util.Optional.ofNullable;
-
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,10 +13,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 
 public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineMavenPluginDaoDecorator {
 
-    private final static List<Supplier<CacheStats>> CACHE_STATS_SUPPLIERS = new ArrayList<>();
+    private static final List<Supplier<CacheStats>> CACHE_STATS_SUPPLIERS = new ArrayList<>();
 
     public static void registerCacheStatsSupplier(Supplier<CacheStats> supplier) {
         CACHE_STATS_SUPPLIERS.add(supplier);
@@ -36,23 +34,72 @@ public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineM
     }
 
     @Override
-    public void recordDependency(@NonNull String jobFullName, int buildNumber, @NonNull String groupId, @NonNull String artifactId, @NonNull String version, @NonNull String type, @NonNull String scope, boolean ignoreUpstreamTriggers, String classifier) {
-        executeMonitored(() -> super.recordDependency(jobFullName, buildNumber, groupId, artifactId, version, type, scope, ignoreUpstreamTriggers, classifier));
+    public void recordDependency(
+            @NonNull String jobFullName,
+            int buildNumber,
+            @NonNull String groupId,
+            @NonNull String artifactId,
+            @NonNull String version,
+            @NonNull String type,
+            @NonNull String scope,
+            boolean ignoreUpstreamTriggers,
+            String classifier) {
+        executeMonitored(() -> super.recordDependency(
+                jobFullName,
+                buildNumber,
+                groupId,
+                artifactId,
+                version,
+                type,
+                scope,
+                ignoreUpstreamTriggers,
+                classifier));
     }
 
     @Override
-    public void recordParentProject(@NonNull String jobFullName, int buildNumber, @NonNull String parentGroupId, @NonNull String parentArtifactId, @NonNull String parentVersion, boolean ignoreUpstreamTriggers) {
-        executeMonitored(() -> super.recordParentProject(jobFullName, buildNumber, parentGroupId, parentArtifactId, parentVersion, ignoreUpstreamTriggers));
+    public void recordParentProject(
+            @NonNull String jobFullName,
+            int buildNumber,
+            @NonNull String parentGroupId,
+            @NonNull String parentArtifactId,
+            @NonNull String parentVersion,
+            boolean ignoreUpstreamTriggers) {
+        executeMonitored(() -> super.recordParentProject(
+                jobFullName, buildNumber, parentGroupId, parentArtifactId, parentVersion, ignoreUpstreamTriggers));
     }
 
     @Override
-    public void recordGeneratedArtifact(@NonNull String jobFullName, int buildNumber, @NonNull String groupId, @NonNull String artifactId, @NonNull String version, @NonNull String type, @NonNull String baseVersion, @Nullable String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier) {
-        executeMonitored(() -> super.recordGeneratedArtifact(jobFullName, buildNumber, groupId, artifactId, version, type, baseVersion, repositoryUrl, skipDownstreamTriggers, extension, classifier));
+    public void recordGeneratedArtifact(
+            @NonNull String jobFullName,
+            int buildNumber,
+            @NonNull String groupId,
+            @NonNull String artifactId,
+            @NonNull String version,
+            @NonNull String type,
+            @NonNull String baseVersion,
+            @Nullable String repositoryUrl,
+            boolean skipDownstreamTriggers,
+            String extension,
+            String classifier) {
+        executeMonitored(() -> super.recordGeneratedArtifact(
+                jobFullName,
+                buildNumber,
+                groupId,
+                artifactId,
+                version,
+                type,
+                baseVersion,
+                repositoryUrl,
+                skipDownstreamTriggers,
+                extension,
+                classifier));
     }
 
     @Override
-    public void recordBuildUpstreamCause(String upstreamJobName, int upstreamBuildNumber, String downstreamJobName, int downstreamBuildNumber) {
-        executeMonitored(() -> super.recordBuildUpstreamCause(upstreamJobName, upstreamBuildNumber, downstreamJobName, downstreamBuildNumber));
+    public void recordBuildUpstreamCause(
+            String upstreamJobName, int upstreamBuildNumber, String downstreamJobName, int downstreamBuildNumber) {
+        executeMonitored(() -> super.recordBuildUpstreamCause(
+                upstreamJobName, upstreamBuildNumber, downstreamJobName, downstreamBuildNumber));
     }
 
     @Override
@@ -91,14 +138,17 @@ public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineM
 
     @NonNull
     @Override
-    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(@NonNull String jobFullName, int buildNumber) {
+    public Map<MavenArtifact, SortedSet<String>> listDownstreamJobsByArtifact(
+            @NonNull String jobFullName, int buildNumber) {
         return executeMonitored(() -> super.listDownstreamJobsByArtifact(jobFullName, buildNumber));
     }
 
     @NonNull
     @Override
-    public SortedSet<String> listDownstreamJobs(String groupId, String artifactId, String version, String baseVersion, String type, String classifier) {
-        return executeMonitored(() -> super.listDownstreamJobs(groupId, artifactId, version, baseVersion, type, classifier));
+    public SortedSet<String> listDownstreamJobs(
+            String groupId, String artifactId, String version, String baseVersion, String type, String classifier) {
+        return executeMonitored(
+                () -> super.listDownstreamJobs(groupId, artifactId, version, baseVersion, type, classifier));
     }
 
     @Override
@@ -119,16 +169,29 @@ public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineM
     }
 
     @Override
-    public void updateBuildOnCompletion(@NonNull String jobFullName, int buildNumber, int buildResultOrdinal, long startTimeInMillis, long durationInMillis) {
-        executeMonitored(() -> super.updateBuildOnCompletion(jobFullName, buildNumber, buildResultOrdinal, startTimeInMillis, durationInMillis));
+    public void updateBuildOnCompletion(
+            @NonNull String jobFullName,
+            int buildNumber,
+            int buildResultOrdinal,
+            long startTimeInMillis,
+            long durationInMillis) {
+        executeMonitored(() -> super.updateBuildOnCompletion(
+                jobFullName, buildNumber, buildResultOrdinal, startTimeInMillis, durationInMillis));
     }
 
     @Override
     public String toPrettyString() {
-        StringBuilder builder = new StringBuilder(ofNullable(super.toPrettyString()).orElse(""));
+        StringBuilder builder =
+                new StringBuilder(ofNullable(super.toPrettyString()).orElse(""));
         builder.append("\r\n Performances: ");
-        builder.append("\r\n\t find: totalDurationInMs=").append(TimeUnit.NANOSECONDS.toMillis(findDurationInNanos.get())).append(", count=").append(findCount.get());
-        builder.append("\r\n\t write: totalDurationInMs=").append(TimeUnit.NANOSECONDS.toMillis(writeDurationInNanos.get())).append(", count=").append(writeCount.get());
+        builder.append("\r\n\t find: totalDurationInMs=")
+                .append(TimeUnit.NANOSECONDS.toMillis(findDurationInNanos.get()))
+                .append(", count=")
+                .append(findCount.get());
+        builder.append("\r\n\t write: totalDurationInMs=")
+                .append(TimeUnit.NANOSECONDS.toMillis(writeDurationInNanos.get()))
+                .append(", count=")
+                .append(writeCount.get());
         builder.append("\r\n Caches: ");
         CACHE_STATS_SUPPLIERS.forEach(s -> builder.append("\r\n\t ").append(cachePrettyString(s.get())));
         return builder.toString();
@@ -177,5 +240,4 @@ public class MonitoringPipelineMavenPluginDaoDecorator extends AbstractPipelineM
     private interface CallableWithoutResult {
         void call();
     }
-
 }

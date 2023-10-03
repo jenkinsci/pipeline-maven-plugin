@@ -2,15 +2,13 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import hudson.Extension;
 import hudson.model.Run;
+import java.io.IOException;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
-
-import java.io.IOException;
-
 
 /**
  *
@@ -41,9 +39,11 @@ public class MavenLinkerPublisher2 extends MavenPublisher {
      * Synchronize because {@link Run#addOrReplaceAction(hudson.model.Action)} is not thread safe
      */
     @Override
-    public synchronized void process(StepContext context, Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public synchronized void process(StepContext context, Element mavenSpyLogsElt)
+            throws IOException, InterruptedException {
         Run<?, ?> run = context.get(Run.class);
-        // we replace instead of because we want to refresh the cache org.jenkinsci.plugins.pipeline.maven.publishers.MavenReport.getGeneratedArtifacts()
+        // we replace instead of because we want to refresh the cache
+        // org.jenkinsci.plugins.pipeline.maven.publishers.MavenReport.getGeneratedArtifacts()
         run.addOrReplaceAction(new MavenReport(run));
     }
 

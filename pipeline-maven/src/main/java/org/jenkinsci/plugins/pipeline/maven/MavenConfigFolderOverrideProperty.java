@@ -3,13 +3,12 @@ package org.jenkinsci.plugins.pipeline.maven;
 import com.cloudbees.hudson.plugins.folder.AbstractFolder;
 import com.cloudbees.hudson.plugins.folder.AbstractFolderProperty;
 import com.cloudbees.hudson.plugins.folder.AbstractFolderPropertyDescriptor;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import jenkins.mvn.GlobalSettingsProvider;
 import jenkins.mvn.SettingsProvider;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * Provides a way to override maven configuration at a folder level
@@ -37,8 +36,7 @@ public class MavenConfigFolderOverrideProperty extends AbstractFolderProperty<Ab
      * Constructor.
      */
     @DataBoundConstructor
-    public MavenConfigFolderOverrideProperty() {
-    }
+    public MavenConfigFolderOverrideProperty() {}
 
     public boolean isOverride() {
         return override;
@@ -60,7 +58,6 @@ public class MavenConfigFolderOverrideProperty extends AbstractFolderProperty<Ab
     public GlobalSettingsProvider getGlobalSettings() {
         return globalSettings;
     }
-
 
     protected void setGlobalSettings(GlobalSettingsProvider globalSettings) {
         this.globalSettings = globalSettings;

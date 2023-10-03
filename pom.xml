@@ -72,10 +72,10 @@
   </developers>
 
   <modules>
+    <module>pipeline-maven</module>
     <module>pipeline-maven-api</module>
     <module>pipeline-maven-database</module>
     <module>pipeline-maven-spy</module>
-    <module>pipeline-maven</module>
   </modules>
 
   <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
@@ -114,19 +114,12 @@
     <plugin-dockerfile.version>1.4.13</plugin-dockerfile.version>
     <plugin-exec.version>3.1.0</plugin-exec.version>
     <slf4j.version>2.0.9</slf4j.version>
+    <spotless.check.skip>false</spotless.check.skip>
     <testcontainers.version>1.19.0</testcontainers.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- Fix RequireUpperBoundDeps dependencies -->
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>${plexus-utils.version}</version>
-      </dependency>
 
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
@@ -152,11 +145,31 @@
         <version>${maven-compat.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertj.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <!-- Fix RequireUpperBoundDeps dependencies -->
+      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+      <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
         <version>${plexus-utils.version}</version>
       </dependency>
-     <dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>${plexus-utils.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>pipeline-maven-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.junit</groupId>
         <artifactId>junit-bom</artifactId>
         <version>${junit.version}</version>
@@ -173,18 +186,6 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
         <version>${slf4j.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>pipeline-maven-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.assertj</groupId>
-        <artifactId>assertj-core</artifactId>
-        <version>${assertj.version}</version>
-        <scope>test</scope>
       </dependency>
 
       <dependency>
@@ -284,13 +285,56 @@
           <version>${plugin-dockerfile.version}</version>
         </plugin>
         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>${plugin-exec.version}</version>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>${plugin-exec.version}</version>
         </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <configuration>
+          <java>
+            <palantirJavaFormat />
+            <removeUnusedImports />
+          </java>
+          <pom>
+            <includes>
+              <include>pom.xml</include>
+            </includes>
+            <sortPom>
+              <nrOfIndentSpace>2</nrOfIndentSpace>
+              <!-- default see https://github.com/Ekryd/sortpom/wiki/PredefinedSortOrderProfiles -->
+              <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
+              <!-- Sort properties -->
+              <sortProperties>true</sortProperties>
+              <!-- Sort modules -->
+              <sortModules>true</sortModules>
+              <!-- Sort plugin executions -->
+              <sortExecutions>true</sortExecutions>
+              <!-- Sort dependencies see https://github.com/Ekryd/sortpom/wiki/SortDependencies -->
+              <sortDependencies>groupId,artifactId</sortDependencies>
+              <!-- Sort dependency exclusions -->
+              <sortDependencyExclusions>groupId,artifactId</sortDependencyExclusions>
+              <!-- Sort plugins: https://github.com/Ekryd/sortpom/wiki/SortPlugins -->
+              <sortPlugins>groupId,artifactId</sortPlugins>
+            </sortPom>
+          </pom>
+          <upToDateChecking>
+            <enabled>true</enabled>
+          </upToDateChecking>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>com.github.ekryd.sortpom</groupId>
         <artifactId>sortpom-maven-plugin</artifactId>

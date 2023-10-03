@@ -24,23 +24,10 @@
 
 package org.jenkinsci.plugins.pipeline.maven;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.FilePath;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import jenkins.model.InterruptedBuildAction;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.pipeline.maven.publishers.JenkinsMavenEventSpyLogsPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.MavenPipelinePublisherException;
-import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
-import org.jenkinsci.plugins.workflow.steps.StepContext;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
@@ -53,6 +40,18 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import jenkins.model.InterruptedBuildAction;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JenkinsMavenEventSpyLogsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.MavenPipelinePublisherException;
+import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -63,13 +62,19 @@ public class MavenSpyLogProcessor implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(MavenSpyLogProcessor.class.getName());
 
-    public void processMavenSpyLogs(@NonNull StepContext context, @NonNull FilePath mavenSpyLogFolder, @NonNull List<MavenPublisher> options,
-                                    @NonNull MavenPublisherStrategy publisherStrategy) throws IOException, InterruptedException {
+    public void processMavenSpyLogs(
+            @NonNull StepContext context,
+            @NonNull FilePath mavenSpyLogFolder,
+            @NonNull List<MavenPublisher> options,
+            @NonNull MavenPublisherStrategy publisherStrategy)
+            throws IOException, InterruptedException {
 
         long nanosBefore = System.nanoTime();
 
         FilePath[] mavenSpyLogsList = mavenSpyLogFolder.list("maven-spy-*.log");
-        LOGGER.log(Level.FINE, "Found {0} maven execution reports in {1}", new Object[]{mavenSpyLogsList.length, mavenSpyLogFolder});
+        LOGGER.log(Level.FINE, "Found {0} maven execution reports in {1}", new Object[] {
+            mavenSpyLogsList.length, mavenSpyLogFolder
+        });
 
         TaskListener listener = context.get(TaskListener.class);
         FilePath workspace = context.get(FilePath.class);
@@ -106,7 +111,8 @@ public class MavenSpyLogProcessor implements Serializable {
 
             documentBuilder = dbf.newDocumentBuilder();
 
-            // See https://github.com/jenkinsci/jenkins/blob/jenkins-2.176/core/src/main/java/jenkins/util/xml/XMLUtils.java#L114
+            // See
+            // https://github.com/jenkinsci/jenkins/blob/jenkins-2.176/core/src/main/java/jenkins/util/xml/XMLUtils.java#L114
             documentBuilder.setEntityResolver(XmlUtils.RestrictiveEntityResolver.INSTANCE);
         } catch (ParserConfigurationException e) {
             throw new IllegalStateException("Failure to create a DocumentBuilder", e);
@@ -129,10 +135,12 @@ public class MavenSpyLogProcessor implements Serializable {
                     new JenkinsMavenEventSpyLogsPublisher().process(context, mavenSpyLogs);
                 }
 
-                Element mavenSpyLogsElt = documentBuilder.parse(mavenSpyLogsInputStream).getDocumentElement();
+                Element mavenSpyLogsElt =
+                        documentBuilder.parse(mavenSpyLogsInputStream).getDocumentElement();
 
-                if (LOGGER.isLoggable(Level.FINE)){
-                    listener.getLogger().println("[withMaven] Maven Publisher Strategy: " + publisherStrategy.getDescription());
+                if (LOGGER.isLoggable(Level.FINE)) {
+                    listener.getLogger()
+                            .println("[withMaven] Maven Publisher Strategy: " + publisherStrategy.getDescription());
                 }
                 List<MavenPublisher> mavenPublishers = publisherStrategy.buildPublishersList(options, listener);
                 List<MavenPipelinePublisherException> exceptions = new ArrayList<>();
@@ -140,34 +148,52 @@ public class MavenSpyLogProcessor implements Serializable {
                     String skipFileName = mavenPublisher.getDescriptor().getSkipFileName();
                     if (Boolean.TRUE.equals(mavenPublisher.isDisabled())) {
                         if (LOGGER.isLoggable(Level.FINE)) {
-                            listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by configuration");
+                            listener.getLogger()
+                                    .println("[withMaven] Skip '"
+                                            + mavenPublisher.getDescriptor().getDisplayName()
+                                            + "' disabled by configuration");
                         }
-                    } else if (StringUtils.isNotEmpty(skipFileName) && workspace.child(skipFileName).exists()) {
+                    } else if (StringUtils.isNotEmpty(skipFileName)
+                            && workspace.child(skipFileName).exists()) {
                         if (LOGGER.isLoggable(Level.FINE)) {
-                            listener.getLogger().println("[withMaven] Skip '" + mavenPublisher.getDescriptor().getDisplayName() + "' disabled by marker file '" + skipFileName + "'");
+                            listener.getLogger()
+                                    .println("[withMaven] Skip '"
+                                            + mavenPublisher.getDescriptor().getDisplayName()
+                                            + "' disabled by marker file '" + skipFileName + "'");
                         }
                     } else {
                         long nanosBeforePublisher = System.nanoTime();
                         if (LOGGER.isLoggable(Level.FINE)) {
-                            listener.getLogger().println("[withMaven] Run '" + mavenPublisher.getDescriptor().getDisplayName() + "'...");
+                            listener.getLogger()
+                                    .println("[withMaven] Run '"
+                                            + mavenPublisher.getDescriptor().getDisplayName() + "'...");
                         }
                         try {
                             mavenPublisher.process(context, mavenSpyLogsElt);
                         } catch (InterruptedException e) {
-                            listener.error("[withMaven] Processing of Maven build outputs interrupted in " + mavenPublisher.toString() + " after " +
-                                    TimeUnit.MILLISECONDS.convert(System.nanoTime() - nanosBefore, TimeUnit.NANOSECONDS) + "ms.");
-                            Thread.currentThread().interrupt();  // set interrupt flag
+                            listener.error("[withMaven] Processing of Maven build outputs interrupted in "
+                                    + mavenPublisher.toString() + " after "
+                                    + TimeUnit.MILLISECONDS.convert(
+                                            System.nanoTime() - nanosBefore, TimeUnit.NANOSECONDS)
+                                    + "ms.");
+                            Thread.currentThread().interrupt(); // set interrupt flag
                             throw e;
                         } catch (MavenPipelinePublisherException e) {
                             exceptions.add(e);
                         } catch (Exception e) {
-                            PrintWriter error = listener.error("[withMaven] WARNING Exception executing Maven reporter '" + mavenPublisher.getDescriptor().getDisplayName() +
-                                    "' / " + mavenPublisher.getDescriptor().getId() + "." +
-                                    " Please report a bug associated for the component 'pipeline-maven-plugin' at https://issues.jenkins-ci.org ");
+                            PrintWriter error = listener.error(
+                                    "[withMaven] WARNING Exception executing Maven reporter '"
+                                            + mavenPublisher.getDescriptor().getDisplayName() + "' / "
+                                            + mavenPublisher.getDescriptor().getId() + "."
+                                            + " Please report a bug associated for the component 'pipeline-maven-plugin' at https://issues.jenkins-ci.org ");
                             e.printStackTrace(error);
-                            exceptions.add(new MavenPipelinePublisherException(mavenPublisher.getDescriptor().getDisplayName(), "", e));
+                            exceptions.add(new MavenPipelinePublisherException(
+                                    mavenPublisher.getDescriptor().getDisplayName(), "", e));
                         } finally {
-                            durationInMillisPerPublisher.add(new AbstractMap.SimpleImmutableEntry(mavenPublisher.getDescriptor().getDisplayName(), TimeUnit.MILLISECONDS.convert(System.nanoTime() - nanosBeforePublisher, TimeUnit.NANOSECONDS)));
+                            durationInMillisPerPublisher.add(new AbstractMap.SimpleImmutableEntry(
+                                    mavenPublisher.getDescriptor().getDisplayName(),
+                                    TimeUnit.MILLISECONDS.convert(
+                                            System.nanoTime() - nanosBeforePublisher, TimeUnit.NANOSECONDS)));
                         }
                     }
                 }
@@ -180,43 +206,55 @@ public class MavenSpyLogProcessor implements Serializable {
                 Run run = context.get(Run.class);
                 String msg = "";
                 if (run.getActions(InterruptedBuildAction.class).isEmpty()) {
-                    msg = "[withMaven] WARNING Exception parsing the logs generated by the Jenkins Maven Event Spy " + mavenSpyLogs + ", ignore file. " +
-                            " Please report a bug associated for the component 'pipeline-maven-plugin' at https://issues.jenkins-ci.org ";
+                    msg = "[withMaven] WARNING Exception parsing the logs generated by the Jenkins Maven Event Spy "
+                            + mavenSpyLogs + ", ignore file. "
+                            + " Please report a bug associated for the component 'pipeline-maven-plugin' at https://issues.jenkins-ci.org ";
                 } else {
                     // job has been aborted (see InterruptedBuildAction)
-                    msg = "[withMaven] WARNING logs generated by the Jenkins Maven Event Spy " + mavenSpyLogs + " are invalid, probably due to the interruption of the job, ignore file.";
+                    msg = "[withMaven] WARNING logs generated by the Jenkins Maven Event Spy " + mavenSpyLogs
+                            + " are invalid, probably due to the interruption of the job, ignore file.";
                 }
                 PrintWriter errorWriter = listener.error(msg);
                 e.printStackTrace(errorWriter);
                 throw new MavenPipelineException(e);
             } catch (InterruptedException e) {
-                PrintWriter errorWriter = listener.error("[withMaven] Processing of Maven build outputs interrupted after " +
-                        TimeUnit.MILLISECONDS.convert(System.nanoTime() - nanosBefore, TimeUnit.NANOSECONDS) + "ms.");
+                PrintWriter errorWriter =
+                        listener.error("[withMaven] Processing of Maven build outputs interrupted after "
+                                + TimeUnit.MILLISECONDS.convert(System.nanoTime() - nanosBefore, TimeUnit.NANOSECONDS)
+                                + "ms.");
                 if (LOGGER.isLoggable(Level.FINE)) {
                     e.printStackTrace(errorWriter);
                 }
-                Thread.currentThread().interrupt();  // set interrupt flag
+                Thread.currentThread().interrupt(); // set interrupt flag
                 return;
             } catch (Exception e) {
-                PrintWriter errorWriter = listener.error("[withMaven] WARNING Exception processing the logs generated by the Jenkins Maven Event Spy " + mavenSpyLogs + ", ignore file. " +
-                        " Please report a bug associated for the component 'pipeline-maven-plugin' at https://issues.jenkins-ci.org ");
+                PrintWriter errorWriter = listener.error(
+                        "[withMaven] WARNING Exception processing the logs generated by the Jenkins Maven Event Spy "
+                                + mavenSpyLogs + ", ignore file. "
+                                + " Please report a bug associated for the component 'pipeline-maven-plugin' at https://issues.jenkins-ci.org ");
                 e.printStackTrace(errorWriter);
                 throw new MavenPipelineException(e);
             } finally {
                 if (LOGGER.isLoggable(Level.INFO)) {
-                    listener.getLogger().println("[withMaven] Publishers: " +
-                            durationInMillisPerPublisher.stream().filter(entry -> entry.getValue() > 0).
-                                    map(entry -> entry.getKey() + ": " + entry.getValue() + " ms").
-                                    collect(Collectors.joining(", ")));
+                    listener.getLogger()
+                            .println("[withMaven] Publishers: "
+                                    + durationInMillisPerPublisher.stream()
+                                            .filter(entry -> entry.getValue() > 0)
+                                            .map(entry -> entry.getKey() + ": " + entry.getValue() + " ms")
+                                            .collect(Collectors.joining(", ")));
                 }
             }
         }
         FilePath[] mavenSpyLogsInterruptedList = mavenSpyLogFolder.list("maven-spy-*.log.tmp");
         if (mavenSpyLogsInterruptedList.length > 0) {
-            listener.getLogger().print("[withMaven] One or multiple Maven executions have been ignored by the " +
-                    "Jenkins Pipeline Maven Plugin because they have been interrupted before completion " +
-                    "(" + mavenSpyLogsInterruptedList.length + "). See ");
-            listener.hyperlink("https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/FAQ.adoc#how-to-use-the-pipeline-maven-plugin-with-docker", "Pipeline Maven Plugin FAQ");
+            listener.getLogger()
+                    .print("[withMaven] One or multiple Maven executions have been ignored by the "
+                            + "Jenkins Pipeline Maven Plugin because they have been interrupted before completion "
+                            + "("
+                            + mavenSpyLogsInterruptedList.length + "). See ");
+            listener.hyperlink(
+                    "https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/FAQ.adoc#how-to-use-the-pipeline-maven-plugin-with-docker",
+                    "Pipeline Maven Plugin FAQ");
             listener.getLogger().println(" for more details.");
             if (LOGGER.isLoggable(Level.FINE)) {
                 for (FilePath mavenSpyLogsInterruptedLogs : mavenSpyLogsInterruptedList) {
@@ -227,26 +265,23 @@ public class MavenSpyLogProcessor implements Serializable {
     }
 
     /*
-      <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
-     */
+     <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
+    */
     public static class PluginInvocation {
         public String groupId, artifactId, version, goal, executionId;
 
         public String getId() {
-            return artifactId + ":" +
-                    goal + " " +
-                    "(" + executionId + ")";
+            return artifactId + ":" + goal + " " + "(" + executionId + ")";
         }
 
         @Override
         public String toString() {
-            return "PluginInvocation{" +
-                    groupId + ":" +
-                    artifactId + ":" +
-                    version + "@" +
-                    goal + " " +
-                    " " + executionId +
-                    '}';
+            return "PluginInvocation{" + groupId
+                    + ":" + artifactId
+                    + ":" + version
+                    + "@" + goal
+                    + " " + " "
+                    + executionId + '}';
         }
     }
 }

@@ -11,6 +11,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import hudson.model.Cause;
+import hudson.model.Job;
+import hudson.model.Queue;
+import hudson.model.Queue.Item;
+import hudson.model.Queue.Task;
+import hudson.model.Result;
+import hudson.model.TaskListener;
+import hudson.model.queue.ScheduleResult;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
+import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.WithMavenStep;
@@ -41,16 +49,6 @@ import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-
-import hudson.model.Cause;
-import hudson.model.Job;
-import hudson.model.Queue;
-import hudson.model.Result;
-import hudson.model.TaskListener;
-import hudson.model.Queue.Item;
-import hudson.model.Queue.Task;
-import hudson.model.queue.ScheduleResult;
-import jenkins.model.Jenkins;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -251,8 +249,10 @@ public class DownstreamPipelineTriggerRunListenerTest {
             when(build.getResult()).thenReturn(Result.SUCCESS);
             when(build.getParent()).thenReturn(job);
             when(build.getNumber()).thenReturn(42);
-            when(dao.listDownstreamJobsByArtifact("pipeline", 42)).thenReturn(
-                    Collections.singletonMap(new MavenArtifact("groupId:artifactId:jar:version"), new TreeSet<>(Collections.singleton("downstream"))));
+            when(dao.listDownstreamJobsByArtifact("pipeline", 42))
+                    .thenReturn(Collections.singletonMap(
+                            new MavenArtifact("groupId:artifactId:jar:version"),
+                            new TreeSet<>(Collections.singleton("downstream"))));
 
             listener.onCompleted(build, taskListener);
 
@@ -277,8 +277,10 @@ public class DownstreamPipelineTriggerRunListenerTest {
             when(build.getResult()).thenReturn(Result.SUCCESS);
             when(build.getParent()).thenReturn(job);
             when(build.getNumber()).thenReturn(42);
-            when(dao.listDownstreamJobsByArtifact("pipeline", 42)).thenReturn(
-                    Collections.singletonMap(new MavenArtifact("groupId:artifactId:jar:version"), new TreeSet<>(Collections.singleton("downstream"))));
+            when(dao.listDownstreamJobsByArtifact("pipeline", 42))
+                    .thenReturn(Collections.singletonMap(
+                            new MavenArtifact("groupId:artifactId:jar:version"),
+                            new TreeSet<>(Collections.singleton("downstream"))));
             when(jenkins.getItemByFullName("downstream", Job.class)).thenReturn(downstream);
 
             listener.onCompleted(build, taskListener);
@@ -312,15 +314,20 @@ public class DownstreamPipelineTriggerRunListenerTest {
             when(build.getResult()).thenReturn(Result.SUCCESS);
             when(build.getParent()).thenReturn(job);
             when(build.getNumber()).thenReturn(42);
-            when(dao.listDownstreamJobsByArtifact("pipeline", 42)).thenReturn(
-                    Collections.singletonMap(new MavenArtifact("groupId:upstreamArtifactId:jar:version"), new TreeSet<>(Collections.singleton("downstream"))));
+            when(dao.listDownstreamJobsByArtifact("pipeline", 42))
+                    .thenReturn(Collections.singletonMap(
+                            new MavenArtifact("groupId:upstreamArtifactId:jar:version"),
+                            new TreeSet<>(Collections.singleton("downstream"))));
             when(jenkins.getItemByFullName("downstream", Job.class)).thenReturn(downstream);
             when(dao.getGeneratedArtifacts("downstream", 4242))
-                    .thenReturn(Collections.singletonList(new MavenArtifact("groupId:downstreamArtifactId:jar:version")));
+                    .thenReturn(
+                            Collections.singletonList(new MavenArtifact("groupId:downstreamArtifactId:jar:version")));
             when(dao.listDownstreamJobsByArtifact("downstream", 4242))
-                    .thenReturn(Collections.singletonMap(new MavenArtifact("groupId:downstreamArtifactId:jar:version"), new TreeSet<>()));
+                    .thenReturn(Collections.singletonMap(
+                            new MavenArtifact("groupId:downstreamArtifactId:jar:version"), new TreeSet<>()));
             when(service.isDownstreamVisibleByUpstreamBuildAuth(downstream)).thenReturn(true);
-            when(service.isUpstreamBuildVisibleByDownstreamBuildAuth(job, downstream)).thenReturn(true);
+            when(service.isUpstreamBuildVisibleByDownstreamBuildAuth(job, downstream))
+                    .thenReturn(true);
 
             listener.onCompleted(build, taskListener);
 
@@ -347,8 +354,12 @@ public class DownstreamPipelineTriggerRunListenerTest {
             when(queueResult.getItem()).thenReturn(queuedItem);
 
             Map<MavenArtifact, SortedSet<String>> downstreamJobs = new HashMap<>();
-            downstreamJobs.put(new MavenArtifact("groupId:upstreamArtifactId1:jar:version"), new TreeSet<>(Collections.singleton("downstream")));
-            downstreamJobs.put(new MavenArtifact("groupId:upstreamArtifactId2:jar:version"), new TreeSet<>(Collections.singleton("downstream")));
+            downstreamJobs.put(
+                    new MavenArtifact("groupId:upstreamArtifactId1:jar:version"),
+                    new TreeSet<>(Collections.singleton("downstream")));
+            downstreamJobs.put(
+                    new MavenArtifact("groupId:upstreamArtifactId2:jar:version"),
+                    new TreeSet<>(Collections.singleton("downstream")));
             MavenDependencyUpstreamCause cause = mock(MavenDependencyUpstreamCause.class);
             WorkflowJob job = mock(WorkflowJob.class);
             when(job.getFullName()).thenReturn("pipeline");
@@ -364,11 +375,14 @@ public class DownstreamPipelineTriggerRunListenerTest {
             when(dao.listDownstreamJobsByArtifact("pipeline", 42)).thenReturn(downstreamJobs);
             when(jenkins.getItemByFullName("downstream", Job.class)).thenReturn(downstream);
             when(dao.getGeneratedArtifacts("downstream", 4242))
-                    .thenReturn(Collections.singletonList(new MavenArtifact("groupId:downstreamArtifactId:jar:version")));
+                    .thenReturn(
+                            Collections.singletonList(new MavenArtifact("groupId:downstreamArtifactId:jar:version")));
             when(dao.listDownstreamJobsByArtifact("downstream", 4242))
-                    .thenReturn(Collections.singletonMap(new MavenArtifact("groupId:downstreamArtifactId:jar:version"), new TreeSet<>()));
+                    .thenReturn(Collections.singletonMap(
+                            new MavenArtifact("groupId:downstreamArtifactId:jar:version"), new TreeSet<>()));
             when(service.isDownstreamVisibleByUpstreamBuildAuth(downstream)).thenReturn(true);
-            when(service.isUpstreamBuildVisibleByDownstreamBuildAuth(job, downstream)).thenReturn(true);
+            when(service.isUpstreamBuildVisibleByDownstreamBuildAuth(job, downstream))
+                    .thenReturn(true);
 
             listener.onCompleted(build, taskListener);
 
@@ -385,5 +399,4 @@ public class DownstreamPipelineTriggerRunListenerTest {
             verifyNoMoreInteractions(dao, service, trigger, queue);
         }
     }
-
 }

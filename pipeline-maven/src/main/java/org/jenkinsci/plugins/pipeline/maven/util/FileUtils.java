@@ -1,8 +1,7 @@
 package org.jenkinsci.plugins.pipeline.maven.util;
 
-import hudson.FilePath;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.FilePath;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -15,7 +14,7 @@ public class FileUtils {
                 // windows path such as "C:\path\to\..."
                 return true;
             } else // Microsoft Windows UNC mount ("\\myserver\myfolder")
-                if (path.length() > 3 && path.charAt(1) == ':' && path.charAt(2) == '/') {
+            if (path.length() > 3 && path.charAt(1) == ':' && path.charAt(2) == '/') {
                 // nasty windows path such as "C:/path/to/...". See JENKINS-44088
                 return true;
             } else return path.length() > 2 && path.charAt(0) == '\\' && path.charAt(1) == '\\';
@@ -23,7 +22,6 @@ public class FileUtils {
             // see java.io.UnixFileSystem.prefixLength()
             return path.charAt(0) == '/';
         }
-
     }
 
     public static boolean isWindows(@NonNull FilePath path) {
