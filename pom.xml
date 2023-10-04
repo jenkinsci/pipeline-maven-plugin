@@ -257,23 +257,6 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>com.github.ekryd.sortpom</groupId>
-          <artifactId>sortpom-maven-plugin</artifactId>
-          <version>${maven-plugin-sortpom.version}</version>
-          <configuration>
-            <createBackupFile>false</createBackupFile>
-            <encoding>${project.build.sourceEncoding}</encoding>
-            <expandEmptyElements>false</expandEmptyElements>
-            <keepBlankLines>true</keepBlankLines>
-            <lineSeparator>\n</lineSeparator>
-            <ignoreLineSeparators>false</ignoreLineSeparators>
-            <nrOfIndentSpace>2</nrOfIndentSpace>
-            <sortDependencies>scope,groupId,artifactId</sortDependencies>
-            <sortPlugins>groupId,artifactId</sortPlugins>
-            <sortProperties>true</sortProperties>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>com.spotify</groupId>
           <artifactId>dockerfile-maven-plugin</artifactId>
           <version>${plugin-dockerfile.version}</version>
@@ -286,18 +269,6 @@
       </plugins>
     </pluginManagement>
     <plugins>
-      <plugin>
-        <groupId>com.github.ekryd.sortpom</groupId>
-        <artifactId>sortpom-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>sort</goal>
-            </goals>
-            <phase>verify</phase>
-          </execution>
-        </executions>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-release-plugin</artifactId>
