@@ -107,7 +107,6 @@
     <mariadb-client.version>3.2.0</mariadb-client.version>
     <maven-compat.version>3.3.9</maven-compat.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
-    <maven-plugin-sortpom.version>3.3.0</maven-plugin-sortpom.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.8.8</maven.version>
     <plexus-utils.version>3.5.1</plexus-utils.version>
