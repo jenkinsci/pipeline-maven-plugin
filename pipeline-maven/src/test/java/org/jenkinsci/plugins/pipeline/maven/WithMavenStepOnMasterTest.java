@@ -93,7 +93,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_build_on_master_with_specified_maven_installation_succeeds() throws Exception {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-        // @// @formatter:off
+        // @formatter:off
         String pipelineScript = "node() {\n" + "    git($/"
                 + gitRepoRule.toString() + "/$)\n"
                 + "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n"
@@ -104,7 +104,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 + "        }\n"
                 + "    }\n"
                 + "}";
-        // @// @formatter:on
+        // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-with-tool-provided-maven");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
@@ -130,7 +130,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_build_on_master_with_missing_specified_maven_installation_fails() throws Exception {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-        // @// @formatter:off
+        // @formatter:off
         String pipelineScript = "node() {\n" + "    git($/"
                 + gitRepoRule.toString() + "/$)\n" + "    withMaven(maven: 'install-does-not-exist') {\n"
                 + "        if (isUnix()) {\n"
@@ -240,7 +240,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 + "        }\n"
                 + "    }\n"
                 + "}";
-        // @// @formatter:on
+        // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
