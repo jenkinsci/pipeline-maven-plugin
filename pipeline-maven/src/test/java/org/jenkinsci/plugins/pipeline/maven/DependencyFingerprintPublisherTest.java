@@ -27,16 +27,16 @@ public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest 
         loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n"
-                + "    withMaven(options:[dependenciesFingerprintPublisher(includeReleaseVersions:true)]) {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn package'\n"
-                + "        } else {\n"
-                + "            bat 'mvn package'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven(options:[dependenciesFingerprintPublisher(includeReleaseVersions:true)]) {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         String commonsLang3version35Md5 = "780b5a8b72eebe6d0dbff1c11b5658fa";

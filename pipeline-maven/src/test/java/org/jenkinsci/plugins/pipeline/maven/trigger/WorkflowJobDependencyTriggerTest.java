@@ -48,10 +48,11 @@ public class WorkflowJobDependencyTriggerTest {
         WorkflowJob p = rule.jenkins.createProject(WorkflowJob.class, "p");
         // @formatter:off
         p.setDefinition(new CpsFlowDefinition(
-                "node {\n" + "semaphore 'config'\n"
-                        + "properties([ pipelineTriggers([ snapshotDependencies() ]) ])\n"
-                        + "}",
-                true));
+            "node {\n" +
+                "semaphore 'config'\n" +
+                "properties([ pipelineTriggers([ snapshotDependencies() ]) ])\n" +
+            "}",
+            true));
         // @formatter:on
         WorkflowRun b = p.scheduleBuild2(0).waitForStart();
         SemaphoreStep.waitForStart("config/1", b);

@@ -75,14 +75,16 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
             String version = registerLatestMavenVersionAsGlobalTool();
 
             // @formatter:off
-            WorkflowRun run = runPipeline("" + "node('"
-                    + AGENT_NAME + "') {\n" + "  def mavenHome = tool '"
-                    + MAVEN_GLOBAL_TOOL_NAME + "'\n" + "  withEnv([\"MAVEN_HOME=${mavenHome}\"]) {\n"
-                    + "    withMaven(traceability: true) {\n"
-                    + "      sh \"mvn --version\"\n"
-                    + "    }\n"
-                    + "  }\n"
-                    + "}");
+            WorkflowRun run = runPipeline(
+                "node('" + AGENT_NAME + "') {\n" +
+                "  def mavenHome = tool '" + MAVEN_GLOBAL_TOOL_NAME + "'\n" +
+                "  withEnv([\"MAVEN_HOME=${mavenHome}\"]) {\n" +
+                "    withMaven(traceability: true) {\n" +
+                "      sh \"mvn --version\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}"
+            );
             // @formatter:on
 
             jenkinsRule.assertLogContains("Apache Maven " + version, run);
@@ -101,21 +103,23 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
             String version = registerLatestMavenVersionAsGlobalTool();
 
             // @formatter:off
-            WorkflowRun run = runPipeline("" + "pipeline {\n"
-                    + "  agent { label '"
-                    + AGENT_NAME + "' }\n" + "  tools {\n"
-                    + "    maven '"
-                    + MAVEN_GLOBAL_TOOL_NAME + "'\n" + "  }\n"
-                    + "  stages {\n"
-                    + "    stage('Build') {\n"
-                    + "      steps {\n"
-                    + "        withMaven(traceability: true) {\n"
-                    + "          sh \"mvn --version\"\n"
-                    + "        }\n"
-                    + "      }\n"
-                    + "    }\n"
-                    + "  }\n"
-                    + "}");
+            WorkflowRun run = runPipeline(
+                "pipeline {\n" +
+                "  agent { label '" + AGENT_NAME + "' }\n" +
+                "  tools {\n" +
+                "    maven '" +MAVEN_GLOBAL_TOOL_NAME + "'\n" +
+                "  }\n" +
+                "  stages {\n" +
+                "    stage('Build') {\n" +
+                "      steps {\n" +
+                "        withMaven(traceability: true) {\n" +
+                "          sh \"mvn --version\"\n" +
+                "        }\n" +
+                "      }\n" +
+                "    }\n" +
+                "  }\n" +
+                "}"
+            );
             // @formatter:on
 
             jenkinsRule.assertLogContains("Apache Maven " + version, run);
@@ -133,11 +137,13 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
             registerAgentForContainer(javaMavenGitContainerRule);
 
             // @formatter:off
-            WorkflowRun run = runPipeline("" + "node('"
-                    + AGENT_NAME + "') {\n" + "  withMaven(traceability: true) {\n"
-                    + "    sh \"mvn --version\"\n"
-                    + "  }\n"
-                    + "}");
+            WorkflowRun run = runPipeline(
+                "node('" + AGENT_NAME + "') {\n" +
+                "  withMaven(traceability: true) {\n" +
+                "    sh \"mvn --version\"\n" +
+                "  }\n" +
+                "}"
+            );
             // @formatter:on
 
             jenkinsRule.assertLogContains("Apache Maven 3.6.0", run);
@@ -154,12 +160,14 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
             registerAgentForContainer(mavenWithMavenHomeContainerRule);
 
             // @formatter:off
-            WorkflowRun run = runPipeline("" + "node('"
-                    + AGENT_NAME + "') {\n" + "  sh 'echo $MAVEN_HOME'\n"
-                    + "  withMaven(traceability: true) {\n"
-                    + "    sh \"mvn --version\"\n"
-                    + "  }\n"
-                    + "}");
+            WorkflowRun run = runPipeline(
+                "node('" + AGENT_NAME + "') {\n" +
+                "  sh 'echo $MAVEN_HOME'\n" +
+                "  withMaven(traceability: true) {\n" +
+                "    sh \"mvn --version\"\n" +
+                "  }\n" +
+                "}"
+            );
             // @formatter:on
 
             jenkinsRule.assertLogContains("Apache Maven 3.6.0", run);

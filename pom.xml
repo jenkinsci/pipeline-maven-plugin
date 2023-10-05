@@ -94,7 +94,6 @@
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-flaky-test.version>1.2.2</jenkins-plugin-flaky-test.version>
     <jenkins-plugin-h2.version>1.4.199</jenkins-plugin-h2.version>
-    <jenkins-plugin-jacoco.version>3.3.2</jenkins-plugin-jacoco.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
     <jenkins-plugin-maven-invoker.version>2.5</jenkins-plugin-maven-invoker.version>
     <jenkins-plugin-maven.version>3.22</jenkins-plugin-maven.version>
@@ -134,7 +133,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
       <dependency>
         <groupId>org.testcontainers</groupId>
         <artifactId>testcontainers-bom</artifactId>
@@ -142,12 +140,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- Fix RequireUpperBoundDeps dependencies -->
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!--
-      for org.jenkins-ci.plugins:maven-invoker-plugin and org.jenkins-ci.main:maven-plugin
-      -->
+
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
@@ -158,9 +151,6 @@
         <artifactId>maven-core</artifactId>
         <version>${maven-compat.version}</version>
       </dependency>
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- Fix RequireUpperBoundDeps dependencies -->
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
@@ -171,7 +161,6 @@
         <artifactId>pipeline-maven-api</artifactId>
         <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
@@ -182,6 +171,7 @@
         <artifactId>slf4j-simple</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
+
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
@@ -255,6 +245,34 @@
   <build>
     <pluginManagement>
       <plugins>
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <configuration>
+            <java>
+              <toggleOffOn>
+                <off>@formatter:off</off>
+                <on>@formatter:on</on>
+              </toggleOffOn>
+            </java>
+            <pom>
+              <sortPom>
+                <nrOfIndentSpace>2</nrOfIndentSpace>
+                <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
+                <sortProperties>true</sortProperties>
+                <sortModules>true</sortModules>
+                <sortExecutions>true</sortExecutions>
+                <sortDependencies>groupId,artifactId</sortDependencies>
+                <sortDependencyExclusions>groupId,artifactId</sortDependencyExclusions>
+                <sortPlugins>groupId,artifactId</sortPlugins>
+              </sortPom>
+              <toggleOffOn>
+                <off>@formatter:off</off>
+                <on>@formatter:on</on>
+              </toggleOffOn>
+            </pom>
+          </configuration>
+        </plugin>
         <plugin>
           <groupId>com.spotify</groupId>
           <artifactId>dockerfile-maven-plugin</artifactId>

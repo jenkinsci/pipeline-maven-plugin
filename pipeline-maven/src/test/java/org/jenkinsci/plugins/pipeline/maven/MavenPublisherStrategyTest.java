@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
@@ -43,16 +44,17 @@ public class MavenPublisherStrategyTest {
         for (MavenPublisher mavenPublisher : mavenPublishers) {
             reportersByDescriptorId.put(mavenPublisher.getDescriptor().getId(), mavenPublisher);
         }
-        assertThat(reportersByDescriptorId).containsKey(new GeneratedArtifactsPublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new FindbugsAnalysisPublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new SpotBugsAnalysisPublisher.DescriptorImpl().getId());
-        assertThat(reportersByDescriptorId).containsKey(new JunitTestsPublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new TasksScannerPublisher.DescriptorImpl().getId());
-        assertThat(reportersByDescriptorId).containsKey(new PipelineGraphPublisher.DescriptorImpl().getId());
-        assertThat(reportersByDescriptorId).containsKey(new InvokerRunsPublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new ConcordionTestsPublisher.DescriptorImpl().getId());
-        assertThat(reportersByDescriptorId).containsKey(new JGivenTestsPublisher.DescriptorImpl().getId());
-        assertThat(reportersByDescriptorId).containsKey(new MavenLinkerPublisher2.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new DependenciesFingerprintPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new GeneratedArtifactsPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new InvokerRunsPublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new JacocoReportPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new JGivenTestsPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new JunitTestsPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new MavenLinkerPublisher2.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new PipelineGraphPublisher.DescriptorImpl().getId());
     }
 }

@@ -22,15 +22,16 @@ public class InvokerRunsPublisherTest extends AbstractIntegrationTest {
                 "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_plugin_project/");
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn verify'\n"
-                + "        } else {\n"
-                + "            bat 'mvn verify'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn verify'\n" +
+            "        } else {\n" +
+            "            bat 'mvn verify'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
@@ -72,15 +73,16 @@ public class InvokerRunsPublisherTest extends AbstractIntegrationTest {
                 "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_plugin_project_with_invoker_as_junit/");
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn verify'\n"
-                + "        } else {\n"
-                + "            bat 'mvn verify'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn verify'\n" +
+            "        } else {\n" +
+            "            bat 'mvn verify'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");

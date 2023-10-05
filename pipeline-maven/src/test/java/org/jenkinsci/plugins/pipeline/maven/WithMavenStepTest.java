@@ -80,12 +80,13 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
 
             // @formatter:off
             WorkflowRun run = runPipeline(
-                    Result.FAILURE,
-                    "" + "node('remote') {\n"
-                            + "  withMaven(mavenSettingsFilePath: '"
-                            + onMaster + "') {\n" + "    echo readFile(MVN_SETTINGS)\n"
-                            + "  }\n"
-                            + "}");
+                Result.FAILURE,
+                "node('remote') {\n" +
+                "  withMaven(mavenSettingsFilePath: '" + onMaster + "') {\n" +
+                "    echo readFile(MVN_SETTINGS)\n" +
+                "  }\n" +
+                "}"
+            );
             // @formatter:on
 
             jenkinsRule.assertLogNotContains(secret, run);
@@ -102,13 +103,14 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
 
             // @formatter:off
             runPipeline(
-                    Result.SUCCESS,
-                    "" + "node() {\n"
-                            + "  git($/"
-                            + gitRepoRule.toString() + "/$)\n" + "  withMaven(publisherStrategy: 'EXPLICIT') {\n"
-                            + "    sh 'mvn package'\n"
-                            + "  }\n"
-                            + "}");
+                Result.SUCCESS,
+                "node() {\n" +
+                "  git($/" + gitRepoRule.toString() + "/$)\n" +
+                "  withMaven(publisherStrategy: 'EXPLICIT') {\n" +
+                "    sh 'mvn package'\n" +
+                "  }\n" +
+                "}"
+            );
             // @formatter:on
 
             assertFingerprintDoesNotExist(COMMONS_LANG3_FINGERPRINT);
@@ -143,12 +145,14 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
 
             // @formatter:off
             WorkflowRun run = runPipeline(
-                    Result.SUCCESS,
-                    "node('" + AGENT_NAME + "') {\n" + "  git('/tmp/gitrepo')\n"
-                            + "  withMaven(jdk: '"
-                            + jdkName + "') {\n" + "    sh 'mvn package'\n"
-                            + "  }\n"
-                            + "}");
+                Result.SUCCESS,
+                "node('" + AGENT_NAME + "') {\n" +
+                "  git('/tmp/gitrepo')\n" +
+                "  withMaven(jdk: '" + jdkName + "') {\n" +
+                "    sh 'mvn package'\n" +
+                "  }\n" +
+                "}"
+            );
             // @formatter:on
             jenkinsRule.assertLogContains(
                     "artifactsPublisher - Archive artifact target/mono-dependency-maven-project-0.1-SNAPSHOT.jar", run);

@@ -65,15 +65,16 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
                 this.gitRepoRule,
                 "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/multi_module_maven_project/");
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline1 = jenkinsRule.createProject(WorkflowJob.class, "pipeline-1");

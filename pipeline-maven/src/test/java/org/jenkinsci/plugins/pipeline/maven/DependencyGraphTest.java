@@ -77,24 +77,26 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         loadMavenWarProjectInGitRepo(this.downstreamArtifactRepoRule);
 
         // @formatter:off
-        String mavenJarPipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
-        String mavenWarPipelineScript = "node() {\n" + "    git($/"
-                + downstreamArtifactRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String mavenJarPipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
+        String mavenWarPipelineScript = "node() {\n" +
+            "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob mavenJarPipeline = jenkinsRule.createProject(WorkflowJob.class, "build-maven-jar");
@@ -138,15 +140,16 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         loadMavenWarProjectInGitRepo(this.downstreamArtifactRepoRule);
 
         // @formatter:off
-        String script = "node() {\n" + "    checkout scm\n"
-                + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String script = "node() {\n" +
+            "    checkout scm\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
         gitRepoRule.write("Jenkinsfile", script);
         gitRepoRule.git("add", "Jenkinsfile");
@@ -216,15 +219,16 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
                 "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/multi_module_bundle_project/");
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         // TRIGGER maven-jar#1 to record that "build-maven-jar"
@@ -272,15 +276,16 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
                 this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_pom_project/");
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         // TRIGGER maven-jar#1 to record that "build-maven-jar"
@@ -316,24 +321,26 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
                 "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_with_parent_pom_project/");
 
         // @formatter:off
-        String mavenParentPipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
-        String mavenJarPipelineScript = "node() {\n" + "    git($/"
-                + downstreamArtifactRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String mavenParentPipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
+        String mavenJarPipelineScript = "node() {\n" +
+            "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob mavenParentPipeline = jenkinsRule.createProject(WorkflowJob.class, "build-maven-parent");
@@ -374,24 +381,26 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         loadMavenWarProjectInGitRepo(this.downstreamArtifactRepoRule);
 
         // @formatter:off
-        String mavenJarPipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
-        String mavenWarPipelineScript = "node() {\n" + "    git($/"
-                + downstreamArtifactRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String mavenJarPipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
+        String mavenWarPipelineScript = "node() {\n" +
+            "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob mavenJarPipeline = jenkinsRule.createProject(WorkflowJob.class, "build-maven-jar");
@@ -437,26 +446,26 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
                 "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_nbm_base_project/");
 
         // @formatter:off
-        String mavenNbmDependencyPipelineScript = "node() {\n"
-                + "    git($/" + gitRepoRule.toString() + "/$)\n"
-                + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
-        String mavenNbmBasePipelineScript = "node() {\n"
-                + "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n"
-                + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String mavenNbmDependencyPipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
+        String mavenNbmBasePipelineScript = "node() {\n" +
+            "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob mavenNbmDependency = jenkinsRule.createProject(WorkflowJob.class, "build-nbm-dependency");
@@ -503,26 +512,26 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
                 "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_docker_base_project/");
 
         // @formatter:off
-        String mavenDockerDependencyPipelineScript = "node() {\n"
-                + "    git($/" + gitRepoRule.toString() + "/$)\n"
-                + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
-        String mavenDockerBasePipelineScript = "node() {\n"
-                + "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n"
-                + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String mavenDockerDependencyPipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
+        String mavenDockerBasePipelineScript = "node() {\n" +
+            "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob mavenDockerDependency = jenkinsRule.createProject(WorkflowJob.class, "build-docker-dependency");
@@ -576,26 +585,26 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
                 "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_deployfile_base_project/");
 
         // @formatter:off
-        String mavenDeployFileDependencyPipelineScript = "node() {\n"
-                + "    git($/" + gitRepoRule.toString() + "/$)\n"
-                + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install deploy:deploy-file@deploy-file'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install deploy:deploy-file@deploy-file'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
-        String mavenDeployFileBasePipelineScript = "node() {\n"
-                + "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n"
-                + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn install'\n"
-                + "        } else {\n"
-                + "            bat 'mvn install'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String mavenDeployFileDependencyPipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install deploy:deploy-file@deploy-file'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install deploy:deploy-file@deploy-file'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
+        String mavenDeployFileBasePipelineScript = "node() {\n" +
+            "    git($/" + downstreamArtifactRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn install'\n" +
+            "        } else {\n" +
+            "            bat 'mvn install'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob mavenDeployFileDependency =

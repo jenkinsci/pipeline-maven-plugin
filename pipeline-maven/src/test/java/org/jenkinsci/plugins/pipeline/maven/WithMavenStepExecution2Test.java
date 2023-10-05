@@ -15,9 +15,9 @@ public class WithMavenStepExecution2Test {
     public void testEscapeWindowsBatchChars() {
 
         // @formatter:off
-        String mavenConfig = "--batch-mode --show-version "
-                + "--settings \"e:\\folder\\branches%2Ftest\\workspace@tmp\\withMaven94865076\\settings.xml\" "
-                + "--global-settings \"e:\\folder\\branches%2Ftest\\workspace@tmp\\withMaven94865076\\globalSettings.xml\"";
+        String mavenConfig = "--batch-mode --show-version " +
+                "--settings \"e:\\folder\\branches%2Ftest\\workspace@tmp\\withMaven94865076\\settings.xml\" " +
+                "--global-settings \"e:\\folder\\branches%2Ftest\\workspace@tmp\\withMaven94865076\\globalSettings.xml\"";
         // @formatter:on
 
         String actualEscapedMavenConfig = mavenConfig.replace("%", "%%");

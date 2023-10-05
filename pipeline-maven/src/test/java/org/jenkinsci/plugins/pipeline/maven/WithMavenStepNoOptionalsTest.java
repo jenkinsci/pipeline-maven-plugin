@@ -79,15 +79,16 @@ public class WithMavenStepNoOptionalsTest {
         @Override
         public void run(JenkinsRule r) throws Throwable {
             // @formatter:off
-            String pipelineScript = "node('mock') {\n" + "    git($/"
-                    + repoUrl + "/$)\n" + "    withMaven() {\n"
-                    + "        if (isUnix()) {\n"
-                    + "            sh 'mvn verify -Dmaven.test.failure.ignore=true'\n"
-                    + "        } else {\n"
-                    + "            bat 'mvn verify -Dmaven.test.failure.ignore=true'\n"
-                    + "        }\n"
-                    + "    }\n"
-                    + "}";
+            String pipelineScript = "node('mock') {\n" +
+                "    git($/" + repoUrl + "/$)\n" +
+                "    withMaven() {\n" +
+                "        if (isUnix()) {\n" +
+                "            sh 'mvn verify -Dmaven.test.failure.ignore=true'\n" +
+                "        } else {\n" +
+                "            bat 'mvn verify -Dmaven.test.failure.ignore=true'\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
             // @formatter:on
 
             WorkflowJob pipeline = r.createProject(WorkflowJob.class, "build-on-master");

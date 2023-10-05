@@ -27,28 +27,29 @@ public class MaskPasswordsConsoleLogFilterTest extends AbstractIntegrationTest {
     @ValueSource(booleans = {true, false})
     public void should_hide_server_username_and_password(boolean usernameIsSecret) throws Exception {
         // @formatter:off
-        String pipelineScript = "node() {\n"
-                + "    withMaven(traceability: true, globalMavenSettingsConfig: 'maven-global-config-test') {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'cat \"$GLOBAL_MVN_SETTINGS\"'\n"
-                + "        } else {\n"
-                + "            bat 'type \"%GLOBAL_MVN_SETTINGS%\"'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    withMaven(traceability: true, globalMavenSettingsConfig: 'maven-global-config-test') {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'cat \"$GLOBAL_MVN_SETTINGS\"'\n" +
+            "        } else {\n" +
+            "            bat 'type \"%GLOBAL_MVN_SETTINGS%\"'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
 
         String serverId = "server-id";
         // @formatter:off
-        String mavenGlobalSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" + "<settings \n"
-                + "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n"
-                + "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n"
-                + "    <servers>\n"
-                + "       <server>\n"
-                + "           <id>"
-                + serverId + "</id>\n" + "       </server>\n"
-                + "    </servers>\n"
-                + "</settings>\n";
+        String mavenGlobalSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<settings \n" +
+            "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+            "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+            "    <servers>\n" +
+            "       <server>\n" +
+            "           <id>" + serverId + "</id>\n" +
+            "       </server>\n" +
+            "    </servers>\n" +
+            "</settings>\n";
         // @formatter:on
 
         String credentialsId = "creds-id";

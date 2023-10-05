@@ -37,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 import jenkins.mvn.FilePathGlobalSettingsProvider;
 import jenkins.mvn.FilePathSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
@@ -55,6 +56,8 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JacocoReportPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
+import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
@@ -64,6 +67,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.jvnet.hudson.test.Issue;
 
 /**
@@ -94,16 +100,16 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n"
-                + "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn package'\n"
-                + "        } else {\n"
-                + "            bat 'mvn package'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-with-tool-provided-maven");
@@ -131,15 +137,16 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven(maven: 'install-does-not-exist') {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn package'\n"
-                + "        } else {\n"
-                + "            bat 'mvn package'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven(maven: 'install-does-not-exist') {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-with-tool-provided-maven");
@@ -153,15 +160,16 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn package verify'\n"
-                + "        } else {\n"
-                + "            bat 'mvn package verify'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package verify'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package verify'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
@@ -231,15 +239,16 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn package verify'\n"
-                + "        } else {\n"
-                + "            bat 'mvn package verify'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package verify'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package verify'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
@@ -261,15 +270,16 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven(traceability: false) {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn package verify'\n"
-                + "        } else {\n"
-                + "            bat 'mvn package verify'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven(traceability: false) {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package verify'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package verify'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
@@ -287,15 +297,16 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven(traceability: true) {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn package verify'\n"
-                + "        } else {\n"
-                + "            bat 'mvn package verify'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven(traceability: true) {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package verify'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package verify'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
@@ -362,26 +373,28 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven(traceability: true) {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'unset MAVEN_ARGS; mvn help:effective-settings'\n"
-                + "        } else {\n"
-                + "            bat 'set MAVEN_ARGS= && mvn help:effective-settings'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven(traceability: true) {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'unset MAVEN_ARGS; mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'set MAVEN_ARGS= && mvn help:effective-settings'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
 
-        String mavenSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" + "<settings \n"
-                + "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n"
-                + "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n"
-                + "    <servers>\n"
-                + "        <server>\n"
-                + "            <id>id-settings-test-through-config-file-provider</id>\n"
-                + "        </server>\n"
-                + "    </servers>\n"
-                + "</settings>\n";
+        String mavenSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<settings \n" +
+            "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+            "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+            "    <servers>\n" +
+            "        <server>\n" +
+            "            <id>id-settings-test-through-config-file-provider</id>\n" +
+            "        </server>\n" +
+            "    </servers>\n" +
+            "</settings>\n";
         // @formatter:on
         MavenSettingsConfig mavenSettingsConfig =
                 new MavenSettingsConfig("maven-config-test", "maven-config-test", "", mavenSettings, false, null);
@@ -401,67 +414,25 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         }
     }
 
-    @Test
-    public void maven_build_jar_project_on_master_findbugs_publisher_desactivation() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(
-                new FindbugsAnalysisPublisher.DescriptorImpl(), "findbugsPublisher");
+    private static Stream<Arguments> mavenPublisherDescriptors() {
+        return Stream.of(
+                Arguments.of(new FindbugsAnalysisPublisher.DescriptorImpl(), "findbugsPublisher"),
+                Arguments.of(new SpotBugsAnalysisPublisher.DescriptorImpl(), "spotbugsPublisher"),
+                Arguments.of(new TasksScannerPublisher.DescriptorImpl(), "openTasksPublisher"),
+                Arguments.of(new ConcordionTestsPublisher.DescriptorImpl(), "concordionPublisher"),
+                Arguments.of(new DependenciesFingerprintPublisher.DescriptorImpl(), "dependenciesFingerprintPublisher"),
+                Arguments.of(new GeneratedArtifactsPublisher.DescriptorImpl(), "artifactsPublisher"),
+                Arguments.of(new InvokerRunsPublisher.DescriptorImpl(), "invokerPublisher"),
+                Arguments.of(new JacocoReportPublisher.DescriptorImpl(), "jacocoPublisher"),
+                Arguments.of(new JGivenTestsPublisher.DescriptorImpl(), "jgivenPublisher"),
+                Arguments.of(new JunitTestsPublisher.DescriptorImpl(), "junitPublisher"),
+                Arguments.of(new MavenLinkerPublisher2.DescriptorImpl(), "mavenLinkerPublisher"),
+                Arguments.of(new PipelineGraphPublisher.DescriptorImpl(), "pipelineGraphPublisher"));
     }
 
-    @Test
-    public void maven_build_jar_project_on_master_spotbugs_publisher_desactivation() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(
-                new SpotBugsAnalysisPublisher.DescriptorImpl(), "spotbugsPublisher");
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_tasks_publisher_desactivation() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(
-                new TasksScannerPublisher.DescriptorImpl(), "openTasksPublisher");
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_concordion_publisher_desactivation() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(
-                new ConcordionTestsPublisher.DescriptorImpl(), "concordionPublisher");
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_dependencies_fingerprint_publisher_desactivation() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(
-                new DependenciesFingerprintPublisher.DescriptorImpl(), "dependenciesFingerprintPublisher");
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_generated_artifacts_publisher_desactivation() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(
-                new GeneratedArtifactsPublisher.DescriptorImpl(), "artifactsPublisher");
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_invoker_publisher_desactivation() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(
-                new InvokerRunsPublisher.DescriptorImpl(), "invokerPublisher");
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_jacoco_publisher_desactivation() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(
-                new JacocoReportPublisher.DescriptorImpl(), "jacocoPublisher");
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_jgiven_publisher_desactivation() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(
-                new JGivenTestsPublisher.DescriptorImpl(), "jgivenPublisher");
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_junit_publisher_desactivation() throws Exception {
-        maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(
-                new JunitTestsPublisher.DescriptorImpl(), "junitPublisher");
-    }
-
-    private void maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(
+    @ParameterizedTest
+    @MethodSource("mavenPublisherDescriptors")
+    public void maven_build_jar_project_on_master_with_disabled_publisher_param_succeeds(
             MavenPublisher.DescriptorImpl descriptor, String symbol) throws Exception {
         Logger logger = Logger.getLogger(MavenSpyLogProcessor.class.getName());
         Level level = logger.getLevel();
@@ -477,15 +448,16 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
             for (Boolean disabled : Arrays.asList(Boolean.TRUE, Boolean.FALSE)) {
                 // @formatter:off
-                String pipelineScript = "node() {\n" + "    git($/"
-                        + gitRepoRule.toString() + "/$)\n" + "    withMaven(options:["
-                        + symbol + "(disabled:" + disabled + ")]) {\n" + "        if (isUnix()) {\n"
-                        + "            sh 'mvn package verify'\n"
-                        + "        } else {\n"
-                        + "            bat 'mvn package verify'\n"
-                        + "        }\n"
-                        + "    }\n"
-                        + "}";
+                String pipelineScript = "node() {\n" +
+                    "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                    "    withMaven(options:[" + symbol + "(disabled:" + disabled + ")]) {\n" +
+                    "        if (isUnix()) {\n" +
+                    "            sh 'mvn package verify'\n" +
+                    "        } else {\n" +
+                    "            bat 'mvn package verify'\n" +
+                    "        }\n" +
+                    "    }\n" +
+                    "}";
                 // @formatter:on
 
                 WorkflowJob pipeline = jenkinsRule.createProject(
@@ -518,19 +490,20 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven(options:[openTasksPublisher("
-                + "        disabled:false, "
-                + "        pattern:'src/main/java', excludePattern:'a/path',"
-                + "        ignoreCase:true, asRegexp:false, "
-                + "        lowPriorityTaskIdentifiers:'minor', normalPriorityTaskIdentifiers:'todo', highPriorityTaskIdentifiers:'fixme')]) {\n"
-                + "            if (isUnix()) {\n"
-                + "                sh 'mvn package verify'\n"
-                + "            } else {\n"
-                + "                bat 'mvn package verify'\n"
-                + "            }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven(options:[openTasksPublisher(" +
+            "        disabled:false, " +
+            "        pattern:'src/main/java', excludePattern:'a/path'," +
+            "        ignoreCase:true, asRegexp:false, " +
+            "        lowPriorityTaskIdentifiers:'minor', normalPriorityTaskIdentifiers:'todo', highPriorityTaskIdentifiers:'fixme')]) {\n" +
+            "            if (isUnix()) {\n" +
+            "                sh 'mvn package verify'\n" +
+            "            } else {\n" +
+            "                bat 'mvn package verify'\n" +
+            "            }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline =
@@ -549,15 +522,16 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_with_flatten_pom_project/");
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven(traceability: true) {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn package'\n"
-                + "        } else {\n"
-                + "            bat 'mvn package'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven(traceability: true) {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline =
@@ -618,15 +592,16 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_hpi_project/");
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven(traceability: true) {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn package'\n"
-                + "        } else {\n"
-                + "            bat 'mvn package'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven(traceability: true) {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn package'\n" +
+            "        } else {\n" +
+            "            bat 'mvn package'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
@@ -679,15 +654,16 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
         // @formatter:off
-        String pipelineScript = "node() {\n" + "    git($/"
-                + gitRepoRule.toString() + "/$)\n" + "    withMaven() {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn test'\n"
-                + "        } else {\n"
-                + "            bat 'mvn test'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}";
+        String pipelineScript = "node() {\n" +
+            "    git($/" + gitRepoRule.toString() + "/$)\n" +
+            "    withMaven() {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn test'\n" +
+            "        } else {\n" +
+            "            bat 'mvn test'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "test-on-master");
@@ -710,41 +686,43 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         File mavenGlobalSettingsFile = new File(jenkinsRule.jenkins.getRootDir(), "maven-global-settings.xml");
         // @formatter:off
-        String mavenGlobalSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" + "<settings \n"
-                + "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n"
-                + "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n"
-                + "    <servers>\n"
-                + "    	<server>\n"
-                + "	        <id>id-global-settings-test</id>\n"
-                + "	    </server>\n"
-                + "    </servers>\n"
-                + "</settings>\n";
+        String mavenGlobalSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<settings \n" +
+            "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+            "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+            "    <servers>\n" +
+            "        <server>\n" +
+            "            <id>id-global-settings-test</id>\n" +
+            "        </server>\n" +
+            "    </servers>\n" +
+            "</settings>\n";
         // @formatter:on
         FileUtils.writeStringToFile(mavenGlobalSettingsFile, mavenGlobalSettings, StandardCharsets.UTF_8);
 
         // @formatter:off
         String pipelineScript =
-                "node () {\n" + "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n"
-                        + "<project\n"
-                        + "        xmlns='http://maven.apache.org/POM/4.0.0' \n"
-                        + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n"
-                        + "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n"
-                        + "    <modelVersion>4.0.0</modelVersion>\n"
-                        + "    <groupId>com.example</groupId>\n"
-                        + "    <artifactId>my-artifact</artifactId>\n"
-                        + "    <version>1.0.0-SNAPSHOT</version>\n"
-                        + "    <packaging>pom</packaging>\n"
-                        + "</project>'''\n"
-                        + "\n"
-                        + "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n"
-                        + "        if (isUnix()) {\n"
-                        + "            sh 'mvn help:effective-settings'\n"
-                        + "        } else {\n"
-                        + "            bat 'mvn help:effective-settings'\n"
-                        + "        }\n"
-                        + "    }\n"
-                        + "}\n";
+            "node () {\n" +
+            "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<project\n" +
+            "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+            "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+            "    <modelVersion>4.0.0</modelVersion>\n" +
+            "    <groupId>com.example</groupId>\n" +
+            "    <artifactId>my-artifact</artifactId>\n" +
+            "    <version>1.0.0-SNAPSHOT</version>\n" +
+            "    <packaging>pom</packaging>\n" +
+            "</project>'''\n" +
+            "\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}\n";
         // @formatter:on
         GlobalMavenConfig.get()
                 .setGlobalSettingsProvider(
@@ -769,16 +747,17 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             throws Exception {
 
         // @formatter:off
-        String mavenGlobalSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" + "<settings \n"
-                + "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n"
-                + "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n"
-                + "    <servers>\n"
-                + "    	<server>\n"
-                + "	        <id>id-global-settings-test-from-config-file-provider</id>\n"
-                + "	    </server>\n"
-                + "    </servers>\n"
-                + "</settings>\n";
+        String mavenGlobalSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<settings \n" +
+            "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+            "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+            "    <servers>\n" +
+            "       <server>\n" +
+            "           <id>id-global-settings-test-from-config-file-provider</id>\n" +
+            "       </server>\n" +
+            "    </servers>\n" +
+            "</settings>\n";
         // @formatter:on
 
         GlobalMavenSettingsConfig mavenGlobalSettingsConfig = new GlobalMavenSettingsConfig(
@@ -786,26 +765,27 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         // @formatter:off
         String pipelineScript =
-                "node () {\n" + "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n"
-                        + "<project\n"
-                        + "        xmlns='http://maven.apache.org/POM/4.0.0' \n"
-                        + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n"
-                        + "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n"
-                        + "    <modelVersion>4.0.0</modelVersion>\n"
-                        + "    <groupId>com.example</groupId>\n"
-                        + "    <artifactId>my-artifact</artifactId>\n"
-                        + "    <version>1.0.0-SNAPSHOT</version>\n"
-                        + "    <packaging>pom</packaging>\n"
-                        + "</project>'''\n"
-                        + "\n"
-                        + "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n"
-                        + "        if (isUnix()) {\n"
-                        + "            sh 'mvn help:effective-settings'\n"
-                        + "        } else {\n"
-                        + "            bat 'mvn help:effective-settings'\n"
-                        + "        }\n"
-                        + "    }\n"
-                        + "}\n";
+            "node () {\n" +
+            "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<project\n" +
+            "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+            "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+            "    <modelVersion>4.0.0</modelVersion>\n" +
+            "    <groupId>com.example</groupId>\n" +
+            "    <artifactId>my-artifact</artifactId>\n" +
+            "    <version>1.0.0-SNAPSHOT</version>\n" +
+            "    <packaging>pom</packaging>\n" +
+            "</project>'''\n" +
+            "\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}\n";
         // @formatter:on
 
         GlobalConfigFiles.get().save(mavenGlobalSettingsConfig);
@@ -831,16 +811,17 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_global_settings_defined_through_folder_config_and_config_file_provider() throws Exception {
 
         // @formatter:off
-        String mavenGlobalSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" + "<settings \n"
-                + "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n"
-                + "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n"
-                + "    <servers>\n"
-                + "       <server>\n"
-                + "           <id>id-global-settings-test-from-config-file-provider-on-a-folder</id>\n"
-                + "       </server>\n"
-                + "    </servers>\n"
-                + "</settings>\n";
+        String mavenGlobalSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<settings \n" +
+            "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+            "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+            "    <servers>\n" +
+            "       <server>\n" +
+            "           <id>id-global-settings-test-from-config-file-provider-on-a-folder</id>\n" +
+            "       </server>\n" +
+            "    </servers>\n" +
+            "</settings>\n";
         // @formatter:on
 
         GlobalMavenSettingsConfig mavenGlobalSettingsConfig = new GlobalMavenSettingsConfig(
@@ -848,29 +829,30 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         // @formatter:off
         String pipelineScript =
-                "node () {\n" + "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n"
-                        + "<project\n"
-                        + "        xmlns='http://maven.apache.org/POM/4.0.0' \n"
-                        + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n"
-                        + "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n"
-                        + "    <modelVersion>4.0.0</modelVersion>\n"
-                        + "    <groupId>com.example</groupId>\n"
-                        + "    <artifactId>my-artifact</artifactId>\n"
-                        + "    <version>1.0.0-SNAPSHOT</version>\n"
-                        + "    <packaging>pom</packaging>\n"
-                        + "</project>'''\n"
-                        + "\n"
-                        + "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n"
-                        + "        if (isUnix()) {\n"
-                        + "            sh 'mvn help:effective-settings'\n"
-                        + "        } else {\n"
-                        + "            bat 'echo %cd%'\n"
-                        + "            bat 'dir'\n"
-                        + "            bat 'set'\n"
-                        + "            bat 'mvn help:effective-settings'\n"
-                        + "        }\n"
-                        + "    }\n"
-                        + "}\n";
+            "node () {\n" +
+            "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<project\n" +
+            "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+            "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+            "    <modelVersion>4.0.0</modelVersion>\n" +
+            "    <groupId>com.example</groupId>\n" +
+            "    <artifactId>my-artifact</artifactId>\n" +
+            "    <version>1.0.0-SNAPSHOT</version>\n" +
+            "    <packaging>pom</packaging>\n" +
+            "</project>'''\n" +
+            "\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'echo %cd%'\n" +
+            "            bat 'dir'\n" +
+            "            bat 'set'\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}\n";
         // @formatter:on
 
         GlobalConfigFiles.get().save(mavenGlobalSettingsConfig);
@@ -903,39 +885,39 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_global_settings_path_defined_through_pipeline_attribute() throws Exception {
 
         // @formatter:off
-        String pipelineScript = "node () {\n"
-                + "    writeFile file: 'maven-global-settings.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n"
-                + "<settings \n"
-                + "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n"
-                + "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n"
-                + "    <servers>\n"
-                + "    	<server>\n"
-                + "	        <id>id-global-settings-test</id>\n"
-                + "	    </server>\n"
-                + "    </servers>\n"
-                + "</settings>'''\n"
-                + "\n"
-                + "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n"
-                + "<project\n"
-                + "        xmlns='http://maven.apache.org/POM/4.0.0' \n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n"
-                + "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n"
-                + "    <modelVersion>4.0.0</modelVersion>\n"
-                + "    <groupId>com.example</groupId>\n"
-                + "    <artifactId>my-artifact</artifactId>\n"
-                + "    <version>1.0.0-SNAPSHOT</version>\n"
-                + "    <packaging>pom</packaging>\n"
-                + "</project>'''\n"
-                + "\n"
-                + "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', globalMavenSettingsFilePath: 'maven-global-settings.xml') {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'mvn help:effective-settings'\n"
-                + "        } else {\n"
-                + "            bat 'mvn help:effective-settings'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}\n";
+        String pipelineScript = "node () {\n" +
+            "    writeFile file: 'maven-global-settings.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<settings \n" +
+            "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+            "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+            "    <servers>\n" +
+            "       <server>\n" +
+            "           <id>id-global-settings-test</id>\n" +
+            "       </server>\n" +
+            "    </servers>\n" +
+            "</settings>'''\n" +
+            "\n" +
+            "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<project\n" +
+            "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+            "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+            "    <modelVersion>4.0.0</modelVersion>\n" +
+            "    <groupId>com.example</groupId>\n" +
+            "    <artifactId>my-artifact</artifactId>\n" +
+            "    <version>1.0.0-SNAPSHOT</version>\n" +
+            "    <packaging>pom</packaging>\n" +
+            "</project>'''\n" +
+            "\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', globalMavenSettingsFilePath: 'maven-global-settings.xml') {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}\n";
         // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(
@@ -952,39 +934,39 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_settings_path_defined_through_pipeline_attribute() throws Exception {
 
         // @formatter:off
-        String pipelineScript = "node () {\n"
-                + "    writeFile file: 'maven-settings.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n"
-                + "<settings \n"
-                + "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n"
-                + "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n"
-                + "    <servers>\n"
-                + "    	<server>\n"
-                + "	        <id>id-settings-test</id>\n"
-                + "	    </server>\n"
-                + "    </servers>\n"
-                + "</settings>'''\n"
-                + "\n"
-                + "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n"
-                + "<project\n"
-                + "        xmlns='http://maven.apache.org/POM/4.0.0' \n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n"
-                + "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n"
-                + "    <modelVersion>4.0.0</modelVersion>\n"
-                + "    <groupId>com.example</groupId>\n"
-                + "    <artifactId>my-artifact</artifactId>\n"
-                + "    <version>1.0.0-SNAPSHOT</version>\n"
-                + "    <packaging>pom</packaging>\n"
-                + "</project>'''\n"
-                + "\n"
-                + "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', mavenSettingsFilePath: 'maven-settings.xml') {\n"
-                + "        if (isUnix()) {\n"
-                + "            sh 'env && mvn help:effective-settings'\n"
-                + "        } else {\n"
-                + "            bat 'set && mvn help:effective-settings'\n"
-                + "        }\n"
-                + "    }\n"
-                + "}\n";
+        String pipelineScript = "node () {\n" +
+            "    writeFile file: 'maven-settings.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<settings \n" +
+            "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+            "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+            "    <servers>\n" +
+            "       <server>\n" +
+            "           <id>id-settings-test</id>\n" +
+            "       </server>\n" +
+            "    </servers>\n" +
+            "</settings>'''\n" +
+            "\n" +
+            "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<project\n" +
+            "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+            "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+            "    <modelVersion>4.0.0</modelVersion>\n" +
+            "    <groupId>com.example</groupId>\n" +
+            "    <artifactId>my-artifact</artifactId>\n" +
+            "    <version>1.0.0-SNAPSHOT</version>\n" +
+            "    <packaging>pom</packaging>\n" +
+            "</project>'''\n" +
+            "\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', mavenSettingsFilePath: 'maven-settings.xml') {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'env && mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'set && mvn help:effective-settings'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}\n";
         // @formatter:on
 
         WorkflowJob pipeline =
@@ -1001,41 +983,43 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         File mavenSettingsFile = new File(jenkinsRule.jenkins.getRootDir(), "maven-settings.xml");
         // @formatter:off
-        String mavenSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" + "<settings \n"
-                + "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n"
-                + "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n"
-                + "    <servers>\n"
-                + "    	<server>\n"
-                + "	        <id>id-settings-test</id>\n"
-                + "	    </server>\n"
-                + "    </servers>\n"
-                + "</settings>\n";
+        String mavenSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<settings \n" +
+            "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+            "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+            "    <servers>\n" +
+            "       <server>\n" +
+            "           <id>id-settings-test</id>\n" +
+            "       </server>\n" +
+            "    </servers>\n" +
+            "</settings>\n";
         // @formatter:on
         FileUtils.writeStringToFile(mavenSettingsFile, mavenSettings, StandardCharsets.UTF_8);
 
         // @formatter:off
         String pipelineScript =
-                "node () {\n" + "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n"
-                        + "<project\n"
-                        + "        xmlns='http://maven.apache.org/POM/4.0.0' \n"
-                        + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n"
-                        + "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n"
-                        + "    <modelVersion>4.0.0</modelVersion>\n"
-                        + "    <groupId>com.example</groupId>\n"
-                        + "    <artifactId>my-artifact</artifactId>\n"
-                        + "    <version>1.0.0-SNAPSHOT</version>\n"
-                        + "    <packaging>pom</packaging>\n"
-                        + "</project>'''\n"
-                        + "\n"
-                        + "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n"
-                        + "        if (isUnix()) {\n"
-                        + "            sh 'mvn help:effective-settings'\n"
-                        + "        } else {\n"
-                        + "            bat 'mvn help:effective-settings'\n"
-                        + "        }\n"
-                        + "    }\n"
-                        + "}\n";
+            "node () {\n" +
+            "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<project\n" +
+            "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+            "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+            "    <modelVersion>4.0.0</modelVersion>\n" +
+            "    <groupId>com.example</groupId>\n" +
+            "    <artifactId>my-artifact</artifactId>\n" +
+            "    <version>1.0.0-SNAPSHOT</version>\n" +
+            "    <packaging>pom</packaging>\n" +
+            "</project>'''\n" +
+            "\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}\n";
         // @formatter:on
         GlobalMavenConfig.get().setSettingsProvider(new FilePathSettingsProvider(mavenSettingsFile.getAbsolutePath()));
 
@@ -1057,42 +1041,44 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_settings_defined_through_jenkins_global_config_and_config_file_provider() throws Exception {
 
         // @formatter:off
-        String mavenSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" + "<settings \n"
-                + "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n"
-                + "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n"
-                + "    <servers>\n"
-                + "        <server>\n"
-                + "            <id>id-settings-test-through-config-file-provider</id>\n"
-                + "        </server>\n"
-                + "    </servers>\n"
-                + "</settings>\n";
+        String mavenSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<settings \n" +
+            "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+            "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+            "    <servers>\n" +
+            "        <server>\n" +
+            "            <id>id-settings-test-through-config-file-provider</id>\n" +
+            "        </server>\n" +
+            "    </servers>\n" +
+            "</settings>\n";
         // @formatter:on
         MavenSettingsConfig mavenSettingsConfig =
                 new MavenSettingsConfig("maven-config-test", "maven-config-test", "", mavenSettings, false, null);
 
         // @formatter:off
         String pipelineScript =
-                "node () {\n" + "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n"
-                        + "<project\n"
-                        + "        xmlns='http://maven.apache.org/POM/4.0.0' \n"
-                        + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n"
-                        + "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n"
-                        + "    <modelVersion>4.0.0</modelVersion>\n"
-                        + "    <groupId>com.example</groupId>\n"
-                        + "    <artifactId>my-artifact</artifactId>\n"
-                        + "    <version>1.0.0-SNAPSHOT</version>\n"
-                        + "    <packaging>pom</packaging>\n"
-                        + "</project>'''\n"
-                        + "\n"
-                        + "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n"
-                        + "        if (isUnix()) {\n"
-                        + "            sh 'mvn help:effective-settings'\n"
-                        + "        } else {\n"
-                        + "            bat 'mvn help:effective-settings'\n"
-                        + "        }\n"
-                        + "    }\n"
-                        + "}\n";
+            "node () {\n" +
+            "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<project\n" +
+            "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+            "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+            "    <modelVersion>4.0.0</modelVersion>\n" +
+            "    <groupId>com.example</groupId>\n" +
+            "    <artifactId>my-artifact</artifactId>\n" +
+            "    <version>1.0.0-SNAPSHOT</version>\n" +
+            "    <packaging>pom</packaging>\n" +
+            "</project>'''\n" +
+            "\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}\n";
         // @formatter:on
         GlobalConfigFiles.get().save(mavenSettingsConfig);
         GlobalMavenConfig.get().setSettingsProvider(new MvnSettingsProvider(mavenSettingsConfig.id));
@@ -1116,42 +1102,44 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_settings_defined_through_folder_config_and_config_file_provider() throws Exception {
 
         // @formatter:off
-        String mavenSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" + "<settings \n"
-                + "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n"
-                + "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n"
-                + "    <servers>\n"
-                + "       <server>\n"
-                + "           <id>id-settings-test-through-config-file-provider-on-a-folder</id>\n"
-                + "       </server>\n"
-                + "    </servers>\n"
-                + "</settings>\n";
+        String mavenSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<settings \n" +
+            "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+            "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+            "    <servers>\n" +
+            "       <server>\n" +
+            "           <id>id-settings-test-through-config-file-provider-on-a-folder</id>\n" +
+            "       </server>\n" +
+            "    </servers>\n" +
+            "</settings>\n";
         // @formatter:on
         MavenSettingsConfig mavenSettingsConfig = new MavenSettingsConfig(
                 "maven-config-test-folder", "maven-config-test-folder", "", mavenSettings, false, null);
 
         // @formatter:off
         String pipelineScript =
-                "node () {\n" + "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n"
-                        + "<project\n"
-                        + "        xmlns='http://maven.apache.org/POM/4.0.0' \n"
-                        + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n"
-                        + "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n"
-                        + "    <modelVersion>4.0.0</modelVersion>\n"
-                        + "    <groupId>com.example</groupId>\n"
-                        + "    <artifactId>my-artifact</artifactId>\n"
-                        + "    <version>1.0.0-SNAPSHOT</version>\n"
-                        + "    <packaging>pom</packaging>\n"
-                        + "</project>'''\n"
-                        + "\n"
-                        + "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n"
-                        + "        if (isUnix()) {\n"
-                        + "            sh 'mvn help:effective-settings'\n"
-                        + "        } else {\n"
-                        + "            bat 'mvn help:effective-settings'\n"
-                        + "        }\n"
-                        + "    }\n"
-                        + "}\n";
+            "node () {\n" +
+            "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<project\n" +
+            "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+            "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+            "    <modelVersion>4.0.0</modelVersion>\n" +
+            "    <groupId>com.example</groupId>\n" +
+            "    <artifactId>my-artifact</artifactId>\n" +
+            "    <version>1.0.0-SNAPSHOT</version>\n" +
+            "    <packaging>pom</packaging>\n" +
+            "</project>'''\n" +
+            "\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}\n";
         // @formatter:on
         GlobalConfigFiles.get().save(mavenSettingsConfig);
 
@@ -1183,16 +1171,17 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     public void maven_settings_defined_through_pipeline_attribute_and_config_file_provider() throws Exception {
 
         // @formatter:off
-        String mavenSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" + "<settings \n"
-                + "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n"
-                + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n"
-                + "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n"
-                + "    <servers>\n"
-                + "    	<server>\n"
-                + "	        <id>id-settings-test-from-pipeline-attribute-and-config-file-provider</id>\n"
-                + "	    </server>\n"
-                + "    </servers>\n"
-                + "</settings>\n";
+        String mavenSettings = "<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<settings \n" +
+            "        xmlns='http://maven.apache.org/SETTINGS/1.0.0'\n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
+            "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
+            "    <servers>\n" +
+            "       <server>\n" +
+            "           <id>id-settings-test-from-pipeline-attribute-and-config-file-provider</id>\n" +
+            "       </server>\n" +
+            "    </servers>\n" +
+            "</settings>\n";
         // @formatter:on
 
         MavenSettingsConfig mavenSettingsConfig = new MavenSettingsConfig(
@@ -1205,26 +1194,27 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         // @formatter:off
         String pipelineScript =
-                "node () {\n" + "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n"
-                        + "<project\n"
-                        + "        xmlns='http://maven.apache.org/POM/4.0.0' \n"
-                        + "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n"
-                        + "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n"
-                        + "    <modelVersion>4.0.0</modelVersion>\n"
-                        + "    <groupId>com.example</groupId>\n"
-                        + "    <artifactId>my-artifact</artifactId>\n"
-                        + "    <version>1.0.0-SNAPSHOT</version>\n"
-                        + "    <packaging>pom</packaging>\n"
-                        + "</project>'''\n"
-                        + "\n"
-                        + "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', mavenSettingsConfig: 'maven-config-test-from-pipeline-attribute') {\n"
-                        + "        if (isUnix()) {\n"
-                        + "            sh 'mvn help:effective-settings'\n"
-                        + "        } else {\n"
-                        + "            bat 'mvn help:effective-settings'\n"
-                        + "        }\n"
-                        + "    }\n"
-                        + "}\n";
+            "node () {\n" +
+            "    writeFile file: 'pom.xml', text: '''<?xml version='1.0' encoding='UTF-8'?>\n" +
+            "<project\n" +
+            "        xmlns='http://maven.apache.org/POM/4.0.0' \n" +
+            "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' \n" +
+            "        xsi:schemaLocation='http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd'>\n" +
+            "    <modelVersion>4.0.0</modelVersion>\n" +
+            "    <groupId>com.example</groupId>\n" +
+            "    <artifactId>my-artifact</artifactId>\n" +
+            "    <version>1.0.0-SNAPSHOT</version>\n" +
+            "    <packaging>pom</packaging>\n" +
+            "</project>'''\n" +
+            "\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', mavenSettingsConfig: 'maven-config-test-from-pipeline-attribute') {\n" +
+            "        if (isUnix()) {\n" +
+            "            sh 'mvn help:effective-settings'\n" +
+            "        } else {\n" +
+            "            bat 'mvn help:effective-settings'\n" +
+            "        }\n" +
+            "    }\n" +
+            "}\n";
         // @formatter:on
 
         GlobalConfigFiles.get().save(mavenSettingsConfig);
@@ -1251,31 +1241,32 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
         // @formatter:off
-        String pipelineScript = "stage('first') {\n" + "    parallel(a: {\n"
-                + "        node() {\n"
-                + "            git($/"
-                + gitRepoRule.toString() + "/$)\n" + "            withMaven() {\n"
-                + "                if (isUnix()) {\n"
-                + "                    sh 'mvn package verify'\n"
-                + "                } else {\n"
-                + "                    bat 'mvn package verify'\n"
-                + "                }\n"
-                + "            }\n"
-                + "        }\n"
-                + "    },\n"
-                + "    b: {\n"
-                + "        node() {\n"
-                + "            git($/"
-                + gitRepoRule.toString() + "/$)\n" + "            withMaven() {\n"
-                + "                if (isUnix()) {\n"
-                + "                    sh 'mvn package verify'\n"
-                + "                } else {\n"
-                + "                    bat 'mvn package verify'\n"
-                + "                }\n"
-                + "            }\n"
-                + "        }\n"
-                + "    })\n"
-                + "}";
+        String pipelineScript = "stage('first') {\n" +
+            "    parallel(a: {\n" +
+            "        node() {\n" +
+            "            git($/" + gitRepoRule.toString() + "/$)\n" +
+            "            withMaven() {\n" +
+            "                if (isUnix()) {\n" +
+            "                    sh 'mvn package verify'\n" +
+            "                } else {\n" +
+            "                    bat 'mvn package verify'\n" +
+            "                }\n" +
+            "            }\n" +
+            "        }\n" +
+            "    },\n" +
+            "    b: {\n" +
+            "        node() {\n" +
+            "            git($/" + gitRepoRule.toString() + "/$)\n" +
+            "            withMaven() {\n" +
+            "                if (isUnix()) {\n" +
+            "                    sh 'mvn package verify'\n" +
+            "                } else {\n" +
+            "                    bat 'mvn package verify'\n" +
+            "                }\n" +
+            "            }\n" +
+            "        }\n" +
+            "    })\n" +
+            "}";
         // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
