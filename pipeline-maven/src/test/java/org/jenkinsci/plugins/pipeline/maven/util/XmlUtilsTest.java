@@ -4,16 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.assertj.core.api.Assertions.fail;
 
+import hudson.FilePath;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-
+import junit.framework.AssertionFailedError;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,9 +21,6 @@ import org.jvnet.hudson.test.Issue;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-
-import hudson.FilePath;
-import junit.framework.AssertionFailedError;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -80,7 +77,8 @@ public class XmlUtilsTest {
     public void test_getExecutionEvents_search_two_types() throws Exception {
         String xml = "<mavenExecution>" + "<ExecutionEvent type='ProjectSucceeded' />" + "</mavenExecution>";
         Element documentElement = toXml(xml);
-        List<Element> actualElements = XmlUtils.getExecutionEvents(documentElement, "ProjectSucceeded", "ProjectFailed");
+        List<Element> actualElements =
+                XmlUtils.getExecutionEvents(documentElement, "ProjectSucceeded", "ProjectFailed");
         assertThat(actualElements.size()).isEqualTo(1);
     }
 
@@ -96,7 +94,8 @@ public class XmlUtilsTest {
     public void test_getExecutionEvents_return_empty_searching_two_types() throws Exception {
         String xml = "<mavenExecution>" + "<ExecutionEvent type='ProjectSkipped' />" + "</mavenExecution>";
         Element documentElement = toXml(xml);
-        List<Element> actualElements = XmlUtils.getExecutionEvents(documentElement, "ProjectSucceeded", "ProjectFailed");
+        List<Element> actualElements =
+                XmlUtils.getExecutionEvents(documentElement, "ProjectSucceeded", "ProjectFailed");
         assertThat(actualElements.size()).isEqualTo(0);
     }
 
@@ -162,8 +161,10 @@ public class XmlUtilsTest {
     @Test
     public void test_getPathInWorkspace_windows_mixed_case_ok_JENKINS_45221() {
         // lowercase versus uppercase "d:\"
-        String workspace = "d:\\jenkins\\workspace\\d.admin_feature_Jenkinsfile-SCSMHLROYAGBAWY5ZNNG6ALR77MVLEH3F3EFF3O7XN3RO5BL6AMA";
-        String absolutePath = "D:\\jenkins\\workspace\\d.admin_feature_Jenkinsfile-SCSMHLROYAGBAWY5ZNNG6ALR77MVLEH3F3EFF3O7XN3RO5BL6AMA\\admin\\xyz\\target\\pad-admin-xyz-2.4.0-SNAPSHOT-tests.jar";
+        String workspace =
+                "d:\\jenkins\\workspace\\d.admin_feature_Jenkinsfile-SCSMHLROYAGBAWY5ZNNG6ALR77MVLEH3F3EFF3O7XN3RO5BL6AMA";
+        String absolutePath =
+                "D:\\jenkins\\workspace\\d.admin_feature_Jenkinsfile-SCSMHLROYAGBAWY5ZNNG6ALR77MVLEH3F3EFF3O7XN3RO5BL6AMA\\admin\\xyz\\target\\pad-admin-xyz-2.4.0-SNAPSHOT-tests.jar";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "admin\\xyz\\target\\pad-admin-xyz-2.4.0-SNAPSHOT-tests.jar";
         assertThat(actual).isEqualTo(expected);
@@ -227,8 +228,10 @@ public class XmlUtilsTest {
         // relatively to
         // '/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven'
 
-        String workspace = "/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven";
-        String absolutePath = "/private/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven/pom.xml";
+        String workspace =
+                "/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven";
+        String absolutePath =
+                "/private/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven/pom.xml";
         String actual = XmlUtils.getPathInWorkspace(absolutePath, new FilePath(new File(workspace)));
         String expected = "pom.xml";
         assertThat(actual).isEqualTo(expected);
@@ -236,35 +239,58 @@ public class XmlUtilsTest {
 
     @Test
     public void test_getExecutedLifecyclePhases() throws Exception {
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-package-jar.xml");
+        InputStream in = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-package-jar.xml");
         in.getClass(); // check non null
-        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(in)
+                .getDocumentElement();
         List<String> executedLifecyclePhases = XmlUtils.getExecutedLifecyclePhases(mavenSpyLogs);
         System.out.println(executedLifecyclePhases);
-        assertThat(executedLifecyclePhases).contains("process-resources", "compile", "process-test-resources", "test-compile", "test", "package");
+        assertThat(executedLifecyclePhases)
+                .contains("process-resources", "compile", "process-test-resources", "test-compile", "test", "package");
     }
 
     @Test
     public void test_getArtifactDeployedEvent() throws Exception {
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
+        InputStream in = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
         in.getClass(); // check non null
-        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(in)
+                .getDocumentElement();
         List<Element> artifactDeployedEvents = XmlUtils.getArtifactDeployedEvents(mavenSpyLogs);
         assertThat(artifactDeployedEvents.size()).isEqualTo(3);
 
-        Element artifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, "/path/to/my-jar/target/my-jar-0.5-SNAPSHOT.jar");
-        String repositoryUrl = XmlUtils.getUniqueChildElement(artifactDeployedEvent, "repository").getAttribute("url");
+        Element artifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(
+                artifactDeployedEvents, "/path/to/my-jar/target/my-jar-0.5-SNAPSHOT.jar");
+        String repositoryUrl = XmlUtils.getUniqueChildElement(artifactDeployedEvent, "repository")
+                .getAttribute("url");
         assertThat(repositoryUrl).isEqualTo("https://nexus.beescloud.com/content/repositories/snapshots/");
     }
 
     @Test
     public void test_getExecutionEventsByPlugin() throws Exception {
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
+        InputStream in = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
         in.getClass(); // check non null
-        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(in)
+                .getDocumentElement();
 
-        List<Element> executionEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogs, "org.apache.maven.plugins", "maven-deploy-plugin", "deploy",
-                "MojoSucceeded", "MojoFailed");
+        List<Element> executionEvents = XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogs,
+                "org.apache.maven.plugins",
+                "maven-deploy-plugin",
+                "deploy",
+                "MojoSucceeded",
+                "MojoFailed");
 
         assertThat(executionEvents.size()).isEqualTo(1);
         Element deployExecutionEvent = executionEvents.get(0);
@@ -273,9 +299,14 @@ public class XmlUtilsTest {
 
     @Test
     public void test_listGeneratedArtifacts() throws Exception {
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
+        InputStream in = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
         in.getClass(); // check non null
-        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(in)
+                .getDocumentElement();
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, false);
         System.out.println(generatedArtifacts);
         assertThat(generatedArtifacts.size()).isEqualTo(2); // a jar file and a pom file are generated
@@ -297,9 +328,14 @@ public class XmlUtilsTest {
 
     @Test
     public void test_listGeneratedArtifacts_deploy_2_8() throws Exception {
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-2.8.xml");
+        InputStream in = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-2.8.xml");
         in.getClass(); // check non null
-        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(in)
+                .getDocumentElement();
 
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, false);
 
@@ -326,9 +362,14 @@ public class XmlUtilsTest {
 
     @Test
     public void test_listGeneratedArtifacts_deploy_3_0() throws Exception {
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-3.0.xml");
+        InputStream in = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-3.0.xml");
         in.getClass(); // check non null
-        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(in)
+                .getDocumentElement();
 
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, false);
 
@@ -355,9 +396,14 @@ public class XmlUtilsTest {
 
     @Test
     public void test_listGeneratedArtifacts_including_generated_artifacts() throws Exception {
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
+        InputStream in = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
         in.getClass(); // check non null
-        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(in)
+                .getDocumentElement();
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, true);
         System.out.println(generatedArtifacts);
         assertThat(generatedArtifacts.size()).isEqualTo(3); // a jar file and a pom file are generated
@@ -382,10 +428,14 @@ public class XmlUtilsTest {
 
     @Test
     public void test_listGeneratedArtifacts_includeAttachedArtifacts() throws Exception {
-        InputStream in = Thread.currentThread().getContextClassLoader()
+        InputStream in = Thread.currentThread()
+                .getContextClassLoader()
                 .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-include-attached-artifacts.log");
         in.getClass(); // check non null
-        Element mavenSpyLogs = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(in).getDocumentElement();
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(in)
+                .getDocumentElement();
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, true);
         System.out.println(generatedArtifacts);
         assertThat(generatedArtifacts.size()).isEqualTo(2); // pom artifact plus 1 attachment

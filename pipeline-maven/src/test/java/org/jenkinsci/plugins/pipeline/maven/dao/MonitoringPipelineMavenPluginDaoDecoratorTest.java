@@ -14,7 +14,8 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
 
     private PipelineMavenPluginDao delegate = mock(PipelineMavenPluginDao.class);
 
-    private MonitoringPipelineMavenPluginDaoDecorator decorator = new MonitoringPipelineMavenPluginDaoDecorator(delegate);
+    private MonitoringPipelineMavenPluginDaoDecorator decorator =
+            new MonitoringPipelineMavenPluginDaoDecorator(delegate);
 
     @AfterEach
     public void checkDelegate() {
@@ -156,5 +157,4 @@ public class MonitoringPipelineMavenPluginDaoDecoratorTest {
 
         verify(delegate).cleanup();
     }
-
 }

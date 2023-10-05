@@ -1,11 +1,17 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
+import hudson.model.Result;
+import hudson.model.Slave;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-
+import jenkins.mvn.DefaultGlobalSettingsProvider;
+import jenkins.mvn.DefaultSettingsProvider;
+import jenkins.mvn.GlobalMavenConfig;
+import jenkins.plugins.git.GitSampleRepoRule;
+import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.MavenUtil;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
@@ -18,14 +24,6 @@ import org.jvnet.hudson.test.InboundAgentRule;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.RealJenkinsRule;
 
-import hudson.model.Result;
-import hudson.model.Slave;
-import jenkins.mvn.DefaultGlobalSettingsProvider;
-import jenkins.mvn.DefaultSettingsProvider;
-import jenkins.mvn.GlobalMavenConfig;
-import jenkins.plugins.git.GitSampleRepoRule;
-import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
-
 // Migrate to full JUnit5 impossible because of RealJenkinsRule
 public class WithMavenStepNoOptionalsTest {
 
@@ -36,17 +34,35 @@ public class WithMavenStepNoOptionalsTest {
     public GitSampleRepoRule gitRepoRule = new GitSampleRepoRule();
 
     @Rule
-    public RealJenkinsRule jenkinsRule = new RealJenkinsRule().omitPlugins("commons-lang3-api", "mysql-api", "postgresql-api", "maven-plugin",
-            "flaky-test-handler", "htmlpublisher", "jacoco", "jgiven", "junit", "junit-attachments", "matrix-project", "maven-invoker-plugin",
-            "pipeline-build-step", "findbugs", "tasks");
+    public RealJenkinsRule jenkinsRule = new RealJenkinsRule()
+            .omitPlugins(
+                    "commons-lang3-api",
+                    "mysql-api",
+                    "postgresql-api",
+                    "maven-plugin",
+                    "flaky-test-handler",
+                    "htmlpublisher",
+                    "jacoco",
+                    "jgiven",
+                    "junit",
+                    "junit-attachments",
+                    "matrix-project",
+                    "maven-invoker-plugin",
+                    "pipeline-build-step",
+                    "findbugs",
+                    "tasks");
 
     @Test
     public void maven_build_jar_project_on_master_succeeds() throws Throwable {
         loadMavenJarProjectInGitRepo(gitRepoRule);
         jenkinsRule
-            .extraEnv("MAVEN_ZIP_PATH", Paths.get("target", "apache-maven-" + MavenUtil.MAVEN_VERSION + "-bin.zip").toAbsolutePath().toString())
-            .extraEnv("MAVEN_VERSION", MavenUtil.MAVEN_VERSION)
-            .then(WithMavenStepNoOptionalsTest::setup, new Build(gitRepoRule.toString()));
+                .extraEnv(
+                        "MAVEN_ZIP_PATH",
+                        Paths.get("target", "apache-maven-" + MavenUtil.MAVEN_VERSION + "-bin.zip")
+                                .toAbsolutePath()
+                                .toString())
+                .extraEnv("MAVEN_VERSION", MavenUtil.MAVEN_VERSION)
+                .then(WithMavenStepNoOptionalsTest::setup, new Build(gitRepoRule.toString()));
     }
 
     private static class Build implements RealJenkinsRule.Step {
@@ -59,7 +75,7 @@ public class WithMavenStepNoOptionalsTest {
 
         @Override
         public void run(JenkinsRule r) throws Throwable {
-            //@formatter:off
+            // @formatter:off
             String pipelineScript = "node('mock') {\n" +
                 "    git($/" + repoUrl + "/$)\n" +
                 "    withMaven() {\n" +
@@ -70,7 +86,7 @@ public class WithMavenStepNoOptionalsTest {
                 "        }\n" +
                 "    }\n" +
                 "}";
-            //@formatter:on
+            // @formatter:on
 
             WorkflowJob pipeline = r.createProject(WorkflowJob.class, "build-on-master");
             pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
@@ -98,12 +114,12 @@ public class WithMavenStepNoOptionalsTest {
 
     private void loadMavenJarProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
         gitRepo.init();
-        Path mavenProjectRoot = Paths
-                .get(WithMavenStepOnMasterTest.class.getResource("/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_project/").toURI());
+        Path mavenProjectRoot = Paths.get(WithMavenStepOnMasterTest.class
+                .getResource("/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_project/")
+                .toURI());
         if (!Files.exists(mavenProjectRoot)) {
             throw new IllegalStateException("Folder '" + mavenProjectRoot + "' not found");
         }
         GitSampleRepoRuleUtils.addFilesAndCommit(mavenProjectRoot, gitRepo);
     }
-
 }

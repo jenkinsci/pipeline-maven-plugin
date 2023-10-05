@@ -26,13 +26,25 @@ package org.jenkinsci.plugins.pipeline.maven;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
+import com.cloudbees.plugins.credentials.Credentials;
+import com.cloudbees.plugins.credentials.CredentialsScope;
+import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
+import com.cloudbees.plugins.credentials.domains.Domain;
+import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
+import hudson.model.Fingerprint;
+import hudson.model.FingerprintMap;
+import hudson.model.JDK;
+import hudson.model.Result;
+import hudson.plugins.sshslaves.SSHLauncher;
+import hudson.slaves.DumbSlave;
+import hudson.slaves.RetentionStrategy;
+import hudson.tools.ToolLocationNodeProperty;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Stream;
-
 import org.apache.commons.io.FileUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -46,21 +58,6 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
-import com.cloudbees.plugins.credentials.Credentials;
-import com.cloudbees.plugins.credentials.CredentialsScope;
-import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
-import com.cloudbees.plugins.credentials.domains.Domain;
-import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
-
-import hudson.model.Fingerprint;
-import hudson.model.FingerprintMap;
-import hudson.model.JDK;
-import hudson.model.Result;
-import hudson.plugins.sshslaves.SSHLauncher;
-import hudson.slaves.DumbSlave;
-import hudson.slaves.RetentionStrategy;
-import hudson.tools.ToolLocationNodeProperty;
-
 @Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
 public class WithMavenStepTest extends AbstractIntegrationTest {
 
@@ -72,7 +69,8 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     @Issue("SECURITY-441")
     @Test
     public void testMavenBuildOnRemoteAgentWithSettingsFileOnMasterFails() throws Exception {
-        try (GenericContainer<?> mavenContainerRule = new GenericContainer<>("localhost/pipeline-maven/java-maven-git").withExposedPorts(22)) {
+        try (GenericContainer<?> mavenContainerRule =
+                new GenericContainer<>("localhost/pipeline-maven/java-maven-git").withExposedPorts(22)) {
             mavenContainerRule.start();
             registerAgentForContainer(mavenContainerRule);
 
@@ -80,14 +78,16 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
             String secret = "secret content on master";
             FileUtils.writeStringToFile(onMaster, secret, StandardCharsets.UTF_8);
 
-            //@formatter:off
-            WorkflowRun run = runPipeline(Result.FAILURE, "" +
+            // @formatter:off
+            WorkflowRun run = runPipeline(
+                Result.FAILURE,
                 "node('remote') {\n" +
                 "  withMaven(mavenSettingsFilePath: '" + onMaster + "') {\n" +
                 "    echo readFile(MVN_SETTINGS)\n" +
                 "  }\n" +
-                "}");
-            //@formatter:on
+                "}"
+            );
+            // @formatter:on
 
             jenkinsRule.assertLogNotContains(secret, run);
         }
@@ -95,20 +95,23 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
 
     @Test
     public void testDisableAllPublishers() throws Exception {
-        try (GenericContainer<?> mavenContainerRule = new GenericContainer<>("localhost/pipeline-maven/java-maven-git").withExposedPorts(22)) {
+        try (GenericContainer<?> mavenContainerRule =
+                new GenericContainer<>("localhost/pipeline-maven/java-maven-git").withExposedPorts(22)) {
             mavenContainerRule.start();
             registerAgentForContainer(mavenContainerRule);
             loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
 
-            //@formatter:off
-            runPipeline(Result.SUCCESS, "" +
+            // @formatter:off
+            runPipeline(
+                Result.SUCCESS,
                 "node() {\n" +
                 "  git($/" + gitRepoRule.toString() + "/$)\n" +
                 "  withMaven(publisherStrategy: 'EXPLICIT') {\n" +
                 "    sh 'mvn package'\n" +
                 "  }\n" +
-                "}");
-            //@formatter:on
+                "}"
+            );
+            // @formatter:on
 
             assertFingerprintDoesNotExist(COMMONS_LANG3_FINGERPRINT);
         }
@@ -123,33 +126,41 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     @MethodSource("jdkMapProvider")
     @Issue("JENKINS-71949")
     public void tesWithDifferentJavasForBuild(String jdkName, String jdkPath) throws Exception {
-        try (GenericContainer<?> javasContainerRule = new GenericContainer<>("localhost/pipeline-maven/javas").withExposedPorts(22)) {
+        try (GenericContainer<?> javasContainerRule =
+                new GenericContainer<>("localhost/pipeline-maven/javas").withExposedPorts(22)) {
             javasContainerRule.start();
             loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
             String gitRepoPath = this.gitRepoRule.toString();
             javasContainerRule.copyFileToContainer(MountableFile.forHostPath(gitRepoPath), "/tmp/gitrepo");
             javasContainerRule.execInContainer("chmod", "-R", "777", "/tmp/gitrepo");
             registerAgentForContainer(javasContainerRule);
-            ToolLocationNodeProperty.ToolLocation toolLocation = new ToolLocationNodeProperty.ToolLocation(new JDK.DescriptorImpl(), jdkName, jdkPath);
+            ToolLocationNodeProperty.ToolLocation toolLocation =
+                    new ToolLocationNodeProperty.ToolLocation(new JDK.DescriptorImpl(), jdkName, jdkPath);
             ToolLocationNodeProperty toolLocationNodeProperty = new ToolLocationNodeProperty(toolLocation);
-            Objects.requireNonNull(jenkinsRule.jenkins.getNode(AGENT_NAME)).getNodeProperties().add(toolLocationNodeProperty);
+            Objects.requireNonNull(jenkinsRule.jenkins.getNode(AGENT_NAME))
+                    .getNodeProperties()
+                    .add(toolLocationNodeProperty);
 
             jenkinsRule.jenkins.getJDKs().add(new JDK(jdkName, jdkPath));
 
-            //@formatter:off
-            WorkflowRun run = runPipeline(Result.SUCCESS,
+            // @formatter:off
+            WorkflowRun run = runPipeline(
+                Result.SUCCESS,
                 "node('" + AGENT_NAME + "') {\n" +
                 "  git('/tmp/gitrepo')\n" +
                 "  withMaven(jdk: '" + jdkName + "') {\n" +
                 "    sh 'mvn package'\n" +
                 "  }\n" +
-                "}");
-            //@formatter:on
-            jenkinsRule.assertLogContains("artifactsPublisher - Archive artifact target/mono-dependency-maven-project-0.1-SNAPSHOT.jar", run);
+                "}"
+            );
+            // @formatter:on
+            jenkinsRule.assertLogContains(
+                    "artifactsPublisher - Archive artifact target/mono-dependency-maven-project-0.1-SNAPSHOT.jar", run);
 
             Collection<String> archives = run.pickArtifactManager().root().list("**/**.jar", "", true);
             assertThat(archives).hasSize(1);
-            assertThat(archives.iterator().next().endsWith("mono-dependency-maven-project-0.1-SNAPSHOT.jar")).isTrue();
+            assertThat(archives.iterator().next().endsWith("mono-dependency-maven-project-0.1-SNAPSHOT.jar"))
+                    .isTrue();
         }
     }
 
@@ -172,18 +183,21 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     }
 
     private void addTestSshCredentials() {
-        Credentials credentials = new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, SSH_CREDENTIALS_ID, null, "test", "test");
+        Credentials credentials =
+                new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, SSH_CREDENTIALS_ID, null, "test", "test");
 
-        SystemCredentialsProvider.getInstance().getDomainCredentialsMap().put(Domain.global(), Collections.singletonList(credentials));
+        SystemCredentialsProvider.getInstance()
+                .getDomainCredentialsMap()
+                .put(Domain.global(), Collections.singletonList(credentials));
     }
 
     private void registerAgentForSlaveContainer(GenericContainer<?> slaveContainer) throws Exception {
-        SSHLauncher sshLauncher = new SSHLauncher(slaveContainer.getHost(), slaveContainer.getMappedPort(22), SSH_CREDENTIALS_ID);
+        SSHLauncher sshLauncher =
+                new SSHLauncher(slaveContainer.getHost(), slaveContainer.getMappedPort(22), SSH_CREDENTIALS_ID);
 
         DumbSlave agent = new DumbSlave(AGENT_NAME, SLAVE_BASE_PATH, sshLauncher);
         agent.setNumExecutors(1);
         agent.setRetentionStrategy(RetentionStrategy.INSTANCE);
         jenkinsRule.jenkins.addNode(agent);
     }
-
 }

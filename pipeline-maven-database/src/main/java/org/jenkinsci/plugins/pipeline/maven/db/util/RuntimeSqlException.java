@@ -24,7 +24,8 @@ public class RuntimeSqlException extends RuntimeException {
         super(cause);
     }
 
-    protected RuntimeSqlException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
+    protected RuntimeSqlException(
+            String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
         super(message, cause, enableSuppression, writableStackTrace);
     }
 }

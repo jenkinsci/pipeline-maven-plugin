@@ -1,13 +1,11 @@
 package org.jenkinsci.plugins.pipeline.maven.util;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import org.jvnet.hudson.test.JenkinsRule;
-
 import hudson.FilePath;
 import hudson.tasks.Maven;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import jenkins.model.Jenkins;
+import org.jvnet.hudson.test.JenkinsRule;
 
 public class MavenUtil {
 
@@ -18,13 +16,14 @@ public class MavenUtil {
         FilePath mvnHome = agentRootPath.child("apache-maven-" + mavenVersion);
         if (!mvnHome.exists()) {
             FilePath mvn = agentRootPath.createTempFile("maven", "zip");
-            mvn.copyFrom(Files.newInputStream(Paths.get(System.getProperty("buildDirectory", "target"), "apache-maven-" + mavenVersion + "-bin.zip")));
+            mvn.copyFrom(Files.newInputStream(Paths.get(
+                    System.getProperty("buildDirectory", "target"), "apache-maven-" + mavenVersion + "-bin.zip")));
             mvn.unzip(agentRootPath);
         }
-        Maven.MavenInstallation mavenInstallation = new Maven.MavenInstallation("default", mvnHome.getRemote(), JenkinsRule.NO_PROPERTIES);
+        Maven.MavenInstallation mavenInstallation =
+                new Maven.MavenInstallation("default", mvnHome.getRemote(), JenkinsRule.NO_PROPERTIES);
         Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
 
         return mavenInstallation;
     }
-
 }

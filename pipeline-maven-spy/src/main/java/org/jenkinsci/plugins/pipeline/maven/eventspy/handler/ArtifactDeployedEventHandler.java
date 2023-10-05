@@ -1,11 +1,10 @@
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.RepositoryEvent;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 
 public class ArtifactDeployedEventHandler implements MavenEventHandler {
 

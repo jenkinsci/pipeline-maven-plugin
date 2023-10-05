@@ -30,7 +30,6 @@ import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runBeforeMethod;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-
 import org.apache.commons.io.FileUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -98,7 +97,8 @@ public class WithMavenStepRestartTest {
         WorkflowRun b = p.getBuildByNumber(1);
         @SuppressWarnings("deprecation")
         Class<?> deprecatedClass = org.jenkinsci.plugins.workflow.support.pickles.FilePathPickle.class;
-        assertThat(FileUtils.readFileToString(new File(b.getRootDir(), "program.dat"), StandardCharsets.ISO_8859_1)).doesNotContain(deprecatedClass.getName());
+        assertThat(FileUtils.readFileToString(new File(b.getRootDir(), "program.dat"), StandardCharsets.ISO_8859_1))
+                .doesNotContain(deprecatedClass.getName());
         SemaphoreStep.success("wait/1", null);
         jenkinsRule.assertBuildStatusSuccess(jenkinsRule.waitForCompletion(b));
         SemaphoreStep.success("wait/2", null);

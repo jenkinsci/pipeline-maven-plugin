@@ -6,9 +6,13 @@ import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import hudson.ExtensionList;
+import io.jenkins.plugins.casc.ConfigurationAsCode;
+import io.jenkins.plugins.casc.ConfigurationContext;
+import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.dao.MonitoringPipelineMavenPluginDaoDecorator;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao;
@@ -23,22 +27,18 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.cloudbees.plugins.credentials.CredentialsProvider;
-
-import hudson.ExtensionList;
-import io.jenkins.plugins.casc.ConfigurationAsCode;
-import io.jenkins.plugins.casc.ConfigurationContext;
-import io.jenkins.plugins.casc.ConfiguratorRegistry;
-
 @WithJenkins
 @Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
 public class ConfigurationAsCodeNeedDockerTest {
 
     @Container
-    public static MySQLContainer<?> MYSQL_DB = new MySQLContainer<>(MySQLContainer.NAME).withUsername("aUser").withPassword("aPass");
+    public static MySQLContainer<?> MYSQL_DB =
+            new MySQLContainer<>(MySQLContainer.NAME).withUsername("aUser").withPassword("aPass");
 
     @Container
-    public static PostgreSQLContainer<?> POSTGRE_DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE).withUsername("aUser").withPassword("aPass");
+    public static PostgreSQLContainer<?> POSTGRE_DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE)
+            .withUsername("aUser")
+            .withPassword("aPass");
 
     @Test
     public void should_support_mysql_configuration(JenkinsRule r) throws Exception {
@@ -57,10 +57,12 @@ public class ConfigurationAsCodeNeedDockerTest {
 
             ConfigurationAsCode.get().configure(singletonList(tmpYml.toFile().getAbsolutePath()));
 
-            GlobalPipelineMavenConfig config = r.jenkins.getExtensionList(GlobalPipelineMavenConfig.class).get(0);
+            GlobalPipelineMavenConfig config =
+                    r.jenkins.getExtensionList(GlobalPipelineMavenConfig.class).get(0);
 
             assertThat(config.getJdbcUrl()).isEqualTo(jdbcUrl);
-            assertThat(config.getProperties()).isEqualTo("dataSource.cachePrepStmts=true\ndataSource.prepStmtCacheSize=250\n");
+            assertThat(config.getProperties())
+                    .isEqualTo("dataSource.cachePrepStmts=true\ndataSource.prepStmtCacheSize=250\n");
             assertThat(config.getDaoClass()).isEqualTo(PipelineMavenPluginMySqlDao.class.getName());
 
             // we can't really test the PipelineMavenPluginMySqlDao is used as it is plenty
@@ -98,7 +100,8 @@ public class ConfigurationAsCodeNeedDockerTest {
 
             ConfigurationAsCode.get().configure(singletonList(tmpYml.toFile().getAbsolutePath()));
 
-            GlobalPipelineMavenConfig config = r.jenkins.getExtensionList(GlobalPipelineMavenConfig.class).get(0);
+            GlobalPipelineMavenConfig config =
+                    r.jenkins.getExtensionList(GlobalPipelineMavenConfig.class).get(0);
 
             assertThat(config.getJdbcUrl()).isEqualTo(jdbcUrl);
             assertThat(config.getDaoClass()).isEqualTo(PipelineMavenPluginPostgreSqlDao.class.getName());
@@ -120,5 +123,4 @@ public class ConfigurationAsCodeNeedDockerTest {
             POSTGRE_DB.stop();
         }
     }
-
 }

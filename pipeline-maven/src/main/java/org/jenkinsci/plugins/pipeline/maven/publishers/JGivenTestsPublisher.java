@@ -20,15 +20,19 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.Extension;
+import hudson.FilePath;
+import hudson.Launcher;
+import hudson.model.Run;
+import hudson.model.StreamBuildListener;
+import hudson.model.TaskListener;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.jgiven.JgivenReportGenerator;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
@@ -37,13 +41,6 @@ import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
-
-import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.Run;
-import hudson.model.StreamBuildListener;
-import hudson.model.TaskListener;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -57,9 +54,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
     private static final long serialVersionUID = 1L;
 
     @DataBoundConstructor
-    public JGivenTestsPublisher() {
-
-    }
+    public JGivenTestsPublisher() {}
 
     @Override
     public void process(@NonNull final StepContext context, @NonNull final Element mavenSpyLogsElt)
@@ -94,8 +89,9 @@ public class JGivenTestsPublisher extends MavenPublisher {
         }
         if (!foundJGivenDependency) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println(
-                        "[withMaven] jgivenPublisher - JGiven not found within your project dependencies, aborting.");
+                listener.getLogger()
+                        .println(
+                                "[withMaven] jgivenPublisher - JGiven not found within your project dependencies, aborting.");
             }
             return;
         }
@@ -104,8 +100,9 @@ public class JGivenTestsPublisher extends MavenPublisher {
         final FilePath[] paths = workspace.list(pattern);
         if (paths == null || paths.length == 0) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println("[withMaven] jgivenPublisher - Pattern \"" + pattern
-                        + "\" does not match any file on workspace, aborting.");
+                listener.getLogger()
+                        .println("[withMaven] jgivenPublisher - Pattern \"" + pattern
+                                + "\" does not match any file on workspace, aborting.");
             }
             return;
         }
@@ -116,8 +113,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
             listener.getLogger().println("[withMaven] jgivenPublisher - Running JGiven report generator");
             generator.perform(run, workspace, launcher, listener);
         } catch (final Exception e) {
-            listener.error(
-                    "[withMaven] jgivenPublisher - exception archiving JGiven reports: " + e);
+            listener.error("[withMaven] jgivenPublisher - exception archiving JGiven reports: " + e);
             LOGGER.log(Level.WARNING, "Exception processing JGiven reports archiving", e);
             throw new MavenPipelinePublisherException("jgivenPublisher", "archiving JGiven reports", e);
         }

@@ -40,48 +40,11 @@
   <url>https://github.com/jenkinsci/pipeline-maven-plugin/</url>
 
   <properties>
-    <hpi.pluginChangelogUrl>https://github.com/jenkinsci/pipeline-maven-plugin/releases</hpi.pluginChangelogUrl>
     <hpi.compatibleSinceVersion>1333</hpi.compatibleSinceVersion>
+    <hpi.pluginChangelogUrl>https://github.com/jenkinsci/pipeline-maven-plugin/releases</hpi.pluginChangelogUrl>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>pipeline-maven-api</artifactId>
-    </dependency>
-
-    <!-- move the related test to pipeline-maven-database and remove this dependency
-    -->
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>pipeline-maven-database</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>h2-api</artifactId>
-      <version>${jenkins-plugin-h2.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>mysql-api</artifactId>
-      <version>${jenkins-plugin-mysql.version}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.protobuf</groupId>
-          <artifactId>protobuf-java</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>io.jenkins.plugins</groupId>
-      <artifactId>postgresql-api</artifactId>
-      <version>${jenkins-plugin-postgresql.version}</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>maven-plugin</artifactId>
@@ -180,7 +143,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>jacoco</artifactId>
-      <version>${jenkins-plugin-jacoco.version}</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -260,6 +222,10 @@
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>pipeline-maven-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>script-security</artifactId>
     </dependency>
     <dependency>
@@ -293,12 +259,12 @@
           <artifactId>library</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>xerces</groupId>
           <artifactId>xercesImpl</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -314,6 +280,13 @@
     </dependency>
 
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>pipeline-maven-spy</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>io.jenkins</groupId>
       <artifactId>configuration-as-code</artifactId>
       <scope>test</scope>
@@ -321,6 +294,30 @@
     <dependency>
       <groupId>io.jenkins.configuration-as-code</groupId>
       <artifactId>test-harness</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>h2-api</artifactId>
+      <version>${jenkins-plugin-h2.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>mysql-api</artifactId>
+      <version>${jenkins-plugin-mysql.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.protobuf</groupId>
+          <artifactId>protobuf-java</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>postgresql-api</artifactId>
+      <version>${jenkins-plugin-postgresql.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -345,6 +342,14 @@
       <artifactId>junit</artifactId>
       <version>1217.v4297208a_a_b_ce</version>
       <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <!-- move the related test to pipeline-maven-database and remove this dependency
+    -->
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>pipeline-maven-database</artifactId>
+      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -503,9 +508,12 @@
           <plugin>
             <groupId>com.spotify</groupId>
             <artifactId>dockerfile-maven-plugin</artifactId>
+            <configuration>
+              <pullNewerImage>false</pullNewerImage>
+            </configuration>
             <executions>
               <execution>
-                <id>build-sshd-image</id>
+                <id>build-first-sshd-image</id>
                 <goals>
                   <goal>build</goal>
                 </goals>
@@ -560,9 +568,6 @@
                 </configuration>
               </execution>
             </executions>
-            <configuration>
-              <pullNewerImage>false</pullNewerImage>
-            </configuration>
           </plugin>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>

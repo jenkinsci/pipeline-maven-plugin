@@ -1,10 +1,9 @@
 package org.jenkinsci.plugins.pipeline.maven.cause;
 
-import hudson.model.Job;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.model.Job;
 import java.util.List;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -27,5 +26,4 @@ public interface MavenDependencyCause {
     void setOmittedPipelineFullNames(List<String> omittedPipelineFullNames);
 
     String getMavenArtifactsDescription();
-
 }

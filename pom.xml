@@ -72,10 +72,10 @@
   </developers>
 
   <modules>
+    <module>pipeline-maven</module>
     <module>pipeline-maven-api</module>
     <module>pipeline-maven-database</module>
     <module>pipeline-maven-spy</module>
-    <module>pipeline-maven</module>
   </modules>
 
   <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
@@ -94,7 +94,6 @@
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-flaky-test.version>1.2.2</jenkins-plugin-flaky-test.version>
     <jenkins-plugin-h2.version>1.4.199</jenkins-plugin-h2.version>
-    <jenkins-plugin-jacoco.version>3.3.2</jenkins-plugin-jacoco.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
     <jenkins-plugin-maven-invoker.version>2.5</jenkins-plugin-maven-invoker.version>
     <jenkins-plugin-maven.version>3.22</jenkins-plugin-maven.version>
@@ -106,26 +105,18 @@
     <junit.version>5.10.0</junit.version>
     <mariadb-client.version>3.2.0</mariadb-client.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
-    <maven-plugin-sortpom.version>3.3.0</maven-plugin-sortpom.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.8.8</maven.version>
     <plexus-utils.version>3.5.1</plexus-utils.version>
     <plugin-dockerfile.version>1.4.13</plugin-dockerfile.version>
     <plugin-exec.version>3.1.0</plugin-exec.version>
     <slf4j.version>2.0.9</slf4j.version>
+    <spotless.check.skip>false</spotless.check.skip>
     <testcontainers.version>1.19.0</testcontainers.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- Fix RequireUpperBoundDeps dependencies -->
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-utils</artifactId>
-        <version>${plexus-utils.version}</version>
-      </dependency>
 
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
@@ -134,12 +125,21 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!-- Fix RequireUpperBoundDeps dependencies -->
-      <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
-      <!--
-      for org.jenkins-ci.plugins:maven-invoker-plugin and org.jenkins-ci.main:maven-plugin
-      -->
+      <dependency>
+        <groupId>org.junit</groupId>
+        <artifactId>junit-bom</artifactId>
+        <version>${junit.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-bom</artifactId>
+        <version>${testcontainers.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
@@ -155,14 +155,11 @@
         <artifactId>plexus-utils</artifactId>
         <version>${plexus-utils.version}</version>
       </dependency>
-     <dependency>
-        <groupId>org.junit</groupId>
-        <artifactId>junit-bom</artifactId>
-        <version>${junit.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
+      <dependency>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>pipeline-maven-api</artifactId>
+        <version>${project.version}</version>
       </dependency>
-
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
@@ -175,23 +172,10 @@
       </dependency>
 
       <dependency>
-        <groupId>org.jenkins-ci.plugins</groupId>
-        <artifactId>pipeline-maven-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
         <version>${assertj.version}</version>
         <scope>test</scope>
-      </dependency>
-
-      <dependency>
-        <groupId>org.testcontainers</groupId>
-        <artifactId>testcontainers-bom</artifactId>
-        <version>${testcontainers.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -261,31 +245,9 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>com.github.ekryd.sortpom</groupId>
-          <artifactId>sortpom-maven-plugin</artifactId>
-          <version>${maven-plugin-sortpom.version}</version>
-          <configuration>
-            <createBackupFile>false</createBackupFile>
-            <encoding>${project.build.sourceEncoding}</encoding>
-            <expandEmptyElements>false</expandEmptyElements>
-            <keepBlankLines>true</keepBlankLines>
-            <lineSeparator>\n</lineSeparator>
-            <ignoreLineSeparators>false</ignoreLineSeparators>
-            <nrOfIndentSpace>2</nrOfIndentSpace>
-            <sortDependencies>scope,groupId,artifactId</sortDependencies>
-            <sortPlugins>groupId,artifactId</sortPlugins>
-            <sortProperties>true</sortProperties>
-          </configuration>
-        </plugin>
-        <plugin>
           <groupId>com.spotify</groupId>
           <artifactId>dockerfile-maven-plugin</artifactId>
           <version>${plugin-dockerfile.version}</version>
-        </plugin>
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <version>${plugin-exec.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-surefire-plugin</artifactId>
@@ -295,20 +257,37 @@
             </systemPropertyVariables>
           </configuration>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>${plugin-exec.version}</version>
+        </plugin>
       </plugins>
     </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>com.github.ekryd.sortpom</groupId>
-        <artifactId>sortpom-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>sort</goal>
-            </goals>
-            <phase>verify</phase>
-          </execution>
-        </executions>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <configuration>
+          <java combine.children="append">
+            <toggleOffOn>
+              <off>@formatter:off</off>
+                <on>@formatter:on</on>
+            </toggleOffOn>
+          </java>
+          <pom>
+            <sortPom combine.children="append">
+              <sortProperties>true</sortProperties>
+              <sortModules>true</sortModules>
+              <sortExecutions>true</sortExecutions>
+              <sortPlugins>groupId,artifactId</sortPlugins>
+            </sortPom>
+            <toggleOffOn>
+              <off>@formatter:off</off>
+                <on>@formatter:on</on>
+            </toggleOffOn>
+          </pom>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

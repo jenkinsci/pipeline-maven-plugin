@@ -1,13 +1,12 @@
 package org.jenkinsci.plugins.pipeline.maven.cause;
 
-import hudson.model.Cause;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import hudson.model.Cause;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -18,8 +17,7 @@ public abstract class MavenDependencyAbstractCause extends Cause implements Mave
 
     private List<String> omittedPipelineFullNames;
 
-    public MavenDependencyAbstractCause() {
-    }
+    public MavenDependencyAbstractCause() {}
 
     public MavenDependencyAbstractCause(@Nullable List<MavenArtifact> mavenArtifacts) {
         this.mavenArtifacts = mavenArtifacts;
@@ -38,7 +36,6 @@ public abstract class MavenDependencyAbstractCause extends Cause implements Mave
     public void setMavenArtifacts(@NonNull List<MavenArtifact> mavenArtifacts) {
         this.mavenArtifacts = mavenArtifacts;
     }
-
 
     @NonNull
     @Override

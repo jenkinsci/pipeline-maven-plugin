@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.util;
 
 import hudson.model.TaskListener;
-
 import java.io.IOException;
 import java.io.PrintStream;
 
@@ -15,7 +14,6 @@ public class TaskListenerTraceWrapper {
     private final boolean traceability;
     private final PrintStream console;
 
-
     /**
      * Wrap the given TaskListener.
      *
@@ -27,7 +25,6 @@ public class TaskListenerTraceWrapper {
         this.traceability = traceability;
         this.console = taskListener.getLogger();
     }
-
 
     /**
      * Prints the given String to the underlying TaskListener if traceability is enabled.
@@ -82,7 +79,6 @@ public class TaskListenerTraceWrapper {
     public PrintStream format(final String format, Object... args) {
         return console.format(format, args);
     }
-
 
     /**
      * Wraps {@link TaskListener#getLogger()} format calls.

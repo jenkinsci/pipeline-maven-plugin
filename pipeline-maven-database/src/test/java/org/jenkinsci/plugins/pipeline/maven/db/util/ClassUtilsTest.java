@@ -12,6 +12,7 @@ public class ClassUtilsTest {
 
     @Test
     public void testGetResource() {
-        assertThat(getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/util/classutils-test-1.txt")).isNotNull();
+        assertThat(getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/util/classutils-test-1.txt"))
+                .isNotNull();
     }
 }

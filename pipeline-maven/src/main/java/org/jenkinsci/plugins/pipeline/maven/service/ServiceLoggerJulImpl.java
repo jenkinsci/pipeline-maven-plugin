@@ -24,10 +24,9 @@
 
 package org.jenkinsci.plugins.pipeline.maven.service;
 
-import hudson.model.Item;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import hudson.model.Item;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +35,7 @@ import java.util.logging.Logger;
  */
 public class ServiceLoggerJulImpl implements ServiceLogger {
 
-    private transient final Logger logger;
+    private final transient Logger logger;
 
     public ServiceLoggerJulImpl(@NonNull Logger logger) {
         this.logger = logger;

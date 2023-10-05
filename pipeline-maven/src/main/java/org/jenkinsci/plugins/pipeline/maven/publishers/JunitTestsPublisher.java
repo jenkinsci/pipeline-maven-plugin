@@ -24,12 +24,24 @@
 
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.tasks.junit.JUnitResultArchiver;
 import hudson.tasks.junit.TestDataPublisher;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
@@ -40,19 +52,6 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
-
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -89,98 +88,96 @@ public class JunitTestsPublisher extends MavenPublisher {
     @CheckForNull
     private Double healthScaleFactor;
 
-
     private boolean ignoreAttachments;
 
     @DataBoundConstructor
-    public JunitTestsPublisher() {
-
-    }
+    public JunitTestsPublisher() {}
 
     /*
-<ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-03 10:15:12.554">
-    <project baseDir="/Users/cleclerc/git/jenkins/pipeline-maven-plugin/maven-spy" file="/Users/cleclerc/git/jenkins/pipeline-maven-plugin/maven-spy/pom.xml" groupId="org.jenkins-ci.plugins" name="Maven Spy for the Pipeline Maven Integration Plugin" artifactId="pipeline-maven-spy" version="2.0-SNAPSHOT">
-      <build outputDirectory="/Users/cleclerc/git/jenkins/pipeline-maven-plugin/maven-spy/target/classes"/>
-    </project>
-    <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
-      <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
-      <argLine>${argLine}</argLine>
-      <basedir>${basedir}</basedir>
-      <childDelegation>${childDelegation}</childDelegation>
-      <classesDirectory>${project.build.outputDirectory}</classesDirectory>
-      <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
-      <debugForkedProcess>${maven.surefire.debug}</debugForkedProcess>
-      <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
-      <disableXmlReport>${disableXmlReport}</disableXmlReport>
-      <enableAssertions>${enableAssertions}</enableAssertions>
-      <excludedGroups>${excludedGroups}</excludedGroups>
-      <excludesFile>${surefire.excludesFile}</excludesFile>
-      <failIfNoSpecifiedTests>${surefire.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
-      <failIfNoTests>${failIfNoTests}</failIfNoTests>
-      <forkCount>1C</forkCount>
-      <forkMode>${forkMode}</forkMode>
-      <forkedProcessTimeoutInSeconds>${surefire.timeout}</forkedProcessTimeoutInSeconds>
-      <groups>${groups}</groups>
-      <includesFile>${surefire.includesFile}</includesFile>
-      <junitArtifactName>${junitArtifactName}</junitArtifactName>
-      <jvm>${jvm}</jvm>
-      <localRepository>${localRepository}</localRepository>
-      <objectFactory>${objectFactory}</objectFactory>
-      <parallel>${parallel}</parallel>
-      <parallelMavenExecution>${session.parallel}</parallelMavenExecution>
-      <parallelOptimized>${parallelOptimized}</parallelOptimized>
-      <parallelTestsTimeoutForcedInSeconds>${surefire.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
-      <parallelTestsTimeoutInSeconds>${surefire.parallel.timeout}</parallelTestsTimeoutInSeconds>
-      <perCoreThreadCount>${perCoreThreadCount}</perCoreThreadCount>
-      <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
-      <pluginDescriptor>${plugin}</pluginDescriptor>
-      <printSummary>${surefire.printSummary}</printSummary>
-      <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
-      <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
-      <remoteRepositories>${project.pluginArtifactRepositories}</remoteRepositories>
-      <reportFormat>${surefire.reportFormat}</reportFormat>
-      <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
-      <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-      <rerunFailingTestsCount>${surefire.rerunFailingTestsCount}</rerunFailingTestsCount>
-      <reuseForks>true</reuseForks>
-      <runOrder>${surefire.runOrder}</runOrder>
-      <shutdown>${surefire.shutdown}</shutdown>
-      <skip>${maven.test.skip}</skip>
-      <skipAfterFailureCount>${surefire.skipAfterFailureCount}</skipAfterFailureCount>
-      <skipExec>${maven.test.skip.exec}</skipExec>
-      <skipTests>${skipTests}</skipTests>
-      <suiteXmlFiles>${surefire.suiteXmlFiles}</suiteXmlFiles>
-      <systemProperties/>
-      <test>${test}</test>
-      <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
-      <testFailureIgnore>${maven.test.failure.ignore}</testFailureIgnore>
-      <testNGArtifactName>${testNGArtifactName}</testNGArtifactName>
-      <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
-      <threadCount>${threadCount}</threadCount>
-      <threadCountClasses>${threadCountClasses}</threadCountClasses>
-      <threadCountMethods>${threadCountMethods}</threadCountMethods>
-      <threadCountSuites>${threadCountSuites}</threadCountSuites>
-      <trimStackTrace>${trimStackTrace}</trimStackTrace>
-      <useFile>${surefire.useFile}</useFile>
-      <useManifestOnlyJar>${surefire.useManifestOnlyJar}</useManifestOnlyJar>
-      <useSystemClassLoader>${surefire.useSystemClassLoader}</useSystemClassLoader>
-      <useUnlimitedThreads>${useUnlimitedThreads}</useUnlimitedThreads>
-      <workingDirectory>${basedir}</workingDirectory>
-      <project>${project}</project>
-      <session>${session}</session>
-    </plugin>
-  </ExecutionEvent>
-<ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-03 10:15:13.274">
-    <project baseDir="/Users/cleclerc/git/jenkins/pipeline-maven-plugin/maven-spy" file="/Users/cleclerc/git/jenkins/pipeline-maven-plugin/maven-spy/pom.xml" groupId="org.jenkins-ci.plugins" name="Maven Spy for the Pipeline Maven Integration Plugin" artifactId="pipeline-maven-spy" version="2.0-SNAPSHOT">
-      <build directory="/Users/cleclerc/git/jenkins/pipeline-maven-plugin/maven-spy/target"/>
-    </project>
-    <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
-      <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-    </plugin>
-  </ExecutionEvent>
-     */
+    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-03 10:15:12.554">
+        <project baseDir="/Users/cleclerc/git/jenkins/pipeline-maven-plugin/maven-spy" file="/Users/cleclerc/git/jenkins/pipeline-maven-plugin/maven-spy/pom.xml" groupId="org.jenkins-ci.plugins" name="Maven Spy for the Pipeline Maven Integration Plugin" artifactId="pipeline-maven-spy" version="2.0-SNAPSHOT">
+          <build outputDirectory="/Users/cleclerc/git/jenkins/pipeline-maven-plugin/maven-spy/target/classes"/>
+        </project>
+        <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
+          <additionalClasspathElements>${maven.test.additionalClasspath}</additionalClasspathElements>
+          <argLine>${argLine}</argLine>
+          <basedir>${basedir}</basedir>
+          <childDelegation>${childDelegation}</childDelegation>
+          <classesDirectory>${project.build.outputDirectory}</classesDirectory>
+          <classpathDependencyExcludes>${maven.test.dependency.excludes}</classpathDependencyExcludes>
+          <debugForkedProcess>${maven.surefire.debug}</debugForkedProcess>
+          <dependenciesToScan>${dependenciesToScan}</dependenciesToScan>
+          <disableXmlReport>${disableXmlReport}</disableXmlReport>
+          <enableAssertions>${enableAssertions}</enableAssertions>
+          <excludedGroups>${excludedGroups}</excludedGroups>
+          <excludesFile>${surefire.excludesFile}</excludesFile>
+          <failIfNoSpecifiedTests>${surefire.failIfNoSpecifiedTests}</failIfNoSpecifiedTests>
+          <failIfNoTests>${failIfNoTests}</failIfNoTests>
+          <forkCount>1C</forkCount>
+          <forkMode>${forkMode}</forkMode>
+          <forkedProcessTimeoutInSeconds>${surefire.timeout}</forkedProcessTimeoutInSeconds>
+          <groups>${groups}</groups>
+          <includesFile>${surefire.includesFile}</includesFile>
+          <junitArtifactName>${junitArtifactName}</junitArtifactName>
+          <jvm>${jvm}</jvm>
+          <localRepository>${localRepository}</localRepository>
+          <objectFactory>${objectFactory}</objectFactory>
+          <parallel>${parallel}</parallel>
+          <parallelMavenExecution>${session.parallel}</parallelMavenExecution>
+          <parallelOptimized>${parallelOptimized}</parallelOptimized>
+          <parallelTestsTimeoutForcedInSeconds>${surefire.parallel.forcedTimeout}</parallelTestsTimeoutForcedInSeconds>
+          <parallelTestsTimeoutInSeconds>${surefire.parallel.timeout}</parallelTestsTimeoutInSeconds>
+          <perCoreThreadCount>${perCoreThreadCount}</perCoreThreadCount>
+          <pluginArtifactMap>${plugin.artifactMap}</pluginArtifactMap>
+          <pluginDescriptor>${plugin}</pluginDescriptor>
+          <printSummary>${surefire.printSummary}</printSummary>
+          <projectArtifactMap>${project.artifactMap}</projectArtifactMap>
+          <redirectTestOutputToFile>${maven.test.redirectTestOutputToFile}</redirectTestOutputToFile>
+          <remoteRepositories>${project.pluginArtifactRepositories}</remoteRepositories>
+          <reportFormat>${surefire.reportFormat}</reportFormat>
+          <reportNameSuffix>${surefire.reportNameSuffix}</reportNameSuffix>
+          <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+          <rerunFailingTestsCount>${surefire.rerunFailingTestsCount}</rerunFailingTestsCount>
+          <reuseForks>true</reuseForks>
+          <runOrder>${surefire.runOrder}</runOrder>
+          <shutdown>${surefire.shutdown}</shutdown>
+          <skip>${maven.test.skip}</skip>
+          <skipAfterFailureCount>${surefire.skipAfterFailureCount}</skipAfterFailureCount>
+          <skipExec>${maven.test.skip.exec}</skipExec>
+          <skipTests>${skipTests}</skipTests>
+          <suiteXmlFiles>${surefire.suiteXmlFiles}</suiteXmlFiles>
+          <systemProperties/>
+          <test>${test}</test>
+          <testClassesDirectory>${project.build.testOutputDirectory}</testClassesDirectory>
+          <testFailureIgnore>${maven.test.failure.ignore}</testFailureIgnore>
+          <testNGArtifactName>${testNGArtifactName}</testNGArtifactName>
+          <testSourceDirectory>${project.build.testSourceDirectory}</testSourceDirectory>
+          <threadCount>${threadCount}</threadCount>
+          <threadCountClasses>${threadCountClasses}</threadCountClasses>
+          <threadCountMethods>${threadCountMethods}</threadCountMethods>
+          <threadCountSuites>${threadCountSuites}</threadCountSuites>
+          <trimStackTrace>${trimStackTrace}</trimStackTrace>
+          <useFile>${surefire.useFile}</useFile>
+          <useManifestOnlyJar>${surefire.useManifestOnlyJar}</useManifestOnlyJar>
+          <useSystemClassLoader>${surefire.useSystemClassLoader}</useSystemClassLoader>
+          <useUnlimitedThreads>${useUnlimitedThreads}</useUnlimitedThreads>
+          <workingDirectory>${basedir}</workingDirectory>
+          <project>${project}</project>
+          <session>${session}</session>
+        </plugin>
+      </ExecutionEvent>
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-03 10:15:13.274">
+        <project baseDir="/Users/cleclerc/git/jenkins/pipeline-maven-plugin/maven-spy" file="/Users/cleclerc/git/jenkins/pipeline-maven-plugin/maven-spy/pom.xml" groupId="org.jenkins-ci.plugins" name="Maven Spy for the Pipeline Maven Integration Plugin" artifactId="pipeline-maven-spy" version="2.0-SNAPSHOT">
+          <build directory="/Users/cleclerc/git/jenkins/pipeline-maven-plugin/maven-spy/target"/>
+        </project>
+        <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
+          <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+        </plugin>
+      </ExecutionEvent>
+         */
     @Override
-    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt)
+            throws IOException, InterruptedException {
 
         TaskListener listener = context.get(TaskListener.class);
         if (listener == null) {
@@ -193,25 +190,65 @@ public class JunitTestsPublisher extends MavenPublisher {
         } catch (ClassNotFoundException e) {
             listener.getLogger().print("[withMaven] Jenkins ");
             listener.hyperlink("http://wiki.jenkins-ci.org/display/JENKINS/JUnit+Plugin", "JUnit Plugin");
-            listener.getLogger().print(" not found, don't display " + APACHE_GROUP_ID + ":" + SUREFIRE_ID + ":" + SUREFIRE_GOAL);
-            listener.getLogger().println(" nor " + APACHE_GROUP_ID + ":" + FAILSAFE_ID + ":" + FAILSAFE_GOAL + " results in pipeline screen.");
+            listener.getLogger()
+                    .print(" not found, don't display " + APACHE_GROUP_ID + ":" + SUREFIRE_ID + ":" + SUREFIRE_GOAL);
+            listener.getLogger()
+                    .println(" nor " + APACHE_GROUP_ID + ":" + FAILSAFE_ID + ":" + FAILSAFE_GOAL
+                            + " results in pipeline screen.");
             return;
         }
 
-        List<Element> sureFireTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, APACHE_GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL, "MojoSucceeded", "MojoFailed");
-        List<Element> failSafeTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, APACHE_GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL, "MojoSucceeded", "MojoFailed");
-        List<Element> tychoTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, TYCHO_GROUP_ID, TYCHO_ID, TYCHO_GOAL, "MojoSucceeded", "MojoFailed");
-        List<Element> karmaTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, KARMA_GROUP_ID, KARMA_ID, KARMA_GOAL, "MojoSucceeded", "MojoFailed");
-        List<Element> frontendTestEvents = XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, FRONTEND_GROUP_ID, FRONTEND_ID, FRONTEND_GOAL, "MojoSucceeded", "MojoFailed");
+        List<Element> sureFireTestEvents = XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt, APACHE_GROUP_ID, SUREFIRE_ID, SUREFIRE_GOAL, "MojoSucceeded", "MojoFailed");
+        List<Element> failSafeTestEvents = XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt, APACHE_GROUP_ID, FAILSAFE_ID, FAILSAFE_GOAL, "MojoSucceeded", "MojoFailed");
+        List<Element> tychoTestEvents = XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt, TYCHO_GROUP_ID, TYCHO_ID, TYCHO_GOAL, "MojoSucceeded", "MojoFailed");
+        List<Element> karmaTestEvents = XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt, KARMA_GROUP_ID, KARMA_ID, KARMA_GOAL, "MojoSucceeded", "MojoFailed");
+        List<Element> frontendTestEvents = XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt, FRONTEND_GROUP_ID, FRONTEND_ID, FRONTEND_GOAL, "MojoSucceeded", "MojoFailed");
 
-        executeReporter(context, listener, sureFireTestEvents, APACHE_GROUP_ID + ":" + SUREFIRE_ID + ":" + SUREFIRE_GOAL, "reportsDirectory");
-        executeReporter(context, listener, failSafeTestEvents, APACHE_GROUP_ID + ":" + FAILSAFE_ID + ":" + FAILSAFE_GOAL, "reportsDirectory");
-        executeReporter(context, listener, tychoTestEvents, APACHE_GROUP_ID + ":" + TYCHO_ID + ":" + TYCHO_GOAL, "reportsDirectory");
-        executeReporter(context, listener, karmaTestEvents, KARMA_GROUP_ID + ":" + KARMA_ID + ":" + KARMA_GOAL, "reportsDirectory");
-        executeReporter(context, listener, frontendTestEvents, FRONTEND_GROUP_ID + ":" + FRONTEND_ID + ":" + FRONTEND_GOAL, "environmentVariables", "REPORTS_DIRECTORY");
+        executeReporter(
+                context,
+                listener,
+                sureFireTestEvents,
+                APACHE_GROUP_ID + ":" + SUREFIRE_ID + ":" + SUREFIRE_GOAL,
+                "reportsDirectory");
+        executeReporter(
+                context,
+                listener,
+                failSafeTestEvents,
+                APACHE_GROUP_ID + ":" + FAILSAFE_ID + ":" + FAILSAFE_GOAL,
+                "reportsDirectory");
+        executeReporter(
+                context,
+                listener,
+                tychoTestEvents,
+                APACHE_GROUP_ID + ":" + TYCHO_ID + ":" + TYCHO_GOAL,
+                "reportsDirectory");
+        executeReporter(
+                context,
+                listener,
+                karmaTestEvents,
+                KARMA_GROUP_ID + ":" + KARMA_ID + ":" + KARMA_GOAL,
+                "reportsDirectory");
+        executeReporter(
+                context,
+                listener,
+                frontendTestEvents,
+                FRONTEND_GROUP_ID + ":" + FRONTEND_ID + ":" + FRONTEND_GOAL,
+                "environmentVariables",
+                "REPORTS_DIRECTORY");
     }
 
-    private void executeReporter(StepContext context, TaskListener listener, List<Element> testEvents, String goal, String... reportsDirElementNames) throws IOException, InterruptedException {
+    private void executeReporter(
+            StepContext context,
+            TaskListener listener,
+            List<Element> testEvents,
+            String goal,
+            String... reportsDirElementNames)
+            throws IOException, InterruptedException {
         if (testEvents.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger().println("[withMaven] junitPublisher - No " + goal + " execution found");
@@ -233,14 +270,19 @@ public class JunitTestsPublisher extends MavenPublisher {
             MavenSpyLogProcessor.PluginInvocation pluginInvocation = XmlUtils.newPluginInvocation(pluginElt);
 
             if (reportsDirectoryElt == null) {
-                listener.getLogger().println("[withMaven] No <" + Arrays.stream(reportsDirElementNames).collect(Collectors.joining(".")) + "> element found for <plugin> in " + XmlUtils.toString(testEvent));
+                listener.getLogger()
+                        .println("[withMaven] No <"
+                                + Arrays.stream(reportsDirElementNames).collect(Collectors.joining("."))
+                                + "> element found for <plugin> in " + XmlUtils.toString(testEvent));
                 continue;
             }
             String reportsDirectory = reportsDirectoryElt.getTextContent().trim();
             if (reportsDirectory.contains("${project.build.directory}")) {
                 String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
                 if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
-                    listener.getLogger().println("[withMaven] '${project.build.directory}' found for <project> in " + XmlUtils.toString(testEvent));
+                    listener.getLogger()
+                            .println("[withMaven] '${project.build.directory}' found for <project> in "
+                                    + XmlUtils.toString(testEvent));
                     continue;
                 }
 
@@ -249,7 +291,8 @@ public class JunitTestsPublisher extends MavenPublisher {
             } else if (reportsDirectory.contains("${basedir}")) {
                 String baseDir = projectElt.getAttribute("baseDir");
                 if (baseDir.isEmpty()) {
-                    listener.getLogger().println("[withMaven] '${basedir}' found for <project> in " + XmlUtils.toString(testEvent));
+                    listener.getLogger()
+                            .println("[withMaven] '${basedir}' found for <project> in " + XmlUtils.toString(testEvent));
                     continue;
                 }
 
@@ -259,11 +302,13 @@ public class JunitTestsPublisher extends MavenPublisher {
             reportsDirectory = XmlUtils.getPathInWorkspace(reportsDirectory, workspace);
 
             String testResults = reportsDirectory + fileSeparatorOnAgent + "*.xml";
-            listener.getLogger().println("[withMaven] junitPublisher - Archive test results for Maven artifact " + mavenArtifact.getId() + " generated by " +
-                    pluginInvocation.getId() + ": " + testResults);
+            listener.getLogger()
+                    .println("[withMaven] junitPublisher - Archive test results for Maven artifact "
+                            + mavenArtifact.getId() + " generated by " + pluginInvocation.getId() + ": " + testResults);
             if (testResultsList.contains(testResults)) {
                 if (LOGGER.isLoggable(Level.FINER)) {
-                    listener.getLogger().println("[withMaven] junitPublisher - Ignore already added testResults " + testResults);
+                    listener.getLogger()
+                            .println("[withMaven] junitPublisher - Ignore already added testResults " + testResults);
                 }
             } else {
                 testResultsList.add(testResults);
@@ -271,7 +316,8 @@ public class JunitTestsPublisher extends MavenPublisher {
         }
         String testResults = String.join(",", testResultsList);
 
-        JUnitResultArchiver archiver = JUnitUtils.buildArchiver(testResults, this.keepLongStdio, this.healthScaleFactor);
+        JUnitResultArchiver archiver =
+                JUnitUtils.buildArchiver(testResults, this.keepLongStdio, this.healthScaleFactor);
 
         List<TestDataPublisher> testDataPublishers = new ArrayList<>();
 
@@ -282,34 +328,41 @@ public class JunitTestsPublisher extends MavenPublisher {
         } else {
             String attachmentsPublisherClassName = "hudson.plugins.junitattachments.AttachmentPublisher";
             try {
-                TestDataPublisher attachmentPublisher =  (TestDataPublisher) Class.forName(attachmentsPublisherClassName).newInstance();
+                TestDataPublisher attachmentPublisher = (TestDataPublisher)
+                        Class.forName(attachmentsPublisherClassName).newInstance();
                 if (LOGGER.isLoggable(Level.FINE)) {
                     listener.getLogger().println("[withMaven] junitPublisher - Publish junit test attachments...");
                 }
                 testDataPublishers.add(attachmentPublisher);
-            } catch(ClassNotFoundException e){
+            } catch (ClassNotFoundException e) {
                 listener.getLogger().print("[withMaven] junitPublisher - Jenkins ");
                 listener.hyperlink("https://plugins.jenkins.io/junit-attachments", "JUnit Attachments Plugin");
                 listener.getLogger().println(" not found, can't publish test attachments.");
-            } catch (IllegalAccessException|InstantiationException e) {
-                PrintWriter err = listener.error("[withMaven] junitPublisher - Failure to publish test attachments, exception instantiating '" + attachmentsPublisherClassName + "'");
+            } catch (IllegalAccessException | InstantiationException e) {
+                PrintWriter err = listener.error(
+                        "[withMaven] junitPublisher - Failure to publish test attachments, exception instantiating '"
+                                + attachmentsPublisherClassName + "'");
                 e.printStackTrace(err);
             }
         }
 
-        String flakyTestDataPublisherClassName = "com.google.jenkins.flakyTestHandler.plugin.JUnitFlakyTestDataPublisher";
+        String flakyTestDataPublisherClassName =
+                "com.google.jenkins.flakyTestHandler.plugin.JUnitFlakyTestDataPublisher";
         try {
-            TestDataPublisher flakyTestPublisher =  (TestDataPublisher) Class.forName(flakyTestDataPublisherClassName).newInstance();
+            TestDataPublisher flakyTestPublisher = (TestDataPublisher)
+                    Class.forName(flakyTestDataPublisherClassName).newInstance();
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger().println("[withMaven] junitPublisher - Publish JUnit flaky tests reports...");
             }
             testDataPublishers.add(flakyTestPublisher);
-        } catch(ClassNotFoundException e){
+        } catch (ClassNotFoundException e) {
             listener.getLogger().print("[withMaven] junitPublisher - Jenkins ");
             listener.hyperlink("https://plugins.jenkins.io/flaky-test-handler", "JUnit Flaky Test Handler Plugin");
             listener.getLogger().println(" not found, can't publish JUnit flaky tests reports.");
-        } catch (IllegalAccessException|InstantiationException e) {
-            PrintWriter err = listener.error("[withMaven] junitPublisher - Failure to publish flaky test reports, exception instantiating '" + flakyTestDataPublisherClassName + "'");
+        } catch (IllegalAccessException | InstantiationException e) {
+            PrintWriter err = listener.error(
+                    "[withMaven] junitPublisher - Failure to publish flaky test reports, exception instantiating '"
+                            + flakyTestDataPublisherClassName + "'");
             e.printStackTrace(err);
         }
 
@@ -350,12 +403,11 @@ public class JunitTestsPublisher extends MavenPublisher {
 
     @Override
     public String toString() {
-        return "JunitTestsPublisher[" +
-                "disabled=" + isDisabled() + "," +
-                "healthScaleFactor=" + (healthScaleFactor == null ? ""  : healthScaleFactor) + "," +
-                "keepLongStdio=" + keepLongStdio + "," +
-                "ignoreAttachments=" + ignoreAttachments +
-                ']';
+        return "JunitTestsPublisher[" + "disabled="
+                + isDisabled() + "," + "healthScaleFactor="
+                + (healthScaleFactor == null ? "" : healthScaleFactor) + "," + "keepLongStdio="
+                + keepLongStdio + "," + "ignoreAttachments="
+                + ignoreAttachments + ']';
     }
 
     /**
@@ -374,7 +426,6 @@ public class JunitTestsPublisher extends MavenPublisher {
         public int ordinal() {
             return 10;
         }
-
 
         @NonNull
         @Override

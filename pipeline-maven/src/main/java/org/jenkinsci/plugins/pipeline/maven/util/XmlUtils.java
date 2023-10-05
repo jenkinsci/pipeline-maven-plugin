@@ -24,26 +24,9 @@
 
 package org.jenkinsci.plugins.pipeline.maven.util;
 
-import hudson.FilePath;
-import org.apache.commons.lang.StringUtils;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
-import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
-import org.w3c.dom.Attr;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import hudson.FilePath;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -57,6 +40,22 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
+import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
+import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -85,27 +84,30 @@ public class XmlUtils {
         mavenArtifact.setArtifactId(artifactElt.getAttribute("artifactId"));
         mavenArtifact.setVersion(artifactElt.getAttribute("version"));
         mavenArtifact.setBaseVersion(artifactElt.getAttribute("baseVersion"));
-        if (mavenArtifact.getBaseVersion() == null || mavenArtifact.getBaseVersion().isEmpty()) {
+        if (mavenArtifact.getBaseVersion() == null
+                || mavenArtifact.getBaseVersion().isEmpty()) {
             mavenArtifact.setBaseVersion(mavenArtifact.getVersion());
         }
         String snapshot = artifactElt.getAttribute("snapshot");
-        mavenArtifact.setSnapshot(snapshot != null && !snapshot.trim().isEmpty()
-                ? Boolean.parseBoolean(artifactElt.getAttribute("snapshot"))
-                : mavenArtifact.getBaseVersion().contains("SNAPSHOT"));
+        mavenArtifact.setSnapshot(
+                snapshot != null && !snapshot.trim().isEmpty()
+                        ? Boolean.parseBoolean(artifactElt.getAttribute("snapshot"))
+                        : mavenArtifact.getBaseVersion().contains("SNAPSHOT"));
         mavenArtifact.setType(artifactElt.getAttribute("type"));
         if (mavenArtifact.getType() == null || mavenArtifact.getType().isEmpty()) {
-            // workaround: sometimes we use "XmlUtils.newMavenArtifact()" on "project" elements, in this case, "packaging" is defined but "type" is not defined
+            // workaround: sometimes we use "XmlUtils.newMavenArtifact()" on "project" elements, in this case,
+            // "packaging" is defined but "type" is not defined
             // we should  probably not use "MavenArtifact"
             mavenArtifact.setType(artifactElt.getAttribute("packaging"));
         }
-        mavenArtifact.setClassifier(artifactElt.hasAttribute("classifier") ? artifactElt.getAttribute("classifier") : null);
+        mavenArtifact.setClassifier(
+                artifactElt.hasAttribute("classifier") ? artifactElt.getAttribute("classifier") : null);
         mavenArtifact.setExtension(artifactElt.getAttribute("extension"));
     }
 
-
     /*
-  <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
- */
+     <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.19.1">
+    */
     public static MavenSpyLogProcessor.PluginInvocation newPluginInvocation(Element pluginInvocationElt) {
         MavenSpyLogProcessor.PluginInvocation pluginInvocation = new MavenSpyLogProcessor.PluginInvocation();
         pluginInvocation.groupId = pluginInvocationElt.getAttribute("groupId");
@@ -133,7 +135,8 @@ public class XmlUtils {
             if (childElts.size() == 0) {
                 return null;
             } else if (childElts.size() > 1) {
-                throw new IllegalStateException("More than 1 (" + childElts.size() + ") elements <" + childEltName + "> found in " + toString(element));
+                throw new IllegalStateException("More than 1 (" + childElts.size() + ") elements <" + childEltName
+                        + "> found in " + toString(element));
             }
 
             result = childElts.get(0);
@@ -243,13 +246,16 @@ public class XmlUtils {
      * @return The "RepositoryEvent" of type "ARTIFACT_DEPLOYED" or {@code null} if non found
      */
     @Nullable
-    public static Element getArtifactDeployedEvent(@NonNull List<Element> artifactDeployedEvents, @NonNull String filePath) {
-        for (Element artifactDeployedEvent: artifactDeployedEvents) {
-            if (!"RepositoryEvent".equals(artifactDeployedEvent.getNodeName()) || !"ARTIFACT_DEPLOYED".equals(artifactDeployedEvent.getAttribute("type"))) {
+    public static Element getArtifactDeployedEvent(
+            @NonNull List<Element> artifactDeployedEvents, @NonNull String filePath) {
+        for (Element artifactDeployedEvent : artifactDeployedEvents) {
+            if (!"RepositoryEvent".equals(artifactDeployedEvent.getNodeName())
+                    || !"ARTIFACT_DEPLOYED".equals(artifactDeployedEvent.getAttribute("type"))) {
                 // skip unexpected element
                 continue;
             }
-            String deployedArtifactFilePath = getUniqueChildElement(artifactDeployedEvent, "artifact").getAttribute("file");
+            String deployedArtifactFilePath =
+                    getUniqueChildElement(artifactDeployedEvent, "artifact").getAttribute("file");
             if (Objects.equals(filePath, deployedArtifactFilePath)) {
                 return artifactDeployedEvent;
             }
@@ -258,15 +264,20 @@ public class XmlUtils {
     }
 
     /*
-   <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-02 23:03:17.06">
-      <project artifactIdId="supplychain-portal" groupId="com.acmewidgets.supplychain" name="supplychain-portal" version="0.0.7" />
-      <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.18.1">
-         <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
-      </plugin>
-   </ExecutionEvent>
-     */
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-02 23:03:17.06">
+       <project artifactIdId="supplychain-portal" groupId="com.acmewidgets.supplychain" name="supplychain-portal" version="0.0.7" />
+       <plugin executionId="default-test" goal="test" groupId="org.apache.maven.plugins" artifactId="maven-surefire-plugin" version="2.18.1">
+          <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
+       </plugin>
+    </ExecutionEvent>
+      */
     @NonNull
-    public static List<Element> getExecutionEventsByPlugin(@NonNull Element mavenSpyLogs, String pluginGroupId, String pluginArtifactId, String pluginGoal, String... eventType) {
+    public static List<Element> getExecutionEventsByPlugin(
+            @NonNull Element mavenSpyLogs,
+            String pluginGroupId,
+            String pluginArtifactId,
+            String pluginGoal,
+            String... eventType) {
         Set<String> eventTypes = new HashSet<>(Arrays.asList(eventType));
 
         List<Element> result = new ArrayList<>();
@@ -277,35 +288,34 @@ public class XmlUtils {
                 if (pluginElt == null) {
 
                 } else {
-                    if (pluginElt.getAttribute("groupId").equals(pluginGroupId) &&
-                            pluginElt.getAttribute("artifactId").equals(pluginArtifactId) &&
-                            pluginElt.getAttribute("goal").equals(pluginGoal)) {
+                    if (pluginElt.getAttribute("groupId").equals(pluginGroupId)
+                            && pluginElt.getAttribute("artifactId").equals(pluginArtifactId)
+                            && pluginElt.getAttribute("goal").equals(pluginGoal)) {
                         result.add(executionEventElt);
                     } else {
 
                     }
                 }
             }
-
         }
         return result;
     }
 
     /*
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-26 23:55:44.188">
-    <project baseDir="/path/to/my-project-workspace" file="/path/to/my-project-workspace/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
-      <build sourceDirectory="/path/to/my-project-workspace/src/main/java" directory="/path/to/my-project-workspace/target"/>
-    </project>
-    <plugin executionId="default-jar" goal="jar" lifecyclePhase="package" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="2.4">
-      <finalName>${jar.finalName}</finalName>
-      <outputDirectory>${project.build.directory}</outputDirectory>
-    </plugin>
-  </ExecutionEvent>
-     */
+      <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-09-26 23:55:44.188">
+      <project baseDir="/path/to/my-project-workspace" file="/path/to/my-project-workspace/pom.xml" groupId="com.example" name="my-jar" artifactId="my-jar" version="0.3-SNAPSHOT">
+        <build sourceDirectory="/path/to/my-project-workspace/src/main/java" directory="/path/to/my-project-workspace/target"/>
+      </project>
+      <plugin executionId="default-jar" goal="jar" lifecyclePhase="package" groupId="org.apache.maven.plugins" artifactId="maven-jar-plugin" version="2.4">
+        <finalName>${jar.finalName}</finalName>
+        <outputDirectory>${project.build.directory}</outputDirectory>
+      </plugin>
+    </ExecutionEvent>
+       */
     @NonNull
     public static List<String> getExecutedLifecyclePhases(@NonNull Element mavenSpyLogs) {
         List<String> lifecyclePhases = new ArrayList<>();
-        for (Element mojoSucceededEvent :getExecutionEvents(mavenSpyLogs, "MojoSucceeded")) {
+        for (Element mojoSucceededEvent : getExecutionEvents(mavenSpyLogs, "MojoSucceeded")) {
             Element pluginElement = getUniqueChildElement(mojoSucceededEvent, "plugin");
             String lifecyclePhase = pluginElement.getAttribute("lifecyclePhase");
             if (!lifecyclePhases.contains(lifecyclePhase)) {
@@ -340,8 +350,10 @@ public class XmlUtils {
 
         if (workspaceRemote.startsWith("/var/") && absoluteFilePath.startsWith("/private/var/")) {
             // workaround MacOSX special folders path
-            // eg String workspace = "/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven";
-            // eg String absolutePath = "/private/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven/pom.xml";
+            // eg String workspace =
+            // "/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven";
+            // eg String absolutePath =
+            // "/private/var/folders/lq/50t8n2nx7l316pwm8gc_2rt40000gn/T/jenkinsTests.tmp/jenkins3845105900446934883test/workspace/build-on-master-with-tool-provided-maven/pom.xml";
             sanitizedWorkspaceRemote = workspaceRemote;
             sanitizedAbsoluteFilePath = absoluteFilePath.substring("/private".length());
         }
@@ -349,20 +361,24 @@ public class XmlUtils {
         if (StringUtils.startsWithIgnoreCase(sanitizedAbsoluteFilePath, sanitizedWorkspaceRemote)) {
             // OK
         } else if (sanitizedWorkspaceRemote.contains("/workspace/")
-                && sanitizedAbsoluteFilePath.contains("/workspace/")
-        ) {
+                && sanitizedAbsoluteFilePath.contains("/workspace/")) {
             // workaround JENKINS-46084
             // sanitizedAbsoluteFilePath = '/app/Jenkins/home/workspace/testjob/pom.xml'
             // sanitizedWorkspaceRemote = '/var/lib/jenkins/workspace/testjob'
-            sanitizedAbsoluteFilePath = "/workspace/" + StringUtils.substringAfter(sanitizedAbsoluteFilePath, "/workspace/");
-            sanitizedWorkspaceRemote = "/workspace/" + StringUtils.substringAfter(sanitizedWorkspaceRemote, "/workspace/");
-        } else if (sanitizedWorkspaceRemote.endsWith("/workspace") && sanitizedAbsoluteFilePath.contains("/workspace/")) {
+            sanitizedAbsoluteFilePath =
+                    "/workspace/" + StringUtils.substringAfter(sanitizedAbsoluteFilePath, "/workspace/");
+            sanitizedWorkspaceRemote =
+                    "/workspace/" + StringUtils.substringAfter(sanitizedWorkspaceRemote, "/workspace/");
+        } else if (sanitizedWorkspaceRemote.endsWith("/workspace")
+                && sanitizedAbsoluteFilePath.contains("/workspace/")) {
             // workspace = "/var/lib/jenkins/jobs/Test-Pipeline/workspace";
             // absolutePath = "/storage/jenkins/jobs/Test-Pipeline/workspace/pom.xml";
-            sanitizedAbsoluteFilePath = "workspace/" + StringUtils.substringAfter(sanitizedAbsoluteFilePath, "/workspace/");
+            sanitizedAbsoluteFilePath =
+                    "workspace/" + StringUtils.substringAfter(sanitizedAbsoluteFilePath, "/workspace/");
             sanitizedWorkspaceRemote = "workspace/";
         } else {
-            throw new IllegalArgumentException("Cannot relativize '" + absoluteFilePath + "' relatively to '" + workspace.getRemote() + "'");
+            throw new IllegalArgumentException(
+                    "Cannot relativize '" + absoluteFilePath + "' relatively to '" + workspace.getRemote() + "'");
         }
 
         String relativePath = StringUtils.removeStartIgnoreCase(sanitizedAbsoluteFilePath, sanitizedWorkspaceRemote);
@@ -372,7 +388,9 @@ public class XmlUtils {
         if (windows) {
             relativePath = relativePath.replace('/', '\\');
         }
-        LOGGER.log(Level.FINEST, "getPathInWorkspace({0}, {1}: {2}", new Object[]{absoluteFilePath, workspaceRemote, relativePath});
+        LOGGER.log(Level.FINEST, "getPathInWorkspace({0}, {1}: {2}", new Object[] {
+            absoluteFilePath, workspaceRemote, relativePath
+        });
         return relativePath;
     }
 
@@ -435,7 +453,6 @@ public class XmlUtils {
         return result.toString();
     }
 
-
     @NonNull
     public static List<MavenArtifact> listGeneratedArtifacts(Element mavenSpyLogs, boolean includeAttachedArtifacts) {
 
@@ -455,12 +472,14 @@ public class XmlUtils {
             pomArtifact.setType("pom");
             pomArtifact.setExtension("pom");
             pomArtifact.setFile(projectElt.getAttribute("file"));
-            Element artifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, pomArtifact.getFile());
+            Element artifactDeployedEvent =
+                    XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, pomArtifact.getFile());
             if (artifactDeployedEvent == null) {
                 // artifact has not been deployed ("mvn deploy")
                 pomArtifact.setVersion(projectArtifact.getVersion());
             } else {
-                pomArtifact.setVersion(XmlUtils.getUniqueChildElement(artifactDeployedEvent, "artifact").getAttribute("version"));
+                pomArtifact.setVersion(XmlUtils.getUniqueChildElement(artifactDeployedEvent, "artifact")
+                        .getAttribute("version"));
             }
 
             result.add(pomArtifact);
@@ -472,47 +491,64 @@ public class XmlUtils {
                 // TODO: evaluate if we really want to skip this file - cyrille le clerc 2018-04-12
             } else {
                 Element fileElt = XmlUtils.getUniqueChildElementOrNull(artifactElt, "file");
-                if (fileElt == null || fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
+                if (fileElt == null
+                        || fileElt.getTextContent() == null
+                        || fileElt.getTextContent().isEmpty()) {
                     if (LOGGER.isLoggable(Level.FINER)) {
-                        LOGGER.log(Level.FINE, "listGeneratedArtifacts: Project " + projectArtifact + ":  no associated file found for " +
-                                mavenArtifact + " in " + XmlUtils.toString(artifactElt));
+                        LOGGER.log(
+                                Level.FINE,
+                                "listGeneratedArtifacts: Project " + projectArtifact
+                                        + ":  no associated file found for " + mavenArtifact + " in "
+                                        + XmlUtils.toString(artifactElt));
                     }
                 } else {
                     mavenArtifact.setFile(StringUtils.trim(fileElt.getTextContent()));
 
-                    artifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, mavenArtifact.getFile());
+                    artifactDeployedEvent =
+                            XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, mavenArtifact.getFile());
                     if (artifactDeployedEvent == null) {
                         // artifact has not been deployed ("mvn deploy")
                     } else {
-                        mavenArtifact.setVersion(XmlUtils.getUniqueChildElement(artifactDeployedEvent, "artifact").getAttribute("version"));
-                        mavenArtifact.setRepositoryUrl(XmlUtils.getUniqueChildElement(artifactDeployedEvent, "repository").getAttribute("url"));
+                        mavenArtifact.setVersion(XmlUtils.getUniqueChildElement(artifactDeployedEvent, "artifact")
+                                .getAttribute("version"));
+                        mavenArtifact.setRepositoryUrl(
+                                XmlUtils.getUniqueChildElement(artifactDeployedEvent, "repository")
+                                        .getAttribute("url"));
                     }
                 }
                 result.add(mavenArtifact);
             }
 
             if (includeAttachedArtifacts) {
-                Element attachedArtifactsParentElt = XmlUtils.getUniqueChildElement(projectSucceededElt, "attachedArtifacts");
-                List<Element> attachedArtifactsElts = XmlUtils.getChildrenElements(attachedArtifactsParentElt, "artifact");
+                Element attachedArtifactsParentElt =
+                        XmlUtils.getUniqueChildElement(projectSucceededElt, "attachedArtifacts");
+                List<Element> attachedArtifactsElts =
+                        XmlUtils.getChildrenElements(attachedArtifactsParentElt, "artifact");
                 for (Element attachedArtifactElt : attachedArtifactsElts) {
                     MavenArtifact attachedMavenArtifact = XmlUtils.newMavenArtifact(attachedArtifactElt);
 
                     Element fileElt = XmlUtils.getUniqueChildElementOrNull(attachedArtifactElt, "file");
-                    if (fileElt == null || fileElt.getTextContent() == null || fileElt.getTextContent().isEmpty()) {
+                    if (fileElt == null
+                            || fileElt.getTextContent() == null
+                            || fileElt.getTextContent().isEmpty()) {
                         if (LOGGER.isLoggable(Level.FINER)) {
-                            LOGGER.log(Level.FINER, "Project " + projectArtifact + ", no associated file found for attached artifact " +
-                                    attachedMavenArtifact + " in " + XmlUtils.toString(attachedArtifactElt));
+                            LOGGER.log(
+                                    Level.FINER,
+                                    "Project " + projectArtifact + ", no associated file found for attached artifact "
+                                            + attachedMavenArtifact + " in " + XmlUtils.toString(attachedArtifactElt));
                         }
                     } else {
                         attachedMavenArtifact.setFile(StringUtils.trim(fileElt.getTextContent()));
 
-                        Element attachedArtifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, attachedMavenArtifact.getFile());
-                        if(attachedArtifactDeployedEvent == null) {
+                        Element attachedArtifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(
+                                artifactDeployedEvents, attachedMavenArtifact.getFile());
+                        if (attachedArtifactDeployedEvent == null) {
                             // artifact has not been deployed ("mvn deploy")
                         } else {
-                            attachedMavenArtifact.setRepositoryUrl(XmlUtils.getUniqueChildElement(attachedArtifactDeployedEvent, "repository").getAttribute("url"));
+                            attachedMavenArtifact.setRepositoryUrl(
+                                    XmlUtils.getUniqueChildElement(attachedArtifactDeployedEvent, "repository")
+                                            .getAttribute("url"));
                         }
-
                     }
                     result.add(attachedMavenArtifact);
                 }
@@ -527,9 +563,9 @@ public class XmlUtils {
      *
      * @see jenkins.util.xml.RestrictiveEntityResolver
      */
-    public final static class RestrictiveEntityResolver implements EntityResolver {
+    public static final class RestrictiveEntityResolver implements EntityResolver {
 
-        public final static RestrictiveEntityResolver INSTANCE = new RestrictiveEntityResolver();
+        public static final RestrictiveEntityResolver INSTANCE = new RestrictiveEntityResolver();
 
         private RestrictiveEntityResolver() {
             // prevent multiple instantiation.
@@ -541,7 +577,8 @@ public class XmlUtils {
          */
         @Override
         public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
-            throw new SAXException("Refusing to resolve entity with publicId(" + publicId + ") and systemId (" + systemId + ")");
+            throw new SAXException(
+                    "Refusing to resolve entity with publicId(" + publicId + ") and systemId (" + systemId + ")");
         }
     }
 }

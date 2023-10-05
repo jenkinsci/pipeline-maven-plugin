@@ -18,14 +18,8 @@ public class CustomTypePipelineMavenPluginDaoDecorator extends AbstractPipelineM
      * <p>
      * See https://maven.apache.org/ref/3.8.4/maven-core/artifact-handlers.html for more details.
      */
-    private static final List<String> KNOWN_JAR_TYPES_WITH_DIFFERENT_EXTENSION = Arrays.asList(
-            "test-jar",
-            "maven-plugin",
-            "ejb",
-            "ejb-client",
-            "java-source",
-            "javadoc"
-    );
+    private static final List<String> KNOWN_JAR_TYPES_WITH_DIFFERENT_EXTENSION =
+            Arrays.asList("test-jar", "maven-plugin", "ejb", "ejb-client", "java-source", "javadoc");
 
     private final Logger LOGGER = Logger.getLogger(getClass().getName());
 
@@ -34,12 +28,48 @@ public class CustomTypePipelineMavenPluginDaoDecorator extends AbstractPipelineM
     }
 
     @Override
-    public void recordGeneratedArtifact(@NonNull String jobFullName, int buildNumber, @NonNull String groupId, @NonNull String artifactId, @NonNull String version, @NonNull String type, @NonNull String baseVersion, @Nullable String repositoryUrl, boolean skipDownstreamTriggers, String extension, String classifier) {
-        super.recordGeneratedArtifact(jobFullName, buildNumber, groupId, artifactId, version, type, baseVersion, repositoryUrl, skipDownstreamTriggers, extension, classifier);
+    public void recordGeneratedArtifact(
+            @NonNull String jobFullName,
+            int buildNumber,
+            @NonNull String groupId,
+            @NonNull String artifactId,
+            @NonNull String version,
+            @NonNull String type,
+            @NonNull String baseVersion,
+            @Nullable String repositoryUrl,
+            boolean skipDownstreamTriggers,
+            String extension,
+            String classifier) {
+        super.recordGeneratedArtifact(
+                jobFullName,
+                buildNumber,
+                groupId,
+                artifactId,
+                version,
+                type,
+                baseVersion,
+                repositoryUrl,
+                skipDownstreamTriggers,
+                extension,
+                classifier);
 
         if (shouldReportAgainWithExtensionAsType(type, extension)) {
-            LOGGER.log(Level.FINE, "Recording generated artifact " + groupId + ":" + artifactId + ":" + version + " as " + extension + " (in addition to " + type + ")");
-            super.recordGeneratedArtifact(jobFullName, buildNumber, groupId, artifactId, version, extension, baseVersion, repositoryUrl, skipDownstreamTriggers, extension, classifier);
+            LOGGER.log(
+                    Level.FINE,
+                    "Recording generated artifact " + groupId + ":" + artifactId + ":" + version + " as " + extension
+                            + " (in addition to " + type + ")");
+            super.recordGeneratedArtifact(
+                    jobFullName,
+                    buildNumber,
+                    groupId,
+                    artifactId,
+                    version,
+                    extension,
+                    baseVersion,
+                    repositoryUrl,
+                    skipDownstreamTriggers,
+                    extension,
+                    classifier);
         }
     }
 
@@ -50,5 +80,4 @@ public class CustomTypePipelineMavenPluginDaoDecorator extends AbstractPipelineM
 
         return type != null && !type.equals(extension);
     }
-
 }

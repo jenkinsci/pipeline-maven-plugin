@@ -1,23 +1,22 @@
 package org.jenkinsci.plugins.pipeline.maven.db.migration.h2;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.model.Cause;
 import hudson.model.Job;
 import hudson.model.Run;
-import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 
 public class MigrationStep11 implements MigrationStep {
 
-    private final static Logger LOGGER = Logger.getLogger(MigrationStep11.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MigrationStep11.class.getName());
 
     @Override
     public void execute(@NonNull Connection cnn, @NonNull JenkinsDetails jenkinsDetails) throws SQLException {
@@ -25,25 +24,26 @@ public class MigrationStep11 implements MigrationStep {
         int buildCauseCount = 0;
 
         LOGGER.info("Upgrade table JENKINS_BUILD_UPSTREAM_CAUSE...");
-        String select = "select jenkins_job.full_name, jenkins_job.jenkins_master_id, jenkins_build.number, jenkins_build.id " +
-                " from jenkins_build inner join jenkins_job on jenkins_build.job_id = jenkins_job.id order by jenkins_job.full_name, jenkins_build.number";
+        String select =
+                "select jenkins_job.full_name, jenkins_job.jenkins_master_id, jenkins_build.number, jenkins_build.id "
+                        + " from jenkins_build inner join jenkins_job on jenkins_build.job_id = jenkins_job.id order by jenkins_job.full_name, jenkins_build.number";
 
-        String insert = " insert into JENKINS_BUILD_UPSTREAM_CAUSE (upstream_build_id, downstream_build_id) " +
-                " select upstream_build.id, ? " +
-                " from jenkins_build as upstream_build, jenkins_job as upstream_job " +
-                " where " +
-                "   upstream_build.job_id = upstream_job.id and" +
-                "   upstream_job.full_name = ? and" +
-                "   upstream_job.jenkins_master_id = ? and" +
-                "   upstream_build.number = ? ";
+        String insert = " insert into JENKINS_BUILD_UPSTREAM_CAUSE (upstream_build_id, downstream_build_id) "
+                + " select upstream_build.id, ? "
+                + " from jenkins_build as upstream_build, jenkins_job as upstream_job "
+                + " where "
+                + "   upstream_build.job_id = upstream_job.id and"
+                + "   upstream_job.full_name = ? and"
+                + "   upstream_job.jenkins_master_id = ? and"
+                + "   upstream_build.number = ? ";
         try (PreparedStatement insertStmt = cnn.prepareStatement(insert)) {
             try (PreparedStatement selectStmt = cnn.prepareStatement(select)) {
                 try (ResultSet rst = selectStmt.executeQuery()) {
                     while (rst.next()) {
                         jobCount++;
-                        if ((jobCount < 100 && (jobCount % 10) == 0) ||
-                                (jobCount < 500 && (jobCount % 20) == 0) ||
-                                ((jobCount % 50) == 0)) {
+                        if ((jobCount < 100 && (jobCount % 10) == 0)
+                                || (jobCount < 500 && (jobCount % 20) == 0)
+                                || ((jobCount % 50) == 0)) {
                             LOGGER.log(Level.INFO, "#" + jobCount + " - " + rst.getString("FULL_NAME") + "...");
                         }
 
@@ -77,20 +77,24 @@ public class MigrationStep11 implements MigrationStep {
                                 }
                             }
                         } catch (RuntimeException e) {
-                            LOGGER.log(Level.WARNING, "Silently ignore exception migrating build " + jobFullName + "#" + buildNumber, e);
+                            LOGGER.log(
+                                    Level.WARNING,
+                                    "Silently ignore exception migrating build " + jobFullName + "#" + buildNumber,
+                                    e);
                         }
-
                     }
                     insertStmt.executeBatch();
                 }
             }
         }
-        LOGGER.info("Successfully upgraded table JENKINS_BUILD_UPSTREAM_CAUSE, " + jobCount + " jobs scanned, " + buildCauseCount + " job causes inserted");
-
+        LOGGER.info("Successfully upgraded table JENKINS_BUILD_UPSTREAM_CAUSE, " + jobCount + " jobs scanned, "
+                + buildCauseCount + " job causes inserted");
     }
 
-    protected void updateJenkinsJobRecord(@NonNull Connection cnn, long jenkinsJobPrimaryKey, int lastBuildNumber) throws SQLException {
-        try (PreparedStatement stmt = cnn.prepareStatement("UPDATE JENKINS_JOB set LAST_BUILD_NUMBER = ?, LAST_SUCCESSFUL_BUILD_NUMBER = ? where ID = ?")) {
+    protected void updateJenkinsJobRecord(@NonNull Connection cnn, long jenkinsJobPrimaryKey, int lastBuildNumber)
+            throws SQLException {
+        try (PreparedStatement stmt = cnn.prepareStatement(
+                "UPDATE JENKINS_JOB set LAST_BUILD_NUMBER = ?, LAST_SUCCESSFUL_BUILD_NUMBER = ? where ID = ?")) {
             stmt.setInt(1, lastBuildNumber);
             // TRICK we assume that the last build is successful
             stmt.setInt(2, lastBuildNumber);
@@ -104,7 +108,8 @@ public class MigrationStep11 implements MigrationStep {
      */
     @Nullable
     protected Integer findLastBuildNumber(@NonNull Connection cnn, long jobPrimaryKey) throws SQLException {
-        try (PreparedStatement stmt2 = cnn.prepareStatement("SELECT * FROM JENKINS_BUILD WHERE JOB_ID = ? ORDER BY JENKINS_BUILD.NUMBER DESC LIMIT 1")) {
+        try (PreparedStatement stmt2 = cnn.prepareStatement(
+                "SELECT * FROM JENKINS_BUILD WHERE JOB_ID = ? ORDER BY JENKINS_BUILD.NUMBER DESC LIMIT 1")) {
             stmt2.setLong(1, jobPrimaryKey);
             try (ResultSet rst2 = stmt2.executeQuery()) {
                 if (rst2.next()) {

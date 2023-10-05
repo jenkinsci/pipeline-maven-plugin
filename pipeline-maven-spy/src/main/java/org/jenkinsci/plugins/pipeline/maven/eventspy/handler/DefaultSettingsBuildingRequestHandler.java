@@ -48,5 +48,4 @@ public class DefaultSettingsBuildingRequestHandler extends AbstractMavenEventHan
         reporter.print(root);
         return true;
     }
-
 }

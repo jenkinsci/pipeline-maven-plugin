@@ -24,15 +24,13 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.List;
-
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.plugin.MojoExecution;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -60,7 +58,9 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
             String[] gag = supportedGoal.split(":");
             if (gag.length == 3) {
                 MojoExecution execution = executionEvent.getMojoExecution();
-                if (execution.getGroupId().equals(gag[0]) && execution.getArtifactId().equals(gag[1]) && execution.getGoal().equals(gag[2])) {
+                if (execution.getGroupId().equals(gag[0])
+                        && execution.getArtifactId().equals(gag[1])
+                        && execution.getGoal().equals(gag[2])) {
                     _handle(executionEvent);
                     return true;
                 } else {
@@ -71,7 +71,6 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
                 return false;
             }
         }
-
     }
 
     @Override
@@ -106,7 +105,8 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
             }
 
             for (String configurationParameter : configurationParameters) {
-                Xpp3Dom element = fullClone(configurationParameter, execution.getConfiguration().getChild(configurationParameter));
+                Xpp3Dom element = fullClone(
+                        configurationParameter, execution.getConfiguration().getChild(configurationParameter));
                 if (element != null) {
                     plugin.addChild(element);
                 }
@@ -115,7 +115,7 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
 
         addDetails(executionEvent, root);
 
-        if(executionEvent.getException() != null) {
+        if (executionEvent.getException() != null) {
             root.addChild(newElement("exception", executionEvent.getException()));
         }
 
@@ -124,9 +124,7 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
         return true;
     }
 
-    protected void addDetails(@NonNull ExecutionEvent executionEvent, @NonNull Xpp3Dom root) {
-
-    }
+    protected void addDetails(@NonNull ExecutionEvent executionEvent, @NonNull Xpp3Dom root) {}
 
     @NonNull
     protected abstract List<String> getConfigurationParametersToReport(ExecutionEvent executionEvent);
@@ -137,7 +135,6 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
      */
     @Nullable
     protected abstract ExecutionEvent.Type getSupportedType();
-
 
     /**
      *
@@ -156,7 +153,9 @@ public abstract class AbstractExecutionHandler extends AbstractMavenEventHandler
     @Nullable
     protected String getMojoConfigurationValue(@NonNull MojoExecution execution, @NonNull String elementName) {
         Xpp3Dom element = execution.getConfiguration().getChild(elementName);
-        return element == null ? null : element.getValue() == null ? element.getAttribute("default-value") : element.getValue();
+        return element == null
+                ? null
+                : element.getValue() == null ? element.getAttribute("default-value") : element.getValue();
     }
 
     @Nullable

@@ -26,17 +26,15 @@ package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
 import static org.jenkinsci.plugins.pipeline.maven.eventspy.JenkinsMavenEventSpy.DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.maven.execution.ExecutionEvent;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 
 /**
  * Handler to alter the
