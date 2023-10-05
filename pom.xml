@@ -250,6 +250,16 @@
           <artifactId>spotless-maven-plugin</artifactId>
           <configuration>
             <java>
+              <endWithNewline />
+              <importOrder />
+              <indent>
+                <spaces>true</spaces>
+              </indent>
+              <palantirJavaFormat>
+                <version>2.35.0</version>
+              </palantirJavaFormat>
+              <removeUnusedImports />
+              <trimTrailingWhitespace />
               <toggleOffOn>
                 <off>@formatter:off</off>
                 <on>@formatter:on</on>
@@ -257,13 +267,13 @@
             </java>
             <pom>
               <sortPom>
-                <nrOfIndentSpace>2</nrOfIndentSpace>
-                <predefinedSortOrder>recommended_2008_06</predefinedSortOrder>
+                <expandEmptyElements>false</expandEmptyElements>
+                <sortDependencies>scope,groupId,artifactId</sortDependencies>
+                <sortDependencyExclusions>groupId,artifactId</sortDependencyExclusions>
+                <spaceBeforeCloseEmptyElement>true</spaceBeforeCloseEmptyElement>
                 <sortProperties>true</sortProperties>
                 <sortModules>true</sortModules>
                 <sortExecutions>true</sortExecutions>
-                <sortDependencies>groupId,artifactId</sortDependencies>
-                <sortDependencyExclusions>groupId,artifactId</sortDependencyExclusions>
                 <sortPlugins>groupId,artifactId</sortPlugins>
               </sortPom>
               <toggleOffOn>
