@@ -24,7 +24,6 @@
 
 package org.jenkinsci.plugins.pipeline.maven;
 
-
 import org.jenkinsci.plugins.workflow.steps.AbstractStepExecutionImpl;
 import org.jenkinsci.plugins.workflow.steps.BodyExecutionCallback;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -50,8 +49,7 @@ class WithMavenStepExecution extends AbstractStepExecutionImpl {
     private class WithMavenStepExecutionCallBack extends BodyExecutionCallback.TailCall {
         private static final long serialVersionUID = 1L;
 
-        private WithMavenStepExecutionCallBack() {
-        }
+        private WithMavenStepExecutionCallBack() {}
 
         @Override
         protected void finished(StepContext context) {

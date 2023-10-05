@@ -1,11 +1,10 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import org.apache.commons.lang.builder.CompareToBuilder;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Serializable;
 import java.util.Objects;
+import org.apache.commons.lang.builder.CompareToBuilder;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -14,9 +13,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
 
     private static final long serialVersionUID = 1L;
 
-    public MavenArtifact() {
-
-    }
+    public MavenArtifact() {}
 
     /**
      * @param identifier Maven {@code $groupId:$artifactId:$version } (GAV) or {@code $groupId:$artifactId:$type:$version} (GATV)
@@ -62,11 +59,14 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      * @see org.eclipse.aether.artifact.Artifact#getBaseVersion()
      */
     private String baseVersion;
+
     private String type;
     private String classifier;
     private String extension;
+
     @Nullable
     private String file;
+
     private boolean snapshot;
     /**
      * URL on of the Maven repository on which the artifact has been deployed ("mvn deploy")
@@ -79,7 +79,9 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      */
     @NonNull
     public String getFileName() {
-        return getArtifactId() + "-" + getVersion() + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : "-" + getClassifier()) + "." + getExtension();
+        return getArtifactId() + "-" + getVersion()
+                + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : "-" + getClassifier()) + "."
+                + getExtension();
     }
 
     /**
@@ -87,7 +89,9 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      */
     @NonNull
     public String getFileNameWithBaseVersion() {
-        return getArtifactId() + "-" + getBaseVersion() + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : "-" + getClassifier()) + "." + getExtension();
+        return getArtifactId() + "-" + getBaseVersion()
+                + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : "-" + getClassifier()) + "."
+                + getExtension();
     }
 
     /**
@@ -95,7 +99,9 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      */
     @NonNull
     public String getFileNameWithVersion() {
-        return getArtifactId() + "-" + getVersion() + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : "-" + getClassifier()) + "." + getExtension();
+        return getArtifactId() + "-" + getVersion()
+                + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : "-" + getClassifier()) + "."
+                + getExtension();
     }
 
     /**
@@ -103,10 +109,9 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      */
     @NonNull
     public String getId() {
-        return getGroupId() + ":" + getArtifactId() + ":" +
-                getType() + ":" +
-                ((getClassifier() == null || getClassifier().isEmpty()) ? "" : getClassifier() + ":") +
-                (getBaseVersion() == null ? getVersion() : getBaseVersion());
+        return getGroupId() + ":" + getArtifactId() + ":" + getType()
+                + ":" + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : getClassifier() + ":")
+                + (getBaseVersion() == null ? getVersion() : getBaseVersion());
     }
 
     /**
@@ -117,13 +122,12 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
         if (getBaseVersion() == null) {
             return getId();
         } else {
-            return getGroupId() + ":" + getArtifactId() + ":" +
-                    getType() + ":" +
-                    ((getClassifier() == null || getClassifier().isEmpty()) ? "" : getClassifier() + ":") +
-                    getBaseVersion() + "(" + getVersion() + ")";
+            return getGroupId() + ":" + getArtifactId() + ":" + getType()
+                    + ":" + ((getClassifier() == null || getClassifier().isEmpty()) ? "" : getClassifier() + ":")
+                    + getBaseVersion()
+                    + "(" + getVersion() + ")";
         }
     }
-
 
     /**
      * URL of the artifact on the maven repository on which it has been deployed if it has been deployed.
@@ -132,33 +136,33 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      */
     @Nullable
     public String getUrl() {
-        if (getRepositoryUrl() == null)
-            return null;
-        return getRepositoryUrl() + "/" + getGroupId().replace('.', '/') + "/" + getArtifactId() + "/" + getBaseVersion() + "/" + getFileNameWithVersion();
+        if (getRepositoryUrl() == null) return null;
+        return getRepositoryUrl() + "/" + getGroupId().replace('.', '/') + "/" + getArtifactId() + "/"
+                + getBaseVersion() + "/" + getFileNameWithVersion();
     }
 
     @Override
     public String toString() {
-        return "MavenArtifact{" +
-                getGroupId() + ":" +
-                getArtifactId() + ":" +
-                getType() +
-                (getClassifier() == null ? "" : ":" + getClassifier()) + ":" +
-                getBaseVersion() + "(version: " + getVersion() + ", snapshot:" + isSnapshot() + ") " +
-                (getFile() == null ? "" : " " + getFile()) +
-                '}';
+        return "MavenArtifact{" + getGroupId()
+                + ":" + getArtifactId()
+                + ":" + getType()
+                + (getClassifier() == null ? "" : ":" + getClassifier())
+                + ":" + getBaseVersion()
+                + "(version: " + getVersion() + ", snapshot:" + isSnapshot() + ") "
+                + (getFile() == null ? "" : " " + getFile())
+                + '}';
     }
 
     @Override
     public int compareTo(MavenArtifact o) {
-        return new CompareToBuilder().
-                append(this.getGroupId(), o.getGroupId()).
-                append(this.getArtifactId(), o.getArtifactId()).
-                append(this.getBaseVersion(), o.getBaseVersion()).
-                append(this.getVersion(), o.getVersion()).
-                append(this.getType(), o.getType()).
-                append(this.getClassifier(), o.getClassifier()).
-                toComparison();
+        return new CompareToBuilder()
+                .append(this.getGroupId(), o.getGroupId())
+                .append(this.getArtifactId(), o.getArtifactId())
+                .append(this.getBaseVersion(), o.getBaseVersion())
+                .append(this.getVersion(), o.getVersion())
+                .append(this.getType(), o.getType())
+                .append(this.getClassifier(), o.getClassifier())
+                .toComparison();
     }
 
     /**
@@ -177,38 +181,25 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         MavenArtifact other = (MavenArtifact) obj;
         if (getGroupId() == null) {
-            if (other.getGroupId() != null)
-                return false;
-        } else if (!getGroupId().equals(other.getGroupId()))
-            return false;
+            if (other.getGroupId() != null) return false;
+        } else if (!getGroupId().equals(other.getGroupId())) return false;
         if (getArtifactId() == null) {
-            if (other.getArtifactId() != null)
-                return false;
-        } else if (!getArtifactId().equals(other.getArtifactId()))
-            return false;
+            if (other.getArtifactId() != null) return false;
+        } else if (!getArtifactId().equals(other.getArtifactId())) return false;
         if (getBaseVersion() == null) {
-            if (other.getBaseVersion() != null)
-                return false;
-        } else if (!getBaseVersion().equals(other.getBaseVersion()))
-            return false;
+            if (other.getBaseVersion() != null) return false;
+        } else if (!getBaseVersion().equals(other.getBaseVersion())) return false;
         if (getVersion() == null) {
-            if (other.getVersion() != null)
-                return false;
-        } else if (!getVersion().equals(other.getVersion()))
-            return false;
+            if (other.getVersion() != null) return false;
+        } else if (!getVersion().equals(other.getVersion())) return false;
         if (getType() == null) {
-            if (other.getType() != null)
-                return false;
-        } else if (!getType().equals(other.getType()))
-            return false;
+            if (other.getType() != null) return false;
+        } else if (!getType().equals(other.getType())) return false;
         if (getClassifier() == null) {
             return other.getClassifier() == null;
         } else return getClassifier().equals(other.getClassifier());

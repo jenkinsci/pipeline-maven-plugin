@@ -2,10 +2,16 @@ package org.jenkinsci.plugins.pipeline.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.cloudbees.plugins.credentials.CredentialsProvider;
+import com.mysql.cj.conf.RuntimeProperty;
+import com.mysql.cj.jdbc.ConnectionImpl;
+import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.pool.HikariProxyConnection;
+import hudson.ExtensionList;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
-
+import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.pipeline.maven.dao.CustomTypePipelineMavenPluginDaoDecorator;
 import org.jenkinsci.plugins.pipeline.maven.dao.MonitoringPipelineMavenPluginDaoDecorator;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
@@ -22,24 +28,18 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.mysql.cj.conf.RuntimeProperty;
-import com.mysql.cj.jdbc.ConnectionImpl;
-import com.zaxxer.hikari.HikariDataSource;
-import com.zaxxer.hikari.pool.HikariProxyConnection;
-
-import hudson.ExtensionList;
-import jenkins.model.Jenkins;
-
 @Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
 @WithJenkins
 public class GlobalPipelineMavenConfigTest {
 
     @Container
-    public static MySQLContainer<?> MYSQL_DB = new MySQLContainer<>(MySQLContainer.NAME).withUsername("aUser").withPassword("aPass");
+    public static MySQLContainer<?> MYSQL_DB =
+            new MySQLContainer<>(MySQLContainer.NAME).withUsername("aUser").withPassword("aPass");
 
     @Container
-    public static PostgreSQLContainer<?> POSTGRE_DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE).withUsername("aUser").withPassword("aPass");
+    public static PostgreSQLContainer<?> POSTGRE_DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE)
+            .withUsername("aUser")
+            .withPassword("aPass");
 
     @BeforeAll
     public static void setup(JenkinsRule r) {
@@ -65,7 +65,8 @@ public class GlobalPipelineMavenConfigTest {
     @Test
     public void shouldBuildMysqlDao() throws Exception {
         config.setDaoClass(PipelineMavenPluginMySqlDao.class.getName());
-        ExtensionList<CredentialsProvider> extensionList = Jenkins.getInstance().getExtensionList(CredentialsProvider.class);
+        ExtensionList<CredentialsProvider> extensionList =
+                Jenkins.getInstance().getExtensionList(CredentialsProvider.class);
         extensionList.add(extensionList.size(), new FakeCredentialsProvider("credsId", "aUser", "aPass", false));
         config.setJdbcUrl(MYSQL_DB.getJdbcUrl());
         config.setJdbcCredentialsId("credsId");
@@ -86,9 +87,11 @@ public class GlobalPipelineMavenConfigTest {
         assertThat(datasource.getPassword()).isEqualTo("aPass");
         assertThat(datasource.getMaxLifetime()).isEqualTo(42000L);
         assertThat(datasource.getDataSourceProperties()).containsKey("dataSource.cachePrepStmts");
-        assertThat(datasource.getDataSourceProperties().getProperty("dataSource.cachePrepStmts")).isEqualTo("true");
+        assertThat(datasource.getDataSourceProperties().getProperty("dataSource.cachePrepStmts"))
+                .isEqualTo("true");
         assertThat(datasource.getDataSourceProperties()).containsKey("dataSource.prepStmtCacheSize");
-        assertThat(datasource.getDataSourceProperties().getProperty("dataSource.prepStmtCacheSize")).isEqualTo("250");
+        assertThat(datasource.getDataSourceProperties().getProperty("dataSource.prepStmtCacheSize"))
+                .isEqualTo("250");
         Connection connection = datasource.getConnection();
         assertThat(connection).isInstanceOf(HikariProxyConnection.class);
         connection = (Connection) getField(connection, "delegate");
@@ -100,7 +103,8 @@ public class GlobalPipelineMavenConfigTest {
     @Test
     public void shouldBuildPostgresqlDao() throws Exception {
         config.setDaoClass(PipelineMavenPluginPostgreSqlDao.class.getName());
-        ExtensionList<CredentialsProvider> extensionList = Jenkins.getInstance().getExtensionList(CredentialsProvider.class);
+        ExtensionList<CredentialsProvider> extensionList =
+                Jenkins.getInstance().getExtensionList(CredentialsProvider.class);
         extensionList.add(extensionList.size(), new FakeCredentialsProvider("credsId", "aUser", "aPass", false));
         config.setJdbcUrl(POSTGRE_DB.getJdbcUrl());
         config.setJdbcCredentialsId("credsId");
@@ -142,7 +146,9 @@ public class GlobalPipelineMavenConfigTest {
     }
 
     private void makeAccessible(Field field) {
-        if ((!Modifier.isPublic(field.getModifiers()) || !Modifier.isPublic(field.getDeclaringClass().getModifiers()) || Modifier.isFinal(field.getModifiers()))
+        if ((!Modifier.isPublic(field.getModifiers())
+                        || !Modifier.isPublic(field.getDeclaringClass().getModifiers())
+                        || Modifier.isFinal(field.getModifiers()))
                 && !field.isAccessible()) {
             field.setAccessible(true);
         }

@@ -1,12 +1,10 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.DescriptorExtensionList;
 import hudson.model.Descriptor;
 import hudson.model.TaskListener;
-import jenkins.model.Jenkins;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,12 +13,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jenkins.model.Jenkins;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public enum MavenPublisherStrategy {
-
     IMPLICIT(Messages.publisher_strategy_implicit_description()) {
         /**
          * <p>Build the list of {@link MavenPublisher}s that should be invoked for the build execution of the given {@link TaskListener}
@@ -38,7 +36,8 @@ public enum MavenPublisherStrategy {
          * @param listener
          */
         @NonNull
-        public List<MavenPublisher> buildPublishersList(@NonNull List<MavenPublisher> configuredPublishers, @NonNull TaskListener listener) {
+        public List<MavenPublisher> buildPublishersList(
+                @NonNull List<MavenPublisher> configuredPublishers, @NonNull TaskListener listener) {
 
             // configuration passed as parameter of "withMaven(options=[...]){}"
             // mavenPublisher.descriptor.id -> mavenPublisher
@@ -55,23 +54,28 @@ public enum MavenPublisherStrategy {
             Map<String, MavenPublisher> globallyConfiguredPublishersById = new HashMap<>();
             GlobalPipelineMavenConfig globalPipelineMavenConfig = GlobalPipelineMavenConfig.get();
 
-            List<MavenPublisher> globallyConfiguredPublishers = globalPipelineMavenConfig == null ? Collections.emptyList() : globalPipelineMavenConfig.getPublisherOptions();
+            List<MavenPublisher> globallyConfiguredPublishers = globalPipelineMavenConfig == null
+                    ? Collections.emptyList()
+                    : globalPipelineMavenConfig.getPublisherOptions();
             if (globallyConfiguredPublishers == null) {
                 globallyConfiguredPublishers = Collections.emptyList();
             }
             for (MavenPublisher mavenPublisher : globallyConfiguredPublishers) {
-                globallyConfiguredPublishersById.put(mavenPublisher.getDescriptor().getId(), mavenPublisher);
+                globallyConfiguredPublishersById.put(
+                        mavenPublisher.getDescriptor().getId(), mavenPublisher);
             }
-
 
             // mavenPublisher.descriptor.id -> mavenPublisher
             Map<String, MavenPublisher> defaultPublishersById = new HashMap<>();
-            DescriptorExtensionList<MavenPublisher, Descriptor<MavenPublisher>> descriptorList = Jenkins.get().getDescriptorList(MavenPublisher.class);
+            DescriptorExtensionList<MavenPublisher, Descriptor<MavenPublisher>> descriptorList =
+                    Jenkins.get().getDescriptorList(MavenPublisher.class);
             for (Descriptor<MavenPublisher> descriptor : descriptorList) {
                 try {
                     defaultPublishersById.put(descriptor.getId(), descriptor.clazz.newInstance());
                 } catch (InstantiationException | IllegalAccessException e) {
-                    PrintWriter error = listener.error("[withMaven] Exception instantiation default config for Maven Publisher '" + descriptor.getDisplayName() + "' / " + descriptor.getId() + ": " + e);
+                    PrintWriter error =
+                            listener.error("[withMaven] Exception instantiation default config for Maven Publisher '"
+                                    + descriptor.getDisplayName() + "' / " + descriptor.getId() + ": " + e);
                     e.printStackTrace(error);
                     error.close();
                     LOGGER.log(Level.WARNING, "Exception instantiating " + descriptor.clazz + ": " + e, e);
@@ -79,11 +83,16 @@ public enum MavenPublisherStrategy {
                 }
             }
 
-
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println("[withMaven] Maven Publishers with configuration provided by the pipeline: " + configuredPublishersById.values());
-                listener.getLogger().println("[withMaven] Maven Publishers with configuration defined globally: " + globallyConfiguredPublishersById.values());
-                listener.getLogger().println("[withMaven] Maven Publishers with default configuration: " + defaultPublishersById.values());
+                listener.getLogger()
+                        .println("[withMaven] Maven Publishers with configuration provided by the pipeline: "
+                                + configuredPublishersById.values());
+                listener.getLogger()
+                        .println("[withMaven] Maven Publishers with configuration defined globally: "
+                                + globallyConfiguredPublishersById.values());
+                listener.getLogger()
+                        .println("[withMaven] Maven Publishers with default configuration: "
+                                + defaultPublishersById.values());
             }
 
             // TODO FILTER
@@ -105,12 +114,12 @@ public enum MavenPublisherStrategy {
     EXPLICIT(Messages.publisher_strategy_explicit_description()) {
         @NonNull
         @Override
-        public List<MavenPublisher> buildPublishersList
-                (@NonNull List<MavenPublisher> configuredPublishers, @NonNull TaskListener listener) {
+        public List<MavenPublisher> buildPublishersList(
+                @NonNull List<MavenPublisher> configuredPublishers, @NonNull TaskListener listener) {
 
             // filter null entries caused by missing plugins
             List<MavenPublisher> result = new ArrayList<>();
-            for(MavenPublisher publisher: configuredPublishers) {
+            for (MavenPublisher publisher : configuredPublishers) {
                 if (publisher != null) {
                     result.add(publisher);
                 }
@@ -128,7 +137,11 @@ public enum MavenPublisherStrategy {
         this.description = description;
     }
 
-    public MavenPublisher buildConfiguredMavenPublisher(@Nullable MavenPublisher pipelinePublisher, @Nullable MavenPublisher globallyConfiguredPublisher, @NonNull MavenPublisher defaultPublisher, @NonNull TaskListener listener) {
+    public MavenPublisher buildConfiguredMavenPublisher(
+            @Nullable MavenPublisher pipelinePublisher,
+            @Nullable MavenPublisher globallyConfiguredPublisher,
+            @NonNull MavenPublisher defaultPublisher,
+            @NonNull TaskListener listener) {
 
         MavenPublisher result;
         String logMessage;
@@ -142,32 +155,37 @@ public enum MavenPublisherStrategy {
         } else if (pipelinePublisher != null && globallyConfiguredPublisher == null) {
             result = pipelinePublisher;
             logMessage = "pipeline";
-        } else if (pipelinePublisher != null && globallyConfiguredPublisher != null)  {
+        } else if (pipelinePublisher != null && globallyConfiguredPublisher != null) {
             // workaround FindBugs "Bug kind and pattern: NP - NP_NULL_ON_SOME_PATH"
             // check pipelinePublisher and globallyConfiguredPublisher are non null even if it is useless
 
             result = pipelinePublisher;
             logMessage = "pipeline";
-            listener.getLogger().println("[withMaven] WARNING merging publisher configuration defined in the 'Global Tool Configuration' and at the pipeline level is not yet supported." +
-                    " Use pipeline level configuration for '" + result.getDescriptor().getDisplayName() + "'");
-//
-//            PropertyDescriptor[] propertyDescriptors = PropertyUtils.getPropertyDescriptors(defaultPublisher);
-//            for(PropertyDescriptor propertyDescriptor: propertyDescriptors) {
-//                Method readMethod = propertyDescriptor.getReadMethod();
-//                Method writeMethod = propertyDescriptor.getWriteMethod();
-//
-//                Object defaultValue = readMethod.invoke(defaultPublisher);
-//                Object globallyDefinedValue = readMethod.invoke(globallyConfiguredPublisher);
-//                Object pipelineValue = readMethod.invoke(pipelinePublisher);
-//            }
+            listener.getLogger()
+                    .println(
+                            "[withMaven] WARNING merging publisher configuration defined in the 'Global Tool Configuration' and at the pipeline level is not yet supported."
+                                    + " Use pipeline level configuration for '"
+                                    + result.getDescriptor().getDisplayName() + "'");
+            //
+            //            PropertyDescriptor[] propertyDescriptors =
+            // PropertyUtils.getPropertyDescriptors(defaultPublisher);
+            //            for(PropertyDescriptor propertyDescriptor: propertyDescriptors) {
+            //                Method readMethod = propertyDescriptor.getReadMethod();
+            //                Method writeMethod = propertyDescriptor.getWriteMethod();
+            //
+            //                Object defaultValue = readMethod.invoke(defaultPublisher);
+            //                Object globallyDefinedValue = readMethod.invoke(globallyConfiguredPublisher);
+            //                Object pipelineValue = readMethod.invoke(pipelinePublisher);
+            //            }
         } else {
             throw new IllegalStateException("Should not happen, workaround for Findbugs NP_NULL_ON_SOME_PATH above");
         }
 
         if (LOGGER.isLoggable(Level.FINE))
-            listener.getLogger().println("[withMaven] Use " + logMessage + " defined publisher for '" + result.getDescriptor().getDisplayName() + "'");
+            listener.getLogger()
+                    .println("[withMaven] Use " + logMessage + " defined publisher for '"
+                            + result.getDescriptor().getDisplayName() + "'");
         return result;
-
     }
 
     public String getDescription() {
@@ -190,7 +208,8 @@ public enum MavenPublisherStrategy {
      * @param listener
      */
     @NonNull
-    public abstract List<MavenPublisher> buildPublishersList(@NonNull List<MavenPublisher> configuredPublishers, @NonNull TaskListener listener);
+    public abstract List<MavenPublisher> buildPublishersList(
+            @NonNull List<MavenPublisher> configuredPublishers, @NonNull TaskListener listener);
 
-    private final static Logger LOGGER = Logger.getLogger(MavenPublisherStrategy.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MavenPublisherStrategy.class.getName());
 }

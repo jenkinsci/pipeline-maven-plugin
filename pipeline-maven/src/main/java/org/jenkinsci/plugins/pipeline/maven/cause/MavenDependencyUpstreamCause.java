@@ -1,13 +1,11 @@
 package org.jenkinsci.plugins.pipeline.maven.cause;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.console.ModelHyperlinkNote;
 import hudson.model.Cause;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -15,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
 public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements MavenDependencyCause {
     private List<MavenArtifact> mavenArtifacts;
@@ -26,15 +25,20 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
         this.mavenArtifacts = Arrays.asList(mavenArtifact);
     }
 
-    public MavenDependencyUpstreamCause(Run<?, ?> up, @Nullable Collection<MavenArtifact> mavenArtifacts, @Nullable Collection<String> omittedPipelineFullNames) {
+    public MavenDependencyUpstreamCause(
+            Run<?, ?> up,
+            @Nullable Collection<MavenArtifact> mavenArtifacts,
+            @Nullable Collection<String> omittedPipelineFullNames) {
         super(up);
         this.mavenArtifacts = mavenArtifacts == null ? Collections.emptyList() : new ArrayList<>(mavenArtifacts);
-        this.omittedPipelineFullNames = omittedPipelineFullNames == null ? Collections.emptyList() : new ArrayList<>(omittedPipelineFullNames);
+        this.omittedPipelineFullNames =
+                omittedPipelineFullNames == null ? Collections.emptyList() : new ArrayList<>(omittedPipelineFullNames);
     }
 
     @Override
     public String getShortDescription() {
-        return "Started by upstream build \"" + getUpstreamProject() + "\" #" + getUpstreamBuild() + " generating Maven artifacts: " + getMavenArtifactsDescription();
+        return "Started by upstream build \"" + getUpstreamProject() + "\" #" + getUpstreamBuild()
+                + " generating Maven artifacts: " + getMavenArtifactsDescription();
     }
 
     /**
@@ -72,12 +76,18 @@ public class MavenDependencyUpstreamCause extends Cause.UpstreamCause implements
         Run<?, ?> upstreamRun = getUpstreamRun();
 
         if (upstreamRun == null) {
-            listener.getLogger().println("Started by upstream build " + ModelHyperlinkNote.encodeTo('/' + getUpstreamUrl(), getUpstreamProject()) +
-                    "\" #" + ModelHyperlinkNote.encodeTo('/' + getUpstreamUrl() + getUpstreamBuild(), Integer.toString(getUpstreamBuild())) +
-                    " generating Maven artifact: " + getMavenArtifactsDescription());
+            listener.getLogger()
+                    .println("Started by upstream build "
+                            + ModelHyperlinkNote.encodeTo('/' + getUpstreamUrl(), getUpstreamProject()) + "\" #"
+                            + ModelHyperlinkNote.encodeTo(
+                                    '/' + getUpstreamUrl() + getUpstreamBuild(), Integer.toString(getUpstreamBuild()))
+                            + " generating Maven artifact: "
+                            + getMavenArtifactsDescription());
         } else {
-            listener.getLogger().println("Started by upstream build " +
-                    ModelHyperlinkNote.encodeTo('/' + upstreamRun.getUrl(), upstreamRun.getFullDisplayName()) + " generating Maven artifacts: " + getMavenArtifactsDescription());
+            listener.getLogger()
+                    .println("Started by upstream build "
+                            + ModelHyperlinkNote.encodeTo('/' + upstreamRun.getUrl(), upstreamRun.getFullDisplayName())
+                            + " generating Maven artifacts: " + getMavenArtifactsDescription());
         }
 
         if (getUpstreamCauses() != null && !getUpstreamCauses().isEmpty()) {

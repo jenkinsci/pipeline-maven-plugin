@@ -32,7 +32,6 @@ import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter;
 import org.codehaus.plexus.util.xml.XMLWriter;
 import org.codehaus.plexus.util.xml.XmlWriterUtil;
@@ -54,6 +53,7 @@ public class FileMavenEventReporter implements MavenEventReporter {
      * extension and gets renamed "maven-spy-*.log" at the end of the execution
      */
     File outFile;
+
     PrintWriter out;
     XMLWriter xmlWriter;
     /**

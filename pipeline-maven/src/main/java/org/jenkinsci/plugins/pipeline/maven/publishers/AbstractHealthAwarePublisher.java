@@ -35,7 +35,6 @@ public abstract class AbstractHealthAwarePublisher extends MavenPublisher {
      */
     private String thresholdLimit = DEFAULT_PRIORITY_THRESHOLD_LIMIT;
 
-
     public String getHealthy() {
         return healthy;
     }
@@ -76,27 +75,24 @@ public abstract class AbstractHealthAwarePublisher extends MavenPublisher {
 
     @Override
     public String toString() {
-        return  getClass().getName() + "[" +
-                "disabled='" + isDisabled() + '\'' +
-                ", healthy='" + healthy + '\'' +
-                ", unHealthy='" + unHealthy + '\'' +
-                ", thresholdLimit='" + thresholdLimit + '\'' +
-                ']';
+        return getClass().getName() + "[" + "disabled='"
+                + isDisabled() + '\'' + ", healthy='"
+                + healthy + '\'' + ", unHealthy='"
+                + unHealthy + '\'' + ", thresholdLimit='"
+                + thresholdLimit + '\'' + ']';
     }
 
     /**
      * Required by org/jenkinsci/plugins/pipeline/maven/publishers/AbstractHealthAwarePublisher/health.jelly
      */
-    public static abstract class DescriptorImpl extends MavenPublisher.DescriptorImpl  {
-
-    }
-
+    public abstract static class DescriptorImpl extends MavenPublisher.DescriptorImpl {}
 
     /**
      * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
      */
     static class Helper {
-        protected static void setHealthAwarePublisherAttributes(Object healthAwarePublisherAsObject, AbstractHealthAwarePublisher abstractHealthAwarePublisher) {
+        protected static void setHealthAwarePublisherAttributes(
+                Object healthAwarePublisherAsObject, AbstractHealthAwarePublisher abstractHealthAwarePublisher) {
             if (healthAwarePublisherAsObject instanceof HealthAwarePublisher) {
                 HealthAwarePublisher healthAwarePublisher = (HealthAwarePublisher) healthAwarePublisherAsObject;
                 healthAwarePublisher.setHealthy(abstractHealthAwarePublisher.getHealthy());

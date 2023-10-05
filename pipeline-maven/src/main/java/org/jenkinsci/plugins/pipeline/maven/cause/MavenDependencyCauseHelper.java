@@ -1,14 +1,13 @@
 package org.jenkinsci.plugins.pipeline.maven.cause;
 
 import com.google.common.base.Preconditions;
-import hudson.model.Cause;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.model.Cause;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -24,8 +23,11 @@ public class MavenDependencyCauseHelper {
             return Collections.emptyList();
         }
 
-        List<MavenArtifact> newCauseArtifacts = Preconditions.checkNotNull(newMavenCause.getMavenArtifacts(), "newMavenCause.mavenArtifacts should not be null");
-        List<MavenArtifact> oldCauseArtifacts =  Preconditions.checkNotNull(((MavenDependencyCause) oldMavenCause).getMavenArtifacts(), "oldMavenCause.mavenArtifacts should not be null");
+        List<MavenArtifact> newCauseArtifacts = Preconditions.checkNotNull(
+                newMavenCause.getMavenArtifacts(), "newMavenCause.mavenArtifacts should not be null");
+        List<MavenArtifact> oldCauseArtifacts = Preconditions.checkNotNull(
+                ((MavenDependencyCause) oldMavenCause).getMavenArtifacts(),
+                "oldMavenCause.mavenArtifacts should not be null");
 
         List<MavenArtifact> matchingArtifacts = new ArrayList<>();
         for (MavenArtifact newCauseArtifact : newCauseArtifacts) {
@@ -33,12 +35,12 @@ public class MavenDependencyCauseHelper {
                 // snapshot without exact version (aka base version), cannot search for same cause
             } else {
                 for (MavenArtifact oldCauseArtifact : oldCauseArtifacts) {
-                    if (Objects.equals(newCauseArtifact.getGroupId(), oldCauseArtifact.getGroupId()) &&
-                            Objects.equals(newCauseArtifact.getArtifactId(), oldCauseArtifact.getArtifactId()) &&
-                            Objects.equals(newCauseArtifact.getVersion(), oldCauseArtifact.getVersion()) &&
-                            Objects.equals(newCauseArtifact.getBaseVersion(), oldCauseArtifact.getBaseVersion()) &&
-                            Objects.equals(newCauseArtifact.getClassifier(), oldCauseArtifact.getClassifier()) &&
-                            Objects.equals(newCauseArtifact.getType(), oldCauseArtifact.getType())) {
+                    if (Objects.equals(newCauseArtifact.getGroupId(), oldCauseArtifact.getGroupId())
+                            && Objects.equals(newCauseArtifact.getArtifactId(), oldCauseArtifact.getArtifactId())
+                            && Objects.equals(newCauseArtifact.getVersion(), oldCauseArtifact.getVersion())
+                            && Objects.equals(newCauseArtifact.getBaseVersion(), oldCauseArtifact.getBaseVersion())
+                            && Objects.equals(newCauseArtifact.getClassifier(), oldCauseArtifact.getClassifier())
+                            && Objects.equals(newCauseArtifact.getType(), oldCauseArtifact.getType())) {
                         matchingArtifacts.add(newCauseArtifact);
                     }
                 }
@@ -51,7 +53,7 @@ public class MavenDependencyCauseHelper {
     public static List<MavenArtifact> isSameCause(MavenDependencyCause newMavenCause, List<Cause> oldMavenCauses) {
         List<MavenArtifact> matchingArtifacts = new ArrayList<>();
 
-        for (Cause oldMavenCause:oldMavenCauses) {
+        for (Cause oldMavenCause : oldMavenCauses) {
             matchingArtifacts.addAll(isSameCause(newMavenCause, oldMavenCause));
         }
         return matchingArtifacts;

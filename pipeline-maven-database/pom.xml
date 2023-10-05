@@ -7,18 +7,10 @@
     <version>${changelist}</version>
   </parent>
   <artifactId>pipeline-maven-database</artifactId>
-  <name>Pipeline Maven Plugin Database</name>
   <packaging>hpi</packaging>
+  <name>Pipeline Maven Plugin Database</name>
 
   <dependencies>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>pipeline-maven-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jenkins-ci.plugins</groupId>
-      <artifactId>credentials</artifactId>
-    </dependency>
     <dependency>
       <groupId>com.zaxxer</groupId>
       <artifactId>HikariCP</artifactId>
@@ -53,6 +45,14 @@
       <artifactId>postgresql-api</artifactId>
       <version>${jenkins-plugin-postgresql.version}</version>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>credentials</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>pipeline-maven-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>

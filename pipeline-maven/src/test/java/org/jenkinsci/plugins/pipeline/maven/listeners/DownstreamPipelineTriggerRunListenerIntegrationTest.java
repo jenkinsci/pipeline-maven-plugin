@@ -3,10 +3,11 @@ package org.jenkinsci.plugins.pipeline.maven.listeners;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import hudson.ExtensionList;
+import hudson.model.Result;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
@@ -21,9 +22,6 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import hudson.ExtensionList;
-import hudson.model.Result;
-
 /**
  * We need some tests. Unfortunately, it is very hard to do unit tests because
  * Jenkins APIs are almost impossible to mock.
@@ -37,7 +35,8 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
 
     @BeforeEach
     public void setup() throws Exception {
-        ExtensionList.lookupSingleton(GlobalPipelineMavenConfig.class).setDaoClass(PipelineMavenPluginH2Dao.class.getName());
+        ExtensionList.lookupSingleton(GlobalPipelineMavenConfig.class)
+                .setDaoClass(PipelineMavenPluginH2Dao.class.getName());
         String jdbcUrl = "jdbc:h2:file:" + new File("target", getClass().getName() + "-h2").getAbsolutePath() + ";"
                 + "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
         ExtensionList.lookupSingleton(GlobalPipelineMavenConfig.class).setJdbcUrl(jdbcUrl);
@@ -62,8 +61,10 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
 
     @Test
     public void test_infinite_loop() throws Exception {
-        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/multi_module_maven_project/");
-        //@formatter:off
+        loadSourceCodeInGitRepository(
+                this.gitRepoRule,
+                "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/multi_module_maven_project/");
+        // @formatter:off
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
@@ -74,7 +75,7 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
             "        }\n" +
             "    }\n" +
             "}";
-        //@formatter:on
+        // @formatter:on
 
         WorkflowJob pipeline1 = jenkinsRule.createProject(WorkflowJob.class, "pipeline-1");
         pipeline1.setDefinition(new CpsFlowDefinition(pipelineScript, true));
@@ -85,19 +86,28 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
         WorkflowRun pipeline2Build1 = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline2.scheduleBuild2(0));
 
         for (WorkflowRun run : asList(pipeline1Build1, pipeline2Build1)) {
-            List<MavenDependency> dependencies = GlobalPipelineMavenConfig.get().getDao().listDependencies(run.getParent().getFullName(), run.number);
-            assertThat(dependencies).contains(dep("jenkins.mvn.test.multimodule", "shared-core", "jar", "0.0.1-SNAPSHOT", "compile"),
-                    dep("junit", "junit", "jar", "4.13.1", "test"), dep("org.hamcrest", "hamcrest-core", "jar", "1.3", "test"));
+            List<MavenDependency> dependencies = GlobalPipelineMavenConfig.get()
+                    .getDao()
+                    .listDependencies(run.getParent().getFullName(), run.number);
+            assertThat(dependencies)
+                    .contains(
+                            dep("jenkins.mvn.test.multimodule", "shared-core", "jar", "0.0.1-SNAPSHOT", "compile"),
+                            dep("junit", "junit", "jar", "4.13.1", "test"),
+                            dep("org.hamcrest", "hamcrest-core", "jar", "1.3", "test"));
 
-            List<MavenArtifact> generatedArtifacts = GlobalPipelineMavenConfig.get().getDao().getGeneratedArtifacts(run.getParent().getFullName(), run.number);
-            assertThat(generatedArtifacts).contains(artifact("jenkins.mvn.test.multimodule:demo-1:jar:0.0.1-SNAPSHOT"),
-                    artifact("jenkins.mvn.test.multimodule:demo-1:pom:0.0.1-SNAPSHOT"), artifact("jenkins.mvn.test.multimodule:demo-2:jar:0.0.1-SNAPSHOT"),
-                    artifact("jenkins.mvn.test.multimodule:demo-2:pom:0.0.1-SNAPSHOT"),
-                    artifact("jenkins.mvn.test.multimodule:multimodule-parent:pom:0.0.1-SNAPSHOT"),
-                    artifact("jenkins.mvn.test.multimodule:shared-core:jar:0.0.1-SNAPSHOT"),
-                    artifact("jenkins.mvn.test.multimodule:shared-core:pom:0.0.1-SNAPSHOT"));
+            List<MavenArtifact> generatedArtifacts = GlobalPipelineMavenConfig.get()
+                    .getDao()
+                    .getGeneratedArtifacts(run.getParent().getFullName(), run.number);
+            assertThat(generatedArtifacts)
+                    .contains(
+                            artifact("jenkins.mvn.test.multimodule:demo-1:jar:0.0.1-SNAPSHOT"),
+                            artifact("jenkins.mvn.test.multimodule:demo-1:pom:0.0.1-SNAPSHOT"),
+                            artifact("jenkins.mvn.test.multimodule:demo-2:jar:0.0.1-SNAPSHOT"),
+                            artifact("jenkins.mvn.test.multimodule:demo-2:pom:0.0.1-SNAPSHOT"),
+                            artifact("jenkins.mvn.test.multimodule:multimodule-parent:pom:0.0.1-SNAPSHOT"),
+                            artifact("jenkins.mvn.test.multimodule:shared-core:jar:0.0.1-SNAPSHOT"),
+                            artifact("jenkins.mvn.test.multimodule:shared-core:pom:0.0.1-SNAPSHOT"));
         }
-
     }
 
     private MavenDependency dep(String groupId, String artifactId, String type, String version, String scope) {
@@ -115,5 +125,4 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
         result.setBaseVersion(result.getVersion());
         return result;
     }
-
 }

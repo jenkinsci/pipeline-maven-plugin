@@ -20,7 +20,8 @@ public class UpstreamMemory {
     private static final AtomicInteger MISSES = new AtomicInteger();
 
     static {
-        MonitoringPipelineMavenPluginDaoDecorator.registerCacheStatsSupplier(() -> new CacheStats("listUpstreamJobs", HITS.get(), MISSES.get()));
+        MonitoringPipelineMavenPluginDaoDecorator.registerCacheStatsSupplier(
+                () -> new CacheStats("listUpstreamJobs", HITS.get(), MISSES.get()));
     }
 
     // remember the already known upstreams
@@ -35,5 +36,4 @@ public class UpstreamMemory {
         }
         return upstreams.computeIfAbsent(key, k -> dao.listUpstreamJobs(jobFullName, buildNumber));
     }
-
 }

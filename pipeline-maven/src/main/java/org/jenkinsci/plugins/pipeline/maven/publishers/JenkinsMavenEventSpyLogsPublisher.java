@@ -1,19 +1,18 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import jenkins.model.ArtifactManager;
-import jenkins.util.BuildListenerAdapter;
-import org.jenkinsci.plugins.workflow.steps.StepContext;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
+import jenkins.model.ArtifactManager;
+import jenkins.util.BuildListenerAdapter;
+import org.jenkinsci.plugins.workflow.steps.StepContext;
 
 /**
  * Primarily for debugging purpose, archive the Maven build logs
@@ -24,7 +23,8 @@ public class JenkinsMavenEventSpyLogsPublisher implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public void process(@NonNull StepContext context, @NonNull FilePath mavenSpyLogs) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull FilePath mavenSpyLogs)
+            throws IOException, InterruptedException {
 
         Run run = context.get(Run.class);
         ArtifactManager artifactManager = run.pickArtifactManager();
@@ -36,12 +36,14 @@ public class JenkinsMavenEventSpyLogsPublisher implements Serializable {
         FilePath tmpFile = new FilePath(workspace, "." + mavenSpyLogs.getName());
         try {
             mavenSpyLogs.copyTo(tmpFile);
-            listener.getLogger().println("[withMaven] Archive " + mavenSpyLogs.getRemote() + " as " + mavenSpyLogs.getName());
+            listener.getLogger()
+                    .println("[withMaven] Archive " + mavenSpyLogs.getRemote() + " as " + mavenSpyLogs.getName());
             // filePathInArchiveZone -> filePathInWorkspace
             Map<String, String> mavenBuildLogs = Collections.singletonMap(mavenSpyLogs.getName(), tmpFile.getName());
             artifactManager.archive(workspace, launcher, new BuildListenerAdapter(listener), mavenBuildLogs);
         } catch (Exception e) {
-            PrintWriter errorWriter = listener.error("[withMaven] WARNING Exception archiving Maven build logs " + mavenSpyLogs + ", skip file. ");
+            PrintWriter errorWriter = listener.error(
+                    "[withMaven] WARNING Exception archiving Maven build logs " + mavenSpyLogs + ", skip file. ");
             e.printStackTrace(errorWriter);
         } finally {
             boolean deleted = tmpFile.delete();

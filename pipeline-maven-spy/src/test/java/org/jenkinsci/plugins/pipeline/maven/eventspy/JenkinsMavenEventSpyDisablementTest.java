@@ -30,7 +30,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -104,5 +103,4 @@ public class JenkinsMavenEventSpyDisablementTest {
         spy.onEvent(request);
         spy.close();
     }
-
 }

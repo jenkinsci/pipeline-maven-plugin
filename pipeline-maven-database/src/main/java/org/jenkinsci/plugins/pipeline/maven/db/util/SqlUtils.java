@@ -10,9 +10,8 @@ import java.sql.SQLException;
  */
 public class SqlUtils {
 
-    private SqlUtils() {
+    private SqlUtils() {}
 
-    }
     public static void dumpResultsetMetadata(ResultSet rst, PrintStream out) {
         try {
             ResultSetMetaData metaData = rst.getMetaData();

@@ -24,6 +24,8 @@
 
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
@@ -31,7 +33,12 @@ import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
 import hudson.tasks.junit.JUnitResultArchiver;
-
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.maveninvoker.MavenInvokerRecorder;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
@@ -45,15 +52,6 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 public class InvokerRunsPublisher extends MavenPublisher {
     private static final Logger LOGGER = Logger.getLogger(InvokerRunsPublisher.class.getName());
     protected static final String GROUP_ID = "org.apache.maven.plugins";
@@ -64,24 +62,23 @@ public class InvokerRunsPublisher extends MavenPublisher {
     private static final long serialVersionUID = 1L;
 
     @DataBoundConstructor
-    public InvokerRunsPublisher() {
-
-    }
+    public InvokerRunsPublisher() {}
 
     /*
-<ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-06-25 20:47:25.741">
-    <project baseDir="/home/jenkins/workspace/aProject" file="/home/jenkins/workspace/aProject/pom.xml" groupId="org.myorg" name="My Project" artifactId="my-maven-plugin" version="1.0.0-SNAPSHOT">
-      <build sourceDirectory="/home/jenkins/workspace/aProject/src/main/java" directory="/home/jenkins/workspace/aProject/target"/>
-    </project>
-    <plugin executionId="integration-test" goal="run" groupId="org.apache.maven.plugins" artifactId="maven-invoker-plugin" version="2.0.0">
-      <projectsDirectory>${invoker.projectsDirectory}</projectsDirectory>
-      <cloneProjectsTo>/var/lib/jenkins/workspace/ncjira-maven-plugin-pipeline/target/it</cloneProjectsTo>
-      <reportsDirectory>${invoker.reportsDirectory}</reportsDirectory>
-    </plugin>
-  </ExecutionEvent>
-     */
+    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-06-25 20:47:25.741">
+        <project baseDir="/home/jenkins/workspace/aProject" file="/home/jenkins/workspace/aProject/pom.xml" groupId="org.myorg" name="My Project" artifactId="my-maven-plugin" version="1.0.0-SNAPSHOT">
+          <build sourceDirectory="/home/jenkins/workspace/aProject/src/main/java" directory="/home/jenkins/workspace/aProject/target"/>
+        </project>
+        <plugin executionId="integration-test" goal="run" groupId="org.apache.maven.plugins" artifactId="maven-invoker-plugin" version="2.0.0">
+          <projectsDirectory>${invoker.projectsDirectory}</projectsDirectory>
+          <cloneProjectsTo>/var/lib/jenkins/workspace/ncjira-maven-plugin-pipeline/target/it</cloneProjectsTo>
+          <reportsDirectory>${invoker.reportsDirectory}</reportsDirectory>
+        </plugin>
+      </ExecutionEvent>
+         */
     @Override
-    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt)
+            throws IOException, InterruptedException {
 
         TaskListener listener = context.get(TaskListener.class);
         if (listener == null) {
@@ -90,14 +87,17 @@ public class InvokerRunsPublisher extends MavenPublisher {
         }
 
         List<Element> events = new ArrayList<>();
-        events.addAll(XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, RUN_GOAL, "MojoSucceeded", "MojoFailed"));
-        events.addAll(XmlUtils.getExecutionEventsByPlugin(mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, INTEGRATION_TEST_GOAL, "MojoSucceeded", "MojoFailed"));
+        events.addAll(XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, RUN_GOAL, "MojoSucceeded", "MojoFailed"));
+        events.addAll(XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt, GROUP_ID, ARTIFACT_ID, INTEGRATION_TEST_GOAL, "MojoSucceeded", "MojoFailed"));
 
         if (events.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
-                listener.getLogger().println("[withMaven] invokerPublisher - " +
-                        "No " + GROUP_ID + ":" + ARTIFACT_ID + ":" + RUN_GOAL +
-                        " or " + GROUP_ID + ":" + ARTIFACT_ID + ":" + INTEGRATION_TEST_GOAL + " execution found");
+                listener.getLogger()
+                        .println("[withMaven] invokerPublisher - " + "No "
+                                + GROUP_ID + ":" + ARTIFACT_ID + ":" + RUN_GOAL + " or "
+                                + GROUP_ID + ":" + ARTIFACT_ID + ":" + INTEGRATION_TEST_GOAL + " execution found");
             }
             return;
         }
@@ -107,7 +107,11 @@ public class InvokerRunsPublisher extends MavenPublisher {
         events.forEach(e -> {
             Element pluginElt = XmlUtils.getUniqueChildElement(e, "plugin");
             Element writeJunitReportElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "writeJunitReport");
-            if (writeJunitReportElt != null && writeJunitReportElt.getTextContent() != null && "true".equalsIgnoreCase(writeJunitReportElt.getTextContent().trim())) {
+            if (writeJunitReportElt != null
+                    && writeJunitReportElt.getTextContent() != null
+                    && "true"
+                            .equalsIgnoreCase(
+                                    writeJunitReportElt.getTextContent().trim())) {
                 junitLikeEvents.add(e);
             } else {
                 oldEvents.add(e);
@@ -118,7 +122,8 @@ public class InvokerRunsPublisher extends MavenPublisher {
         manageOldEvents(context, listener, oldEvents);
     }
 
-    private void manageEvents(StepContext context, TaskListener listener, List<Element> testEvents) throws IOException, InterruptedException {
+    private void manageEvents(StepContext context, TaskListener listener, List<Element> testEvents)
+            throws IOException, InterruptedException {
         if (testEvents.isEmpty()) {
             return;
         }
@@ -128,8 +133,10 @@ public class InvokerRunsPublisher extends MavenPublisher {
         } catch (ClassNotFoundException e) {
             listener.getLogger().print("[withMaven] Jenkins ");
             listener.hyperlink("http://wiki.jenkins-ci.org/display/JENKINS/JUnit+Plugin", "JUnit Plugin");
-            listener.getLogger().print(" not found, don't display " + GROUP_ID + ":" + ARTIFACT_ID + ":" + INTEGRATION_TEST_GOAL);
-            listener.getLogger().println(" nor " + GROUP_ID + ":" + ARTIFACT_ID + ":" + RUN_GOAL + " results in pipeline screen.");
+            listener.getLogger()
+                    .print(" not found, don't display " + GROUP_ID + ":" + ARTIFACT_ID + ":" + INTEGRATION_TEST_GOAL);
+            listener.getLogger()
+                    .println(" nor " + GROUP_ID + ":" + ARTIFACT_ID + ":" + RUN_GOAL + " results in pipeline screen.");
             return;
         }
 
@@ -145,17 +152,22 @@ public class InvokerRunsPublisher extends MavenPublisher {
             MavenSpyLogProcessor.PluginInvocation pluginInvocation = XmlUtils.newPluginInvocation(pluginElt);
 
             if (reportsDirectoryElt == null) {
-                listener.getLogger().println("[withMaven] invokerPublisher - No <reportsDirectory> element found for <plugin> in " + XmlUtils.toString(testEvent));
+                listener.getLogger()
+                        .println("[withMaven] invokerPublisher - No <reportsDirectory> element found for <plugin> in "
+                                + XmlUtils.toString(testEvent));
                 continue;
             }
-            String reportsDirectory = expandAndRelativize(reportsDirectoryElt, "reportsDirectory", testEvent, projectElt, workspace, listener);
+            String reportsDirectory = expandAndRelativize(
+                    reportsDirectoryElt, "reportsDirectory", testEvent, projectElt, workspace, listener);
 
             String testResults = reportsDirectory + fileSeparatorOnAgent + "TEST-*.xml";
-            listener.getLogger().println("[withMaven] invokerPublisher - Archive test results for Maven artifact " + mavenArtifact.getId() + " generated by " +
-                    pluginInvocation.getId() + ": " + testResults);
+            listener.getLogger()
+                    .println("[withMaven] invokerPublisher - Archive test results for Maven artifact "
+                            + mavenArtifact.getId() + " generated by " + pluginInvocation.getId() + ": " + testResults);
             if (testResultsList.contains(testResults)) {
                 if (LOGGER.isLoggable(Level.FINER)) {
-                    listener.getLogger().println("[withMaven] invokerPublisher - Ignore already added testResults " + testResults);
+                    listener.getLogger()
+                            .println("[withMaven] invokerPublisher - Ignore already added testResults " + testResults);
                 }
             } else {
                 testResultsList.add(testResults);
@@ -167,13 +179,16 @@ public class InvokerRunsPublisher extends MavenPublisher {
         JUnitUtils.archiveResults(context, archiver, testResults, "invokerPublisher");
     }
 
-    private void manageOldEvents(StepContext context, TaskListener listener, List<Element> testEvents) throws IOException, InterruptedException {
+    private void manageOldEvents(StepContext context, TaskListener listener, List<Element> testEvents)
+            throws IOException, InterruptedException {
         if (testEvents.isEmpty()) {
             return;
         }
 
         listener.getLogger().print("[withMaven] invokerPublisher - Found invoker tests without the ");
-        listener.hyperlink("https://maven.apache.org/plugins/maven-invoker-plugin/run-mojo.html#writeJunitReport", "writeJunitReport parameter");
+        listener.hyperlink(
+                "https://maven.apache.org/plugins/maven-invoker-plugin/run-mojo.html#writeJunitReport",
+                "writeJunitReport parameter");
         listener.getLogger().print(" set. According to the ");
         listener.hyperlink("https://github.com/jenkinsci/maven-invoker-plugin", "Maven Invoker Plugin");
         listener.getLogger().println(" plugin, this is now the way to go.");
@@ -183,14 +198,17 @@ public class InvokerRunsPublisher extends MavenPublisher {
         } catch (ClassNotFoundException e) {
             listener.getLogger().print("[withMaven] invokerPublisher - Jenkins ");
             listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/Maven+Invoker+Plugin", "Maven Invoker Plugin");
-            listener.getLogger().println(" not found, don't display " + GROUP_ID + ":" + ARTIFACT_ID + ":" + RUN_GOAL + " results in pipeline screen.");
+            listener.getLogger()
+                    .println(" not found, don't display " + GROUP_ID + ":" + ARTIFACT_ID + ":" + RUN_GOAL
+                            + " results in pipeline screen.");
             return;
         }
 
         executeReporterForOldEvents(context, listener, testEvents);
     }
 
-    private void executeReporterForOldEvents(StepContext context, TaskListener listener, List<Element> testEvents) throws IOException, InterruptedException {
+    private void executeReporterForOldEvents(StepContext context, TaskListener listener, List<Element> testEvents)
+            throws IOException, InterruptedException {
         FilePath workspace = context.get(FilePath.class);
         final String fileSeparatorOnAgent = XmlUtils.getFileSeparatorOnRemote(workspace);
         Run run = context.get(Run.class);
@@ -206,34 +224,55 @@ public class InvokerRunsPublisher extends MavenPublisher {
             MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
             MavenSpyLogProcessor.PluginInvocation pluginInvocation = XmlUtils.newPluginInvocation(pluginElt);
 
-            String reportsDirectory = expandAndRelativize(reportsDirectoryElt, "reportsDirectory", testEvent, projectElt, workspace, listener);
-            String projectsDirectory = expandAndRelativize(projectsDirectoryElt, "projectsDirectory", testEvent, projectElt, workspace, listener);
-            String cloneProjectsTo = expandAndRelativize(cloneProjectsToElt, "cloneProjectsTo", testEvent, projectElt, workspace, listener);
-            if (reportsDirectory == null || projectsDirectory == null ) {
-                listener.getLogger().println("[withMaven] invokerPublisher - Missing <projectsDirectory> or <reportsDirectory> element for <plugin> in " + XmlUtils.toString(testEvent));
+            String reportsDirectory = expandAndRelativize(
+                    reportsDirectoryElt, "reportsDirectory", testEvent, projectElt, workspace, listener);
+            String projectsDirectory = expandAndRelativize(
+                    projectsDirectoryElt, "projectsDirectory", testEvent, projectElt, workspace, listener);
+            String cloneProjectsTo = expandAndRelativize(
+                    cloneProjectsToElt, "cloneProjectsTo", testEvent, projectElt, workspace, listener);
+            if (reportsDirectory == null || projectsDirectory == null) {
+                listener.getLogger()
+                        .println(
+                                "[withMaven] invokerPublisher - Missing <projectsDirectory> or <reportsDirectory> element for <plugin> in "
+                                        + XmlUtils.toString(testEvent));
                 continue;
             }
 
             String testResults = reportsDirectory + fileSeparatorOnAgent + "*.xml";
-            listener.getLogger().println("[withMaven] invokerPublisher - Archive invoker results for Maven artifact " + mavenArtifact.getId() + " generated by " +
-                pluginInvocation.getId() + ": " + testResults);
-            MavenInvokerRecorder archiver = new MavenInvokerRecorder("**/" + reportsDirectory + "/BUILD*.xml", "**/" + (cloneProjectsTo != null ? cloneProjectsTo : projectsDirectory));
+            listener.getLogger()
+                    .println("[withMaven] invokerPublisher - Archive invoker results for Maven artifact "
+                            + mavenArtifact.getId() + " generated by " + pluginInvocation.getId() + ": " + testResults);
+            MavenInvokerRecorder archiver = new MavenInvokerRecorder(
+                    "**/" + reportsDirectory + "/BUILD*.xml",
+                    "**/" + (cloneProjectsTo != null ? cloneProjectsTo : projectsDirectory));
 
             try {
                 archiver.perform(run, workspace, launcher, listener, node);
             } catch (Exception e) {
-                listener.error("[withMaven] invokerPublisher - exception archiving Invoker runs for Maven artifact " + mavenArtifact.getId() + " generated by " + pluginInvocation.getId() + ": " + e);
+                listener.error("[withMaven] invokerPublisher - exception archiving Invoker runs for Maven artifact "
+                        + mavenArtifact.getId() + " generated by " + pluginInvocation.getId() + ": " + e);
                 LOGGER.log(Level.WARNING, "Exception processing " + XmlUtils.toString(testEvent), e);
-                throw new MavenPipelinePublisherException("invokerPublisher",
-                        "archiving Invoker runs for Maven artifact " + mavenArtifact.getId() + " generated by " + pluginInvocation.getId(), e);
+                throw new MavenPipelinePublisherException(
+                        "invokerPublisher",
+                        "archiving Invoker runs for Maven artifact " + mavenArtifact.getId() + " generated by "
+                                + pluginInvocation.getId(),
+                        e);
             }
         }
     }
 
     @Nullable
-    protected String expandAndRelativize(@Nullable Element element, @Nullable String name, Element testEvent, Element projectElt, FilePath workspace, TaskListener listener) {
+    protected String expandAndRelativize(
+            @Nullable Element element,
+            @Nullable String name,
+            Element testEvent,
+            Element projectElt,
+            FilePath workspace,
+            TaskListener listener) {
         if (element == null) {
-            listener.getLogger().println("[withMaven] invokerPublisher - No <" + name + "> element found for <plugin> in " + XmlUtils.toString(testEvent));
+            listener.getLogger()
+                    .println("[withMaven] invokerPublisher - No <" + name + "> element found for <plugin> in "
+                            + XmlUtils.toString(testEvent));
             return null;
         }
 
@@ -248,7 +287,9 @@ public class InvokerRunsPublisher extends MavenPublisher {
         if (result.contains("${project.build.directory}")) {
             String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
             if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
-                listener.getLogger().println("[withMaven] invokerPublisher - '${project.build.directory}' found for <project> in " + XmlUtils.toString(testEvent));
+                listener.getLogger()
+                        .println("[withMaven] invokerPublisher - '${project.build.directory}' found for <project> in "
+                                + XmlUtils.toString(testEvent));
                 return null;
             }
 
@@ -257,7 +298,9 @@ public class InvokerRunsPublisher extends MavenPublisher {
         } else if (result.contains("${basedir}")) {
             String baseDir = projectElt.getAttribute("baseDir");
             if (baseDir.isEmpty()) {
-                listener.getLogger().println("[withMaven] invokerPublisher - '${basedir}' NOT found for <project> in " + XmlUtils.toString(testEvent));
+                listener.getLogger()
+                        .println("[withMaven] invokerPublisher - '${basedir}' NOT found for <project> in "
+                                + XmlUtils.toString(testEvent));
                 return null;
             }
 
@@ -266,7 +309,9 @@ public class InvokerRunsPublisher extends MavenPublisher {
             char separator = FileUtils.isWindows(result) ? '\\' : '/';
             String baseDir = projectElt.getAttribute("baseDir");
             if (baseDir.isEmpty()) {
-                listener.getLogger().println("[withMaven] invokerPublisher - '${basedir}' NOT found for <project> in " + XmlUtils.toString(testEvent));
+                listener.getLogger()
+                        .println("[withMaven] invokerPublisher - '${basedir}' NOT found for <project> in "
+                                + XmlUtils.toString(testEvent));
                 return null;
             }
             result = baseDir + separator + result;
@@ -291,7 +336,6 @@ public class InvokerRunsPublisher extends MavenPublisher {
         public int ordinal() {
             return 10;
         }
-
 
         @NonNull
         @Override

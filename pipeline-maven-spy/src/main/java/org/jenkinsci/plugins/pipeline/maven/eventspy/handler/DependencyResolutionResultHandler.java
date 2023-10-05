@@ -24,15 +24,14 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import org.apache.maven.project.DependencyResolutionResult;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.Dependency;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
-
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -69,13 +68,13 @@ public class DependencyResolutionResultHandler extends AbstractMavenEventHandler
         for (Dependency dependency : result.getResolvedDependencies()) {
             Artifact artifact = dependency.getArtifact();
 
-            if ( !includedScopes.contains(dependency.getScope())) {
+            if (!includedScopes.contains(dependency.getScope())) {
                 continue;
             }
             if (!includeSnapshots && artifact.isSnapshot()) {
                 continue;
             }
-            if(!includeReleases && !artifact.isSnapshot()) {
+            if (!includeReleases && !artifact.isSnapshot()) {
                 continue;
             }
 

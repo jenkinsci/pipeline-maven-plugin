@@ -4,9 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.InputStream;
 import java.util.List;
-
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,9 +29,13 @@ public class DependenciesListerTest {
         List<MavenDependency> mavenArtifacts = DependenciesLister.listDependencies(doc.getDocumentElement(), null);
 
         assertThat(mavenArtifacts).hasSize(2);
-        assertThat(mavenArtifacts).anyMatch(dep -> "spring-test".equals(dep.getArtifactId())
-                && "/path/to/spring-petclinic/spring-test/3.2.16.RELEASE/spring-test-3.2.16.RELEASE.jar".equals(dep.getFile()));
-        assertThat(mavenArtifacts).anyMatch(dep -> "spring-core".equals(dep.getArtifactId())
-                && "/path/to/spring-petclinic/3.2.16.RELEASE/spring-core-3.2.16.RELEASE.jar".equals(dep.getFile()));
+        assertThat(mavenArtifacts)
+                .anyMatch(dep -> "spring-test".equals(dep.getArtifactId())
+                        && "/path/to/spring-petclinic/spring-test/3.2.16.RELEASE/spring-test-3.2.16.RELEASE.jar"
+                                .equals(dep.getFile()));
+        assertThat(mavenArtifacts)
+                .anyMatch(dep -> "spring-core".equals(dep.getArtifactId())
+                        && "/path/to/spring-petclinic/3.2.16.RELEASE/spring-core-3.2.16.RELEASE.jar"
+                                .equals(dep.getFile()));
     }
 }

@@ -24,6 +24,16 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import javax.inject.Named;
+import javax.inject.Singleton;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.eventspy.EventSpy;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
@@ -52,17 +62,6 @@ import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 /**
  * Maven {@link EventSpy} to capture build details consumed by the Jenkins Pipeline Maven Plugin
  * and the {@code withMaven(){...}} pipeline step.
@@ -73,9 +72,10 @@ import java.util.Set;
 @Singleton
 public class JenkinsMavenEventSpy extends AbstractEventSpy {
 
-    public final static String DISABLE_MAVEN_EVENT_SPY_PROPERTY_NAME =  JenkinsMavenEventSpy.class.getName() + ".disabled";
+    public static final String DISABLE_MAVEN_EVENT_SPY_PROPERTY_NAME =
+            JenkinsMavenEventSpy.class.getName() + ".disabled";
 
-    public final static String DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME =  "JENKINS_MAVEN_AGENT_DISABLED";
+    public static final String DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME = "JENKINS_MAVEN_AGENT_DISABLED";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -87,10 +87,11 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
     protected final boolean disabled;
 
     private Set<Class> blackList = new HashSet();
-    private Set<String> ignoredList = new HashSet(Collections.singletonList(
-            /*"org.eclipse.aether.RepositoryEvent",*/
-            "org.apache.maven.settings.building.DefaultSettingsBuildingResult"/*,
-            "org.apache.maven.execution.DefaultMavenExecutionResult"*/));
+    private Set<String> ignoredList = new HashSet(
+            Collections.singletonList(
+                    /*"org.eclipse.aether.RepositoryEvent",*/
+                    "org.apache.maven.settings.building.DefaultSettingsBuildingResult" /*,
+                                                                                       "org.apache.maven.execution.DefaultMavenExecutionResult"*/));
 
     private List<MavenEventHandler> handlers = new ArrayList();
 
@@ -150,8 +151,7 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
 
     @Override
     public void onEvent(Object event) throws Exception {
-        if (disabled)
-            return;
+        if (disabled) return;
 
         try {
             if (blackList.contains(event.getClass())) {
@@ -174,7 +174,6 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
         }
     }
 
-
     @Override
     public void close() {
         if (disabled) {
@@ -187,9 +186,9 @@ public class JenkinsMavenEventSpy extends AbstractEventSpy {
     /**
      * Visible for testing
      */
-    protected boolean isEventSpyDisabled(){
-        return "true".equalsIgnoreCase(System.getProperty(DISABLE_MAVEN_EVENT_SPY_PROPERTY_NAME)) ||
-                "true".equalsIgnoreCase(System.getenv(DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME));
+    protected boolean isEventSpyDisabled() {
+        return "true".equalsIgnoreCase(System.getProperty(DISABLE_MAVEN_EVENT_SPY_PROPERTY_NAME))
+                || "true".equalsIgnoreCase(System.getenv(DISABLE_MAVEN_EVENT_SPY_ENVIRONMENT_VARIABLE_NAME));
     }
 
     public MavenEventReporter getReporter() {

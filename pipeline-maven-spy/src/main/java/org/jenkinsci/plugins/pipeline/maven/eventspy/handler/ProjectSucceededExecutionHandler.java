@@ -24,17 +24,16 @@
 
 package org.jenkinsci.plugins.pipeline.maven.eventspy.handler;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.RuntimeIOException;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -81,7 +80,6 @@ public class ProjectSucceededExecutionHandler extends AbstractExecutionHandler {
             }
             attachedArtifactsElt.addChild(artifactElt);
         }
-
     }
 
     @Override

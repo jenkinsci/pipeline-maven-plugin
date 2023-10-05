@@ -24,13 +24,8 @@
 
 package org.jenkinsci.plugins.pipeline.maven.db;
 
-import hudson.Extension;
-import jenkins.model.Jenkins;
-import org.h2.jdbcx.JdbcConnectionPool;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
-
-import javax.sql.DataSource;
+import hudson.Extension;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -38,6 +33,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
+import javax.sql.DataSource;
+import jenkins.model.Jenkins;
+import org.h2.jdbcx.JdbcConnectionPool;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -63,18 +61,20 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
     }
 
     public PipelineMavenPluginH2Dao(@NonNull File rootDir) {
-        this(JdbcConnectionPool.create("jdbc:h2:file:" + new File(rootDir, "jenkins-jobs").getAbsolutePath() + ";" +
-                "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE", "sa", "sa"));
+        this(JdbcConnectionPool.create(
+                "jdbc:h2:file:" + new File(rootDir, "jenkins-jobs").getAbsolutePath() + ";"
+                        + "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE",
+                "sa",
+                "sa"));
     }
-
-
 
     @Override
     protected void registerJdbcDriver() {
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("H2 driver 'org.h2.Driver' not found. Please install the 'H2 Database Plugin' to install the H2 driver");
+            throw new RuntimeException(
+                    "H2 driver 'org.h2.Driver' not found. Please install the 'H2 Database Plugin' to install the H2 driver");
         }
     }
 
@@ -129,7 +129,7 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
                     stmt.execute("SHUTDOWN");
                 }
             } catch (SQLException e) {
-                if (e.getErrorCode() == 90121) { 
+                if (e.getErrorCode() == 90121) {
                     // DATABASE_CALLED_AT_SHUTDOWN (the JVM shutdown hooks are running already :-o )
                     LOGGER.log(Level.FINE, "Failed to close the database as it is already closed", e);
                 } else {
@@ -150,8 +150,7 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
                 throw new IllegalStateException("Failure to create database root dir " + databaseRootDir);
             }
         }
-        return  "jdbc:h2:file:" + new File(databaseRootDir, "jenkins-jobs").getAbsolutePath() + ";" +
-                "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
+        return "jdbc:h2:file:" + new File(databaseRootDir, "jenkins-jobs").getAbsolutePath() + ";"
+                + "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
     }
-
 }

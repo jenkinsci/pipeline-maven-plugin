@@ -24,10 +24,9 @@
 
 package org.jenkinsci.plugins.pipeline.maven.db;
 
+import javax.sql.DataSource;
 import org.h2.jdbcx.JdbcConnectionPool;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
-
-import javax.sql.DataSource;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>

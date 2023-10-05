@@ -23,21 +23,30 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
+import hudson.model.Result;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import java.util.stream.Stream;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JacocoReportPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
+import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.jupiter.api.Test;
-
-import hudson.model.Result;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * TODO migrate to {@link WithMavenStepTest} once we have implemented a
@@ -45,92 +54,9 @@ import hudson.model.Result;
  */
 public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTest {
 
-    @Test
-    public void maven_build_jar_project_on_master_disable_globally_findbugs_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(new FindbugsAnalysisPublisher.DescriptorImpl());
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_disable_globally_tasks_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(new TasksScannerPublisher.DescriptorImpl());
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_disable_globally_junit_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(new JunitTestsPublisher.DescriptorImpl());
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_disable_globally_generated_artifacts_publisher_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(new GeneratedArtifactsPublisher.DescriptorImpl());
-    }
-
-    private void maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(MavenPublisher.DescriptorImpl descriptor) throws Exception {
-
-        MavenPublisher publisher = descriptor.clazz.newInstance();
-        publisher.setDisabled(true);
-
-        GlobalPipelineMavenConfig globalPipelineMavenConfig = GlobalPipelineMavenConfig.get();
-
-        globalPipelineMavenConfig.setPublisherOptions(Collections.singletonList(publisher));
-        Logger logger = Logger.getLogger(MavenSpyLogProcessor.class.getName());
-        Level level = logger.getLevel();
-        logger.setLevel(Level.FINE);
-        try {
-
-            Symbol symbolAnnotation = descriptor.getClass().getAnnotation(Symbol.class);
-            String symbol = symbolAnnotation.value()[0];
-            String displayName = descriptor.getDisplayName();
-
-            loadMavenJarProjectInGitRepo(this.gitRepoRule);
-
-            //@formatter:off
-            String pipelineScript = "node() {\n" +
-                "    git($/" + gitRepoRule.toString() + "/$)\n" +
-                "    withMaven() {\n" +
-                "        if (isUnix()) {\n" +
-                "            sh 'mvn package verify'\n" +
-                "        } else {\n" +
-                "            bat 'mvn package verify'\n" +
-                "        }\n" +
-                "    }\n" +
-                "}";
-            //@formatter:on
-
-            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-" + symbol + "-publisher-globally-disabled");
-            pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-            WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
-
-            String message = "[withMaven] Skip '" + displayName + "' disabled by configuration";
-            jenkinsRule.assertLogContains(message, build);
-        } finally {
-            logger.setLevel(level);
-            globalPipelineMavenConfig.setPublisherOptions(null);
-        }
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_with_findbugs_publisher_configured_both_globally_and_on_the_pipeline_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(new FindbugsAnalysisPublisher.DescriptorImpl());
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_with_task_scanner_publisher_configured_both_globally_and_on_the_pipeline_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(new TasksScannerPublisher.DescriptorImpl());
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_with_junit_publisher_configured_both_globally_and_on_the_pipeline_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(new JunitTestsPublisher.DescriptorImpl());
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_with_generated_artifacts_publisher_configured_both_globally_and_on_the_pipeline_succeeds() throws Exception {
-        maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(
-                new GeneratedArtifactsPublisher.DescriptorImpl());
-    }
-
-    private void maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(
+    @ParameterizedTest
+    @MethodSource("mavenPublisherDescriptors")
+    public void maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(
             MavenPublisher.DescriptorImpl descriptor) throws Exception {
 
         MavenPublisher publisher = descriptor.clazz.newInstance();
@@ -150,7 +76,55 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
 
             loadMavenJarProjectInGitRepo(this.gitRepoRule);
 
-            //@formatter:off
+            // @formatter:off
+            String pipelineScript = "node() {\n" +
+                "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    withMaven() {\n" +
+                "        if (isUnix()) {\n" +
+                "            sh 'mvn package verify'\n" +
+                "        } else {\n" +
+                "            bat 'mvn package verify'\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+            // @formatter:on
+
+            WorkflowJob pipeline = jenkinsRule.createProject(
+                    WorkflowJob.class, "build-on-master-" + symbol + "-publisher-globally-disabled");
+            pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+            WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+
+            String message = "[withMaven] Skip '" + displayName + "' disabled by configuration";
+            jenkinsRule.assertLogContains(message, build);
+        } finally {
+            logger.setLevel(level);
+            globalPipelineMavenConfig.setPublisherOptions(null);
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("mavenPublisherDescriptors")
+    public void maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(
+            MavenPublisher.DescriptorImpl descriptor) throws Exception {
+
+        MavenPublisher publisher = descriptor.clazz.newInstance();
+        publisher.setDisabled(true);
+
+        GlobalPipelineMavenConfig globalPipelineMavenConfig = GlobalPipelineMavenConfig.get();
+
+        globalPipelineMavenConfig.setPublisherOptions(Collections.singletonList(publisher));
+        Logger logger = Logger.getLogger(MavenSpyLogProcessor.class.getName());
+        Level level = logger.getLevel();
+        logger.setLevel(Level.FINE);
+        try {
+
+            Symbol symbolAnnotation = descriptor.getClass().getAnnotation(Symbol.class);
+            String symbol = symbolAnnotation.value()[0];
+            String displayName = descriptor.getDisplayName();
+
+            loadMavenJarProjectInGitRepo(this.gitRepoRule);
+
+            // @formatter:off
             String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven(options:[" + symbol + "(disabled: true)]) {\n" +
@@ -161,10 +135,10 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
                 "        }\n" +
                 "    }\n" +
                 "}";
-            //@formatter:on
+            // @formatter:on
 
-            WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class,
-                    "build-on-master-" + symbol + "-publisher-defined-globally-and-in-the-pipeline");
+            WorkflowJob pipeline = jenkinsRule.createProject(
+                    WorkflowJob.class, "build-on-master-" + symbol + "-publisher-defined-globally-and-in-the-pipeline");
             pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
             WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
@@ -179,4 +153,19 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
         }
     }
 
+    private static Stream<Arguments> mavenPublisherDescriptors() {
+        return Stream.of(
+                Arguments.of(new FindbugsAnalysisPublisher.DescriptorImpl()),
+                Arguments.of(new SpotBugsAnalysisPublisher.DescriptorImpl()),
+                Arguments.of(new TasksScannerPublisher.DescriptorImpl()),
+                Arguments.of(new ConcordionTestsPublisher.DescriptorImpl()),
+                Arguments.of(new DependenciesFingerprintPublisher.DescriptorImpl()),
+                Arguments.of(new GeneratedArtifactsPublisher.DescriptorImpl()),
+                Arguments.of(new InvokerRunsPublisher.DescriptorImpl()),
+                Arguments.of(new JacocoReportPublisher.DescriptorImpl()),
+                Arguments.of(new JGivenTestsPublisher.DescriptorImpl()),
+                Arguments.of(new JunitTestsPublisher.DescriptorImpl()),
+                Arguments.of(new MavenLinkerPublisher2.DescriptorImpl()),
+                Arguments.of(new PipelineGraphPublisher.DescriptorImpl()));
+    }
 }

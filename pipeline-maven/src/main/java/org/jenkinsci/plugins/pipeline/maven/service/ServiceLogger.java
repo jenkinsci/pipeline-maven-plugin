@@ -24,10 +24,9 @@
 
 package org.jenkinsci.plugins.pipeline.maven.service;
 
-import hudson.model.Item;
-
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
+import hudson.model.Item;
 import java.util.logging.Level;
 
 /**

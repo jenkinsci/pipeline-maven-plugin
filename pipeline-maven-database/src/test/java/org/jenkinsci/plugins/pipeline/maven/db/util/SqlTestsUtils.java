@@ -1,14 +1,8 @@
 package org.jenkinsci.plugins.pipeline.maven.db.util;
 
-import org.h2.api.ErrorCode;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import org.jenkinsci.plugins.pipeline.maven.db.util.RuntimeSqlException;
-
-import javax.sql.DataSource;
-
 import static java.util.Optional.ofNullable;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -16,12 +10,13 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.sql.DataSource;
+import org.h2.api.ErrorCode;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public class SqlTestsUtils {
-
 
     public static void dump(String sql, DataSource ds, PrintStream out) throws RuntimeSqlException {
         try (Connection connection = ds.getConnection()) {
@@ -66,11 +61,12 @@ public class SqlTestsUtils {
     }
 
     public static int countRows(@NonNull String sql, @NonNull Connection cnn, Object... params) throws SQLException {
-        String sqlQuery ;
-        if (sql.startsWith("select * from")){
+        String sqlQuery;
+        if (sql.startsWith("select * from")) {
             sqlQuery = "select count(*) from " + sql.substring("select * from".length());
         } else {
-            sqlQuery = "select count(*) from (" + sql + ")";        }
+            sqlQuery = "select count(*) from (" + sql + ")";
+        }
 
         try (PreparedStatement stmt = cnn.prepareStatement(sqlQuery)) {
             int idx = 1;

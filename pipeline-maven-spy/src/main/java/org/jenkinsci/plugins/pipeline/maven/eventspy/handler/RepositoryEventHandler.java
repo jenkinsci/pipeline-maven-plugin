@@ -65,6 +65,7 @@ public class RepositoryEventHandler extends AbstractMavenEventHandler<Repository
     }
 
     private void print(RepositoryEvent repositoryEvent, long durationInNanos) {
-        reporter.print(repositoryEvent.getArtifact().toString() + "-" + repositoryEvent.getType() + "-" + durationInNanos + "nanos");
+        reporter.print(repositoryEvent.getArtifact().toString() + "-" + repositoryEvent.getType() + "-"
+                + durationInNanos + "nanos");
     }
 }

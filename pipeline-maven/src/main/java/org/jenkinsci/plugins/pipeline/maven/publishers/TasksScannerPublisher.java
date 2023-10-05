@@ -1,11 +1,19 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.StreamBuildListener;
 import hudson.model.TaskListener;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
@@ -15,15 +23,6 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -67,9 +66,7 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
     private boolean asRegexp = false;
 
     @DataBoundConstructor
-    public TasksScannerPublisher() {
-
-    }
+    public TasksScannerPublisher() {}
 
     /*
     <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-03-08 21:03:33.564">
@@ -80,7 +77,8 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
     </ExecutionEvent>
      */
     @Override
-    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt) throws IOException, InterruptedException {
+    public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt)
+            throws IOException, InterruptedException {
         TaskListener listener = context.get(TaskListener.class);
         if (listener == null) {
             LOGGER.warning("TaskListener is NULL, default to stderr");
@@ -92,18 +90,21 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
         Run run = context.get(Run.class);
         Launcher launcher = context.get(Launcher.class);
 
-
         try {
             Class.forName("hudson.plugins.tasks.TasksPublisher");
         } catch (ClassNotFoundException e) {
             listener.getLogger().print("[withMaven] Jenkins ");
-            listener.hyperlink("https://wiki.jenkins-ci.org/display/JENKINS/Task+Scanner+Plugin", "Task Scanner Plugin");
-            listener.getLogger().println(" not found, don't display results of source code scanning for 'TODO' and 'FIXME' in pipeline screen.");
+            listener.hyperlink(
+                    "https://wiki.jenkins-ci.org/display/JENKINS/Task+Scanner+Plugin", "Task Scanner Plugin");
+            listener.getLogger()
+                    .println(
+                            " not found, don't display results of source code scanning for 'TODO' and 'FIXME' in pipeline screen.");
             return;
         }
 
         List<String> sourceDirectoriesPatterns = new ArrayList<>();
-        for (Element executionEvent : XmlUtils.getExecutionEvents(mavenSpyLogsElt, "ProjectSucceeded", "ProjectFailed")) {
+        for (Element executionEvent :
+                XmlUtils.getExecutionEvents(mavenSpyLogsElt, "ProjectSucceeded", "ProjectFailed")) {
 
             /*
             <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-03-08 21:03:33.564">
@@ -116,7 +117,9 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
             Element buildElement = XmlUtils.getUniqueChildElementOrNull(executionEvent, "project", "build");
             if (buildElement == null) {
                 if (LOGGER.isLoggable(Level.FINE))
-                    LOGGER.log(Level.FINE, "Ignore execution event with missing 'build' child:" + XmlUtils.toString(executionEvent));
+                    LOGGER.log(
+                            Level.FINE,
+                            "Ignore execution event with missing 'build' child:" + XmlUtils.toString(executionEvent));
                 continue;
             }
             Element projectElt = XmlUtils.getUniqueChildElement(executionEvent, "project");
@@ -134,10 +137,15 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
             String sourceDirectoryRelativePath = XmlUtils.getPathInWorkspace(sourceDirectory, workspace);
 
             if (workspace.child(sourceDirectoryRelativePath).exists()) {
-                sourceDirectoriesPatterns.add(sourceDirectoryRelativePath + fileSeparatorOnAgent + "**" + fileSeparatorOnAgent + "*");
-                listener.getLogger().println("[withMaven] openTasksPublisher - Scan Tasks for Maven artifact " + mavenArtifact.getId() + " in source directory " + sourceDirectoryRelativePath);
+                sourceDirectoriesPatterns.add(
+                        sourceDirectoryRelativePath + fileSeparatorOnAgent + "**" + fileSeparatorOnAgent + "*");
+                listener.getLogger()
+                        .println("[withMaven] openTasksPublisher - Scan Tasks for Maven artifact "
+                                + mavenArtifact.getId() + " in source directory " + sourceDirectoryRelativePath);
             } else {
-                LOGGER.log(Level.FINE, "Skip task scanning for {0}, folder {1} does not exist", new Object[]{mavenArtifact, sourceDirectoryRelativePath});
+                LOGGER.log(Level.FINE, "Skip task scanning for {0}, folder {1} does not exist", new Object[] {
+                    mavenArtifact, sourceDirectoryRelativePath
+                });
             }
         }
 
@@ -149,13 +157,15 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
         }
 
         // To avoid duplicates
-        hudson.plugins.tasks.TasksResultAction tasksResult = run.getAction(hudson.plugins.tasks.TasksResultAction.class);
+        hudson.plugins.tasks.TasksResultAction tasksResult =
+                run.getAction(hudson.plugins.tasks.TasksResultAction.class);
         if (tasksResult != null) {
             run.removeAction(tasksResult);
         }
 
         hudson.plugins.tasks.TasksPublisher tasksPublisher = new hudson.plugins.tasks.TasksPublisher();
-        String pattern = StringUtils.isEmpty(this.pattern)? XmlUtils.join(sourceDirectoriesPatterns, ",") : this.pattern;
+        String pattern =
+                StringUtils.isEmpty(this.pattern) ? XmlUtils.join(sourceDirectoriesPatterns, ",") : this.pattern;
         tasksPublisher.setPattern(pattern);
         tasksPublisher.setExcludePattern(StringUtils.trimToNull(this.excludePattern));
 

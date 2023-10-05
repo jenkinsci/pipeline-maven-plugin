@@ -2,12 +2,10 @@ package org.jenkinsci.plugins.pipeline.maven.util;
 
 import static org.assertj.core.api.Assertions.fail;
 
+import com.cloudbees.hudson.plugins.folder.computed.FolderComputation;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
-
-import com.cloudbees.hudson.plugins.folder.computed.FolderComputation;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -18,7 +16,8 @@ public class WorkflowMultibranchProjectTestsUtils {
      * @see org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProjectTest#scheduleAndFindBranchProject
      */
     @NonNull
-    public static WorkflowJob scheduleAndFindBranchProject(@NonNull WorkflowMultiBranchProject mp, @NonNull String name) throws Exception {
+    public static WorkflowJob scheduleAndFindBranchProject(@NonNull WorkflowMultiBranchProject mp, @NonNull String name)
+            throws Exception {
         mp.scheduleBuild2(0).getFuture().get();
         return findBranchProject(mp, name);
     }
@@ -27,7 +26,8 @@ public class WorkflowMultibranchProjectTestsUtils {
      * @see org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProjectTest#findBranchProject
      */
     @NonNull
-    public static WorkflowJob findBranchProject(@NonNull WorkflowMultiBranchProject mp, @NonNull String name) throws Exception {
+    public static WorkflowJob findBranchProject(@NonNull WorkflowMultiBranchProject mp, @NonNull String name)
+            throws Exception {
         WorkflowJob p = mp.getItem(name);
         showIndexing(mp);
         if (p == null) {

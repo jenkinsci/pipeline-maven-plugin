@@ -4,9 +4,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import hudson.model.Result;
 import java.util.Arrays;
 import java.util.Collections;
-
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.pipeline.maven.WithMavenStep;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
@@ -20,8 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import hudson.model.Result;
 
 @ExtendWith(MockitoExtension.class)
 public class DatabaseSyncRunListenerTest {

@@ -2,9 +2,11 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import hudson.model.Result;
+import hudson.plugins.jacoco.JacocoBuildAction;
+import hudson.tasks.junit.TestResultAction;
 import java.util.Collection;
 import java.util.List;
-
 import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
 import org.jenkinsci.plugins.pipeline.maven.TestUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
@@ -12,17 +14,15 @@ import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.Test;
 
-import hudson.model.Result;
-import hudson.plugins.jacoco.JacocoBuildAction;
-import hudson.tasks.junit.TestResultAction;
-
 public class JacocoReportPublisherTest extends AbstractIntegrationTest {
 
     @Test
     public void maven_build_jar_with_jacoco_succeeds() throws Exception {
-        loadSourceCodeInGitRepository(this.gitRepoRule, "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_with_jacoco_project/");
+        loadSourceCodeInGitRepository(
+                this.gitRepoRule,
+                "/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_with_jacoco_project/");
 
-        //@formatter:off
+        // @formatter:off
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
             "    withMaven() {\n" +
@@ -33,7 +33,7 @@ public class JacocoReportPublisherTest extends AbstractIntegrationTest {
             "        }\n" +
             "    }\n" +
             "}";
-        //@formatter:on
+        // @formatter:on
 
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "jar-with-jacoco");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
@@ -42,8 +42,10 @@ public class JacocoReportPublisherTest extends AbstractIntegrationTest {
         Collection<String> artifactsFileNames = TestUtils.artifactsToArtifactsFileNames(build.getArtifacts());
         assertThat(artifactsFileNames).contains("jar-with-jacoco-0.1-SNAPSHOT.pom", "jar-with-jacoco-0.1-SNAPSHOT.jar");
 
-        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/jar-with-jacoco/0.1-SNAPSHOT/jar-with-jacoco-0.1-SNAPSHOT.jar");
-        verifyFileIsFingerPrinted(pipeline, build, "jenkins/mvn/test/jar-with-jacoco/0.1-SNAPSHOT/jar-with-jacoco-0.1-SNAPSHOT.pom");
+        verifyFileIsFingerPrinted(
+                pipeline, build, "jenkins/mvn/test/jar-with-jacoco/0.1-SNAPSHOT/jar-with-jacoco-0.1-SNAPSHOT.jar");
+        verifyFileIsFingerPrinted(
+                pipeline, build, "jenkins/mvn/test/jar-with-jacoco/0.1-SNAPSHOT/jar-with-jacoco-0.1-SNAPSHOT.pom");
 
         List<TestResultAction> testResultActions = build.getActions(TestResultAction.class);
         assertThat(testResultActions).hasSize(1);
@@ -56,5 +58,4 @@ public class JacocoReportPublisherTest extends AbstractIntegrationTest {
         JacocoBuildAction jacocoBuildAction = jacocoBuildActions.get(0);
         assertThat(jacocoBuildAction.getProjectActions()).hasSize(1);
     }
-
 }

@@ -4,12 +4,10 @@ import com.cloudbees.jenkins.plugins.sshcredentials.SSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.Credentials;
 import com.cloudbees.plugins.credentials.common.PasswordCredentials;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
-
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.console.ConsoleLogFilter;
 import hudson.model.Run;
 import hudson.util.Secret;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -27,23 +25,26 @@ import org.jenkinsci.plugins.credentialsbinding.masking.SecretPatterns;
  */
 public class MaskPasswordsConsoleLogFilter extends ConsoleLogFilter implements Serializable {
     private static final long serialVersionUID = 1;
-    private final static Logger LOGGER = Logger.getLogger(MaskPasswordsConsoleLogFilter.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MaskPasswordsConsoleLogFilter.class.getName());
 
     private final Secret secretsAsRegexp;
     private final String charsetName;
 
     public MaskPasswordsConsoleLogFilter(@NonNull Collection<String> secrets, @NonNull String charsetName) {
-        this.secretsAsRegexp = Secret.fromString(SecretPatterns.getAggregateSecretPattern(secrets).toString());
+        this.secretsAsRegexp = Secret.fromString(
+                SecretPatterns.getAggregateSecretPattern(secrets).toString());
         this.charsetName = charsetName;
     }
 
     @Override
     public OutputStream decorateLogger(Run build, final OutputStream logger) throws IOException, InterruptedException {
-        return new SecretPatterns.MaskingOutputStream(logger, () -> Pattern.compile(secretsAsRegexp.getPlainText()), charsetName);
+        return new SecretPatterns.MaskingOutputStream(
+                logger, () -> Pattern.compile(secretsAsRegexp.getPlainText()), charsetName);
     }
 
     @NonNull
-    public static MaskPasswordsConsoleLogFilter newMaskPasswordsConsoleLogFilter(@NonNull Iterable<Credentials> credentials, @NonNull Charset charset){
+    public static MaskPasswordsConsoleLogFilter newMaskPasswordsConsoleLogFilter(
+            @NonNull Iterable<Credentials> credentials, @NonNull Charset charset) {
         Collection<String> secrets = toString(credentials);
         return new MaskPasswordsConsoleLogFilter(secrets, charset.name());
     }
@@ -69,7 +70,9 @@ public class MaskPasswordsConsoleLogFilter extends ConsoleLogFilter implements S
                 }
                 // omit the private key, there
             } else {
-                LOGGER.log(Level.FINE, "Skip masking of unsupported credentials type {0}: {1}", new Object[]{creds.getClass(), creds.getDescriptor().getDisplayName()});
+                LOGGER.log(Level.FINE, "Skip masking of unsupported credentials type {0}: {1}", new Object[] {
+                    creds.getClass(), creds.getDescriptor().getDisplayName()
+                });
             }
         }
         return result;

@@ -35,11 +35,9 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.model.Model;
@@ -77,7 +75,9 @@ public class JenkinsMavenEventSpyMTTest {
         });
 
         MavenXpp3Reader mavenXpp3Reader = new MavenXpp3Reader();
-        InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/eventspy/pom.xml");
+        InputStream in = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/eventspy/pom.xml");
 
         assertThat(in).isNotNull();
         Model model = mavenXpp3Reader.read(in);
@@ -92,7 +92,8 @@ public class JenkinsMavenEventSpyMTTest {
     @Test // Issue JENKINS-46579
     public void testMavenExecutionMTSpyReporters() throws Exception {
         int numThreads = 100;
-        final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1); // we need to also stop the test thread (current)
+        final CyclicBarrier barrier =
+                new CyclicBarrier(numThreads + 1); // we need to also stop the test thread (current)
         final AtomicInteger counter = new AtomicInteger(0);
         final ExceptionHolder exceptionHolder = new ExceptionHolder();
 
@@ -103,27 +104,28 @@ public class JenkinsMavenEventSpyMTTest {
         // persisted state, the rest will read it a couple of times.
         for (int i = 0; i < numThreads; i++) {
             new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        barrier.await();
-                        // Thread.sleep(RandomUtils.nextInt(0, 500));
-                        JenkinsMavenEventSpy spy = createSpy();
-                        spyList.add(spy);
-                        DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
-                        request.setPom(new File("path/to/pom.xml"));
-                        request.setGoals(Arrays.asList("clean", "source:jar", "deploy"));
+                        @Override
+                        public void run() {
+                            try {
+                                barrier.await();
+                                // Thread.sleep(RandomUtils.nextInt(0, 500));
+                                JenkinsMavenEventSpy spy = createSpy();
+                                spyList.add(spy);
+                                DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
+                                request.setPom(new File("path/to/pom.xml"));
+                                request.setGoals(Arrays.asList("clean", "source:jar", "deploy"));
 
-                        for (int i = 0; i < 100; i++) {
-                            spy.onEvent(request);
+                                for (int i = 0; i < 100; i++) {
+                                    spy.onEvent(request);
+                                }
+
+                            } catch (Exception e) {
+                                exceptionHolder.e = e;
+                            }
+                            counter.incrementAndGet();
                         }
-
-                    } catch (Exception e) {
-                        exceptionHolder.e = e;
-                    }
-                    counter.incrementAndGet();
-                }
-            }).start();
+                    })
+                    .start();
         }
         barrier.await();
 
@@ -164,7 +166,8 @@ public class JenkinsMavenEventSpyMTTest {
     @Test // Issue JENKINS-46579
     public void testMavenExecutionMTRequestsSingleSpyReporter() throws Exception {
         int numThreads = 100;
-        final CyclicBarrier barrier = new CyclicBarrier(numThreads + 1); // we need to also stop the test thread (current)
+        final CyclicBarrier barrier =
+                new CyclicBarrier(numThreads + 1); // we need to also stop the test thread (current)
         final AtomicInteger counter = new AtomicInteger(0);
         final ExceptionHolder exceptionHolder = new ExceptionHolder();
 
@@ -175,25 +178,26 @@ public class JenkinsMavenEventSpyMTTest {
         // persisted state, the rest will read it a couple of times.
         for (int i = 0; i < numThreads; i++) {
             new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        barrier.await();
-                        // Thread.sleep(RandomUtils.nextInt(0, 500));
+                        @Override
+                        public void run() {
+                            try {
+                                barrier.await();
+                                // Thread.sleep(RandomUtils.nextInt(0, 500));
 
-                        DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
-                        request.setPom(new File("path/to/pom.xml"));
-                        request.setGoals(Arrays.asList("clean", "source:jar", "deploy"));
-                        for (int i = 0; i < 100; i++) {
-                            spy.onEvent(request);
+                                DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
+                                request.setPom(new File("path/to/pom.xml"));
+                                request.setGoals(Arrays.asList("clean", "source:jar", "deploy"));
+                                for (int i = 0; i < 100; i++) {
+                                    spy.onEvent(request);
+                                }
+
+                            } catch (Exception e) {
+                                exceptionHolder.e = e;
+                            }
+                            counter.incrementAndGet();
                         }
-
-                    } catch (Exception e) {
-                        exceptionHolder.e = e;
-                    }
-                    counter.incrementAndGet();
-                }
-            }).start();
+                    })
+                    .start();
         }
         barrier.await();
 
@@ -246,7 +250,6 @@ public class JenkinsMavenEventSpyMTTest {
             e.printStackTrace();
             fail("Failed to parse spylog: " + document + " error:" + e);
         }
-
     }
 
     public static class ExceptionHolder {

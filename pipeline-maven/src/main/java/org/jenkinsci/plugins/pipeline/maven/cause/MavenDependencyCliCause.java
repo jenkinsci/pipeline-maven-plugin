@@ -3,11 +3,10 @@ package org.jenkinsci.plugins.pipeline.maven.cause;
 import hudson.console.ModelHyperlinkNote;
 import hudson.model.TaskListener;
 import hudson.model.User;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -38,8 +37,8 @@ public class MavenDependencyCliCause extends MavenDependencyAbstractCause {
 
     @Override
     public void print(TaskListener listener) {
-        listener.getLogger().println(
-                "Started from command line by " + ModelHyperlinkNote.encodeTo("/user/" + startedBy, startedBy) + " for maven artifacts " + getMavenArtifactsDescription());
+        listener.getLogger()
+                .println("Started from command line by " + ModelHyperlinkNote.encodeTo("/user/" + startedBy, startedBy)
+                        + " for maven artifacts " + getMavenArtifactsDescription());
     }
-
 }

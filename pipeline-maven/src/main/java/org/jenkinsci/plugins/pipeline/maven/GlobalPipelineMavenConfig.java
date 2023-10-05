@@ -28,6 +28,9 @@ import com.cloudbees.plugins.credentials.CredentialsMatchers;
 import com.cloudbees.plugins.credentials.CredentialsProvider;
 import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
 import com.cloudbees.plugins.credentials.common.UsernamePasswordCredentials;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.init.Terminator;
@@ -35,6 +38,15 @@ import hudson.model.Result;
 import hudson.security.ACL;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jenkins.model.GlobalConfiguration;
 import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
@@ -51,19 +63,6 @@ import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.verb.POST;
 
-import edu.umd.cs.findbugs.annotations.CheckForNull;
-import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
@@ -71,7 +70,7 @@ import java.util.logging.Logger;
 @Symbol("pipelineMaven")
 public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
-    private final static Logger LOGGER = Logger.getLogger(GlobalPipelineMavenConfig.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(GlobalPipelineMavenConfig.class.getName());
 
     private transient volatile PipelineMavenPluginDao dao;
 
@@ -110,10 +109,10 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     }
 
     private Optional<PipelineMavenPluginDao> findDaoFromExtension(String daoClass) {
-        return ExtensionList.lookup(PipelineMavenPluginDao.class)
-                        .stream()
-                        .filter(pipelineMavenPluginDao -> StringUtils.equals(pipelineMavenPluginDao.getClass().getName(), daoClass))
-                        .findFirst();
+        return ExtensionList.lookup(PipelineMavenPluginDao.class).stream()
+                .filter(pipelineMavenPluginDao ->
+                        StringUtils.equals(pipelineMavenPluginDao.getClass().getName(), daoClass))
+                .findFirst();
     }
 
     @Override
@@ -227,7 +226,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
     @Override
     public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
-        if(!StringUtils.equals(json.getString("daoClass"), daoClass)) {
+        if (!StringUtils.equals(json.getString("daoClass"), daoClass)) {
             closeDatasource();
             this.dao = null;
         }
@@ -279,16 +278,11 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     @NonNull
     public Set<Result> getTriggerDownstreamBuildsResultsCriteria() {
         Set<Result> result = new HashSet<>(5);
-        if (this.triggerDownstreamUponResultSuccess)
-            result.add(Result.SUCCESS);
-        if (this.triggerDownstreamUponResultUnstable)
-            result.add(Result.UNSTABLE);
-        if (this.triggerDownstreamUponResultAborted)
-            result.add(Result.ABORTED);
-        if (this.triggerDownstreamUponResultNotBuilt)
-            result.add(Result.NOT_BUILT);
-        if (this.triggerDownstreamUponResultFailure)
-            result.add(Result.FAILURE);
+        if (this.triggerDownstreamUponResultSuccess) result.add(Result.SUCCESS);
+        if (this.triggerDownstreamUponResultUnstable) result.add(Result.UNSTABLE);
+        if (this.triggerDownstreamUponResultAborted) result.add(Result.ABORTED);
+        if (this.triggerDownstreamUponResultNotBuilt) result.add(Result.NOT_BUILT);
+        if (this.triggerDownstreamUponResultFailure) result.add(Result.FAILURE);
 
         return result;
     }
@@ -306,21 +300,19 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
                 .includeEmptyValue()
                 .withMatching(
                         CredentialsMatchers.always(),
-                        CredentialsProvider.lookupCredentials(UsernamePasswordCredentials.class,
-                                Jenkins.get(),
-                                ACL.SYSTEM,
-                                Collections.EMPTY_LIST));
+                        CredentialsProvider.lookupCredentials(
+                                UsernamePasswordCredentials.class, Jenkins.get(), ACL.SYSTEM, Collections.EMPTY_LIST));
     }
 
     @POST
     public FormValidation doValidateJdbcConnection(
-                                     @QueryParameter String jdbcUrl,
-                                     @QueryParameter String properties,
-                                     @QueryParameter String jdbcCredentialsId,
-                                     @QueryParameter String daoClass) {
+            @QueryParameter String jdbcUrl,
+            @QueryParameter String properties,
+            @QueryParameter String jdbcCredentialsId,
+            @QueryParameter String daoClass) {
         Jenkins.get().checkPermission(Jenkins.ADMINISTER);
         Optional<PipelineMavenPluginDao> optionalPipelineMavenPluginDao = findDaoFromExtension(daoClass);
-        if(optionalPipelineMavenPluginDao.isEmpty()) {
+        if (optionalPipelineMavenPluginDao.isEmpty()) {
             return FormValidation.ok("OK");
         }
 
