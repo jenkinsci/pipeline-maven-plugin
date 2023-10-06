@@ -100,8 +100,8 @@
     <jenkins-plugin-mysql.version>8.0.16</jenkins-plugin-mysql.version>
     <jenkins-plugin-postgresql.version>42.6.0-31.vb_7e76dc13969</jenkins-plugin-postgresql.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
-    <jenkins-tools-bom.version>2543.vfb_1a_5fb_9496d</jenkins-tools-bom.version>
-    <jenkins.version>2.387.3</jenkins.version>
+    <jenkins-tools-bom.version>2745.vc7b_fe4c876fa_</jenkins-tools-bom.version>
+    <jenkins.version>2.401.3</jenkins.version>
     <junit.version>5.10.1</junit.version>
     <mariadb-client.version>3.3.2</mariadb-client.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
@@ -120,7 +120,7 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.387.x</artifactId>
+        <artifactId>bom-2.401.x</artifactId>
         <version>${jenkins-tools-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
