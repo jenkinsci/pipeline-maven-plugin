@@ -102,7 +102,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         // @formatter:off
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn package'\n" +
             "        } else {\n" +
@@ -117,7 +117,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
         // verify provided Maven is used
-        jenkinsRule.assertLogContains("using Maven installation 'apache-maven-3.6.3'", build);
+        jenkinsRule.assertLogContains("using Maven installation 'apache-maven-3'", build);
 
         // verify .pom is archived and fingerprinted
         // "[withMaven] Archive ... under
@@ -715,7 +715,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -753,9 +753,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
             "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
             "    <servers>\n" +
-            "       <server>\n" +
-            "           <id>id-global-settings-test-from-config-file-provider</id>\n" +
-            "       </server>\n" +
+            "        <server>\n" +
+            "            <id>id-global-settings-test-from-config-file-provider</id>\n" +
+            "        </server>\n" +
             "    </servers>\n" +
             "</settings>\n";
         // @formatter:on
@@ -778,7 +778,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -842,7 +842,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -892,9 +892,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
             "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
             "    <servers>\n" +
-            "       <server>\n" +
-            "           <id>id-global-settings-test</id>\n" +
-            "       </server>\n" +
+            "        <server>\n" +
+            "            <id>id-global-settings-test</id>\n" +
+            "        </server>\n" +
             "    </servers>\n" +
             "</settings>'''\n" +
             "\n" +
@@ -910,7 +910,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', globalMavenSettingsFilePath: 'maven-global-settings.xml') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3', globalMavenSettingsFilePath: 'maven-global-settings.xml') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -941,9 +941,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
             "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
             "    <servers>\n" +
-            "       <server>\n" +
-            "           <id>id-settings-test</id>\n" +
-            "       </server>\n" +
+            "        <server>\n" +
+            "            <id>id-settings-test</id>\n" +
+            "        </server>\n" +
             "    </servers>\n" +
             "</settings>'''\n" +
             "\n" +
@@ -959,7 +959,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', mavenSettingsFilePath: 'maven-settings.xml') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3', mavenSettingsFilePath: 'maven-settings.xml') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'env && mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -989,9 +989,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
             "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
             "    <servers>\n" +
-            "       <server>\n" +
-            "           <id>id-settings-test</id>\n" +
-            "       </server>\n" +
+            "        <server>\n" +
+            "            <id>id-settings-test</id>\n" +
+            "        </server>\n" +
             "    </servers>\n" +
             "</settings>\n";
         // @formatter:on
@@ -1012,7 +1012,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -1071,7 +1071,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -1132,7 +1132,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +
@@ -1177,9 +1177,9 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "        xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'\n" +
             "        xsi:schemaLocation='http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd'>\n" +
             "    <servers>\n" +
-            "       <server>\n" +
-            "           <id>id-settings-test-from-pipeline-attribute-and-config-file-provider</id>\n" +
-            "       </server>\n" +
+            "        <server>\n" +
+            "            <id>id-settings-test-from-pipeline-attribute-and-config-file-provider</id>\n" +
+            "        </server>\n" +
             "    </servers>\n" +
             "</settings>\n";
         // @formatter:on
@@ -1207,7 +1207,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "    <packaging>pom</packaging>\n" +
             "</project>'''\n" +
             "\n" +
-            "    withMaven(traceability: true, maven: 'apache-maven-3.6.3', mavenSettingsConfig: 'maven-config-test-from-pipeline-attribute') {\n" +
+            "    withMaven(traceability: true, maven: 'apache-maven-3', mavenSettingsConfig: 'maven-config-test-from-pipeline-attribute') {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn help:effective-settings'\n" +
             "        } else {\n" +

@@ -1,22 +1,19 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
-import hudson.FilePath;
 import hudson.model.Result;
 import hudson.model.Slave;
-import hudson.tasks.Maven;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import jenkins.model.Jenkins;
 import jenkins.mvn.DefaultGlobalSettingsProvider;
 import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
+import org.jenkinsci.plugins.pipeline.maven.util.MavenUtil;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -61,10 +58,10 @@ public class WithMavenStepNoOptionalsTest {
         jenkinsRule
                 .extraEnv(
                         "MAVEN_ZIP_PATH",
-                        Paths.get("target", "apache-maven-3.6.3-bin.zip")
+                        Paths.get("target", "apache-maven-" + MavenUtil.MAVEN_VERSION + "-bin.zip")
                                 .toAbsolutePath()
                                 .toString())
-                .extraEnv("MAVEN_VERSION", "3.6.3")
+                .extraEnv("MAVEN_VERSION", MavenUtil.MAVEN_VERSION)
                 .then(WithMavenStepNoOptionalsTest::setup, new Build(gitRepoRule.toString()));
     }
 
@@ -101,19 +98,7 @@ public class WithMavenStepNoOptionalsTest {
     private static void setup(final JenkinsRule r) throws Throwable {
         Slave agent = agentRule.createAgent(r, "mock");
         r.waitOnline(agent);
-
-        String mavenVersion = "3.6.3";
-        FilePath buildDirectory =
-                agent.getRootPath(); // No need of MasterToSlaveCallable because agent is a dumb, thus sharing file
-        // system with controller
-        FilePath mvnHome = buildDirectory.child("apache-maven-" + mavenVersion);
-        FilePath mvn = buildDirectory.createTempFile("maven", "zip");
-        mvn.copyFrom(new URL("https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/" + mavenVersion
-                + "/apache-maven-" + mavenVersion + "-bin.tar.gz"));
-        mvn.untar(buildDirectory, FilePath.TarCompression.GZIP);
-        Maven.MavenInstallation mavenInstallation =
-                new Maven.MavenInstallation("default", mvnHome.getRemote(), JenkinsRule.NO_PROPERTIES);
-        Jenkins.get().getDescriptorByType(Maven.DescriptorImpl.class).setInstallations(mavenInstallation);
+        MavenUtil.configureDefaultMaven(agent.getRootPath());
 
         GlobalMavenConfig globalMavenConfig = r.get(GlobalMavenConfig.class);
         globalMavenConfig.setGlobalSettingsProvider(new DefaultGlobalSettingsProvider());
