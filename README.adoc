@@ -168,9 +168,7 @@ https://github.com/jenkinsci/configuration-as-code-plugin/tree/master/demos/pipe
 [#feature-sensible-default-maven-settings]
 === Sensible default Maven parameters
 
-The Maven parameters that are useful on a build server, `--batch-mode` (`-B`) and `--no-transfer-progress` (`-ntp`) are enable by default, no need to add them in your mvn invocations.
-
-if **<<feature-traceability>>** is enabled, `--no-transfer-progress` (`-ntp`) option is removed, and `--show-version` (`-V`) is added.
+The Maven parameters that are useful on a build server, `--batch-mode`(`-B`) and `--show-version` (`-V`) are enable by default, no need to add them in your mvn invocations.
 
 [#feature-maven-integration-global-settings]
 === Maven Settings Support
