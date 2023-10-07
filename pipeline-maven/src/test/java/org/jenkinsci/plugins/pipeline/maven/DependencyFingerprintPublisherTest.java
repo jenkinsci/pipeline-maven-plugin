@@ -39,7 +39,7 @@ public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest 
             "}";
         // @formatter:on
 
-        String commonsLang3version35Md5 = "780b5a8b72eebe6d0dbff1c11b5658fa";
+        String commonsLang3version310Md5 = "3435b913691a5c1b173485a49850b1a8";
 
         WorkflowJob firstPipeline;
         { // first job using commons-lang3:3.5
@@ -47,11 +47,11 @@ public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest 
             firstPipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
             jenkinsRule.assertBuildStatus(Result.SUCCESS, firstPipeline.scheduleBuild2(0));
 
-            Fingerprint fingerprint = jenkinsRule.jenkins.getFingerprintMap().get(commonsLang3version35Md5);
+            Fingerprint fingerprint = jenkinsRule.jenkins.getFingerprintMap().get(commonsLang3version310Md5);
             assertThat(fingerprint).isNotNull();
 
             assertThat(fingerprint.getFileName())
-                    .isEqualTo("org/apache/commons/commons-lang3/3.5/commons-lang3-3.5.jar");
+                    .isEqualTo("org/apache/commons/commons-lang3/3.13.0/commons-lang3-3.13.0.jar");
             Fingerprint.BuildPtr original = fingerprint.getOriginal();
             assertThat(original).isNull();
             Hashtable<String, Fingerprint.RangeSet> usages = fingerprint.getUsages();
@@ -64,7 +64,7 @@ public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest 
             secondPipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
             jenkinsRule.assertBuildStatus(Result.SUCCESS, secondPipeline.scheduleBuild2(0));
 
-            Fingerprint fingerprint = jenkinsRule.jenkins.getFingerprintMap().get(commonsLang3version35Md5);
+            Fingerprint fingerprint = jenkinsRule.jenkins.getFingerprintMap().get(commonsLang3version310Md5);
             assertThat(fingerprint).isNotNull();
             Hashtable<String, Fingerprint.RangeSet> usages = fingerprint.getUsages();
             assertThat(usages).hasSize(2);

@@ -119,7 +119,10 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
 
     // the jdk path is configured in Dockerfile
     private static Stream<Arguments> jdkMapProvider() {
-        return Stream.of(arguments("jdk8", "/opt/java/jdk8"), arguments("jdk11", "/opt/java/jdk11"));
+        return Stream.of(
+                arguments("jdk8", "/opt/java/jdk8"),
+                arguments("jdk11", "/opt/java/jdk11"),
+                arguments("jdk17", "/opt/java/jdk17"));
     }
 
     @ParameterizedTest

@@ -4,6 +4,10 @@
     <groupId>com.deploy.sample</groupId>
     <artifactId>maven_deployfile_base_project</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <properties>
+        <maven.compiler.release>11</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>com.deploy.sample</groupId>
@@ -11,4 +15,14 @@
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.11.0</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

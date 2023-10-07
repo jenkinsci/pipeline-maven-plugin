@@ -92,7 +92,7 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
             assertThat(dependencies)
                     .contains(
                             dep("jenkins.mvn.test.multimodule", "shared-core", "jar", "0.0.1-SNAPSHOT", "compile"),
-                            dep("junit", "junit", "jar", "4.13.1", "test"),
+                            dep("junit", "junit", "jar", "4.13.2", "test"),
                             dep("org.hamcrest", "hamcrest-core", "jar", "1.3", "test"));
 
             List<MavenArtifact> generatedArtifacts = GlobalPipelineMavenConfig.get()
