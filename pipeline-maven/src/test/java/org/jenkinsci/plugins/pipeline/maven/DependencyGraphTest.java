@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.pipeline.maven;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runAfterMethod;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runBeforeMethod;
+import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import hudson.ExtensionList;
 import hudson.model.Cause;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.condition.OS;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
+@EnabledOnOs(LINUX) // "fatal error: aux_index does not match even or odd indices" on Windows JDK 19
 public class DependencyGraphTest extends AbstractIntegrationTest {
 
     public GitSampleRepoRule downstreamArtifactRepoRule;
