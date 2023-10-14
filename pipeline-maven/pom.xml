@@ -168,6 +168,12 @@
       <artifactId>jgiven</artifactId>
       <version>${jenkins-plugin-jgiven.version}</version>
       <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>net.bytebuddy</groupId>
+          <artifactId>byte-buddy</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>

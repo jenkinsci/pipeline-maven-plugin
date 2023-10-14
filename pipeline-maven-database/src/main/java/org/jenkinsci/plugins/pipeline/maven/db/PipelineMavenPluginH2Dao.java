@@ -24,6 +24,7 @@
 
 package org.jenkinsci.plugins.pipeline.maven.db;
 
+import com.zaxxer.hikari.HikariDataSource;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import java.io.File;
@@ -51,6 +52,7 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
         super(ds);
     }
 
+    @Override
     protected boolean acceptNoCredentials() {
         return true;
     }
@@ -113,35 +115,40 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
 
     @Override
     public void close() throws IOException {
-        LOGGER.log(Level.INFO, "Termination of the DAO Requested");
-        boolean requireShutdown = false;
-        try (Connection conn = getDataSource().getConnection()) {
-            String url = conn.getMetaData().getURL();
-            // if we are using a file based URL - so the DB needs to be closed.
-            requireShutdown = url.startsWith("jdbc:h2:file:");
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Failed to determin if the DB needs to be shutdown.", e);
-        }
-        if (requireShutdown) {
-            LOGGER.log(Level.FINE, "Termination of the DAO Requested and shutdown is required");
-            try (Connection con = getDataSource().getConnection()) {
-                try (Statement stmt = con.createStatement()) {
-                    stmt.execute("SHUTDOWN");
-                }
-            } catch (SQLException e) {
-                if (e.getErrorCode() == 90121) {
-                    // DATABASE_CALLED_AT_SHUTDOWN (the JVM shutdown hooks are running already :-o )
-                    LOGGER.log(Level.FINE, "Failed to close the database as it is already closed", e);
-                } else {
-                    LOGGER.log(Level.WARNING, "Failed to cleanly close the database", e);
-                }
-            }
+        if (isClosed()) {
+            LOGGER.log(Level.FINE, "DataSource already closed, cancelling DAO closing");
         } else {
-            LOGGER.log(Level.FINE, "Termination of the DAO Requested not required, as requireShutdown is false");
+            LOGGER.log(Level.INFO, "Termination of the DAO Requested");
+            boolean requireShutdown = false;
+            try (Connection conn = getDataSource().getConnection()) {
+                String url = conn.getMetaData().getURL();
+                // if we are using a file based URL - so the DB needs to be closed.
+                requireShutdown = url.startsWith("jdbc:h2:file:");
+            } catch (SQLException e) {
+                LOGGER.log(Level.WARNING, "Failed to determin if the DB needs to be shutdown.", e);
+            }
+            if (requireShutdown) {
+                LOGGER.log(Level.FINE, "Termination of the DAO Requested and shutdown is required");
+                try (Connection con = getDataSource().getConnection()) {
+                    try (Statement stmt = con.createStatement()) {
+                        stmt.execute("SHUTDOWN");
+                    }
+                } catch (SQLException e) {
+                    if (e.getErrorCode() == 90121) {
+                        // DATABASE_CALLED_AT_SHUTDOWN (the JVM shutdown hooks are running already :-o )
+                        LOGGER.log(Level.FINE, "Failed to close the database as it is already closed", e);
+                    } else {
+                        LOGGER.log(Level.WARNING, "Failed to cleanly close the database", e);
+                    }
+                }
+            } else {
+                LOGGER.log(Level.FINE, "Termination of the DAO Requested not required, as requireShutdown is false");
+            }
         }
         super.close();
     }
 
+    @Override
     public String getDefaultJdbcUrl() {
         File databaseRootDir = new File(Jenkins.get().getRootDir(), "jenkins-jobs");
         if (!databaseRootDir.exists()) {
@@ -152,5 +159,17 @@ public class PipelineMavenPluginH2Dao extends AbstractPipelineMavenPluginDao {
         }
         return "jdbc:h2:file:" + new File(databaseRootDir, "jenkins-jobs").getAbsolutePath() + ";"
                 + "AUTO_SERVER=TRUE;MULTI_THREADED=1;QUERY_CACHE_SIZE=25;JMX=TRUE";
+    }
+
+    private boolean isClosed() {
+        DataSource ds = getDataSource();
+        if (ds instanceof HikariDataSource) {
+            return ((HikariDataSource) ds).isClosed();
+        }
+        try (Connection connection = ds.getConnection()) {
+            return connection == null || connection.isClosed();
+        } catch (Exception ex) {
+            return true;
+        }
     }
 }
