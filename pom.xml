@@ -96,7 +96,7 @@
     <jenkins-plugin-h2.version>1.4.199</jenkins-plugin-h2.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
     <jenkins-plugin-maven-invoker.version>2.5</jenkins-plugin-maven-invoker.version>
-    <jenkins-plugin-maven.version>3.22</jenkins-plugin-maven.version>
+    <jenkins-plugin-maven.version>3.23</jenkins-plugin-maven.version>
     <jenkins-plugin-mysql.version>8.0.16</jenkins-plugin-mysql.version>
     <jenkins-plugin-postgresql.version>42.6.0-31.vb_7e76dc13969</jenkins-plugin-postgresql.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
