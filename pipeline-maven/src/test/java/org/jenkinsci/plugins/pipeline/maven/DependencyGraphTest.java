@@ -3,7 +3,6 @@ package org.jenkinsci.plugins.pipeline.maven;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runAfterMethod;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runBeforeMethod;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import hudson.ExtensionList;
@@ -34,13 +33,14 @@ import org.jenkinsci.plugins.workflow.multibranch.WorkflowMultiBranchProject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-@EnabledOnOs(LINUX) // "fatal error: aux_index does not match even or odd indices" on Windows JDK 19
+@EnabledOnOs(value = LINUX, disabledReason = "'fatal error: aux_index does not match even or odd indices' on Windows JDK 19")
 public class DependencyGraphTest extends AbstractIntegrationTest {
 
     public GitSampleRepoRule downstreamArtifactRepoRule;
@@ -504,10 +504,13 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         assertThat(upstreamCause).isNotNull();
     }
 
+    public boolean checkIsLinuxAndDockerSocketExists() {
+        return OS.current() == OS.LINUX && Files.exists(Paths.get("/var/run/docker.sock"));
+    }
+
     @Test
-    @EnabledOnOs(OS.LINUX) // Docker does not work on Windows 2019 servers CI agents
+    @EnabledIf(value = "checkIsLinuxAndDockerSocketExists", disabledReason = "Needs Docker and Docker does not work on Windows 2019 servers CI agents")
     public void verify_docker_downstream_simple_pipeline_trigger() throws Exception {
-        assumeTrue(Files.exists(Paths.get("/var/run/docker.sock")));
         System.out.println("gitRepoRule: " + gitRepoRule);
         loadSourceCodeInGitRepository(
                 this.gitRepoRule,

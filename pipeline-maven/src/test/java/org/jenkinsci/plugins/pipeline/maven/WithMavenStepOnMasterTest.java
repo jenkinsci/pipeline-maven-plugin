@@ -681,7 +681,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
+    @EnabledOnOs(value = LINUX, disabledReason = "bat step get stuck on Windows 2019 CI agents")
     public void maven_global_settings_path_defined_through_jenkins_global_config() throws Exception {
 
         File mavenGlobalSettingsFile = new File(jenkinsRule.jenkins.getRootDir(), "maven-global-settings.xml");
@@ -742,7 +742,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
+    @EnabledOnOs(value = LINUX, disabledReason = "bat step get stuck on Windows 2019 CI agents")
     public void maven_global_settings_defined_through_jenkins_global_config_and_config_file_provider()
             throws Exception {
 
@@ -807,7 +807,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
+    @EnabledOnOs(value = LINUX, disabledReason = "bat step get stuck on Windows 2019 CI agents")
     public void maven_global_settings_defined_through_folder_config_and_config_file_provider() throws Exception {
 
         // @formatter:off
@@ -881,7 +881,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
+    @EnabledOnOs(value = LINUX, disabledReason = "bat step get stuck on Windows 2019 CI agents")
     public void maven_global_settings_path_defined_through_pipeline_attribute() throws Exception {
 
         // @formatter:off
@@ -930,7 +930,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
     @Issue("JENKINS-42565")
     @Test
-    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
+    @EnabledOnOs(value = LINUX, disabledReason = "bat step get stuck on Windows 2019 CI agents")
     public void maven_settings_path_defined_through_pipeline_attribute() throws Exception {
 
         // @formatter:off
@@ -978,7 +978,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
+    @EnabledOnOs(value = LINUX, disabledReason = "bat step get stuck on Windows 2019 CI agents")
     public void maven_settings_defined_through_jenkins_global_config() throws Exception {
 
         File mavenSettingsFile = new File(jenkinsRule.jenkins.getRootDir(), "maven-settings.xml");
@@ -1037,7 +1037,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
+    @EnabledOnOs(value = LINUX, disabledReason = "bat step get stuck on Windows 2019 CI agents")
     public void maven_settings_defined_through_jenkins_global_config_and_config_file_provider() throws Exception {
 
         // @formatter:off
@@ -1098,7 +1098,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
+    @EnabledOnOs(value = LINUX, disabledReason = "bat step get stuck on Windows 2019 CI agents")
     public void maven_settings_defined_through_folder_config_and_config_file_provider() throws Exception {
 
         // @formatter:off
@@ -1167,7 +1167,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @EnabledOnOs(LINUX) // bat step get stuck on Windows 2019 CI agents
+    @EnabledOnOs(value = LINUX, disabledReason = "bat step get stuck on Windows 2019 CI agents")
     public void maven_settings_defined_through_pipeline_attribute_and_config_file_provider() throws Exception {
 
         // @formatter:off
