@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.pipeline.maven;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runAfterMethod;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runBeforeMethod;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import hudson.ExtensionList;
@@ -10,6 +11,8 @@ import hudson.model.Cause;
 import hudson.model.CauseAction;
 import hudson.model.Result;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -504,6 +507,7 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
     @Test
     @EnabledOnOs(OS.LINUX) // Docker does not work on Windows 2019 servers CI agents
     public void verify_docker_downstream_simple_pipeline_trigger() throws Exception {
+        assumeTrue(Files.exists(Paths.get("/var/run/docker.sock")));
         System.out.println("gitRepoRule: " + gitRepoRule);
         loadSourceCodeInGitRepository(
                 this.gitRepoRule,
