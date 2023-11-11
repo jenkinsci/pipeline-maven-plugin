@@ -40,7 +40,9 @@ import org.junit.jupiter.api.condition.OS;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-@EnabledOnOs(value = LINUX, disabledReason = "'fatal error: aux_index does not match even or odd indices' on Windows JDK 19")
+@EnabledOnOs(
+        value = LINUX,
+        disabledReason = "'fatal error: aux_index does not match even or odd indices' on Windows JDK 19")
 public class DependencyGraphTest extends AbstractIntegrationTest {
 
     public GitSampleRepoRule downstreamArtifactRepoRule;
@@ -509,7 +511,9 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @EnabledIf(value = "checkIsLinuxAndDockerSocketExists", disabledReason = "Needs Docker and Docker does not work on Windows 2019 servers CI agents")
+    @EnabledIf(
+            value = "checkIsLinuxAndDockerSocketExists",
+            disabledReason = "Needs Docker and Docker does not work on Windows 2019 servers CI agents")
     public void verify_docker_downstream_simple_pipeline_trigger() throws Exception {
         System.out.println("gitRepoRule: " + gitRepoRule);
         loadSourceCodeInGitRepository(
