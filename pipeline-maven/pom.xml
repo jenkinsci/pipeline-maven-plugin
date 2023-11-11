@@ -508,6 +508,9 @@
         <os>
           <family>unix</family>
         </os>
+        <file>
+          <exists>/var/run/docker.sock</exists>
+        </file>
       </activation>
       <build>
         <plugins>
