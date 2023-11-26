@@ -37,6 +37,7 @@ public class WithMavenStepNoOptionalsTest {
     public RealJenkinsRule jenkinsRule = new RealJenkinsRule()
             .omitPlugins(
                     "commons-lang3-api",
+                    "mariadb-api",
                     "mysql-api",
                     "postgresql-api",
                     "maven-plugin",

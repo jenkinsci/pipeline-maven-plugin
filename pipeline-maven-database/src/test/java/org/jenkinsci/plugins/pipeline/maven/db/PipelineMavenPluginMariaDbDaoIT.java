@@ -70,7 +70,7 @@ public class PipelineMavenPluginMariaDbDaoIT extends PipelineMavenPluginDaoAbstr
 
     @Override
     public AbstractPipelineMavenPluginDao before_newAbstractPipelineMavenPluginDao(DataSource ds) {
-        return new PipelineMavenPluginMySqlDao(ds) {
+        return new PipelineMavenPluginMariaDbDao(ds) {
             @Override
             protected MigrationStep.JenkinsDetails getJenkinsDetails() {
                 return new MigrationStep.JenkinsDetails() {

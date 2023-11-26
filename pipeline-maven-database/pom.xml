@@ -25,13 +25,16 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>h2-api</artifactId>
-      <version>${jenkins-plugin-h2.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>mariadb-api</artifactId>
       <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>mysql-api</artifactId>
-      <version>${jenkins-plugin-mysql.version}</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -43,7 +46,6 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>postgresql-api</artifactId>
-      <version>${jenkins-plugin-postgresql.version}</version>
       <optional>true</optional>
     </dependency>
     <dependency>
