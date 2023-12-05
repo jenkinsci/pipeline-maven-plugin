@@ -364,7 +364,13 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
         StringBuilder mavenConfig = new StringBuilder();
         mavenConfig.append("--batch-mode ");
-        ifTraceabilityDisabled(() -> mavenConfig.append("--no-transfer-progress "));
+        ifTraceabilityDisabled(() -> {
+            // In batch-mode transfer output is sent through Slf4jMavenTransferListener
+            // Not using -ntp because it breaks maven <=3.6 which does not support the option
+            // Maven 4.0 supports CI=true to quite transfer output
+            mavenConfig.append(
+                    "-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn ");
+        });
         ifTraceabilityEnabled(() -> mavenConfig.append("--show-version "));
         if (StringUtils.isNotEmpty(settingsFilePath)) {
             // JENKINS-57324 escape '%' as '%%'. See
