@@ -22,7 +22,7 @@ Since the version 1.14 of the Docker Pipeline plugin, `withMaven` requires to
 
 * Either prepend the `MVN_CMD_DIR` environment variable to the `PATH` environment variable in every `sh` step that invokes `mvn` (e.g. `sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy'`).
 * Or call the generated script directly via `MVN_CMD` (e.g. `sh '$MVN_CMD clean deploy'`)
-* Or use Takari's Maven Wrapper (e.g. `sh './mvnw clean deploy'`)
+* Or use https://maven.apache.org/wrapper/[Maven Wrapper] (e.g. `sh './mvnw clean deploy'`)
 
 If omitted, the Maven settings file and Mven global settings file will not be injected in the Maven execution.
 
