@@ -41,6 +41,7 @@ import hudson.FilePath;
 import hudson.Functions;
 import hudson.Launcher;
 import hudson.Launcher.ProcStarter;
+import hudson.Platform;
 import hudson.Proc;
 import hudson.Util;
 import hudson.console.ConsoleLogFilter;
@@ -52,12 +53,16 @@ import hudson.model.Job;
 import hudson.model.Node;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.remoting.VirtualChannel;
 import hudson.slaves.WorkspaceList;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.ArrayList;
@@ -68,11 +73,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import jenkins.MasterToSlaveFileCallable;
 import jenkins.model.Jenkins;
 import jenkins.mvn.DefaultGlobalSettingsProvider;
 import jenkins.mvn.DefaultSettingsProvider;
@@ -94,6 +101,8 @@ import org.jenkinsci.plugins.configfiles.maven.security.ServerCredentialMapping;
 import org.jenkinsci.plugins.pipeline.maven.console.MaskPasswordsConsoleLogFilter;
 import org.jenkinsci.plugins.pipeline.maven.console.MavenColorizerConsoleLogFilter;
 import org.jenkinsci.plugins.pipeline.maven.util.FileUtils;
+import org.jenkinsci.plugins.pipeline.maven.util.MavenVersion;
+import org.jenkinsci.plugins.pipeline.maven.util.MavenVersionUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.TaskListenerTraceWrapper;
 import org.jenkinsci.plugins.tokenmacro.MacroEvaluationException;
 import org.jenkinsci.plugins.tokenmacro.TokenMacro;
@@ -359,12 +368,22 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                 + "-Dorg.jenkinsci.plugins.pipeline.maven.reportsFolder=\"" + this.tempBinDir.getRemote() + "\" ";
         envOverride.put("JAVA_TOOL_OPTIONS", javaToolsOptions);
 
+        // MAVEN SCRIPT WRAPPER
+        String mvnExecPath = obtainMavenExec();
+        MavenVersion mvnVersion = readMavenVersion(mvnExecPath);
+        if (!mvnVersion.isAtLeast(3, 8)) {
+            console.println("[withMaven] WARNING: You are running an old version of Maven (" + mvnVersion
+                    + "), you should update to at least 3.8.x");
+        }
+
         //
         // MAVEN_CONFIG
         boolean isUnix = Boolean.TRUE.equals(getComputer().isUnix());
         StringBuilder mavenConfig = new StringBuilder();
         mavenConfig.append("--batch-mode ");
-        ifTraceabilityDisabled(() -> mavenConfig.append("--no-transfer-progress "));
+        if (mvnVersion.isAtLeast(3, 6, 1)) {
+            ifTraceabilityDisabled(() -> mavenConfig.append("--no-transfer-progress "));
+        }
         ifTraceabilityEnabled(() -> mavenConfig.append("--show-version "));
         if (StringUtils.isNotEmpty(settingsFilePath)) {
             // JENKINS-57324 escape '%' as '%%'. See
@@ -401,9 +420,6 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             }
             envOverride.put(MAVEN_OPTS, mavenOpts.replaceAll("[\t\r\n]+", " "));
         }
-
-        // MAVEN SCRIPT WRAPPER
-        String mvnExecPath = obtainMavenExec();
 
         LOGGER.log(Level.FINE, "Using temp dir: {0}", tempBinDir.getRemote());
 
@@ -622,6 +638,46 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         console.trace("[withMaven] using Maven installation '" + mavenInstallation.getName() + "'");
 
         return mavenInstallation.getExecutable(launcher);
+    }
+
+    private MavenVersion readMavenVersion(String mvnExecPath) {
+        try {
+            Optional<String> version = new FilePath(ws.getChannel(), mvnExecPath)
+                    .act(new MasterToSlaveFileCallable<Optional<String>>() {
+
+                        private static final long serialVersionUID = -1064011914865943982L;
+
+                        @Override
+                        public Optional<String> invoke(File f, VirtualChannel channel)
+                                throws IOException, InterruptedException {
+                            ProcessBuilder builder = new ProcessBuilder();
+                            if (Platform.current() == Platform.WINDOWS) {
+                                builder.command("cmd.exe", "/c", "\"" + f.getAbsolutePath() + "\" --version");
+                            } else {
+                                builder.command("sh", "-c", "\"" + f.getAbsolutePath() + "\" --version");
+                            }
+                            Process process = builder.start();
+                            try (InputStreamReader is = new InputStreamReader(process.getInputStream(), "UTF-8");
+                                    BufferedReader reader = new BufferedReader(is)) {
+                                Optional<String> versionLine = reader.lines()
+                                        .filter(MavenVersionUtils.containsMavenVersion())
+                                        .findFirst();
+                                int exitCode = process.waitFor();
+                                if (exitCode != 0) {
+                                    console.trace("[withMaven] failed to read Maven version (" + exitCode + "): "
+                                            + new String(
+                                                    process.getErrorStream().readAllBytes(), "UTF-8"));
+                                }
+                                return exitCode == 0 ? versionLine : Optional.empty();
+                            }
+                        }
+                    });
+            console.trace("[withMaven] found Maven version: " + version.orElse("none"));
+            return version.map(MavenVersionUtils::parseMavenVersion).orElse(MavenVersion.UNKNOWN);
+        } catch (Exception ex) {
+            console.trace("[withMaven] failed to read Maven version: " + ex.getMessage());
+            return MavenVersion.UNKNOWN;
+        }
     }
 
     /**
