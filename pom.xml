@@ -103,7 +103,7 @@
     <jenkins-tools-bom.version>2543.vfb_1a_5fb_9496d</jenkins-tools-bom.version>
     <jenkins.version>2.387.3</jenkins.version>
     <junit.version>5.10.1</junit.version>
-    <mariadb-client.version>3.3.0</mariadb-client.version>
+    <mariadb-client.version>3.3.2</mariadb-client.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.8.8</maven.version>
