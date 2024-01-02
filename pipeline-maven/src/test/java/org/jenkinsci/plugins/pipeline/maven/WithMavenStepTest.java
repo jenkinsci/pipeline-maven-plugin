@@ -38,6 +38,7 @@ import hudson.model.Result;
 import hudson.plugins.sshslaves.SSHLauncher;
 import hudson.slaves.DumbSlave;
 import hudson.slaves.RetentionStrategy;
+import hudson.tasks.Maven;
 import hudson.tools.ToolLocationNodeProperty;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -45,7 +46,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.stream.Stream;
+import jenkins.model.Jenkins;
 import org.apache.commons.io.FileUtils;
+import org.jenkinsci.plugins.pipeline.maven.util.MavenUtil;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -166,6 +169,48 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
             assertThat(archives.iterator().next().endsWith("mono-dependency-maven-project-0.1-SNAPSHOT.jar"))
                     .isTrue();
         }
+    }
+
+    private static Stream<Arguments> mavenMapProvider() {
+        return Stream.of(
+                arguments("3.8.8", false),
+                arguments("3.6.3", true),
+                arguments("3.5.4", true),
+                arguments("3.3.9", true));
+    }
+
+    @ParameterizedTest
+    @MethodSource("mavenMapProvider")
+    public void tesWithDifferentMavensForBuild(String mavenVersion, boolean shouldWarn) throws Exception {
+        Maven.MavenInstallation mvn =
+                MavenUtil.configureMaven(Jenkins.get().getRootPath(), mavenVersion, "apache-maven-" + mavenVersion);
+        loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
+
+        // @formatter:off
+        WorkflowRun run = runPipeline(
+                Result.SUCCESS,
+                "node() {\n" +
+                "  git($/" + gitRepoRule.toString() + "/$)\n" +
+                "  withMaven(maven: '" + mvn.getName() + "') {\n" +
+                "    sh 'mvn package'\n" +
+                "  }\n" +
+                "}"
+            );
+        // @formatter:on
+
+        if (shouldWarn) {
+            jenkinsRule.assertLogContains(
+                    "[withMaven] WARNING: You are running an old version of Maven (" + mavenVersion
+                            + "), you should update to at least 3.8.x",
+                    run);
+        }
+        jenkinsRule.assertLogContains(
+                "artifactsPublisher - Archive artifact target/mono-dependency-maven-project-0.1-SNAPSHOT.jar", run);
+
+        Collection<String> archives = run.pickArtifactManager().root().list("**/**.jar", "", true);
+        assertThat(archives).hasSize(1);
+        assertThat(archives.iterator().next().endsWith("mono-dependency-maven-project-0.1-SNAPSHOT.jar"))
+                .isTrue();
     }
 
     private WorkflowRun runPipeline(Result expectedResult, String pipelineScript) throws Exception {
