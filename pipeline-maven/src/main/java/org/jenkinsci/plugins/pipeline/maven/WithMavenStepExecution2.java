@@ -1146,8 +1146,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                 }
             }
 
-            mavenSettingsFile.write(
-                    mavenSettingsFileContent, getComputer().getDefaultCharset().name());
+            mavenSettingsFile.write(mavenSettingsFileContent, "UTF-8");
         } catch (Exception e) {
             throw new IllegalStateException(
                     "Exception injecting Maven settings.xml " + mavenSettingsConfig.id + " during the build: " + build
@@ -1217,9 +1216,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                                 .collect(Collectors.joining(", ")));
             }
 
-            mavenGlobalSettingsFile.write(
-                    mavenGlobalSettingsFileContent,
-                    getComputer().getDefaultCharset().name());
+            mavenGlobalSettingsFile.write(mavenGlobalSettingsFileContent, "UTF-8");
             LOGGER.log(Level.FINE, "Created global config file {0}", new Object[] {mavenGlobalSettingsFile});
         } catch (Exception e) {
             throw new IllegalStateException(
