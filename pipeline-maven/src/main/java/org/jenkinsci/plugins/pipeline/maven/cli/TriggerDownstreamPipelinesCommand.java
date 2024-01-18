@@ -46,9 +46,6 @@ public class TriggerDownstreamPipelinesCommand extends CLICommand {
 
     @Override
     protected int run() throws Exception {
-        /*
-         * @Inject does NOT work to inject GlobalPipelineMavenConfig in the TriggerDownstreamPipelinesCommand instance, use static code :-(
-         */
         PipelineTriggerService pipelineTriggerService =
                 GlobalPipelineMavenConfig.get().getPipelineTriggerService();
 

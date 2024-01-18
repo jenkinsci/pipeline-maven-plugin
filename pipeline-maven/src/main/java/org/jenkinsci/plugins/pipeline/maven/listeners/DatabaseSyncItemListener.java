@@ -6,7 +6,6 @@ import hudson.model.ItemGroup;
 import hudson.model.listeners.ItemListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.inject.Inject;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.workflow.flow.BlockableResume;
@@ -20,14 +19,21 @@ import org.jenkinsci.plugins.workflow.flow.BlockableResume;
 public class DatabaseSyncItemListener extends ItemListener {
     private static final Logger LOGGER = Logger.getLogger(DatabaseSyncItemListener.class.getName());
 
-    @Inject
-    public GlobalPipelineMavenConfig globalPipelineMavenConfig;
+    private GlobalPipelineMavenConfig globalPipelineMavenConfig;
+
+    public GlobalPipelineMavenConfig getGlobalPipelineMavenConfig() {
+        return globalPipelineMavenConfig != null ? globalPipelineMavenConfig : GlobalPipelineMavenConfig.get();
+    }
+
+    public void setGlobalPipelineMavenConfig(GlobalPipelineMavenConfig globalPipelineMavenConfig) {
+        this.globalPipelineMavenConfig = globalPipelineMavenConfig;
+    }
 
     @Override
     public void onDeleted(Item item) {
         if (item instanceof BlockableResume) {
             LOGGER.log(Level.FINE, "onDeleted({0})", item);
-            globalPipelineMavenConfig.getDao().deleteJob(item.getFullName());
+            getGlobalPipelineMavenConfig().getDao().deleteJob(item.getFullName());
         } else {
             LOGGER.log(Level.FINE, "Ignore onDeleted({0})", new Object[] {item});
         }
@@ -46,7 +52,7 @@ public class DatabaseSyncItemListener extends ItemListener {
                 oldFullName = parent.getFullName() + "/" + oldName;
             }
             String newFullName = item.getFullName();
-            globalPipelineMavenConfig.getDao().renameJob(oldFullName, newFullName);
+            getGlobalPipelineMavenConfig().getDao().renameJob(oldFullName, newFullName);
         } else {
             LOGGER.log(Level.FINE, "Ignore onRenamed({0}, {1}, {2})", new Object[] {item, oldName, newName});
         }
@@ -56,7 +62,7 @@ public class DatabaseSyncItemListener extends ItemListener {
     public void onLocationChanged(Item item, String oldFullName, String newFullName) {
         if (item instanceof BlockableResume) {
             LOGGER.log(Level.FINE, "onLocationChanged({0}, {1}, {2})", new Object[] {item, oldFullName, newFullName});
-            globalPipelineMavenConfig.getDao().renameJob(oldFullName, newFullName);
+            getGlobalPipelineMavenConfig().getDao().renameJob(oldFullName, newFullName);
         } else {
             LOGGER.log(
                     Level.FINE, "Ignore onLocationChanged({0}, {1}, {2})", new Object[] {item, oldFullName, newFullName

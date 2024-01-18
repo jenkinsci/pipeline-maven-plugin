@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
@@ -48,15 +47,22 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
 
     private static final Logger LOGGER = Logger.getLogger(DownstreamPipelineTriggerRunListener.class.getName());
 
-    @Inject
-    public GlobalPipelineMavenConfig globalPipelineMavenConfig;
+    private GlobalPipelineMavenConfig globalPipelineMavenConfig;
+
+    public GlobalPipelineMavenConfig getGlobalPipelineMavenConfig() {
+        return globalPipelineMavenConfig != null ? globalPipelineMavenConfig : GlobalPipelineMavenConfig.get();
+    }
+
+    public void setGlobalPipelineMavenConfig(GlobalPipelineMavenConfig globalPipelineMavenConfig) {
+        this.globalPipelineMavenConfig = globalPipelineMavenConfig;
+    }
 
     @Override
     public void onCompleted(Run<?, ?> upstreamBuild, @NonNull TaskListener listener) {
         LOGGER.log(Level.FINER, "onCompleted({0})", new Object[] {upstreamBuild});
 
         UpstreamMemory upstreamMemory = new UpstreamMemory();
-        DaoHelper daoHelper = new DaoHelper(globalPipelineMavenConfig);
+        DaoHelper daoHelper = new DaoHelper(getGlobalPipelineMavenConfig());
 
         if (!shouldRun(upstreamBuild, listener)) {
             LOGGER.log(
@@ -71,7 +77,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
             listener.getLogger().println("[withMaven] pipelineGraphPublisher - triggerDownstreamPipelines");
         }
 
-        if (!globalPipelineMavenConfig
+        if (!getGlobalPipelineMavenConfig()
                 .getTriggerDownstreamBuildsResultsCriteria()
                 .contains(upstreamBuild.getResult())) {
             Map<String, List<MavenDependencyCause>> omittedPipelineFullNamesAndCauses = new HashMap<>();
@@ -162,7 +168,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
         }
 
         try {
-            this.globalPipelineMavenConfig
+            getGlobalPipelineMavenConfig()
                     .getPipelineTriggerService()
                     .checkNoInfiniteLoopOfUpstreamCause(upstreamBuild);
         } catch (IllegalStateException e) {
@@ -177,7 +183,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
 
         String upstreamPipelineFullName = upstreamPipeline.getFullName();
         int upstreamBuildNumber = upstreamBuild.getNumber();
-        Map<MavenArtifact, SortedSet<String>> downstreamPipelinesByArtifact = globalPipelineMavenConfig
+        Map<MavenArtifact, SortedSet<String>> downstreamPipelinesByArtifact = getGlobalPipelineMavenConfig()
                 .getDao()
                 .listDownstreamJobsByArtifact(upstreamPipelineFullName, upstreamBuildNumber);
         LOGGER.log(Level.FINER, "got downstreamPipelinesByArtifact for project {0} and build #{1}: {2}", new Object[] {
@@ -301,7 +307,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
 
                 // Avoid excessive triggering
                 // See #46313
-                Map<String, Integer> transitiveUpstreamPipelines = globalPipelineMavenConfig
+                Map<String, Integer> transitiveUpstreamPipelines = getGlobalPipelineMavenConfig()
                         .getDao()
                         .listTransitiveUpstreamJobs(downstreamPipelineFullName, downstreamBuildNumber, upstreamMemory);
                 if (LOGGER.isLoggable(Level.FINER)) {
@@ -320,7 +326,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                     if (job != null) {
                         Run lastSuccessfulBuild = job.getLastSuccessfulBuild();
                         if (lastSuccessfulBuild != null) {
-                            transitiveUpstreamPipelines = globalPipelineMavenConfig
+                            transitiveUpstreamPipelines = getGlobalPipelineMavenConfig()
                                     .getDao()
                                     .listTransitiveUpstreamJobs(
                                             downstreamPipelineFullName, lastSuccessfulBuild.number, upstreamMemory);
@@ -414,7 +420,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                     continue;
                 }
 
-                WorkflowJobDependencyTrigger downstreamPipelineTrigger = this.globalPipelineMavenConfig
+                WorkflowJobDependencyTrigger downstreamPipelineTrigger = getGlobalPipelineMavenConfig()
                         .getPipelineTriggerService()
                         .getWorkflowJobDependencyTrigger(
                                 (ParameterizedJobMixIn.ParameterizedJob<?, ?>) downstreamPipeline);
@@ -429,10 +435,10 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                     continue;
                 }
 
-                boolean downstreamVisibleByUpstreamBuildAuth = this.globalPipelineMavenConfig
+                boolean downstreamVisibleByUpstreamBuildAuth = getGlobalPipelineMavenConfig()
                         .getPipelineTriggerService()
                         .isDownstreamVisibleByUpstreamBuildAuth(downstreamPipeline);
-                boolean upstreamVisibleByDownstreamBuildAuth = this.globalPipelineMavenConfig
+                boolean upstreamVisibleByDownstreamBuildAuth = getGlobalPipelineMavenConfig()
                         .getPipelineTriggerService()
                         .isUpstreamBuildVisibleByDownstreamBuildAuth(upstreamPipeline, downstreamPipeline);
 

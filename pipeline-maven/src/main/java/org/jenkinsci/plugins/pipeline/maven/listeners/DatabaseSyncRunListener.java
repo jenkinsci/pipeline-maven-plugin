@@ -6,7 +6,6 @@ import hudson.model.Cause;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import javax.inject.Inject;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 
 /**
@@ -15,12 +14,19 @@ import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 @Extension
 public class DatabaseSyncRunListener extends AbstractWorkflowRunListener {
 
-    @Inject
-    public GlobalPipelineMavenConfig globalPipelineMavenConfig;
+    private GlobalPipelineMavenConfig globalPipelineMavenConfig;
+
+    public GlobalPipelineMavenConfig getGlobalPipelineMavenConfig() {
+        return globalPipelineMavenConfig != null ? globalPipelineMavenConfig : GlobalPipelineMavenConfig.get();
+    }
+
+    public void setGlobalPipelineMavenConfig(GlobalPipelineMavenConfig globalPipelineMavenConfig) {
+        this.globalPipelineMavenConfig = globalPipelineMavenConfig;
+    }
 
     @Override
     public void onDeleted(Run<?, ?> run) {
-        globalPipelineMavenConfig.getDao().deleteBuild(run.getParent().getFullName(), run.getNumber());
+        getGlobalPipelineMavenConfig().getDao().deleteBuild(run.getParent().getFullName(), run.getNumber());
     }
 
     @Override
@@ -33,7 +39,7 @@ public class DatabaseSyncRunListener extends AbstractWorkflowRunListener {
 
                 String upstreamJobName = upstreamCause.getUpstreamProject();
                 int upstreamBuildNumber = upstreamCause.getUpstreamBuild();
-                globalPipelineMavenConfig
+                getGlobalPipelineMavenConfig()
                         .getDao()
                         .recordBuildUpstreamCause(
                                 upstreamJobName,
@@ -60,7 +66,7 @@ public class DatabaseSyncRunListener extends AbstractWorkflowRunListener {
         if (result == null) {
             result = Result.SUCCESS; // FIXME more elegant handling
         }
-        globalPipelineMavenConfig
+        getGlobalPipelineMavenConfig()
                 .getDao()
                 .updateBuildOnCompletion(
                         workflowRun.getParent().getFullName(),
