@@ -33,7 +33,7 @@ public class ConfigurationAsCodeNeedDockerTest {
 
     @Container
     public static MySQLContainer<?> MYSQL_DB =
-            new MySQLContainer<>(MySQLContainer.NAME).withUsername("aUser").withPassword("aPass");
+            new MySQLContainer<>("mysql:8.2.0").withUsername("aUser").withPassword("aPass");
 
     @Container
     public static PostgreSQLContainer<?> POSTGRE_DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE)
