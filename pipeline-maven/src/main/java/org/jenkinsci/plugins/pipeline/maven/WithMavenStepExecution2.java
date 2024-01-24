@@ -76,6 +76,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -642,36 +643,35 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
     private MavenVersion readMavenVersion(String mvnExecPath) {
         try {
-            Optional<String> version = new FilePath(ws.getChannel(), mvnExecPath)
-                    .act(new MasterToSlaveFileCallable<Optional<String>>() {
+            String result = new FilePath(ws.getChannel(), mvnExecPath).act(new MasterToSlaveFileCallable<String>() {
 
-                        private static final long serialVersionUID = -1064011914865943982L;
+                private static final long serialVersionUID = -1064011914865943982L;
 
-                        @Override
-                        public Optional<String> invoke(File f, VirtualChannel channel)
-                                throws IOException, InterruptedException {
-                            ProcessBuilder builder = new ProcessBuilder();
-                            if (Platform.current() == Platform.WINDOWS) {
-                                builder.command("cmd.exe", "/c", "\"" + f.getAbsolutePath() + "\" --version");
-                            } else {
-                                builder.command("sh", "-c", "\"" + f.getAbsolutePath() + "\" --version");
-                            }
-                            Process process = builder.start();
-                            try (InputStreamReader is = new InputStreamReader(process.getInputStream(), "UTF-8");
-                                    BufferedReader reader = new BufferedReader(is)) {
-                                Optional<String> versionLine = reader.lines()
-                                        .filter(MavenVersionUtils.containsMavenVersion())
-                                        .findFirst();
-                                int exitCode = process.waitFor();
-                                if (exitCode != 0) {
-                                    console.trace("[withMaven] failed to read Maven version (" + exitCode + "): "
-                                            + new String(
-                                                    process.getErrorStream().readAllBytes(), "UTF-8"));
-                                }
-                                return exitCode == 0 ? versionLine : Optional.empty();
-                            }
+                @Override
+                public String invoke(File f, VirtualChannel channel) throws IOException, InterruptedException {
+                    ProcessBuilder builder = new ProcessBuilder();
+                    if (Platform.current() == Platform.WINDOWS) {
+                        builder.command("cmd.exe", "/c", "\"" + f.getAbsolutePath() + "\" --version");
+                    } else {
+                        builder.command("sh", "-c", "\"" + f.getAbsolutePath() + "\" --version");
+                    }
+                    Process process = builder.start();
+                    try (InputStreamReader is = new InputStreamReader(process.getInputStream(), "UTF-8");
+                            BufferedReader reader = new BufferedReader(is)) {
+                        Optional<String> versionLine = reader.lines()
+                                .filter(MavenVersionUtils.containsMavenVersion())
+                                .findFirst();
+                        int exitCode = process.waitFor();
+                        if (exitCode != 0) {
+                            console.trace("[withMaven] failed to read Maven version (" + exitCode + "): "
+                                    + new String(process.getErrorStream().readAllBytes(), "UTF-8"));
+                            return null;
                         }
-                    });
+                        return versionLine.orElse("");
+                    }
+                }
+            });
+            Optional<String> version = Optional.ofNullable(result).filter(Predicate.not(String::isBlank));
             console.trace("[withMaven] found Maven version: " + version.orElse("none"));
             return version.map(MavenVersionUtils::parseMavenVersion).orElse(MavenVersion.UNKNOWN);
         } catch (Exception ex) {
