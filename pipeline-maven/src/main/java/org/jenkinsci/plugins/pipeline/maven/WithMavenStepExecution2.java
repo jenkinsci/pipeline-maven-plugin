@@ -271,7 +271,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             String launcherClassName = launcher1.getClass().getName();
             if (launcherClassName.contains("org.csanchez.jenkins.plugins.kubernetes.pipeline.ContainerExecDecorator")) {
                 LOGGER.log(Level.FINE, "Step running within Kubernetes withContainer(): {0}", launcherClassName);
-                return false;
+                return true;
             }
             if (launcherClassName.contains("WithContainerStep")) {
                 LOGGER.log(Level.FINE, "Step running within docker.image(): {0}", launcherClassName);
