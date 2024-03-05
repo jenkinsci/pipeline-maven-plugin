@@ -280,10 +280,6 @@
       <version>${jenkins-plugin-tasks.version}</version>
       <optional>true</optional>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>${project.groupId}</groupId>
