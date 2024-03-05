@@ -262,7 +262,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         while (launcher1 instanceof Launcher.DecoratedLauncher) {
             String launcherClassName = launcher1.getClass().getName();
             if (launcherClassName.contains("ContainerExecDecorator")) {
-                LOGGER.log(Level.FINE, "Step running within Kubernetes withContainer(): {0}", launcherClassName);
+                LOGGER.log(Level.FINE, "Step running within Kubernetes container(): {0}", launcherClassName);
                 return true;
             }
             if (launcherClassName.contains("WithContainerStep")) {
