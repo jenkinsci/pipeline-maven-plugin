@@ -197,14 +197,6 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         withContainer = detectWithContainer();
 
-        if (withContainer) {
-            console.trace("[withMaven] IMPORTANT \"withMaven(){...}\" step running within a Docker container. See ");
-            console.traceHyperlink(
-                    "https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/FAQ.adoc#how-to-use-the-pipeline-maven-plugin-with-docker",
-                    "Pipeline Maven Plugin FAQ");
-            console.trace(" in case of problem.");
-        }
-
         setupJDK();
 
         // list of credentials injected by withMaven. They will be tracked and masked in the logs
@@ -265,7 +257,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * "https://github.com/jenkinsci/kubernetes-plugin/blob/master/src/main/java/org/csanchez/jenkins/plugins/kubernetes/pipeline/ContainerStep.java">
      * ContainerStep</a>
      */
-    private boolean detectWithContainer() {
+    private boolean detectWithContainer() throws IOException {
         Launcher launcher1 = launcher;
         while (launcher1 instanceof Launcher.DecoratedLauncher) {
             String launcherClassName = launcher1.getClass().getName();
@@ -275,6 +267,13 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             }
             if (launcherClassName.contains("WithContainerStep")) {
                 LOGGER.log(Level.FINE, "Step running within docker.image(): {0}", launcherClassName);
+
+                console.trace(
+                        "[withMaven] IMPORTANT \"withMaven(){...}\" step running within a Docker container. See ");
+                console.traceHyperlink(
+                        "https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/FAQ.adoc#how-to-use-the-pipeline-maven-plugin-with-docker",
+                        "Pipeline Maven Plugin FAQ");
+                console.trace(" in case of problem.");
                 return true;
             }
             launcher1 = ((Launcher.DecoratedLauncher) launcher1).getInner();
