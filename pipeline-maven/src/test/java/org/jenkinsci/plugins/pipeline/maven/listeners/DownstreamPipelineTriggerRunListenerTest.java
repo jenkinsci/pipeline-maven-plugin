@@ -43,7 +43,6 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -54,7 +53,6 @@ import org.mockito.quality.Strictness;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class DownstreamPipelineTriggerRunListenerTest {
 
-    @InjectMocks
     private DownstreamPipelineTriggerRunListener listener;
 
     @Mock
@@ -101,6 +99,7 @@ public class DownstreamPipelineTriggerRunListenerTest {
 
     @BeforeEach
     public void configureMocks() throws Exception {
+        listener = new DownstreamPipelineTriggerRunListener(config);
         when(config.getTriggerDownstreamBuildsResultsCriteria()).thenReturn(Collections.singleton(Result.SUCCESS));
         when(config.getPipelineTriggerService()).thenReturn(service);
         when(config.getDao()).thenReturn(dao);

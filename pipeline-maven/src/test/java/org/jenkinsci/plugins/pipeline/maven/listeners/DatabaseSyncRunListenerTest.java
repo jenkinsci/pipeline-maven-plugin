@@ -15,16 +15,15 @@ import org.jenkinsci.plugins.workflow.flow.FlowExecutionOwner;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 public class DatabaseSyncRunListenerTest {
 
-    @InjectMocks
     private DatabaseSyncRunListener listener;
 
     @Mock
@@ -47,6 +46,11 @@ public class DatabaseSyncRunListenerTest {
 
     @Mock
     private FlowNode flowNode;
+
+    @BeforeEach
+    public void configureMocks() {
+        listener = new DatabaseSyncRunListener(config);
+    }
 
     @Test
     public void test_abort_when_step_not_run() throws Exception {

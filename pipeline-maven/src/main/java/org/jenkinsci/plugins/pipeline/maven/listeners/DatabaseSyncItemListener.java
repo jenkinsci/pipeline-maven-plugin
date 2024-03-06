@@ -1,12 +1,12 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
+import com.google.common.annotations.VisibleForTesting;
 import hudson.Extension;
 import hudson.model.Item;
 import hudson.model.ItemGroup;
 import hudson.model.listeners.ItemListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.inject.Inject;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 import org.jenkinsci.plugins.workflow.flow.BlockableResume;
@@ -18,10 +18,19 @@ import org.jenkinsci.plugins.workflow.flow.BlockableResume;
  */
 @Extension
 public class DatabaseSyncItemListener extends ItemListener {
+
     private static final Logger LOGGER = Logger.getLogger(DatabaseSyncItemListener.class.getName());
 
-    @Inject
-    public GlobalPipelineMavenConfig globalPipelineMavenConfig;
+    private GlobalPipelineMavenConfig globalPipelineMavenConfig;
+
+    public DatabaseSyncItemListener() {
+        this(GlobalPipelineMavenConfig.get());
+    }
+
+    @VisibleForTesting
+    DatabaseSyncItemListener(GlobalPipelineMavenConfig globalPipelineMavenConfig) {
+        this.globalPipelineMavenConfig = globalPipelineMavenConfig;
+    }
 
     @Override
     public void onDeleted(Item item) {

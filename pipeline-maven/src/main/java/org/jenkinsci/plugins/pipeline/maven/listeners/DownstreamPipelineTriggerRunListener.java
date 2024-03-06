@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
+import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.console.ModelHyperlinkNote;
@@ -25,7 +26,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.inject.Inject;
 import jenkins.model.Jenkins;
 import jenkins.model.ParameterizedJobMixIn;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
@@ -48,8 +48,16 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
 
     private static final Logger LOGGER = Logger.getLogger(DownstreamPipelineTriggerRunListener.class.getName());
 
-    @Inject
-    public GlobalPipelineMavenConfig globalPipelineMavenConfig;
+    private GlobalPipelineMavenConfig globalPipelineMavenConfig;
+
+    public DownstreamPipelineTriggerRunListener() {
+        this(GlobalPipelineMavenConfig.get());
+    }
+
+    @VisibleForTesting
+    DownstreamPipelineTriggerRunListener(GlobalPipelineMavenConfig globalPipelineMavenConfig) {
+        this.globalPipelineMavenConfig = globalPipelineMavenConfig;
+    }
 
     @Override
     public void onCompleted(Run<?, ?> upstreamBuild, @NonNull TaskListener listener) {
@@ -162,9 +170,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
         }
 
         try {
-            this.globalPipelineMavenConfig
-                    .getPipelineTriggerService()
-                    .checkNoInfiniteLoopOfUpstreamCause(upstreamBuild);
+            globalPipelineMavenConfig.getPipelineTriggerService().checkNoInfiniteLoopOfUpstreamCause(upstreamBuild);
         } catch (IllegalStateException e) {
             listener.getLogger()
                     .println(
@@ -414,7 +420,7 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                     continue;
                 }
 
-                WorkflowJobDependencyTrigger downstreamPipelineTrigger = this.globalPipelineMavenConfig
+                WorkflowJobDependencyTrigger downstreamPipelineTrigger = globalPipelineMavenConfig
                         .getPipelineTriggerService()
                         .getWorkflowJobDependencyTrigger(
                                 (ParameterizedJobMixIn.ParameterizedJob<?, ?>) downstreamPipeline);
@@ -429,10 +435,10 @@ public class DownstreamPipelineTriggerRunListener extends AbstractWorkflowRunLis
                     continue;
                 }
 
-                boolean downstreamVisibleByUpstreamBuildAuth = this.globalPipelineMavenConfig
+                boolean downstreamVisibleByUpstreamBuildAuth = globalPipelineMavenConfig
                         .getPipelineTriggerService()
                         .isDownstreamVisibleByUpstreamBuildAuth(downstreamPipeline);
-                boolean upstreamVisibleByDownstreamBuildAuth = this.globalPipelineMavenConfig
+                boolean upstreamVisibleByDownstreamBuildAuth = globalPipelineMavenConfig
                         .getPipelineTriggerService()
                         .isUpstreamBuildVisibleByDownstreamBuildAuth(upstreamPipeline, downstreamPipeline);
 

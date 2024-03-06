@@ -1,12 +1,12 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
+import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.Cause;
 import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import javax.inject.Inject;
 import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 
 /**
@@ -15,8 +15,16 @@ import org.jenkinsci.plugins.pipeline.maven.GlobalPipelineMavenConfig;
 @Extension
 public class DatabaseSyncRunListener extends AbstractWorkflowRunListener {
 
-    @Inject
-    public GlobalPipelineMavenConfig globalPipelineMavenConfig;
+    private GlobalPipelineMavenConfig globalPipelineMavenConfig;
+
+    public DatabaseSyncRunListener() {
+        this(GlobalPipelineMavenConfig.get());
+    }
+
+    @VisibleForTesting
+    DatabaseSyncRunListener(GlobalPipelineMavenConfig globalPipelineMavenConfig) {
+        this.globalPipelineMavenConfig = globalPipelineMavenConfig;
+    }
 
     @Override
     public void onDeleted(Run<?, ?> run) {
