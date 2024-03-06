@@ -1,12 +1,18 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import hudson.model.Result;
 import hudson.plugins.jacoco.JacocoBuildAction;
+import hudson.plugins.jacoco.report.CoverageReport;
+import hudson.plugins.jacoco.report.PackageReport;
 import hudson.tasks.junit.TestResultAction;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
 import org.jenkinsci.plugins.pipeline.maven.TestUtils;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
@@ -57,5 +63,14 @@ public class JacocoReportPublisherTest extends AbstractIntegrationTest {
         assertThat(jacocoBuildActions).hasSize(1);
         JacocoBuildAction jacocoBuildAction = jacocoBuildActions.get(0);
         assertThat(jacocoBuildAction.getProjectActions()).hasSize(1);
+
+        // verify that the excluded package is not in the report
+        CoverageReport result = jacocoBuildAction.getResult();
+        Map<String, PackageReport> children = result.getChildren();
+        Set<String> childrenKeys = children.keySet();
+        // not excluded package
+        assertTrue(childrenKeys.stream().anyMatch("com.example"::equals));
+        // excluded package
+        assertFalse(childrenKeys.stream().anyMatch("com.example.exclude"::equals));
     }
 }
