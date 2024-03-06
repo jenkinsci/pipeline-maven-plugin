@@ -45,7 +45,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import jenkins.model.InterruptedBuildAction;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JenkinsMavenEventSpyLogsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.MavenPipelinePublisherException;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;

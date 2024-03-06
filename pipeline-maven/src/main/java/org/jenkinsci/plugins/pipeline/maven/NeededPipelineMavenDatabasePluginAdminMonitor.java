@@ -28,7 +28,7 @@ import hudson.Extension;
 import hudson.model.AdministrativeMonitor;
 import java.util.Objects;
 import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *

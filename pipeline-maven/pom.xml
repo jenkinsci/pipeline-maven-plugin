@@ -130,6 +130,15 @@
       <artifactId>credentials-binding</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>commons-lang3-api</artifactId>
+      <version>3.13.0-62.v7d18e55f51e2</version>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>commons-text-api</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>flaky-test-handler</artifactId>
       <version>${jenkins-plugin-flaky-test.version}</version>
@@ -485,7 +494,6 @@
               <rules combine.children="append">
                 <RestrictImports>
                   <bannedImports>
-                    <bannedImport>org.apache.commons.lang3.**</bannedImport>
                     <bannedImport>javax.annotation.**</bannedImport>
                   </bannedImports>
                 </RestrictImports>

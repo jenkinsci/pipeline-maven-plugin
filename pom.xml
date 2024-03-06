@@ -118,7 +118,6 @@
 
   <dependencyManagement>
     <dependencies>
-
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
         <artifactId>bom-2.387.x</artifactId>
