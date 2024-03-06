@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.listeners;
 
+import com.google.common.annotations.VisibleForTesting;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.model.Cause;
@@ -16,17 +17,18 @@ public class DatabaseSyncRunListener extends AbstractWorkflowRunListener {
 
     private GlobalPipelineMavenConfig globalPipelineMavenConfig;
 
-    public GlobalPipelineMavenConfig getGlobalPipelineMavenConfig() {
-        return globalPipelineMavenConfig != null ? globalPipelineMavenConfig : GlobalPipelineMavenConfig.get();
+    public DatabaseSyncRunListener() {
+        this(GlobalPipelineMavenConfig.get());
     }
 
-    public void setGlobalPipelineMavenConfig(GlobalPipelineMavenConfig globalPipelineMavenConfig) {
+    @VisibleForTesting
+    DatabaseSyncRunListener(GlobalPipelineMavenConfig globalPipelineMavenConfig) {
         this.globalPipelineMavenConfig = globalPipelineMavenConfig;
     }
 
     @Override
     public void onDeleted(Run<?, ?> run) {
-        getGlobalPipelineMavenConfig().getDao().deleteBuild(run.getParent().getFullName(), run.getNumber());
+        globalPipelineMavenConfig.getDao().deleteBuild(run.getParent().getFullName(), run.getNumber());
     }
 
     @Override
@@ -39,7 +41,7 @@ public class DatabaseSyncRunListener extends AbstractWorkflowRunListener {
 
                 String upstreamJobName = upstreamCause.getUpstreamProject();
                 int upstreamBuildNumber = upstreamCause.getUpstreamBuild();
-                getGlobalPipelineMavenConfig()
+                globalPipelineMavenConfig
                         .getDao()
                         .recordBuildUpstreamCause(
                                 upstreamJobName,
@@ -66,7 +68,7 @@ public class DatabaseSyncRunListener extends AbstractWorkflowRunListener {
         if (result == null) {
             result = Result.SUCCESS; // FIXME more elegant handling
         }
-        getGlobalPipelineMavenConfig()
+        globalPipelineMavenConfig
                 .getDao()
                 .updateBuildOnCompletion(
                         workflowRun.getParent().getFullName(),

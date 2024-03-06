@@ -49,8 +49,7 @@ public class DatabaseSyncRunListenerTest {
 
     @BeforeEach
     public void configureMocks() {
-        listener = new DatabaseSyncRunListener();
-        listener.setGlobalPipelineMavenConfig(config);
+        listener = new DatabaseSyncRunListener(config);
     }
 
     @Test

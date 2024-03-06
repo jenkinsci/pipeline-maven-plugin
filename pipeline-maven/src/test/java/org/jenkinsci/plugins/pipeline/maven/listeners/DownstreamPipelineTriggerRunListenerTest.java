@@ -99,8 +99,7 @@ public class DownstreamPipelineTriggerRunListenerTest {
 
     @BeforeEach
     public void configureMocks() throws Exception {
-        listener = new DownstreamPipelineTriggerRunListener();
-        listener.setGlobalPipelineMavenConfig(config);
+        listener = new DownstreamPipelineTriggerRunListener(config);
         when(config.getTriggerDownstreamBuildsResultsCriteria()).thenReturn(Collections.singleton(Result.SUCCESS));
         when(config.getPipelineTriggerService()).thenReturn(service);
         when(config.getDao()).thenReturn(dao);
