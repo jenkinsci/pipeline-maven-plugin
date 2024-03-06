@@ -28,11 +28,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
+@EnabledIf(
+        value = "org.jenkinsci.plugins.pipeline.maven.util.Conditions#isLinuxAndDockerSocketExists",
+        disabledReason = "Needs Docker and Docker does not work on Windows 2019 servers CI agents")
+@Testcontainers
 public class JavaGitContainerTest extends AbstractIntegrationTest {
 
     @Container

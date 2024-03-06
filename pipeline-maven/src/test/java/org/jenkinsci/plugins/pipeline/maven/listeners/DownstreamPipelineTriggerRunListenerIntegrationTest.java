@@ -2,6 +2,7 @@ package org.jenkinsci.plugins.pipeline.maven.listeners;
 
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import hudson.ExtensionList;
 import hudson.model.Result;
@@ -21,6 +22,7 @@ import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
 
 /**
  * We need some tests. Unfortunately, it is very hard to do unit tests because
@@ -31,6 +33,9 @@ import org.junit.jupiter.api.Test;
  * <li>Pipeline doesn't trigger itself when it has a dependency on</li>
  * </ul>
  */
+@EnabledOnOs(
+        value = LINUX,
+        disabledReason = "'fatal error: aux_index does not match even or odd indices' on Windows JDK 19")
 public class DownstreamPipelineTriggerRunListenerIntegrationTest extends AbstractIntegrationTest {
 
     @BeforeEach
