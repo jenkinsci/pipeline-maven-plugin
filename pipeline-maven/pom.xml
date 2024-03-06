@@ -305,13 +305,16 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>h2-api</artifactId>
-      <version>${jenkins-plugin-h2.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>mariadb-api</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>mysql-api</artifactId>
-      <version>${jenkins-plugin-mysql.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -323,7 +326,6 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>postgresql-api</artifactId>
-      <version>${jenkins-plugin-postgresql.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
