@@ -36,7 +36,6 @@ public class WithMavenStepNoOptionalsTest {
     @Rule
     public RealJenkinsRule jenkinsRule = new RealJenkinsRule()
             .omitPlugins(
-                    "commons-lang3-api",
                     "mysql-api",
                     "postgresql-api",
                     "maven-plugin",

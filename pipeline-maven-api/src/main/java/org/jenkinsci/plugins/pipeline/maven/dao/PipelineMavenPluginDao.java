@@ -33,7 +33,6 @@ import java.io.Closeable;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
-import org.apache.maven.artifact.Artifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 
@@ -201,12 +200,12 @@ public interface PipelineMavenPluginDao extends Closeable {
     /**
      * List the downstream jobs who have a dependency on the given artifact.
      *
-     * @param groupId Maven artifact group ID  (see {@link Artifact#getArtifactId()})
-     * @param artifactId Maven artifact id (see {@link Artifact#getArtifactId()})
-     * @param version Maven artifact version (see {@link Artifact#getVersion()})
-     * @param baseVersion Maven artifact (see {@link Artifact#getBaseVersion()})
-     * @param type Maven artifact type (see {@link Artifact#getType()}})
-     * @return list of job full names (see {@link Item#getFullName()}) by {@link MavenArtifact}
+     * @param groupId Maven artifact group ID  (see Artifact#getArtifactId())
+     * @param artifactId Maven artifact id (see Artifact#getArtifactId())
+     * @param version Maven artifact version (see Artifact#getVersion())
+     * @param baseVersion Maven artifact (see Artifact#getBaseVersion())
+     * @param type Maven artifact type (see Artifact#getType())
+     * @return list of job full names (see {@link Item#getFullName()}) by {MavenArtifact}
      * @see Item#getFullName()
      */
     @NonNull
@@ -222,12 +221,12 @@ public interface PipelineMavenPluginDao extends Closeable {
     /**
      * List the downstream jobs who have a dependency on the given artifact.
      *
-     * @param groupId Maven artifact group ID  (see {@link Artifact#getArtifactId()})
-     * @param artifactId Maven artifact id (see {@link Artifact#getArtifactId()})
-     * @param version Maven artifact version (see {@link Artifact#getVersion()})
-     * @param baseVersion Maven artifact (see {@link Artifact#getBaseVersion()})
-     * @param type Maven artifact type (see {@link Artifact#getType()}})
-     * @param classifier Maven artifact classifier (see {@link Artifact#getClassifier()}})
+     * @param groupId Maven artifact group ID  (see Artifact#getArtifactId())
+     * @param artifactId Maven artifact id (see Artifact#getArtifactId())
+     * @param version Maven artifact version (see Artifact#getVersion())
+     * @param baseVersion Maven artifact (see Artifact#getBaseVersion())
+     * @param type Maven artifact type (see Artifact#getType())
+     * @param classifier Maven artifact classifier (see Artifact#getClassifier())
      * @return list of job full names (see {@link Item#getFullName()}) by {@link MavenArtifact}
      * @see Item#getFullName()
      */

@@ -4,7 +4,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
 import java.io.Serializable;
 import java.util.Objects;
-import org.apache.commons.lang.builder.CompareToBuilder;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -49,14 +49,14 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      * "1.0-SNAPSHOT", the artifact's version depends on the state of the artifact. Artifacts that have been resolved or
      * deployed will usually have the meta version expanded.
      *
-     * @see org.eclipse.aether.artifact.Artifact#getVersion()
+     *  org.eclipse.aether.artifact.Artifact#getVersion()
      */
     private String version;
     /**
      * Gets the base version of this artifact, for example "1.0-SNAPSHOT". In contrast to the org.eclipse.aether.artifact.Artifact#getVersion(), the
      * base version will always refer to the unresolved meta version.
      *
-     * @see org.eclipse.aether.artifact.Artifact#getBaseVersion()
+     * org.eclipse.aether.artifact.Artifact#getBaseVersion()
      */
     private String baseVersion;
 
@@ -105,7 +105,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     }
 
     /**
-     * @see org.apache.maven.artifact.Artifact#getId()
+     * org.apache.maven.artifact.Artifact#getId()
      */
     @NonNull
     public String getId() {
@@ -209,7 +209,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      * Gets the base version of this artifact, for example "1.0-SNAPSHOT". In contrast to the org.eclipse.aether.artifact.Artifact#getVersion(), the
      * base version will always refer to the unresolved meta version.
      *
-     * @see org.eclipse.aether.artifact.Artifact#getBaseVersion()
+     * org.eclipse.aether.artifact.Artifact#getBaseVersion()
      */
     public String getBaseVersion() {
         return baseVersion;
@@ -227,7 +227,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      * "1.0-SNAPSHOT", the artifact's version depends on the state of the artifact. Artifacts that have been resolved or
      * deployed will usually have the meta version expanded.
      *
-     * @see org.eclipse.aether.artifact.Artifact#getVersion()
+     * org.eclipse.aether.artifact.Artifact#getVersion()
      */
     public String getVersion() {
         return version;
@@ -271,7 +271,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
      * Gets the classifier of this artifact, for example "sources".
      *
      * @return The classifier or {@code null} if none, never empty.
-     * @see org.eclipse.aether.artifact.Artifact#getClassifier()
+     * org.eclipse.aether.artifact.Artifact#getClassifier()
      */
     @Nullable
     public String getClassifier() {
@@ -285,7 +285,7 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     /**
      * Extension of the generated file
      * @return file extension (e.g. "jar", "war"...)
-     * @see org.eclipse.aether.artifact.Artifact#getExtension()
+     * org.eclipse.aether.artifact.Artifact#getExtension()
      */
     public String getExtension() {
         return extension;
