@@ -145,7 +145,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
     private transient FilePath tempBinDir;
 
     /**
-     * Indicates if running on docker with <code>docker.image()</code> or <code>container()</code>
+     * Indicates if running on docker with <code>docker.image()</code>
      */
     private boolean withContainer;
 
@@ -238,7 +238,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
     }
 
     /**
-     * Detects if this step is running inside <code>docker.image()</code> or <code>container()</code>
+     * Detects if this step is running inside <code>docker.image()</code>
      * <p>
      * This has the following implications:
      * <li>Tool installers do no work, as they install in the host, see:
@@ -247,24 +247,17 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      * container running the <code>sh</code> command for maven This is due to the fact that <code>docker.image()</code> all it
      * does is decorate the launcher and execute the command with a <code>docker run</code> which means that the inherited
      * environment from the OS will be totally different eg: MAVEN_HOME, JAVA_HOME, PATH, etc.
-     * <li>Kubernetes' <code>container()</code> support is still in early stages, and environment variables might not be
-     * completely configured, depending on the version of the Jenkins Kubernetes plugin.
      *
-     * @return true if running inside a container with <code>docker.image()</code> or <code>container()</code>
+     * @return true if running inside a container with <code>docker.image()</code>
      * @see <a href=
      * "https://github.com/jenkinsci/docker-workflow-plugin/blob/master/src/main/java/org/jenkinsci/plugins/docker/workflow/WithContainerStep.java">
-     * WithContainerStep</a> and <a href=
-     * "https://github.com/jenkinsci/kubernetes-plugin/blob/master/src/main/java/org/csanchez/jenkins/plugins/kubernetes/pipeline/ContainerStep.java">
-     * ContainerStep</a>
+     * WithContainerStep</a>
      */
     private boolean detectWithContainer() throws IOException {
         Launcher launcher1 = launcher;
         while (launcher1 instanceof Launcher.DecoratedLauncher) {
             String launcherClassName = launcher1.getClass().getName();
-            if (launcherClassName.contains("ContainerExecDecorator")) {
-                LOGGER.log(Level.FINE, "Step running within Kubernetes container(): {0}", launcherClassName);
-                return true;
-            }
+            // ToDo: add support for container() step (ContainerExecDecorator) from Kubernetes plugin
             if (launcherClassName.contains("WithContainerStep")) {
                 LOGGER.log(Level.FINE, "Step running within docker.image(): {0}", launcherClassName);
 
