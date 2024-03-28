@@ -10,8 +10,6 @@ import hudson.model.Cause;
 import hudson.model.CauseAction;
 import hudson.model.Result;
 import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;
@@ -35,7 +33,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.api.condition.EnabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -506,13 +503,9 @@ public class DependencyGraphTest extends AbstractIntegrationTest {
         assertThat(upstreamCause).isNotNull();
     }
 
-    public boolean checkIsLinuxAndDockerSocketExists() {
-        return OS.current() == OS.LINUX && Files.exists(Paths.get("/var/run/docker.sock"));
-    }
-
     @Test
     @EnabledIf(
-            value = "checkIsLinuxAndDockerSocketExists",
+            value = "org.jenkinsci.plugins.pipeline.maven.util.Conditions#isLinuxAndDockerSocketExists",
             disabledReason = "Needs Docker and Docker does not work on Windows 2019 servers CI agents")
     public void verify_docker_downstream_simple_pipeline_trigger() throws Exception {
         System.out.println("gitRepoRule: " + gitRepoRule);
