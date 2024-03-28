@@ -43,11 +43,13 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.jvnet.hudson.test.Issue;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
+@EnabledIf(
+        value = "org.jenkinsci.plugins.pipeline.maven.util.Conditions#isLinuxAndDockerSocketExists",
+        disabledReason = "Needs Docker and Docker does not work on Windows 2019 servers CI agents")
 @Issue("JENKINS-43651")
 public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTest {
 
