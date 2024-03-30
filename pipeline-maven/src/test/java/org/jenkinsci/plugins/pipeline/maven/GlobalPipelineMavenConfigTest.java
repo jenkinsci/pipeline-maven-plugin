@@ -21,6 +21,7 @@ import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginPostgreSqlDao;
 import org.jenkinsci.plugins.pipeline.maven.util.FakeCredentialsProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIf;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.testcontainers.containers.MySQLContainer;
@@ -28,7 +29,10 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
+@EnabledIf(
+        value = "org.jenkinsci.plugins.pipeline.maven.util.Conditions#isLinuxAndDockerSocketExists",
+        disabledReason = "Needs Docker and Docker does not work on Windows 2019 servers CI agents")
+@Testcontainers
 @WithJenkins
 public class GlobalPipelineMavenConfigTest {
 
