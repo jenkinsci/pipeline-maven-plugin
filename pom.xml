@@ -100,7 +100,7 @@
     <jenkins-plugin-mysql.version>8.0.16</jenkins-plugin-mysql.version>
     <jenkins-plugin-postgresql.version>42.7.2-40.v76d376d65c77</jenkins-plugin-postgresql.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
-    <jenkins-tools-bom.version>2950.va_633b_f42f759</jenkins-tools-bom.version>
+    <jenkins-tools-bom.version>2982.vdce2153031a_0</jenkins-tools-bom.version>
     <jenkins.version>2.414.3</jenkins.version>
     <junit.version>5.10.2</junit.version>
     <mariadb-client.version>3.3.3</mariadb-client.version>
