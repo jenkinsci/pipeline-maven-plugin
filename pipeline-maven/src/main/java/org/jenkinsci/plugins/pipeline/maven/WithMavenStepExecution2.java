@@ -257,7 +257,22 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         Launcher launcher1 = launcher;
         while (launcher1 instanceof Launcher.DecoratedLauncher) {
             String launcherClassName = launcher1.getClass().getName();
-            // ToDo: add support for container() step (ContainerExecDecorator) from Kubernetes plugin
+            // kubernetes-plugin container step execution does not require special container handling
+            if (launcherClassName.contains("org.csanchez.jenkins.plugins.kubernetes.pipeline.ContainerExecDecorator")) {
+                LOGGER.log(Level.FINE, "Step running within Kubernetes withContainer(): {1}", launcherClassName);
+                return false;
+            }
+
+            // for plugins that require special container handling should include this name launcher naming convention
+            // since there is no common interface to detect if a step is running within a container
+            if (launcherClassName.contains("ContainerExecDecorator")) {
+                LOGGER.log(Level.FINE, "Step running within container exec decorator: {0}", launcherClassName);
+                console.traceHyperlink(
+                        "https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/FAQ.adoc#how-to-use-the-pipeline-maven-plugin-with-docker",
+                        "Pipeline Maven Plugin FAQ");
+                return true;
+            }
+
             if (launcherClassName.contains("WithContainerStep")) {
                 LOGGER.log(Level.FINE, "Step running within docker.image(): {0}", launcherClassName);
 
