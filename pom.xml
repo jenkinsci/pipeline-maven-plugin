@@ -93,7 +93,7 @@
     <jansi.version>2.4.0</jansi.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-flaky-test.version>1.2.3</jenkins-plugin-flaky-test.version>
-    <jenkins-plugin-h2.version>11.1.4.199-12.v9f4244395f7a_</jenkins-plugin-h2.version>
+    <jenkins-plugin-h2.version>11.1.4.199-30.v1c64e772f3a_c</jenkins-plugin-h2.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
     <jenkins-plugin-maven-invoker.version>2.5</jenkins-plugin-maven-invoker.version>
     <jenkins-plugin-maven.version>3.23</jenkins-plugin-maven.version>
