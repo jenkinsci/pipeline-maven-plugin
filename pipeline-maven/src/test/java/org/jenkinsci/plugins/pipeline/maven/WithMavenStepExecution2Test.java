@@ -31,4 +31,26 @@ public class WithMavenStepExecution2Test {
 
         assertThat(actualEscapedMavenConfig).isEqualTo(expectedEscapedMavenConfig);
     }
+
+    @Test
+    public void testIsWithContainerLauncherUnknown() {
+        assertThat(WithMavenStepExecution2.isWithContainerLauncher("hudson.SomeUnknownLauncher")).isEmpty();
+    }
+
+    @Test
+    public void testIsWithContainerLauncherWithContainerStep() {
+        assertThat(WithMavenStepExecution2.isWithContainerLauncher("org.jenkinsci.plugins.docker.workflow.WithContainerStep.Decorator")).contains(true);
+    }
+
+    @Test
+    public void testIsWithContainerLauncherKubernetesPluginContainerExecDecorator() {
+        assertThat(WithMavenStepExecution2.isWithContainerLauncher("org.csanchez.jenkins.plugins.kubernetes.pipeline.ContainerExecDecorator")).contains(false);
+    }
+
+    @Test
+    public void testIsWithContainerLauncherCustomContainerExecDecorator() {
+        // for plugins that supporting launching their own containerized steps
+        assertThat(WithMavenStepExecution2.isWithContainerLauncher("com.jenkins.plugins.custom.ContainerExecDecorator")).contains(true);
+        assertThat(WithMavenStepExecution2.isWithContainerLauncher("com.jenkins.plugins.kubernetes.pipeline.MyContainerExecDecorator.MyContainerDecoratedLauncher")).contains(true);
+    }
 }
