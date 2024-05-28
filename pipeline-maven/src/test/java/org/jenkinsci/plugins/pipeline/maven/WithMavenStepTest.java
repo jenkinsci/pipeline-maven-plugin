@@ -58,6 +58,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.jvnet.hudson.test.Issue;
+import org.testcontainers.containers.ExecConfig;
+import org.testcontainers.containers.ExecInContainerPattern;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.utility.MountableFile;
 
@@ -142,6 +144,15 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
             String gitRepoPath = this.gitRepoRule.toString();
             javasContainerRule.copyFileToContainer(MountableFile.forHostPath(gitRepoPath), "/tmp/gitrepo");
             javasContainerRule.execInContainer("chmod", "-R", "777", "/tmp/gitrepo");
+            System.out.println(ExecInContainerPattern.execInContainer(
+                    javasContainerRule.getDockerClient(),
+                    javasContainerRule.getContainerInfo(),
+                    ExecConfig.builder()
+                            .user("test")
+                            .command(new String[] {
+                                "git", "config", "--global", "--add", "safe.directory", "/tmp/gitrepo/.git"
+                            })
+                            .build()));
             registerAgentForContainer(javasContainerRule);
             ToolLocationNodeProperty.ToolLocation toolLocation =
                     new ToolLocationNodeProperty.ToolLocation(new JDK.DescriptorImpl(), jdkName, jdkPath);
