@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 public class MavenVersionUtils {
 
     public static Predicate<String> containsMavenVersion() {
-        return string -> string != null && string.matches("Apache Maven \\d+\\.\\d+\\.\\d+ \\(.*\\)");
+        return string -> string != null && string.matches("Apache Maven \\d+\\.\\d+\\.\\d+(.*) \\(.*\\)");
     }
 
     public static MavenVersion parseMavenVersion(String outputLine) {

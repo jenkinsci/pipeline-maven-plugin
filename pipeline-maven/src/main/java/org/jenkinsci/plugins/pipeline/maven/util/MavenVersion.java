@@ -8,7 +8,7 @@ public class MavenVersion {
 
     public static MavenVersion fromString(String str) {
         try {
-            String[] parts = str.split("\\.");
+            String[] parts = str.split("[.\\-]");
             return new MavenVersion(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
         } catch (Exception ex) {
             throw new IllegalArgumentException("'" + str + "' is not a valid maven version", ex);

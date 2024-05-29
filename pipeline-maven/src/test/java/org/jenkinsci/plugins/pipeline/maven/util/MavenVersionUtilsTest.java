@@ -20,6 +20,10 @@ class MavenVersionUtilsTest {
         assertThat(MavenVersionUtils.containsMavenVersion()
                         .test("Apache Maven 3.9.6 (bc0240f3c744dd6b6ec2920b3cd08dcc295161ae)"))
                 .isTrue();
+
+        assertThat(MavenVersionUtils.containsMavenVersion()
+                        .test("Apache Maven 4.0.0-beta-3 (e92f645c2749eb2a4f5a8843cf01e7441e4b559f)"))
+                .isTrue();
     }
 
     @Test
@@ -30,5 +34,6 @@ class MavenVersionUtilsTest {
                 .isEqualTo(new MavenVersion(3, 8, 8));
         assertThat(MavenVersionUtils.parseMavenVersion("Apache Maven 3.6.1")).isEqualTo(new MavenVersion(3, 6, 1));
         assertThat(MavenVersionUtils.parseMavenVersion("Apache Maven 3.5.4")).isEqualTo(new MavenVersion(3, 5, 4));
+        assertThat(MavenVersionUtils.parseMavenVersion("Apache Maven 4.0.0-beta-3")).isEqualTo(new MavenVersion(4, 0, 0));
     }
 }
