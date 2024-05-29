@@ -24,7 +24,7 @@ Since the version 1.14 of the Docker Pipeline plugin, `withMaven` requires to
 * Or call the generated script directly via `MVN_CMD` (e.g. `sh '$MVN_CMD clean deploy'`)
 * Or use https://maven.apache.org/wrapper/[Maven Wrapper] (e.g. `sh './mvnw clean deploy'`)
 
-If omitted, the Maven settings file and Mven global settings file will not be injected in the Maven execution.
+If omitted, the Maven settings file and Maven global settings file will not be injected in the Maven execution.
 
 === Using `withMaven` with `docker.image(...).inside{...}` and a Jenkins Scripted Pipeline
 
@@ -42,7 +42,7 @@ node("linux-agent-running-docker") { // Linux agent with the Docker daemon
 }
 ----
 
-**Using Takari's Maven Wrapper mvnw**
+**Using Maven Wrapper mvnw**
 
 [source,groovy]
 ----
@@ -81,18 +81,6 @@ pipeline {
 ----
 
 Note: In Declarative Pipelines, the agent configuration is used to define the docker environment instead of `docker.image(...).inside{...}`  (docs https://www.jenkins.io/doc/book/pipeline/docker)[here]). Stage-level agents work with `withMaven` as well. 
-
-
-=== Sample message displayed in the build logs when using withMaven in a Docker Pipeline execution environment
-
-The warning message displayed in the logs when invoking `withMaven` within Docker Pipeline:
-
-----
- [withMaven] WARNING: "withMaven(){...}" step running within "docker.image('image').inside {...}". Since the Docker Pipeline Plugin version 1.14, you MUST:
- [withMaven] * Either prepend the 'MVN_CMD_DIR' environment variable to the 'PATH' environment variable in every 'sh' step that invokes 'mvn' (e.g. "sh 'export PATH=$MVN_CMD_DIR:$PATH && mvn clean deploy' ").
- [withMaven] * Or use Takari's Maven Wrapper (e.g. "sh './mvnw clean deploy'")
- [withMaven] See Pipeline Maven Plugin FAQ.
-----
 
 == How to disable the Maven Event Spy injected by the Pipeline Maven Plugin in Maven builds?
 

@@ -483,11 +483,11 @@ By default, only the maven builds who reach the `deploy` phase will trigger down
 image:docs/images/downstream-pipeline-trigger-threshold-lifecycle.png[]
 
 [#feature-mvnw]
-=== Support of Takari's Maven Wrapper 'mvnw'
+=== Support of Maven Wrapper 'mvnw'
 
 NOTE: Available since version 3.0.3
 
-The Pipeline Maven Plugin works with https://github.com/takari/maven-wrapper[Takari's Maven wrapper] 'mvnw'.
+The Pipeline Maven Plugin works with https://maven.apache.org/wrapper/[Maven Wrapper] 'mvnw'.
 
 [source,groovy]
 ----
