@@ -34,6 +34,7 @@ class MavenVersionUtilsTest {
                 .isEqualTo(new MavenVersion(3, 8, 8));
         assertThat(MavenVersionUtils.parseMavenVersion("Apache Maven 3.6.1")).isEqualTo(new MavenVersion(3, 6, 1));
         assertThat(MavenVersionUtils.parseMavenVersion("Apache Maven 3.5.4")).isEqualTo(new MavenVersion(3, 5, 4));
-        assertThat(MavenVersionUtils.parseMavenVersion("Apache Maven 4.0.0-beta-3")).isEqualTo(new MavenVersion(4, 0, 0));
+        assertThat(MavenVersionUtils.parseMavenVersion("Apache Maven 4.0.0-beta-3"))
+                .isEqualTo(new MavenVersion(4, 0, 0));
     }
 }
