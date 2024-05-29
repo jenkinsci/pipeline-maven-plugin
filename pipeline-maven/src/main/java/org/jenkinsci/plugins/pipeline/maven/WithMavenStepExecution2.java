@@ -111,6 +111,8 @@ import org.jenkinsci.plugins.workflow.steps.BodyInvoker;
 import org.jenkinsci.plugins.workflow.steps.EnvironmentExpander;
 import org.jenkinsci.plugins.workflow.steps.GeneralNonBlockingStepExecution;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 import org.springframework.util.ClassUtils;
 
 @SuppressFBWarnings(
@@ -257,21 +259,54 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         Launcher launcher1 = launcher;
         while (launcher1 instanceof Launcher.DecoratedLauncher) {
             String launcherClassName = launcher1.getClass().getName();
-            // ToDo: add support for container() step (ContainerExecDecorator) from Kubernetes plugin
-            if (launcherClassName.contains("WithContainerStep")) {
-                LOGGER.log(Level.FINE, "Step running within docker.image(): {0}", launcherClassName);
+            Optional<Boolean> withContainer = isWithContainerLauncher(launcherClassName);
+            if (withContainer.isPresent()) {
+                boolean result = withContainer.get();
+                if (result) {
+                    console.trace(
+                            "[withMaven] IMPORTANT \"withMaven(){...}\" step running within a Docker container. See ");
+                    console.traceHyperlink(
+                            "https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/FAQ.adoc#how-to-use-the-pipeline-maven-plugin-with-docker",
+                            "Pipeline Maven Plugin FAQ");
+                    console.trace(" in case of problem.");
+                }
 
-                console.trace(
-                        "[withMaven] IMPORTANT \"withMaven(){...}\" step running within a Docker container. See ");
-                console.traceHyperlink(
-                        "https://github.com/jenkinsci/pipeline-maven-plugin/blob/master/FAQ.adoc#how-to-use-the-pipeline-maven-plugin-with-docker",
-                        "Pipeline Maven Plugin FAQ");
-                console.trace(" in case of problem.");
-                return true;
+                return result;
             }
+
             launcher1 = ((Launcher.DecoratedLauncher) launcher1).getInner();
         }
         return false;
+    }
+
+    /**
+     * Check if the launcher class name is a known container launcher.
+     * @param launcherClassName launcher class name
+     * @return empty if unknown and should keep checking, true if it is a container launcher, false if it is not.
+     */
+    @Restricted(NoExternalUse.class)
+    protected static Optional<Boolean> isWithContainerLauncher(String launcherClassName) {
+        // kubernetes-plugin container step execution does not require special container handling
+        if (launcherClassName.contains("org.csanchez.jenkins.plugins.kubernetes.pipeline.ContainerExecDecorator")) {
+            LOGGER.log(Level.FINE, "Step running within Kubernetes withContainer(): {1}", launcherClassName);
+            return Optional.of(false);
+        }
+
+        // for plugins that require special container handling should include this name launcher naming convention
+        // since there is no common interface to detect if a step is running within a container
+        if (launcherClassName.contains("ContainerExecDecorator")) {
+            LOGGER.log(Level.FINE, "Step running within container exec decorator: {0}", launcherClassName);
+            return Optional.of(true);
+        }
+
+        // detect docker.image().inside {} or withDockerContainer step from docker-workflow-plugin, which has the
+        // launcher name org.jenkinsci.plugins.docker.workflow.WithContainerStep.Decorator
+        if (launcherClassName.contains("WithContainerStep")) {
+            LOGGER.log(Level.FINE, "Step running within docker.image(): {0}", launcherClassName);
+            return Optional.of(true);
+        }
+
+        return Optional.empty();
     }
 
     /**
