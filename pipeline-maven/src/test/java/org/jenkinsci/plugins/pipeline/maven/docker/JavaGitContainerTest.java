@@ -46,7 +46,7 @@ public class JavaGitContainerTest extends AbstractIntegrationTest {
     @Test
     public void smokes() throws Exception {
         assertThat(containerRule.execInContainer("java", "-version").getStderr())
-                .contains("openjdk version \"11");
+                .contains("openjdk version \"17");
         assertThat(containerRule.execInContainer("git", "--version").getStdout())
                 .contains("git version 2.");
     }
