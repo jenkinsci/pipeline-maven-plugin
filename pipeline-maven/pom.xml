@@ -502,10 +502,10 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>com.spotify</groupId>
-            <artifactId>dockerfile-maven-plugin</artifactId>
+            <groupId>io.fabric8</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
             <configuration>
-              <pullNewerImage>false</pullNewerImage>
+              <imagePullPolicy>IfNotPresent</imagePullPolicy>
             </configuration>
             <executions>
               <execution>
@@ -515,8 +515,14 @@
                 </goals>
                 <phase>process-test-resources</phase>
                 <configuration>
-                  <contextDirectory>src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/SshdContainer/</contextDirectory>
-                  <repository>localhost/pipeline-maven/sshd</repository>
+                  <images>
+                    <image>
+                      <build>
+                        <contextDir>${project.basedir}/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/SshdContainer/</contextDir>
+                      </build>
+                      <name>localhost/pipeline-maven/sshd</name>
+                    </image>
+                  </images>
                 </configuration>
               </execution>
               <execution>
@@ -526,8 +532,14 @@
                 </goals>
                 <phase>process-test-resources</phase>
                 <configuration>
-                  <contextDirectory>src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/</contextDirectory>
-                  <repository>localhost/pipeline-maven/java-git</repository>
+                  <images>
+                    <image>
+                      <build>
+                        <contextDir>${project.basedir}/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/JavaGitContainer/</contextDir>
+                      </build>
+                      <name>localhost/pipeline-maven/java-git</name>
+                    </image>
+                  </images>
                 </configuration>
               </execution>
               <execution>
@@ -537,8 +549,14 @@
                 </goals>
                 <phase>process-test-resources</phase>
                 <configuration>
-                  <contextDirectory>src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/JavaMavenContainer/</contextDirectory>
-                  <repository>localhost/pipeline-maven/java-maven-git</repository>
+                  <images>
+                    <image>
+                      <build>
+                        <contextDir>${project.basedir}/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/JavaMavenContainer/</contextDir>
+                      </build>
+                      <name>localhost/pipeline-maven/java-maven-git</name>
+                    </image>
+                  </images>
                 </configuration>
               </execution>
               <execution>
@@ -548,8 +566,14 @@
                 </goals>
                 <phase>process-test-resources</phase>
                 <configuration>
-                  <contextDirectory>src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/JavasContainer/</contextDirectory>
-                  <repository>localhost/pipeline-maven/javas</repository>
+                  <images>
+                    <image>
+                      <build>
+                        <contextDir>${project.basedir}/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/JavasContainer/</contextDir>
+                      </build>
+                      <name>localhost/pipeline-maven/javas</name>
+                    </image>
+                  </images>
                 </configuration>
               </execution>
               <execution>
@@ -559,8 +583,14 @@
                 </goals>
                 <phase>process-test-resources</phase>
                 <configuration>
-                  <contextDirectory>src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/JavaMavenWithMavenHomeContainer/</contextDirectory>
-                  <repository>localhost/pipeline-maven/maven-home</repository>
+                  <images>
+                    <image>
+                      <build>
+                        <contextDir>${project.basedir}/src/test/resources/org/jenkinsci/plugins/pipeline/maven/docker/JavaMavenWithMavenHomeContainer/</contextDir>
+                      </build>
+                      <name>localhost/pipeline-maven/maven-home</name>
+                    </image>
+                  </images>
                 </configuration>
               </execution>
             </executions>

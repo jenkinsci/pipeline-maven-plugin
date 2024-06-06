@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu:noble
 
 # install SSHD
 RUN apt-get update -y && \

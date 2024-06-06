@@ -28,7 +28,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>4.82</version>
+    <version>4.83</version>
     <relativePath />
   </parent>
 
@@ -100,8 +100,8 @@
     <jenkins-plugin-mysql.version>8.4.0-31.va_b_5ce7933762</jenkins-plugin-mysql.version>
     <jenkins-plugin-postgresql.version>42.7.2-40.v76d376d65c77</jenkins-plugin-postgresql.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
-    <jenkins-tools-bom.version>2982.vdce2153031a_0</jenkins-tools-bom.version>
-    <jenkins.version>2.414.3</jenkins.version>
+    <jenkins-tools-bom.version>3105.v672692894683</jenkins-tools-bom.version>
+    <jenkins.version>2.426.3</jenkins.version>
     <junit.version>5.10.2</junit.version>
     <mariadb-client.version>3.4.0</mariadb-client.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
@@ -109,7 +109,7 @@
     <maven.version>3.8.8</maven.version>
     <mockito.version>5.6.0</mockito.version>
     <plexus-utils.version>3.5.1</plexus-utils.version>
-    <plugin-dockerfile.version>1.4.13</plugin-dockerfile.version>
+    <plugin-dockerfile.version>0.44.0</plugin-dockerfile.version>
     <plugin-exec.version>3.3.0</plugin-exec.version>
     <slf4j.version>2.0.13</slf4j.version>
     <spotless.check.skip>false</spotless.check.skip>
@@ -120,7 +120,7 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.414.x</artifactId>
+        <artifactId>bom-2.426.x</artifactId>
         <version>${jenkins-tools-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
@@ -252,8 +252,8 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>com.spotify</groupId>
-          <artifactId>dockerfile-maven-plugin</artifactId>
+          <groupId>io.fabric8</groupId>
+          <artifactId>docker-maven-plugin</artifactId>
           <version>${plugin-dockerfile.version}</version>
         </plugin>
         <plugin>
