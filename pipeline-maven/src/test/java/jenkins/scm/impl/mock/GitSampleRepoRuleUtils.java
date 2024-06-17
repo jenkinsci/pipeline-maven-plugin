@@ -40,7 +40,7 @@ public class GitSampleRepoRuleUtils {
         final Path source = rootFolder;
         final Path target = sampleDVCSRepoRule.sampleRepo.toPath();
         Files.walkFileTree(
-                source, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<Path>() {
+                source, EnumSet.of(FileVisitOption.FOLLOW_LINKS), Integer.MAX_VALUE, new SimpleFileVisitor<>() {
                     @Override
                     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                         Path targetDir = target.resolve(source.relativize(dir));
