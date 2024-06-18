@@ -53,7 +53,6 @@ import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledIf;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -61,11 +60,10 @@ import org.jvnet.hudson.test.Issue;
 import org.testcontainers.containers.ExecConfig;
 import org.testcontainers.containers.ExecInContainerPattern;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.MountableFile;
 
-@EnabledIf(
-        value = "org.jenkinsci.plugins.pipeline.maven.util.Conditions#isLinuxAndDockerSocketExists",
-        disabledReason = "Needs Docker and Docker does not work on Windows 2019 servers CI agents")
+@Testcontainers(disabledWithoutDocker = true)
 public class WithMavenStepTest extends AbstractIntegrationTest {
 
     private static final String SSH_CREDENTIALS_ID = "test";

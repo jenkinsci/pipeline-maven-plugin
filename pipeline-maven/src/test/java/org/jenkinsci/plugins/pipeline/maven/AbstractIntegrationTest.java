@@ -7,19 +7,18 @@ import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runBeforeMethod;
 import hudson.model.Fingerprint;
 import hudson.tasks.Fingerprinter;
 import hudson.tasks.Maven;
-import java.io.Closeable;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Objects;
 import jenkins.model.Jenkins;
 import jenkins.mvn.DefaultGlobalSettingsProvider;
 import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.plugins.git.GitSampleRepoRule;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
-import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.util.MavenUtil;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -72,11 +71,7 @@ public abstract class AbstractIntegrationTest {
 
     @AfterEach
     public void after() throws IOException {
-        PipelineMavenPluginDao dao = GlobalPipelineMavenConfig.get().getDao();
-        if (dao instanceof Closeable) {
-            dao.close();
-        }
-
+        Objects.requireNonNull(GlobalPipelineMavenConfig.get()).getDao().close();
         runAfterMethod(gitRepoRule);
     }
 
