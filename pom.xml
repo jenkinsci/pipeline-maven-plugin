@@ -102,7 +102,7 @@
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
     <jenkins-tools-bom.version>3157.vb_3e8b_8a_d185d</jenkins-tools-bom.version>
     <jenkins.version>2.426.3</jenkins.version>
-    <junit.version>5.10.2</junit.version>
+    <junit.version>5.10.3</junit.version>
     <mariadb-client.version>3.4.0</mariadb-client.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
