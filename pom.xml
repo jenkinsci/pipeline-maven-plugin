@@ -170,9 +170,8 @@
 
       <!-- Conflict with AssertJ -->
       <dependency>
-        <groupId>net.bytebuddy</groupId>
-        <artifactId>byte-buddy</artifactId>
-        <version>1.14.18</version>
+        <groupId>io.jenkins.plugins</groupId>
+        <artifactId>byte-buddy-api</artifactId>
         <scope>test</scope>
       </dependency>
       <dependency>
