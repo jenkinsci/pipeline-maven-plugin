@@ -167,14 +167,6 @@
         <artifactId>pipeline-maven-api</artifactId>
         <version>${project.version}</version>
       </dependency>
-
-      <!-- Conflict with AssertJ -->
-      <dependency>
-        <groupId>net.bytebuddy</groupId>
-        <artifactId>byte-buddy</artifactId>
-        <version>1.14.18</version>
-        <scope>test</scope>
-      </dependency>
       <dependency>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
