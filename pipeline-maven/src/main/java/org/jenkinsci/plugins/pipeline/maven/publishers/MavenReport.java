@@ -187,7 +187,7 @@ public class MavenReport implements RunAction2, SimpleBuildStep.LastBuildAction,
     @CheckForNull
     @Override
     public String getIconFileName() {
-        return "/plugin/pipeline-maven/images/24x24/apache-maven.png";
+        return "symbol-apache-maven-icon plugin-pipeline-maven";
     }
 
     @CheckForNull
