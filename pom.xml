@@ -109,7 +109,7 @@
     <maven.version>3.8.8</maven.version>
     <mockito.version>5.6.0</mockito.version>
     <plexus-utils.version>3.5.1</plexus-utils.version>
-    <plugin-dockerfile.version>0.45.0</plugin-dockerfile.version>
+    <plugin-dockerfile.version>0.45.1</plugin-dockerfile.version>
     <plugin-exec.version>3.4.1</plugin-exec.version>
     <slf4j.version>2.0.16</slf4j.version>
     <spotless.check.skip>false</spotless.check.skip>
