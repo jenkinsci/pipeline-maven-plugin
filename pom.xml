@@ -89,7 +89,7 @@
     <assertj.version>3.26.3</assertj.version>
     <changelist>999999-SNAPSHOT</changelist>
     <gson.version>2.10.1</gson.version>
-    <hikaricp.version>5.1.0</hikaricp.version>
+    <hikaricp.version>6.0.0</hikaricp.version>
     <jansi.version>2.4.0</jansi.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-flaky-test.version>1.2.3</jenkins-plugin-flaky-test.version>
@@ -102,14 +102,14 @@
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
     <jenkins-tools-bom.version>3208.vb_21177d4b_cd9</jenkins-tools-bom.version>
     <jenkins.version>2.426.3</jenkins.version>
-    <junit.version>5.11.0</junit.version>
+    <junit.version>5.11.1</junit.version>
     <mariadb-client.version>3.4.1</mariadb-client.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.8.8</maven.version>
     <mockito.version>5.6.0</mockito.version>
     <plexus-utils.version>3.5.1</plexus-utils.version>
-    <plugin-dockerfile.version>0.45.0</plugin-dockerfile.version>
+    <plugin-dockerfile.version>0.45.1</plugin-dockerfile.version>
     <plugin-exec.version>3.4.1</plugin-exec.version>
     <slf4j.version>2.0.16</slf4j.version>
     <spotless.check.skip>false</spotless.check.skip>
