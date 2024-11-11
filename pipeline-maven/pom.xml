@@ -334,7 +334,7 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>junit</artifactId>
-      <version>1307.vdd5b_2646279e</version>
+      <version>1309.v0078b_fecd6ed</version>
       <classifier>tests</classifier>
       <scope>test</scope>
     </dependency>
