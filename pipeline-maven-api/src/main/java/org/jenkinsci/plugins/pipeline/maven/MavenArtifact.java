@@ -137,8 +137,9 @@ public class MavenArtifact implements Serializable, Comparable<MavenArtifact> {
     @Nullable
     public String getUrl() {
         if (getRepositoryUrl() == null) return null;
-        return getRepositoryUrl() + "/" + getGroupId().replace('.', '/') + "/" + getArtifactId() + "/"
-                + getBaseVersion() + "/" + getFileNameWithVersion();
+        return getRepositoryUrl() + (getRepositoryUrl().endsWith("/") ? "" : "/")
+                + getGroupId().replace('.', '/') + "/" + getArtifactId() + "/" + getBaseVersion() + "/"
+                + getFileNameWithVersion();
     }
 
     @Override

@@ -545,6 +545,9 @@ public class XmlUtils {
                         if (attachedArtifactDeployedEvent == null) {
                             // artifact has not been deployed ("mvn deploy")
                         } else {
+                            attachedMavenArtifact.setVersion(
+                                    XmlUtils.getUniqueChildElement(attachedArtifactDeployedEvent, "artifact")
+                                            .getAttribute("version"));
                             attachedMavenArtifact.setRepositoryUrl(
                                     XmlUtils.getUniqueChildElement(attachedArtifactDeployedEvent, "repository")
                                             .getAttribute("url"));
