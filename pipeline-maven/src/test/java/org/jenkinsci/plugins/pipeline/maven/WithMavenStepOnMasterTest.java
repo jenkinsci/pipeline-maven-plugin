@@ -172,7 +172,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "}";
         // @formatter:on
 
-        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-no-traceability");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
@@ -251,7 +251,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "}";
         // @formatter:on
 
-        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-global-traceability");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
@@ -282,7 +282,8 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "}";
         // @formatter:on
 
-        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
+        WorkflowJob pipeline = jenkinsRule.createProject(
+                WorkflowJob.class, "build-on-master-global-traceability-disabled-for-one-step");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
@@ -309,7 +310,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "}";
         // @formatter:on
 
-        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-jar-project");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
@@ -594,7 +595,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         // @formatter:off
         String pipelineScript = "node() {\n" +
             "    git($/" + gitRepoRule.toString() + "/$)\n" +
-            "    withMaven(traceability: true) {\n" +
+            "    withMaven(traceability: true, mavenLocalRepo: \"${pwd tmp: true}/m2repo\") {\n" +
             "        if (isUnix()) {\n" +
             "            sh 'mvn -P!might-produce-incrementals package'\n" +
             "        } else {\n" +
@@ -604,7 +605,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "}";
         // @formatter:on
 
-        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-maven-hpi-project");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
 
@@ -1269,7 +1270,8 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
             "}";
         // @formatter:on
 
-        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master");
+        WorkflowJob pipeline =
+                jenkinsRule.createProject(WorkflowJob.class, "build-on-master-test-results-by-stage-and-branch");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.buildAndAssertSuccess(pipeline);
 
