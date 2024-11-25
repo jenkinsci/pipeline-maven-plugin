@@ -961,11 +961,11 @@
             <build sourceDirectory="/path/to/my-jar/src/main/java" directory="/path/to/my-jar/target"/>
         </project>
         <no-execution-found/>
-        <artifact extension="jar" baseVersion="0.5-SNAPSHOT" groupId="com.example" artifactId="my-jar" id="com.example:my-jar:jar:0.5-SNAPSHOT" type="jar" version="0.5-20180304.184830-1" snapshot="true">
+        <artifact extension="jar" baseVersion="0.5-SNAPSHOT" groupId="com.example" artifactId="my-jar" id="com.example:my-jar:jar:0.5-SNAPSHOT" type="jar" version="0.5-20180304.184830-2" snapshot="true">
             <file>/path/to/my-jar/target/my-jar-0.5-SNAPSHOT.jar</file>
         </artifact>
         <attachedArtifacts>
-            <artifact extension="jar" baseVersion="0.5-SNAPSHOT" groupId="com.example" classifier="sources" artifactId="my-jar" id="com.example:my-jar:java-source:sources:0.5-SNAPSHOT" type="java-source" version="0.5-20180304.184830-1" snapshot="true">
+            <artifact extension="jar" baseVersion="0.5-SNAPSHOT" groupId="com.example" classifier="sources" artifactId="my-jar" id="com.example:my-jar:java-source:sources:0.5-SNAPSHOT" type="java-source" version="0.5-20180304.184830-2" snapshot="true">
                 <file>/path/to/my-jar/target/my-jar-0.5-SNAPSHOT-sources.jar</file>
             </artifact>
         </attachedArtifacts>

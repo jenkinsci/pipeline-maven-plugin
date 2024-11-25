@@ -185,11 +185,11 @@
       <build sourceDirectory="/Users/Shared/Jenkins/Home/workspace/my-jar/src/main/java" directory="/Users/Shared/Jenkins/Home/workspace/my-jar/target"/>
     </project>
     <no-execution-found/>
-    <artifact extension="pom" baseVersion="0.5-SNAPSHOT" groupId="com.example" artifactId="my-jar" id="com.example:my-jar:pom:0.5-SNAPSHOT" type="pom" version="0.5-20180410.070244-14" snapshot="true">
+    <artifact extension="pom" baseVersion="0.5-SNAPSHOT" groupId="com.example" artifactId="my-jar" id="com.example:my-jar:pom:0.5-SNAPSHOT" type="pom" version="0.5-20180410.070244-15" snapshot="true">
       <file/>
     </artifact>
     <attachedArtifacts>
-      <artifact extension="ova" baseVersion="0.5-SNAPSHOT" groupId="com.example" artifactId="my-jar" id="com.example:my-jar:ova:0.5-SNAPSHOT" type="ova" version="0.5-20180410.070244-14" snapshot="true">
+      <artifact extension="ova" baseVersion="0.5-SNAPSHOT" groupId="com.example" artifactId="my-jar" id="com.example:my-jar:ova:0.5-SNAPSHOT" type="ova" version="0.5-20180410.070244-15" snapshot="true">
         <file>/Users/Shared/Jenkins/Home/workspace/my-jar/my-jar-0.5-SNAPSHOT.ova</file>
       </artifact>
     </attachedArtifacts>
