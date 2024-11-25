@@ -242,7 +242,7 @@ public class XmlUtilsTest {
         InputStream in = Thread.currentThread()
                 .getContextClassLoader()
                 .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-package-jar.xml");
-        in.getClass(); // check non null
+        assertThat(in).isNotNull();
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder()
                 .parse(in)
@@ -258,7 +258,7 @@ public class XmlUtilsTest {
         InputStream in = Thread.currentThread()
                 .getContextClassLoader()
                 .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
-        in.getClass(); // check non null
+        assertThat(in).isNotNull();
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder()
                 .parse(in)
@@ -278,7 +278,7 @@ public class XmlUtilsTest {
         InputStream in = Thread.currentThread()
                 .getContextClassLoader()
                 .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
-        in.getClass(); // check non null
+        assertThat(in).isNotNull();
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder()
                 .parse(in)
@@ -302,13 +302,12 @@ public class XmlUtilsTest {
         InputStream in = Thread.currentThread()
                 .getContextClassLoader()
                 .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
-        in.getClass(); // check non null
+        assertThat(in).isNotNull();
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder()
                 .parse(in)
                 .getDocumentElement();
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, false);
-        System.out.println(generatedArtifacts);
         assertThat(generatedArtifacts.size()).isEqualTo(2); // a jar file and a pom file are generated
 
         for (MavenArtifact mavenArtifact : generatedArtifacts) {
@@ -331,7 +330,7 @@ public class XmlUtilsTest {
         InputStream in = Thread.currentThread()
                 .getContextClassLoader()
                 .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-2.8.xml");
-        in.getClass(); // check non null
+        assertThat(in).isNotNull();
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder()
                 .parse(in)
@@ -365,7 +364,7 @@ public class XmlUtilsTest {
         InputStream in = Thread.currentThread()
                 .getContextClassLoader()
                 .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-3.0.xml");
-        in.getClass(); // check non null
+        assertThat(in).isNotNull();
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder()
                 .parse(in)
@@ -399,18 +398,20 @@ public class XmlUtilsTest {
         InputStream in = Thread.currentThread()
                 .getContextClassLoader()
                 .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-deploy-jar.xml");
-        in.getClass(); // check non null
+        assertThat(in).isNotNull();
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder()
                 .parse(in)
                 .getDocumentElement();
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, true);
-        System.out.println(generatedArtifacts);
         assertThat(generatedArtifacts.size()).isEqualTo(3); // a jar file and a pom file are generated
 
         for (MavenArtifact mavenArtifact : generatedArtifacts) {
             assertThat(mavenArtifact.getGroupId()).isEqualTo("com.example");
             assertThat(mavenArtifact.getArtifactId()).isEqualTo("my-jar");
+            assertThat(mavenArtifact.getBaseVersion()).isEqualTo("0.5-SNAPSHOT");
+            assertThat(mavenArtifact.getVersion()).isEqualTo("0.5-20180304.184830-1");
+            assertThat(mavenArtifact.isSnapshot()).isTrue();
             if ("pom".equals(mavenArtifact.getType())) {
                 assertThat(mavenArtifact.getExtension()).isEqualTo("pom");
                 assertThat(mavenArtifact.getClassifier()).isNullOrEmpty();
@@ -430,19 +431,21 @@ public class XmlUtilsTest {
     public void test_listGeneratedArtifacts_includeAttachedArtifacts() throws Exception {
         InputStream in = Thread.currentThread()
                 .getContextClassLoader()
-                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-include-attached-artifacts.log");
-        in.getClass(); // check non null
+                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-include-attached-artifacts.xml");
+        assertThat(in).isNotNull();
         Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
                 .newDocumentBuilder()
                 .parse(in)
                 .getDocumentElement();
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, true);
-        System.out.println(generatedArtifacts);
         assertThat(generatedArtifacts.size()).isEqualTo(2); // pom artifact plus 1 attachment
 
         for (MavenArtifact mavenArtifact : generatedArtifacts) {
             assertThat(mavenArtifact.getGroupId()).isEqualTo("com.example");
             assertThat(mavenArtifact.getArtifactId()).isEqualTo("my-jar");
+            assertThat(mavenArtifact.getBaseVersion()).isEqualTo("0.5-SNAPSHOT");
+            assertThat(mavenArtifact.getVersion()).isEqualTo("0.5-20180410.070244-14");
+            assertThat(mavenArtifact.isSnapshot()).isTrue();
             if ("pom".equals(mavenArtifact.getType())) {
                 assertThat(mavenArtifact.getExtension()).isEqualTo("pom");
                 assertThat(mavenArtifact.getClassifier()).isNullOrEmpty();
