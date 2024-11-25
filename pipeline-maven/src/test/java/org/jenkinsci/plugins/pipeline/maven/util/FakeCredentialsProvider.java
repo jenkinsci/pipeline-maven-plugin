@@ -36,9 +36,14 @@ public class FakeCredentialsProvider extends CredentialsProvider {
             ItemGroup itemGroup,
             Authentication authentication,
             List<DomainRequirement> domainRequirements) {
-        UsernamePasswordCredentialsImpl creds = new UsernamePasswordCredentialsImpl(GLOBAL, id, "", username, password);
-        creds.setUsernameSecret(usernameIsSecret);
-        return (List<C>) asList(creds);
+        UsernamePasswordCredentialsImpl creds;
+        try {
+            creds = new UsernamePasswordCredentialsImpl(GLOBAL, id, "", username, password);
+            creds.setUsernameSecret(usernameIsSecret);
+            return (List<C>) asList(creds);
+        } catch (FormException e) {
+            throw new IllegalStateException("Cannot create fake credentials", e);
+        }
     }
 
     @Override

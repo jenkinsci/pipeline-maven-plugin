@@ -242,7 +242,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         registerAgentForSlaveContainer(container);
     }
 
-    private void addTestSshCredentials() {
+    private void addTestSshCredentials() throws Exception {
         Credentials credentials =
                 new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, SSH_CREDENTIALS_ID, null, "test", "test");
 
