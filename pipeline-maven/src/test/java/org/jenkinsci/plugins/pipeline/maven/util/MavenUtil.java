@@ -14,7 +14,7 @@ import org.jvnet.hudson.test.JenkinsRule;
 
 public class MavenUtil {
 
-    public static final String MAVEN_VERSION = System.getProperty("maven.version", "3.8.8");
+    public static final String MAVEN_VERSION = System.getProperty("maven.version", "3.9.5");
 
     public static Maven.MavenInstallation configureDefaultMaven(FilePath agentRootPath) throws Exception {
         return configureMaven(agentRootPath, MAVEN_VERSION, "default");
