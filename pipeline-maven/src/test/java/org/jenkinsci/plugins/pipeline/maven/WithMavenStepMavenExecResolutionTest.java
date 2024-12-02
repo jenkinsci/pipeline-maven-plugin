@@ -189,7 +189,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
         registerAgentForSlaveContainer(slaveContainer);
     }
 
-    private void addTestSshCredentials() {
+    private void addTestSshCredentials() throws Exception {
         Credentials credentials =
                 new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, SSH_CREDENTIALS_ID, null, "test", "test");
 
