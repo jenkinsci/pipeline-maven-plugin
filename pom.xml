@@ -101,7 +101,9 @@
     <jenkins-plugin-postgresql.version>42.7.2-40.v76d376d65c77</jenkins-plugin-postgresql.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
     <jenkins-tools-bom.version>3435.v238d66a_043fb_</jenkins-tools-bom.version>
-    <jenkins.version>2.440.3</jenkins.version>
+    <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
+    <jenkins.baseline>2.440</jenkins.baseline>
+    <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <junit.version>5.11.4</junit.version>
     <mariadb-client.version>3.5.1</mariadb-client.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
@@ -120,7 +122,7 @@
     <dependencies>
       <dependency>
         <groupId>io.jenkins.tools.bom</groupId>
-        <artifactId>bom-2.440.x</artifactId>
+        <artifactId>bom-${jenkins.baseline}.x</artifactId>
         <version>${jenkins-tools-bom.version}</version>
         <type>pom</type>
         <scope>import</scope>
