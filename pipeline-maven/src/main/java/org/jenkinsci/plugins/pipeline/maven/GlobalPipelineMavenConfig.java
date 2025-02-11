@@ -60,7 +60,7 @@ import org.jenkinsci.plugins.pipeline.maven.service.PipelineTriggerService;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
-import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.StaplerRequest2;
 import org.kohsuke.stapler.verb.POST;
 
 /**
@@ -225,7 +225,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     }
 
     @Override
-    public boolean configure(StaplerRequest req, JSONObject json) throws FormException {
+    public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
         if (!StringUtils.equals(json.getString("daoClass"), daoClass)) {
             closeDatasource();
             this.dao = null;
