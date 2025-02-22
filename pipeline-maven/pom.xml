@@ -506,6 +506,7 @@
             <artifactId>docker-maven-plugin</artifactId>
             <configuration>
               <imagePullPolicy>IfNotPresent</imagePullPolicy>
+              <skip>${skipTests}</skip>
             </configuration>
             <executions>
               <execution>
@@ -606,6 +607,7 @@
                 </goals>
                 <phase>prepare-package</phase>
                 <configuration>
+                  <skip>${skipTests}</skip>
                   <executable>docker</executable>
                   <arguments>
                     <argument>rmi</argument>
