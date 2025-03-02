@@ -251,6 +251,7 @@
           <artifactId>maven-deploy-plugin</artifactId>
           <configuration>
             <deployAtEnd>true</deployAtEnd>
+            <retryFailedDeploymentCount>2</retryFailedDeploymentCount>
           </configuration>
         </plugin>
         <plugin>
