@@ -26,33 +26,23 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.plugins.jacoco.JacocoPublisher;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
-import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
-import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
 
+
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
+ *
+ * @deprecated since TODO
  */
+@Deprecated
 public class JacocoReportPublisher extends MavenPublisher {
-    private static final Logger LOGGER = Logger.getLogger(JacocoReportPublisher.class.getName());
-
     private static final long serialVersionUID = 1L;
 
     @DataBoundConstructor
@@ -125,182 +115,7 @@ public class JacocoReportPublisher extends MavenPublisher {
             throws IOException, InterruptedException {
 
         TaskListener listener = context.get(TaskListener.class);
-        FilePath workspace = context.get(FilePath.class);
-        Run run = context.get(Run.class);
-        Launcher launcher = context.get(Launcher.class);
-
-        List<Element> jacocoPrepareAgentEvents = XmlUtils.getExecutionEventsByPlugin(
-                mavenSpyLogsElt, "org.jacoco", "jacoco-maven-plugin", "prepare-agent", "MojoSucceeded", "MojoFailed");
-        List<Element> jacocoPrepareAgentIntegrationEvents = XmlUtils.getExecutionEventsByPlugin(
-                mavenSpyLogsElt,
-                "org.jacoco",
-                "jacoco-maven-plugin",
-                "prepare-agent-integration",
-                "MojoSucceeded",
-                "MojoFailed");
-        jacocoPrepareAgentEvents.addAll(jacocoPrepareAgentIntegrationEvents); // add prepare-agent-integration goals
-
-        if (jacocoPrepareAgentEvents.isEmpty()) {
-            LOGGER.log(Level.FINE, "No org.jacoco:jacoco-maven-plugin:prepare-agent[-integration] execution found");
-            return;
-        }
-
-        try {
-            Class.forName("hudson.plugins.jacoco.JacocoPublisher");
-        } catch (ClassNotFoundException e) {
-            listener.getLogger().print("[withMaven] Jenkins ");
-            listener.hyperlink("https://wiki.jenkins.io/display/JENKINS/JaCoCo+Plugin", "JaCoCo Plugin");
-            listener.getLogger()
-                    .println(
-                            " not found, don't display org.jacoco:jacoco-maven-plugin:prepare-agent[-integration] results in pipeline screen.");
-            return;
-        }
-
-        List<JacocoReportDetails> jacocoReportDetails = new ArrayList<>();
-
-        for (Element jacocoPrepareAgentEvent : jacocoPrepareAgentEvents) {
-
-            Element buildElement = XmlUtils.getUniqueChildElementOrNull(jacocoPrepareAgentEvent, "project", "build");
-            if (buildElement == null) {
-                if (LOGGER.isLoggable(Level.FINE))
-                    LOGGER.log(
-                            Level.FINE,
-                            "Ignore execution event with missing 'build' child:"
-                                    + XmlUtils.toString(jacocoPrepareAgentEvent));
-                continue;
-            }
-
-            Element pluginElt = XmlUtils.getUniqueChildElement(jacocoPrepareAgentEvent, "plugin");
-            Element destFileElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "destFile");
-            Element projectElt = XmlUtils.getUniqueChildElement(jacocoPrepareAgentEvent, "project");
-            MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
-            MavenSpyLogProcessor.PluginInvocation pluginInvocation = XmlUtils.newPluginInvocation(pluginElt);
-
-            if (destFileElt == null) {
-                listener.getLogger()
-                        .println("[withMaven] No <destFile> element found for <plugin> in "
-                                + XmlUtils.toString(jacocoPrepareAgentEvent));
-                continue;
-            }
-            String destFile = destFileElt.getTextContent().trim();
-            if (destFile.equals("${jacoco.destFile}")) {
-                destFile = "${project.build.directory}/jacoco.exec";
-                if ("prepare-agent-integration".equals(pluginInvocation.goal))
-                    destFile = "${project.build.directory}/jacoco-it.exec";
-                String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
-                if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
-                    listener.getLogger()
-                            .println("[withMaven] '${project.build.directory}' found for <project> in "
-                                    + XmlUtils.toString(jacocoPrepareAgentEvent));
-                    continue;
-                }
-
-                destFile = destFile.replace("${project.build.directory}", projectBuildDirectory);
-            } else if (destFile.contains("${project.build.directory}")) {
-                String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
-                if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
-                    listener.getLogger()
-                            .println("[withMaven] '${project.build.directory}' found for <project> in "
-                                    + XmlUtils.toString(jacocoPrepareAgentEvent));
-                    continue;
-                }
-                destFile = destFile.replace("${project.build.directory}", projectBuildDirectory);
-
-            } else if (destFile.contains("${basedir}")) {
-                String baseDir = projectElt.getAttribute("baseDir");
-                if (baseDir.isEmpty()) {
-                    listener.getLogger()
-                            .println("[withMaven] '${basedir}' found for <project> in "
-                                    + XmlUtils.toString(jacocoPrepareAgentEvent));
-                    continue;
-                }
-                destFile = destFile.replace("${basedir}", baseDir);
-            }
-
-            destFile = XmlUtils.getPathInWorkspace(destFile, workspace);
-
-            String sourceDirectory = buildElement.getAttribute("sourceDirectory");
-            String classesDirectory = buildElement.getAttribute("directory") + "/classes";
-
-            String sourceDirectoryRelativePath = XmlUtils.getPathInWorkspace(sourceDirectory, workspace);
-            String classesDirectoryRelativePath = XmlUtils.getPathInWorkspace(classesDirectory, workspace);
-
-            String excludes = null;
-            Element excludesElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "excludes");
-            if (excludesElt != null) {
-                List<Element> excludeElements = XmlUtils.getChildrenElements(excludesElt, "exclude");
-                excludes = excludeElements.stream()
-                        .map(e -> e.getTextContent().trim())
-                        .collect(Collectors.joining(","));
-            }
-
-            listener.getLogger()
-                    .println("[withMaven] jacocoPublisher - Archive JaCoCo analysis results for Maven artifact "
-                            + mavenArtifact.toString() + " generated by " + pluginInvocation + ": execFile: " + destFile
-                            + ", sources: " + sourceDirectoryRelativePath + ", classes: "
-                            + classesDirectoryRelativePath + ", excludes: "
-                            + excludes);
-            jacocoReportDetails.add(new JacocoReportDetails(
-                    destFile,
-                    sourceDirectoryRelativePath,
-                    classesDirectoryRelativePath,
-                    excludes,
-                    mavenArtifact.toString() + " " + pluginInvocation));
-        }
-
-        JacocoPublisher jacocoPublisher = new JacocoPublisher();
-
-        String aggregatedDestFile =
-                jacocoReportDetails.stream().map(details -> details.execFile).collect(Collectors.joining(","));
-        String aggregatedSourceDirectory = jacocoReportDetails.stream()
-                .map(details -> details.sourceDirectory)
-                .collect(Collectors.joining(","));
-        String aggregatedClassesDirectory = jacocoReportDetails.stream()
-                .map(details -> details.classesDirectory)
-                .collect(Collectors.joining(","));
-        String aggregatedExclusionPattern = jacocoReportDetails.stream()
-                .map(details -> details.excludes)
-                .filter(e -> e != null && !e.isEmpty())
-                .distinct()
-                .collect(Collectors.joining(","));
-
-        jacocoPublisher.setExecPattern(aggregatedDestFile);
-        jacocoPublisher.setSourcePattern(aggregatedSourceDirectory);
-        jacocoPublisher.setClassPattern(aggregatedClassesDirectory);
-        jacocoPublisher.setExclusionPattern(aggregatedExclusionPattern);
-
-        try {
-            jacocoPublisher.perform(run, workspace, launcher, listener);
-        } catch (Exception e) {
-            listener.error("[withMaven] jacocoPublisher - exception archiving JaCoCo results for " + jacocoReportDetails
-                    + ": " + e);
-            LOGGER.log(Level.WARNING, "Exception processing JaCoCo results", e);
-            throw new MavenPipelinePublisherException(
-                    "jacocoPublisher", "archiving JaCoCo results for " + jacocoReportDetails, e);
-        }
-    }
-
-    public static class JacocoReportDetails {
-        final String execFile, sourceDirectory, classesDirectory, excludes, description;
-
-        public JacocoReportDetails(
-                String execFile, String sourceDirectory, String classesDirectory, String excludes, String description) {
-            this.execFile = execFile;
-            this.sourceDirectory = sourceDirectory;
-            this.classesDirectory = classesDirectory;
-            this.excludes = excludes;
-            this.description = description;
-        }
-
-        @Override
-        public String toString() {
-            return "JacocoReportDetails{" + "execFile='"
-                    + execFile + '\'' + ", sourceDirectory='"
-                    + sourceDirectory + '\'' + ", classesDirectory='"
-                    + classesDirectory + '\'' + ", excludes='"
-                    + excludes + '\'' + ", description='"
-                    + description + '\'' + '}';
-        }
+        listener.getLogger().println("[withMaven] JacocoReportPublisher is deprecated and will be removed in a future version");
     }
 
     @Symbol("jacocoPublisher")
