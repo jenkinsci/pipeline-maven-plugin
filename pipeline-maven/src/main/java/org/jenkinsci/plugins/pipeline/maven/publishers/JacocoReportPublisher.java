@@ -25,8 +25,8 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import hudson.AbortException;
 import hudson.Extension;
-import hudson.model.TaskListener;
 import java.io.IOException;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
@@ -34,7 +34,6 @@ import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
-
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -113,9 +112,10 @@ public class JacocoReportPublisher extends MavenPublisher {
     @Override
     public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt)
             throws IOException, InterruptedException {
-
-        TaskListener listener = context.get(TaskListener.class);
-        listener.getLogger().println("[withMaven] JacocoReportPublisher is deprecated and will be removed in a future version");
+        throw new AbortException("""
+        The jacocoPublisher is deprecated as is the Jacoco plugin and you should not use it.
+        Alternatively, you should rely on Coverage plugin and see the configuration required at https://plugins.jenkins.io/coverage/#plugin-content-pipeline-example.
+        """);
     }
 
     @Symbol("jacocoPublisher")
