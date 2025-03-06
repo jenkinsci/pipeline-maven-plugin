@@ -112,7 +112,8 @@ public class JacocoReportPublisher extends MavenPublisher {
     @Override
     public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt)
             throws IOException, InterruptedException {
-        throw new AbortException("""
+        throw new AbortException(
+                """
         The jacocoPublisher is deprecated as is the Jacoco plugin and you should not use it.
         Alternatively, you should rely on Coverage plugin and see the configuration required at https://plugins.jenkins.io/coverage/#plugin-content-pipeline-example.
         """);

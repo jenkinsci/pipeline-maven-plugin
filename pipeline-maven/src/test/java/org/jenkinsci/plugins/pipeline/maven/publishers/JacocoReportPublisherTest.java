@@ -31,6 +31,7 @@ public class JacocoReportPublisherTest extends AbstractIntegrationTest {
         WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "jar-with-jacoco");
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.ABORTED, pipeline.scheduleBuild2(0));
-        jenkinsRule.assertLogContains("The jacocoPublisher is deprecated as is the Jacoco plugin and you should not use it", build);
+        jenkinsRule.assertLogContains(
+                "The jacocoPublisher is deprecated as is the Jacoco plugin and you should not use it", build);
     }
 }
