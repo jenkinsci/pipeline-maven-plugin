@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JacocoReportPublisher;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -71,7 +72,18 @@ public enum MavenPublisherStrategy {
                     Jenkins.get().getDescriptorList(MavenPublisher.class);
             for (Descriptor<MavenPublisher> descriptor : descriptorList) {
                 try {
-                    defaultPublishersById.put(descriptor.getId(), descriptor.clazz.newInstance());
+                    if (!JacocoReportPublisher.DescriptorImpl.class.isAssignableFrom(descriptor.getClass())) {
+                        defaultPublishersById.put(descriptor.getId(), descriptor.clazz.newInstance());
+                    } else {
+                        listener.getLogger()
+                                .println(
+                                        """
+                        [withMaven] JacocoPublisher is no longer implicitly used with `withMaven` step.
+                        [withMaven] Jacoco plugin has been deprecated and should not be used anymore.
+                        [withMaven] Usage of Coverage plugin is recommended.
+                        [withMaven] See https://plugins.jenkins.io/coverage/#plugin-content-pipeline-example.
+                        """);
+                    }
                 } catch (InstantiationException | IllegalAccessException e) {
                     PrintWriter error =
                             listener.error("[withMaven] Exception instantiation default config for Maven Publisher '"
