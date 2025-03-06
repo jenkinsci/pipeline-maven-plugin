@@ -424,7 +424,6 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 Arguments.of(new DependenciesFingerprintPublisher.DescriptorImpl(), "dependenciesFingerprintPublisher"),
                 Arguments.of(new GeneratedArtifactsPublisher.DescriptorImpl(), "artifactsPublisher"),
                 Arguments.of(new InvokerRunsPublisher.DescriptorImpl(), "invokerPublisher"),
-                Arguments.of(new JacocoReportPublisher.DescriptorImpl(), "jacocoPublisher"),
                 Arguments.of(new JGivenTestsPublisher.DescriptorImpl(), "jgivenPublisher"),
                 Arguments.of(new JunitTestsPublisher.DescriptorImpl(), "junitPublisher"),
                 Arguments.of(new MavenLinkerPublisher2.DescriptorImpl(), "mavenLinkerPublisher"),

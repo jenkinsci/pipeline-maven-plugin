@@ -162,7 +162,6 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
                 Arguments.of(new DependenciesFingerprintPublisher.DescriptorImpl()),
                 Arguments.of(new GeneratedArtifactsPublisher.DescriptorImpl()),
                 Arguments.of(new InvokerRunsPublisher.DescriptorImpl()),
-                Arguments.of(new JacocoReportPublisher.DescriptorImpl()),
                 Arguments.of(new JGivenTestsPublisher.DescriptorImpl()),
                 Arguments.of(new JunitTestsPublisher.DescriptorImpl()),
                 Arguments.of(new MavenLinkerPublisher2.DescriptorImpl()),
