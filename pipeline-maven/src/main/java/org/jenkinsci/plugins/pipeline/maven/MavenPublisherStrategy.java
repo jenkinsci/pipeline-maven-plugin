@@ -72,9 +72,7 @@ public enum MavenPublisherStrategy {
                     Jenkins.get().getDescriptorList(MavenPublisher.class);
             for (Descriptor<MavenPublisher> descriptor : descriptorList) {
                 try {
-                    if (!JacocoReportPublisher.DescriptorImpl.class.isAssignableFrom(descriptor.getClass())) {
-                        defaultPublishersById.put(descriptor.getId(), descriptor.clazz.newInstance());
-                    } else {
+                    if (JacocoReportPublisher.DescriptorImpl.class.isAssignableFrom(descriptor.getClass())) {
                         listener.getLogger()
                                 .println(
                                         """
@@ -83,6 +81,8 @@ public enum MavenPublisherStrategy {
                         [withMaven] Usage of Coverage plugin is recommended.
                         [withMaven] See https://plugins.jenkins.io/coverage/#plugin-content-pipeline-example.
                         """);
+                    } else {
+                        defaultPublishersById.put(descriptor.getId(), descriptor.clazz.newInstance());
                     }
                 } catch (InstantiationException | IllegalAccessException e) {
                     PrintWriter error =
