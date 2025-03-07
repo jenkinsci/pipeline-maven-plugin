@@ -347,11 +347,6 @@ Requires the https://plugins.jenkins.io/jgiven/[Jenkins JGiven Plugin]
 +
 Publish http://jgiven.org/[JGiven] test reports
 
-JaCoCo Code Coverage::
-Requires the https://plugins.jenkins.io/jacoco/[Jenkins JaCoCo Plugin]
-+
-Publish JaCoCo Code Coverage
-
 Maven Linker Publisher::
 Publish the Maven report on the pipeline build GUI (list of dependencies, produced artifacts, downstream & upstream pipelines). +
 This publisher should be renamed "Maven Build Report Publisher". +
@@ -416,10 +411,6 @@ Since 3.11.0 more fine granular options: +
 |JGiven reports
 |`withMaven(options: [jgivenPublisher(disabled: true)],...)`
 |`.skip-publish-jgiven-results`
-
-|JaCoCo Code Coverage
-|`withMaven(options: [jacocoPublisher(disabled: true)],...)`
-|
 
 |Maven Linker Publisher
 |`withMaven(options: [mavenLinkerPublisher(disabled: true)],...)`
@@ -501,7 +492,7 @@ withMaven() {
 The API for Maven reporters is still experimental.
 Please open a Request for Enhancement Jira issue to discuss how to add Maven reporters.
 
-We want to quickly add reporters for CheckStyle, Jacoco...
+We want to quickly add reporters for CheckStyle...
 
 [#db-setup]
 == Database Setup
