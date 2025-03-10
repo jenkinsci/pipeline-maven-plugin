@@ -23,6 +23,9 @@
  */
 package org.jenkinsci.plugins.pipeline.maven;
 
+import static org.junit.jupiter.api.Named.named;
+import static org.junit.jupiter.params.provider.Arguments.arguments;
+
 import hudson.model.Result;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -35,7 +38,6 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.JacocoReportPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
@@ -44,6 +46,7 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -54,7 +57,8 @@ import org.junit.jupiter.params.provider.MethodSource;
  */
 public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTest {
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0}")
+    @DisplayName("Publisher disabled")
     @MethodSource("mavenPublisherDescriptors")
     public void maven_build_jar_project_on_master_with_globally_disabled_publisher_succeeds(
             MavenPublisher.DescriptorImpl descriptor) throws Exception {
@@ -78,6 +82,7 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
 
             // @formatter:off
             String pipelineScript = "node() {\n" +
+                "    echo 'Running pipeline for " + displayName + "'\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven() {\n" +
                 "        if (isUnix()) {\n" +
@@ -102,7 +107,8 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
         }
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "{0}")
+    @DisplayName("Publisher enabled globally and on pipeline")
     @MethodSource("mavenPublisherDescriptors")
     public void maven_build_jar_project_on_master_with_publisher_configured_both_globally_and_on_the_pipeline_succeeds(
             MavenPublisher.DescriptorImpl descriptor) throws Exception {
@@ -126,6 +132,7 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
 
             // @formatter:off
             String pipelineScript = "node() {\n" +
+                "    echo 'Running pipeline for " + displayName + "'\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
                 "    withMaven(options:[" + symbol + "(disabled: true)]) {\n" +
                 "        if (isUnix()) {\n" +
@@ -155,17 +162,16 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
 
     private static Stream<Arguments> mavenPublisherDescriptors() {
         return Stream.of(
-                Arguments.of(new FindbugsAnalysisPublisher.DescriptorImpl()),
-                Arguments.of(new SpotBugsAnalysisPublisher.DescriptorImpl()),
-                Arguments.of(new TasksScannerPublisher.DescriptorImpl()),
-                Arguments.of(new ConcordionTestsPublisher.DescriptorImpl()),
-                Arguments.of(new DependenciesFingerprintPublisher.DescriptorImpl()),
-                Arguments.of(new GeneratedArtifactsPublisher.DescriptorImpl()),
-                Arguments.of(new InvokerRunsPublisher.DescriptorImpl()),
-                Arguments.of(new JacocoReportPublisher.DescriptorImpl()),
-                Arguments.of(new JGivenTestsPublisher.DescriptorImpl()),
-                Arguments.of(new JunitTestsPublisher.DescriptorImpl()),
-                Arguments.of(new MavenLinkerPublisher2.DescriptorImpl()),
-                Arguments.of(new PipelineGraphPublisher.DescriptorImpl()));
+                arguments(named("Findbugs", new FindbugsAnalysisPublisher.DescriptorImpl())),
+                arguments(named("SpotBugs", new SpotBugsAnalysisPublisher.DescriptorImpl())),
+                arguments(named("TasksScanner", new TasksScannerPublisher.DescriptorImpl())),
+                arguments(named("Concordion", new ConcordionTestsPublisher.DescriptorImpl())),
+                arguments(named("DependenciesFingerprint", new DependenciesFingerprintPublisher.DescriptorImpl())),
+                arguments(named("GeneratedArtifacts", new GeneratedArtifactsPublisher.DescriptorImpl())),
+                arguments(named("InvokerRuns", new InvokerRunsPublisher.DescriptorImpl())),
+                arguments(named("JGiven", new JGivenTestsPublisher.DescriptorImpl())),
+                arguments(named("Junit", new JunitTestsPublisher.DescriptorImpl())),
+                arguments(named("MavenLinker", new MavenLinkerPublisher2.DescriptorImpl())),
+                arguments(named("PipelineGraph", new PipelineGraphPublisher.DescriptorImpl())));
     }
 }

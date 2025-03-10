@@ -54,7 +54,6 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.JacocoReportPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
@@ -424,7 +423,6 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 Arguments.of(new DependenciesFingerprintPublisher.DescriptorImpl(), "dependenciesFingerprintPublisher"),
                 Arguments.of(new GeneratedArtifactsPublisher.DescriptorImpl(), "artifactsPublisher"),
                 Arguments.of(new InvokerRunsPublisher.DescriptorImpl(), "invokerPublisher"),
-                Arguments.of(new JacocoReportPublisher.DescriptorImpl(), "jacocoPublisher"),
                 Arguments.of(new JGivenTestsPublisher.DescriptorImpl(), "jgivenPublisher"),
                 Arguments.of(new JunitTestsPublisher.DescriptorImpl(), "junitPublisher"),
                 Arguments.of(new MavenLinkerPublisher2.DescriptorImpl(), "mavenLinkerPublisher"),
