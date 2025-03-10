@@ -116,6 +116,7 @@ public class JacocoReportPublisher extends MavenPublisher {
                 """
         The jacocoPublisher is deprecated as is the Jacoco plugin and you should not use it.
         Alternatively, you should rely on Coverage plugin and see the configuration required at https://plugins.jenkins.io/coverage/#plugin-content-pipeline-example.
+        Or, if continuing to use the JaCoCo plugin for now, run it explicitly rather than expecting withMaven to run it implicitly.
         """);
     }
 
