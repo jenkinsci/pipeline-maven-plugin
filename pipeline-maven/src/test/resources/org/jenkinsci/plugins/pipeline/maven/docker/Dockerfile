@@ -1,4 +1,4 @@
-FROM ubuntu:noble
+FROM ubuntu:noble as base
 
 # install SSHD
 RUN apt-get update -y && \
@@ -24,3 +24,39 @@ ENV LANG en_US.UTF-8
 
 # run SSHD in the foreground with error messages to stderr
 ENTRYPOINT ["/usr/sbin/sshd", "-D", "-e"]
+
+FROM base as java-git
+
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+        software-properties-common \
+        openjdk-17-jdk-headless \
+        curl \
+        ant \
+        git
+
+FROM java-git as java-maven-git
+
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y \
+        maven
+
+FROM java-maven-git as javas
+
+COPY --from=eclipse-temurin:8u382-b05-jdk /opt/java/openjdk /opt/java/jdk8
+COPY --from=eclipse-temurin:11.0.20.1_1-jdk /opt/java/openjdk /opt/java/jdk11
+COPY --from=eclipse-temurin:17.0.8.1_1-jdk /opt/java/openjdk /opt/java/jdk17
+COPY --from=eclipse-temurin:21.0.6_7-jdk  /opt/java/openjdk /opt/java/jdk21
+
+FROM java-maven-git as maven-home
+
+ENV MAVEN_HOME="/usr/share/maven"
+
+# see https://www.jenkins.io/doc/book/using/using-agents/ and https://github.com/jenkinsci/docker-ssh-agent/issues/33
+# probably, it would be better to use the official image docker-ssh-agent as a base
+RUN VARS1="HOME=|USER=|MAIL=|LC_ALL=|LS_COLORS=|LANG=" \
+    VARS2="HOSTNAME=|PWD=|TERM=|SHLVL=|LANGUAGE=|_=" \
+    VARS="${VARS1}|${VARS2}" \
+    env | egrep -v '^(${VARS})' >> /etc/environment
+
+

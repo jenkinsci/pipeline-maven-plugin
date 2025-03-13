@@ -58,8 +58,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
     @Test
     public void testMavenNotInstalledInDockerImage() throws Exception {
-        try (GenericContainer<?> nonMavenContainerRule =
-                new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22)) {
+        try (GenericContainer<?> nonMavenContainerRule = createContainer("java-git")) {
             nonMavenContainerRule.start();
             assertThat(nonMavenContainerRule.execInContainer("mvn", "--version").getStdout())
                     .contains("exec: \"mvn\": executable file not found in $PATH");
@@ -68,8 +67,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
     @Test
     public void testMavenGlobalToolRecognizedInScriptedPipeline() throws Exception {
-        try (GenericContainer<?> nonMavenContainerRule =
-                new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22)) {
+        try (GenericContainer<?> nonMavenContainerRule = createContainer("java-git")) {
             nonMavenContainerRule.start();
             registerAgentForContainer(nonMavenContainerRule);
             String version = registerLatestMavenVersionAsGlobalTool();
@@ -96,8 +94,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
     @Test
     public void testMavenGlobalToolRecognizedInDeclarativePipeline() throws Exception {
-        try (GenericContainer<?> nonMavenContainerRule =
-                new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22)) {
+        try (GenericContainer<?> nonMavenContainerRule = createContainer("java-git")) {
             nonMavenContainerRule.start();
             registerAgentForContainer(nonMavenContainerRule);
             String version = registerLatestMavenVersionAsGlobalTool();
@@ -131,8 +128,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
     @Test
     public void testPreInstalledMavenRecognizedWithoutMavenHome() throws Exception {
-        try (GenericContainer<?> javaMavenGitContainerRule =
-                new GenericContainer<>("localhost/pipeline-maven/java-maven-git").withExposedPorts(22)) {
+        try (GenericContainer<?> javaMavenGitContainerRule = createContainer("java-maven-git")) {
             javaMavenGitContainerRule.start();
             registerAgentForContainer(javaMavenGitContainerRule);
 
@@ -154,8 +150,7 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
 
     @Test
     public void testPreInstalledMavenRecognizedWithMavenHome() throws Exception {
-        try (GenericContainer<?> mavenWithMavenHomeContainerRule =
-                new GenericContainer<>("localhost/pipeline-maven/maven-home").withExposedPorts(22)) {
+        try (GenericContainer<?> mavenWithMavenHomeContainerRule = createContainer("maven-home")) {
             mavenWithMavenHomeContainerRule.start();
             registerAgentForContainer(mavenWithMavenHomeContainerRule);
 

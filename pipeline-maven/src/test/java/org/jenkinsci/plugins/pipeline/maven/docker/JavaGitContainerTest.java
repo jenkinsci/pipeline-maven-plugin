@@ -36,8 +36,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class JavaGitContainerTest extends AbstractIntegrationTest {
 
     @Container
-    public GenericContainer<?> containerRule =
-            new GenericContainer<>("localhost/pipeline-maven/java-git").withExposedPorts(22);
+    public GenericContainer<?> containerRule = createContainer("java-git");
 
     @Test
     public void smokes() throws Exception {

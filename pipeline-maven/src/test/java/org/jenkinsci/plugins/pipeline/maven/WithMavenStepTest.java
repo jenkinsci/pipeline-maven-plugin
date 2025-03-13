@@ -74,8 +74,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     @Issue("SECURITY-441")
     @Test
     public void testMavenBuildOnRemoteAgentWithSettingsFileOnMasterFails() throws Exception {
-        try (GenericContainer<?> mavenContainerRule =
-                new GenericContainer<>("localhost/pipeline-maven/java-maven-git").withExposedPorts(22)) {
+        try (GenericContainer<?> mavenContainerRule = createContainer("java-maven-git")) {
             mavenContainerRule.start();
             registerAgentForContainer(mavenContainerRule);
 
@@ -100,8 +99,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
 
     @Test
     public void testDisableAllPublishers() throws Exception {
-        try (GenericContainer<?> mavenContainerRule =
-                new GenericContainer<>("localhost/pipeline-maven/java-maven-git").withExposedPorts(22)) {
+        try (GenericContainer<?> mavenContainerRule = createContainer("java-maven-git")) {
             mavenContainerRule.start();
             registerAgentForContainer(mavenContainerRule);
             loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
@@ -135,8 +133,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     @MethodSource("jdkMapProvider")
     @Issue("JENKINS-71949")
     public void tesWithDifferentJavasForBuild(String jdkName, String jdkPath) throws Exception {
-        try (GenericContainer<?> javasContainerRule =
-                new GenericContainer<>("localhost/pipeline-maven/javas").withExposedPorts(22)) {
+        try (GenericContainer<?> javasContainerRule = createContainer("javas")) {
             javasContainerRule.start();
             loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
             String gitRepoPath = this.gitRepoRule.toString();

@@ -29,6 +29,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.images.builder.ImageFromDockerfile;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -43,6 +45,14 @@ public abstract class AbstractIntegrationTest {
     public JenkinsRule jenkinsRule;
 
     String mavenInstallationName;
+
+    public static GenericContainer<?> createContainer(String target) {
+        return new GenericContainer<>(new ImageFromDockerfile(
+                                "localhost/pipeline-maven/" + target, Boolean.parseBoolean(System.getenv("CI")))
+                        .withFileFromClasspath(".", "/org/jenkinsci/plugins/pipeline/maven/docker")
+                        .withTarget(target))
+                .withExposedPorts(22);
+    }
 
     @BeforeAll
     public static void setupWatcher() {
