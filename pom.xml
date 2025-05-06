@@ -109,7 +109,6 @@
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.8.8</maven.version>
-    <mockito.version>5.6.0</mockito.version>
     <plexus-utils.version>3.6.0</plexus-utils.version>
     <plugin-dockerfile.version>0.46.0</plugin-dockerfile.version>
     <plugin-exec.version>3.5.0</plugin-exec.version>
