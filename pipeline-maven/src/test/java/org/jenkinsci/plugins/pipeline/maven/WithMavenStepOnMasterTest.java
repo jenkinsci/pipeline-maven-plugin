@@ -62,6 +62,7 @@ import org.jenkinsci.plugins.configfiles.maven.MavenSettingsConfig;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnGlobalSettingsProvider;
 import org.jenkinsci.plugins.configfiles.maven.job.MvnSettingsProvider;
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.CoveragePublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
@@ -449,7 +450,8 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 Arguments.of(new JGivenTestsPublisher.DescriptorImpl(), "jgivenPublisher"),
                 Arguments.of(new JunitTestsPublisher.DescriptorImpl(), "junitPublisher"),
                 Arguments.of(new MavenLinkerPublisher2.DescriptorImpl(), "mavenLinkerPublisher"),
-                Arguments.of(new PipelineGraphPublisher.DescriptorImpl(), "pipelineGraphPublisher"));
+                Arguments.of(new PipelineGraphPublisher.DescriptorImpl(), "pipelineGraphPublisher"),
+                Arguments.of(new CoveragePublisher.DescriptorImpl(), "coveragePublisher"));
     }
 
     @ParameterizedTest

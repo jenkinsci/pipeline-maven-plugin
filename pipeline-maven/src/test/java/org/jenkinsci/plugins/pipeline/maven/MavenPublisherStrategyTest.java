@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.CoveragePublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
@@ -37,7 +38,7 @@ public class MavenPublisherStrategyTest {
 
         List<MavenPublisher> mavenPublishers = MavenPublisherStrategy.IMPLICIT.buildPublishersList(
                 Collections.emptyList(), new StreamTaskListener(baos));
-        assertThat(mavenPublishers).hasSize(11);
+        assertThat(mavenPublishers).hasSize(12);
 
         Map<String, MavenPublisher> reportersByDescriptorId = new HashMap<>();
         for (MavenPublisher mavenPublisher : mavenPublishers) {
@@ -54,5 +55,6 @@ public class MavenPublisherStrategyTest {
         assertThat(reportersByDescriptorId).containsKey(new JunitTestsPublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new MavenLinkerPublisher2.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new PipelineGraphPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new CoveragePublisher.DescriptorImpl().getId());
     }
 }
