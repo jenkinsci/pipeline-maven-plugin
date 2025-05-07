@@ -78,8 +78,7 @@ public enum MavenPublisherStrategy {
                                         """
                         [withMaven] JacocoPublisher is no longer implicitly used with `withMaven` step.
                         [withMaven] Jacoco plugin has been deprecated and should not be used anymore.
-                        [withMaven] Usage of Coverage plugin is recommended.
-                        [withMaven] See https://plugins.jenkins.io/coverage/#plugin-content-pipeline-example.
+                        [withMaven] CoveragePublisher will be used instead.
                         """);
                     } else {
                         defaultPublishersById.put(descriptor.getId(), descriptor.clazz.newInstance());
