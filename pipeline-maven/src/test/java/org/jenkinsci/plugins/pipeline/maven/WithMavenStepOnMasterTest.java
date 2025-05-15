@@ -24,17 +24,26 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.condition.OS.LINUX;
 
 import com.cloudbees.hudson.plugins.folder.Folder;
+import com.google.common.base.Predicate;
 import hudson.model.Result;
 import hudson.plugins.tasks.TasksResultAction;
+import hudson.tasks.junit.CaseResult;
+import hudson.tasks.junit.TestResult;
 import hudson.tasks.junit.TestResultAction;
-import hudson.tasks.junit.pipeline.JUnitResultsStepTest;
+import hudson.tasks.junit.pipeline.JUnitResultsStep;
+import hudson.tasks.test.PipelineBlockWithTests;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
@@ -42,6 +51,10 @@ import jenkins.mvn.FilePathGlobalSettingsProvider;
 import jenkins.mvn.FilePathSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import org.apache.commons.io.FileUtils;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Description;
+import org.hamcrest.MatcherAssert;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.configfiles.GlobalConfigFiles;
 import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
@@ -59,9 +72,19 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
+import org.jenkinsci.plugins.workflow.actions.LabelAction;
+import org.jenkinsci.plugins.workflow.actions.ThreadNameAction;
+import org.jenkinsci.plugins.workflow.actions.WarningAction;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
+import org.jenkinsci.plugins.workflow.cps.nodes.StepAtomNode;
+import org.jenkinsci.plugins.workflow.cps.nodes.StepStartNode;
+import org.jenkinsci.plugins.workflow.flow.FlowExecution;
+import org.jenkinsci.plugins.workflow.graph.BlockStartNode;
+import org.jenkinsci.plugins.workflow.graph.FlowNode;
+import org.jenkinsci.plugins.workflow.graphanalysis.DepthFirstScanner;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.jenkinsci.plugins.workflow.support.steps.StageStep;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -1277,9 +1300,117 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         assertThat(testResultAction.getTotalCount()).isEqualTo(4);
         assertThat(testResultAction.getFailCount()).isEqualTo(0);
 
-        JUnitResultsStepTest.assertStageResults(build, 4, 4, 0, "first");
+        assertStageResults(build, 4, 4, 0, "first");
 
-        JUnitResultsStepTest.assertBranchResults(build, 2, 2, 0, "a", "first", null);
-        JUnitResultsStepTest.assertBranchResults(build, 2, 2, 0, "b", "first", null);
+        assertBranchResults(build, 2, 2, 0, "a", "first", null, false);
+        assertBranchResults(build, 2, 2, 0, "b", "first", null, false);
+    }
+
+    private static void assertBranchResults(
+            WorkflowRun run,
+            int suiteCount,
+            int testCount,
+            int failCount,
+            String branchName,
+            String stageName,
+            String innerStageName,
+            boolean keepTestNames) {
+        FlowExecution execution = run.getExecution();
+        DepthFirstScanner scanner = new DepthFirstScanner();
+        BlockStartNode aBranch = (BlockStartNode) scanner.findFirstMatch(execution, branchForName(branchName));
+        assertNotNull(aBranch);
+        TestResult branchResult = assertBlockResults(run, suiteCount, testCount, failCount, aBranch);
+        String namePrefix;
+        if (!keepTestNames) {
+            namePrefix = stageName + " / " + branchName;
+            if (innerStageName != null) {
+                namePrefix += " / " + innerStageName;
+            }
+            namePrefix += " / ";
+        } else {
+            namePrefix = "";
+        }
+        for (CaseResult c : branchResult.getPassedTests()) {
+            assertEquals(namePrefix + c.getTransformedTestName(), c.getDisplayName());
+        }
+    }
+
+    private static void assertStageResults(
+            WorkflowRun run, int suiteCount, int testCount, int failCount, String stageName) {
+        FlowExecution execution = run.getExecution();
+        DepthFirstScanner scanner = new DepthFirstScanner();
+        BlockStartNode aStage = (BlockStartNode) scanner.findFirstMatch(execution, stageForName(stageName));
+        assertNotNull(aStage);
+        assertBlockResults(run, suiteCount, testCount, failCount, aStage);
+    }
+
+    private static TestResult assertBlockResults(
+            WorkflowRun run, int suiteCount, int testCount, int failCount, BlockStartNode blockNode) {
+        assertNotNull(blockNode);
+
+        TestResultAction action = run.getAction(TestResultAction.class);
+        assertNotNull(action);
+
+        TestResult aResult = action.getResult().getResultForPipelineBlock(blockNode.getId());
+        assertNotNull(aResult);
+
+        assertEquals(suiteCount, aResult.getSuites().size());
+        assertEquals(testCount, aResult.getTotalCount());
+        assertEquals(failCount, aResult.getFailCount());
+        if (failCount > 0) {
+            MatcherAssert.assertThat(findJUnitSteps(blockNode), CoreMatchers.hasItem(hasWarningAction()));
+        } else {
+            MatcherAssert.assertThat(
+                    findJUnitSteps(blockNode), CoreMatchers.not(CoreMatchers.hasItem(hasWarningAction())));
+        }
+
+        PipelineBlockWithTests aBlock = action.getResult().getPipelineBlockWithTests(blockNode.getId());
+
+        assertNotNull(aBlock);
+        List<String> aTestNodes = new ArrayList<>(aBlock.nodesWithTests());
+        TestResult aFromNodes = action.getResult().getResultByNodes(aTestNodes);
+        assertNotNull(aFromNodes);
+        assertEquals(aResult.getSuites().size(), aFromNodes.getSuites().size());
+        assertEquals(aResult.getFailCount(), aFromNodes.getFailCount());
+        assertEquals(aResult.getSkipCount(), aFromNodes.getSkipCount());
+        assertEquals(aResult.getPassCount(), aFromNodes.getPassCount());
+
+        return aResult;
+    }
+
+    private static Predicate<FlowNode> stageForName(final String name) {
+        return input -> input instanceof StepStartNode
+                && ((StepStartNode) input).getDescriptor() instanceof StageStep.DescriptorImpl
+                && input.getDisplayName().equals(name);
+    }
+
+    private static Predicate<FlowNode> branchForName(final String name) {
+        return input -> input != null
+                && input.getAction(LabelAction.class) != null
+                && input.getAction(ThreadNameAction.class) != null
+                && name.equals(input.getAction(ThreadNameAction.class).getThreadName());
+    }
+
+    private static List<FlowNode> findJUnitSteps(BlockStartNode blockStart) {
+        return new DepthFirstScanner()
+                .filteredNodes(
+                        Collections.singletonList(blockStart.getEndNode()),
+                        Collections.singletonList(blockStart),
+                        node -> node instanceof StepAtomNode
+                                && ((StepAtomNode) node).getDescriptor() instanceof JUnitResultsStep.DescriptorImpl);
+    }
+
+    private static BaseMatcher<FlowNode> hasWarningAction() {
+        return new BaseMatcher<>() {
+            @Override
+            public boolean matches(Object item) {
+                return item instanceof FlowNode && ((FlowNode) item).getPersistentAction(WarningAction.class) != null;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("a FlowNode with a WarningAction");
+            }
+        };
     }
 }
