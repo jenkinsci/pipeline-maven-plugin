@@ -100,7 +100,7 @@
     <jenkins-plugin-mysql.version>8.4.0-31.va_b_5ce7933762</jenkins-plugin-mysql.version>
     <jenkins-plugin-postgresql.version>42.7.5-56.vc0921b_3cc11e</jenkins-plugin-postgresql.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
-    <jenkins-tools-bom.version>4740.v75a_90f6fefb_7</jenkins-tools-bom.version>
+    <jenkins-tools-bom.version>4770.v9a_2b_7a_9d8b_7f</jenkins-tools-bom.version>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.baseline>2.479</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
