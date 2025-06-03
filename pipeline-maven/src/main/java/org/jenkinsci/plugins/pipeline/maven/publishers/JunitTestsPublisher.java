@@ -276,29 +276,14 @@ public class JunitTestsPublisher extends MavenPublisher {
                                 + "> element found for <plugin> in " + XmlUtils.toString(testEvent));
                 continue;
             }
-            String reportsDirectory = reportsDirectoryElt.getTextContent().trim();
-            if (reportsDirectory.contains("${project.build.directory}")) {
-                String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
-                if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
-                    listener.getLogger()
-                            .println("[withMaven] '${project.build.directory}' found for <project> in "
-                                    + XmlUtils.toString(testEvent));
-                    continue;
-                }
-
-                reportsDirectory = reportsDirectory.replace("${project.build.directory}", projectBuildDirectory);
-
-            } else if (reportsDirectory.contains("${basedir}")) {
-                String baseDir = projectElt.getAttribute("baseDir");
-                if (baseDir.isEmpty()) {
-                    listener.getLogger()
-                            .println("[withMaven] '${basedir}' found for <project> in " + XmlUtils.toString(testEvent));
-                    continue;
-                }
-
-                reportsDirectory = reportsDirectory.replace("${basedir}", baseDir);
+            String reportsDirectory = XmlUtils.resolveMavenPlaceholders(reportsDirectoryElt, projectElt);
+            if (reportsDirectory == null) {
+                listener.getLogger()
+                        .println(
+                                "[withMaven] could not resolve placeholder '${project.build.directory}' or '${basedir}' in "
+                                        + XmlUtils.toString(testEvent));
+                continue;
             }
-
             reportsDirectory = XmlUtils.getPathInWorkspace(reportsDirectory, workspace);
 
             String testResults = reportsDirectory + fileSeparatorOnAgent + "*.xml";

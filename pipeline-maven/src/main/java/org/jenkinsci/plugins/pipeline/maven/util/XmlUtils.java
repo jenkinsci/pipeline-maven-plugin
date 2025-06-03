@@ -326,6 +326,40 @@ public class XmlUtils {
         return lifecyclePhases;
     }
 
+    @Nullable
+    public static String resolveMavenPlaceholders(Element targetElt, Element projectElt) {
+        return resolveMavenPlaceholders(targetElt.getTextContent().trim(), projectElt);
+    }
+
+    @Nullable
+    public static String resolveMavenPlaceholders(String target, Element projectElt) {
+        String result = target;
+        if (result.contains("${project.build.directory}")) {
+            String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
+            if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
+                return null;
+            }
+
+            result = result.replace("${project.build.directory}", projectBuildDirectory);
+
+        } else if (result.contains("${basedir}")) {
+            String baseDir = projectElt.getAttribute("baseDir");
+            if (baseDir.isEmpty()) {
+                return null;
+            }
+
+            result = result.replace("${basedir}", baseDir);
+        } else if (!FileUtils.isAbsolutePath(result)) {
+            char separator = FileUtils.isWindows(result) ? '\\' : '/';
+            String baseDir = projectElt.getAttribute("baseDir");
+            if (baseDir.isEmpty()) {
+                return null;
+            }
+            result = baseDir + separator + result;
+        }
+        return result;
+    }
+
     /**
      * Relativize path
      * <p>
