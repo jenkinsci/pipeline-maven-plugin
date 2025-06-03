@@ -208,30 +208,14 @@ public class FindbugsAnalysisPublisher extends AbstractHealthAwarePublisher {
                                 + XmlUtils.toString(findBugsTestEvent));
                 continue;
             }
-            String xmlOutputDirectory = xmlOutputDirectoryElt.getTextContent().trim();
-            if (xmlOutputDirectory.contains("${project.build.directory}")) {
-                String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
-                if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
-                    listener.getLogger()
-                            .println("[withMaven] '${project.build.directory}' found for <project> in "
-                                    + XmlUtils.toString(findBugsTestEvent));
-                    continue;
-                }
-
-                xmlOutputDirectory = xmlOutputDirectory.replace("${project.build.directory}", projectBuildDirectory);
-
-            } else if (xmlOutputDirectory.contains("${basedir}")) {
-                String baseDir = projectElt.getAttribute("baseDir");
-                if (baseDir.isEmpty()) {
-                    listener.getLogger()
-                            .println("[withMaven] '${basedir}' found for <project> in "
-                                    + XmlUtils.toString(findBugsTestEvent));
-                    continue;
-                }
-
-                xmlOutputDirectory = xmlOutputDirectory.replace("${basedir}", baseDir);
+            String xmlOutputDirectory = XmlUtils.resolveMavenPlaceholders(xmlOutputDirectoryElt, projectElt);
+            if (xmlOutputDirectory == null) {
+                listener.getLogger()
+                        .println(
+                                "[withMaven] could not resolve placeholder '${project.build.directory}' or '${basedir}' in "
+                                        + XmlUtils.toString(findBugsTestEvent));
+                continue;
             }
-
             xmlOutputDirectory = XmlUtils.getPathInWorkspace(xmlOutputDirectory, workspace);
 
             String findBugsResultsFile = xmlOutputDirectory + "/findbugsXml.xml";

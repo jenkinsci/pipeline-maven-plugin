@@ -45,7 +45,6 @@ import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
-import org.jenkinsci.plugins.pipeline.maven.util.FileUtils;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
@@ -284,37 +283,13 @@ public class InvokerRunsPublisher extends MavenPublisher {
             result = result.replace("${invoker.reportsDirectory}", "${project.build.directory}/invoker-reports");
         }
 
-        if (result.contains("${project.build.directory}")) {
-            String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
-            if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
-                listener.getLogger()
-                        .println("[withMaven] invokerPublisher - '${project.build.directory}' found for <project> in "
-                                + XmlUtils.toString(testEvent));
-                return null;
-            }
-
-            result = result.replace("${project.build.directory}", projectBuildDirectory);
-
-        } else if (result.contains("${basedir}")) {
-            String baseDir = projectElt.getAttribute("baseDir");
-            if (baseDir.isEmpty()) {
-                listener.getLogger()
-                        .println("[withMaven] invokerPublisher - '${basedir}' NOT found for <project> in "
-                                + XmlUtils.toString(testEvent));
-                return null;
-            }
-
-            result = result.replace("${basedir}", baseDir);
-        } else if (!FileUtils.isAbsolutePath(result)) {
-            char separator = FileUtils.isWindows(result) ? '\\' : '/';
-            String baseDir = projectElt.getAttribute("baseDir");
-            if (baseDir.isEmpty()) {
-                listener.getLogger()
-                        .println("[withMaven] invokerPublisher - '${basedir}' NOT found for <project> in "
-                                + XmlUtils.toString(testEvent));
-                return null;
-            }
-            result = baseDir + separator + result;
+        result = XmlUtils.resolveMavenPlaceholders(result, projectElt);
+        if (result == null) {
+            listener.getLogger()
+                    .println(
+                            "[withMaven] could not resolve placeholder '${project.build.directory}' or '${basedir}' in "
+                                    + XmlUtils.toString(testEvent));
+            return null;
         }
 
         return XmlUtils.getPathInWorkspace(result, workspace);

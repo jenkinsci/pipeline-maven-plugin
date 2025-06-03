@@ -99,6 +99,79 @@ public class XmlUtilsTest {
         assertThat(actualElements.size()).isEqualTo(0);
     }
 
+    @Test
+    public void test_resolveMavenPlaceholders_no_placeholder() throws Exception {
+        Element dirElement = toXml("<directory>/aDir</directory>");
+
+        String result = XmlUtils.resolveMavenPlaceholders(dirElement, null);
+
+        assertThat(result).isEqualTo("/aDir");
+    }
+
+    @Test
+    public void test_resolveMavenPlaceholders_projectBuildDir_not_found() throws Exception {
+        Element dirElement = toXml("<directory>/${project.build.directory}</directory>");
+        Element projectElement = toXml("<project></project>");
+
+        String result = XmlUtils.resolveMavenPlaceholders(dirElement, projectElement);
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void test_resolveMavenPlaceholders_projectBuildDir() throws Exception {
+        Element dirElement = toXml("<directory>/${project.build.directory}</directory>");
+        Element projectElement =
+                toXml("<project baseDir=\"projectBaseDir\"><build directory=\"projectBuildDir\"/></project>");
+
+        String result = XmlUtils.resolveMavenPlaceholders(dirElement, projectElement);
+
+        assertThat(result).isEqualTo("/projectBuildDir");
+    }
+
+    @Test
+    public void test_resolveMavenPlaceholders_projectBaseDir_not_found() throws Exception {
+        Element dirElement = toXml("<directory>/${basedir}</directory>");
+        Element projectElement = toXml("<project></project>");
+
+        String result = XmlUtils.resolveMavenPlaceholders(dirElement, projectElement);
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void test_resolveMavenPlaceholders_projectBaseDir() throws Exception {
+        Element dirElement = toXml("<directory>/${basedir}</directory>");
+        Element projectElement =
+                toXml("<project baseDir=\"projectBaseDir\"><build directory=\"projectBuildDir\"/></project>");
+
+        String result = XmlUtils.resolveMavenPlaceholders(dirElement, projectElement);
+
+        assertThat(result).isEqualTo("/projectBaseDir");
+    }
+
+    @Test
+    public void test_resolveMavenPlaceholders_both() throws Exception {
+        Element dirElement = toXml("<directory>/${project.build.directory} - ${basedir}</directory>");
+        Element projectElement =
+                toXml("<project baseDir=\"projectBaseDir\"><build directory=\"projectBuildDir\"/></project>");
+
+        String result = XmlUtils.resolveMavenPlaceholders(dirElement, projectElement);
+
+        assertThat(result).isEqualTo("/projectBuildDir - ${basedir}");
+    }
+
+    @Test
+    public void test_resolveMavenPlaceholders_relative() throws Exception {
+        Element dirElement = toXml("<directory>a/Dir</directory>");
+        Element projectElement =
+                toXml("<project baseDir=\"projectBaseDir\"><build directory=\"projectBuildDir\"/></project>");
+
+        String result = XmlUtils.resolveMavenPlaceholders(dirElement, projectElement);
+
+        assertThat(result).isEqualTo("projectBaseDir/a/Dir");
+    }
+
     private Element toXml(String xml) throws SAXException, IOException {
         return documentBuilder.parse(new InputSource(new StringReader(xml))).getDocumentElement();
     }
