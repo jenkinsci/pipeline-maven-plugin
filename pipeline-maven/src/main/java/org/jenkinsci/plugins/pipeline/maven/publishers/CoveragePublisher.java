@@ -1,5 +1,6 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
 import hudson.FilePath;
@@ -8,6 +9,8 @@ import io.jenkins.plugins.coverage.metrics.steps.CoverageStep;
 import io.jenkins.plugins.coverage.metrics.steps.CoverageTool;
 import io.jenkins.plugins.coverage.metrics.steps.CoverageTool.Parser;
 import io.jenkins.plugins.prism.SourceCodeDirectory;
+import io.jenkins.plugins.prism.SourceCodeRetention;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -16,6 +19,8 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
@@ -24,6 +29,7 @@ import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
 public class CoveragePublisher extends MavenPublisher {
@@ -36,8 +42,30 @@ public class CoveragePublisher extends MavenPublisher {
     private static final String JACOCO_ID = "jacoco-maven-plugin";
     private static final String REPORT_GOAL = "report";
 
+    private String extraPattern = StringUtils.EMPTY;
+    private SourceCodeRetention sourceCodeRetention = SourceCodeRetention.MODIFIED;
+
     @DataBoundConstructor
     public CoveragePublisher() {}
+
+    @DataBoundSetter
+    public void setExtraPattern(final String extraPattern) {
+        this.extraPattern = extraPattern;
+    }
+
+    @CheckForNull
+    public String getExtraPattern() {
+        return extraPattern;
+    }
+
+    @DataBoundSetter
+    public void setSourceCodeRetention(final SourceCodeRetention sourceCodeRetention) {
+        this.sourceCodeRetention = sourceCodeRetention;
+    }
+
+    public SourceCodeRetention getSourceCodeRetention() {
+        return sourceCodeRetention;
+    }
 
     @Override
     public void process(StepContext context, Element mavenSpyLogsElt) throws IOException, InterruptedException {
@@ -67,6 +95,7 @@ public class CoveragePublisher extends MavenPublisher {
 
         CoverageStep step = new CoverageStep();
         step.setTools(List.of(tool));
+        step.setSourceCodeRetention(getSourceCodeRetention());
         step.setSourceDirectories(jacocoReportEvents.stream()
                 .map(this::toSourceDirectory)
                 .filter(Objects::nonNull)
@@ -152,9 +181,15 @@ public class CoveragePublisher extends MavenPublisher {
                             + resultFile);
         }
 
+        StringBuilder patternsAsString = new StringBuilder();
+        patternsAsString.append(patterns.stream().collect(Collectors.joining(",")));
+        if (StringUtils.isNotBlank(getExtraPattern())) {
+            patternsAsString.append(",").append(getExtraPattern());
+        }
+
         CoverageTool tool = new CoverageTool();
         tool.setParser(Parser.JACOCO);
-        tool.setPattern(patterns.stream().collect(Collectors.joining(",")));
+        tool.setPattern(patternsAsString.toString());
         return tool;
     }
 
