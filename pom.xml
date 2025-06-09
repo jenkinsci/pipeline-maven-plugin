@@ -119,7 +119,7 @@
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.8.8</maven.version>
     <plexus-utils.version>3.6.0</plexus-utils.version>
-    <plugin-exec.version>3.5.0</plugin-exec.version>
+    <plugin-exec.version>3.5.1</plugin-exec.version>
     <slf4j.version>2.0.17</slf4j.version>
     <spotless.check.skip>false</spotless.check.skip>
     <testcontainers.version>1.21.1</testcontainers.version>
