@@ -44,6 +44,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 import jenkins.model.Jenkins;
@@ -52,6 +53,7 @@ import org.jenkinsci.plugins.pipeline.maven.util.MavenUtil;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
+import org.jenkinsci.plugins.workflow.steps.StepConfigTester;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -70,6 +72,27 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
     private static final String AGENT_NAME = "remote";
     private static final String SLAVE_BASE_PATH = "/home/test/slave";
     private static final String COMMONS_LANG3_FINGERPRINT = "780b5a8b72eebe6d0dbff1c11b5658fa";
+
+    @Test
+    public void configRoundTrip() throws Exception {
+        WithMavenStep step1 = new WithMavenStep();
+        step1.setMaven("someMaven");
+        step1.setJdk("someJdk");
+        step1.setPublisherStrategy(MavenPublisherStrategy.EXPLICIT);
+        step1.setMavenLocalRepo("aLocalRepo");
+        step1.setGlobalMavenSettingsConfig("");
+        step1.setGlobalMavenSettingsFilePath("globalSettingsFilePath");
+        step1.setMavenOpts("someMavenOpts");
+        step1.setMavenSettingsConfig("");
+        step1.setMavenSettingsFilePath("settingsFilePath");
+        step1.setTempBinDir("aTmpDir");
+        step1.setTraceability(true);
+        jenkinsRule.getInstance().setJDKs(List.of(new JDK("someJdk", "somePath")));
+        MavenUtil.configureMaven(jenkinsRule.getInstance().getRootPath(), MavenUtil.MAVEN_VERSION, "someMaven");
+
+        WithMavenStep step2 = new StepConfigTester(jenkinsRule).configRoundTrip(step1);
+        jenkinsRule.assertEqualDataBoundBeans(step1, step2);
+    }
 
     @Issue("SECURITY-441")
     @Test

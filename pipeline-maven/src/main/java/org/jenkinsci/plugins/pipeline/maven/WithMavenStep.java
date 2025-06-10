@@ -174,6 +174,10 @@ public class WithMavenStep extends Step {
         return traceability;
     }
 
+    public Boolean getTraceability() {
+        return isTraceability();
+    }
+
     @DataBoundSetter
     public void setTraceability(final Boolean traceability) {
         this.traceability = traceability;

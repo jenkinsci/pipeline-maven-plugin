@@ -1,7 +1,54 @@
 globalTraceability: false
 publisherOptions:
+- concordionPublisher:
+    disabled: true
+- dependenciesFingerprintPublisher:
+    disabled: true
+    includeReleaseVersions: true
+    includeScopeCompile: false
+    includeScopeTest: true
+- findbugsPublisher:
+    disabled: true
+    healthy: "5"
+    thresholdLimit: "high"
+    unHealthy: "15"
+- artifactsPublisher:
+    disabled: true
+- invokerPublisher:
+    disabled: true
+- jgivenPublisher:
+    disabled: true
+- junitPublisher:
+    disabled: true
+    healthScaleFactor: "5.0"
+    ignoreAttachments: true
+    keepLongStdio: true
 - mavenLinkerPublisher:
     disabled: true
+- openTasksPublisher:
+    asRegexp: true
+    disabled: true
+    excludePattern: "**/*.xml"
+    healthy: "5"
+    highPriorityTaskIdentifiers: "task1,task2"
+    ignoreCase: true
+    lowPriorityTaskIdentifiers: "task4"
+    normalPriorityTaskIdentifiers: "task3"
+    pattern: "**/*.java"
+    thresholdLimit: "normal"
+    unHealthy: "15"
+- pipelineGraphPublisher:
+    disabled: true
+    ignoreUpstreamTriggers: true
+    includeReleaseVersions: true
+    includeScopeTest: true
+    lifecycleThreshold: "install"
+    skipDownstreamTriggers: true
+- spotbugsPublisher:
+    disabled: true
+    healthy: "5"
+    thresholdLimit: "high"
+    unHealthy: "15"
 triggerDownstreamUponResultAborted: false
 triggerDownstreamUponResultFailure: false
 triggerDownstreamUponResultNotBuilt: false
