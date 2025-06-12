@@ -41,7 +41,6 @@ import hudson.FilePath;
 import hudson.Functions;
 import hudson.Launcher;
 import hudson.Launcher.ProcStarter;
-import hudson.Platform;
 import hudson.Proc;
 import hudson.Util;
 import hudson.console.ConsoleLogFilter;
@@ -53,16 +52,12 @@ import hudson.model.Job;
 import hudson.model.Node;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.remoting.VirtualChannel;
 import hudson.slaves.WorkspaceList;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.ArrayList;
@@ -76,11 +71,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import jenkins.MasterToSlaveFileCallable;
 import jenkins.model.Jenkins;
 import jenkins.mvn.DefaultGlobalSettingsProvider;
 import jenkins.mvn.DefaultSettingsProvider;
@@ -667,37 +660,25 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
     private MavenVersion readMavenVersion(String mvnExecPath) {
         try {
-            String result = new FilePath(ws.getChannel(), mvnExecPath).act(new MasterToSlaveFileCallable<String>() {
-
-                private static final long serialVersionUID = -1064011914865943982L;
-
-                @Override
-                public String invoke(File f, VirtualChannel channel) throws IOException, InterruptedException {
-                    ProcessBuilder builder = new ProcessBuilder();
-                    if (Platform.current() == Platform.WINDOWS) {
-                        builder.command("cmd.exe", "/c", "\"" + f.getAbsolutePath() + "\" --version");
-                    } else {
-                        builder.command("sh", "-c", "\"" + f.getAbsolutePath() + "\" --version");
-                    }
-                    Process process = builder.start();
-                    try (InputStreamReader is = new InputStreamReader(process.getInputStream(), "UTF-8");
-                            BufferedReader reader = new BufferedReader(is)) {
-                        Optional<String> versionLine = reader.lines()
-                                .filter(MavenVersionUtils.containsMavenVersion())
-                                .findFirst();
-                        int exitCode = process.waitFor();
-                        if (exitCode != 0) {
-                            console.trace("[withMaven] failed to read Maven version (" + exitCode + "): "
-                                    + new String(process.getErrorStream().readAllBytes(), "UTF-8"));
-                            return null;
-                        }
-                        return versionLine.orElse("");
-                    }
+            try (ByteArrayOutputStream stdout = new ByteArrayOutputStream();
+                    ByteArrayOutputStream stderr = new ByteArrayOutputStream()) {
+                ProcStarter ps = launcher.launch();
+                Proc p = launcher.launch(
+                        ps.cmds(mvnExecPath, "--version").stdout(stdout).stderr(stderr));
+                int exitCode = p.join();
+                if (exitCode == 0) {
+                    Optional<String> version = stdout.toString(getComputer().getDefaultCharset())
+                            .lines()
+                            .filter(MavenVersionUtils.containsMavenVersion())
+                            .findFirst();
+                    console.trace("[withMaven] found Maven version: " + version.orElse("none"));
+                    return version.map(MavenVersionUtils::parseMavenVersion).orElse(MavenVersion.UNKNOWN);
+                } else {
+                    console.trace("[withMaven] failed to read Maven version (" + exitCode + "): "
+                            + stderr.toString(getComputer().getDefaultCharset()));
+                    return MavenVersion.UNKNOWN;
                 }
-            });
-            Optional<String> version = Optional.ofNullable(result).filter(Predicate.not(String::isBlank));
-            console.trace("[withMaven] found Maven version: " + version.orElse("none"));
-            return version.map(MavenVersionUtils::parseMavenVersion).orElse(MavenVersion.UNKNOWN);
+            }
         } catch (Exception ex) {
             console.trace("[withMaven] failed to read Maven version: " + ex.getMessage());
             return MavenVersion.UNKNOWN;
