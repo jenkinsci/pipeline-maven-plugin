@@ -11,6 +11,7 @@ import hudson.ExtensionList;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
+import java.util.List;
 import jenkins.model.Jenkins;
 import org.jenkinsci.plugins.pipeline.maven.dao.CustomTypePipelineMavenPluginDaoDecorator;
 import org.jenkinsci.plugins.pipeline.maven.dao.MonitoringPipelineMavenPluginDaoDecorator;
@@ -18,6 +19,17 @@ import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginPostgreSqlDao;
+import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
+import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.FakeCredentialsProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -49,6 +61,99 @@ public class GlobalPipelineMavenConfigTest {
     private static JenkinsRule j;
 
     private GlobalPipelineMavenConfig config = new GlobalPipelineMavenConfig();
+
+    @Test
+    public void configRoundTrip() throws Exception {
+        GlobalPipelineMavenConfig c = GlobalPipelineMavenConfig.get();
+        c.setGlobalTraceability(true);
+        c.setTriggerDownstreamUponResultAborted(true);
+        c.setTriggerDownstreamUponResultFailure(true);
+        c.setTriggerDownstreamUponResultNotBuilt(true);
+        c.setTriggerDownstreamUponResultSuccess(false);
+        c.setTriggerDownstreamUponResultUnstable(true);
+
+        ConcordionTestsPublisher concordionTestsPublisher = new ConcordionTestsPublisher();
+        concordionTestsPublisher.setDisabled(true);
+
+        DependenciesFingerprintPublisher dependenciesFingerprintPublisher = new DependenciesFingerprintPublisher();
+        dependenciesFingerprintPublisher.setDisabled(true);
+        dependenciesFingerprintPublisher.setIncludeReleaseVersions(true);
+        dependenciesFingerprintPublisher.setIncludeScopeCompile(false);
+        dependenciesFingerprintPublisher.setIncludeScopeProvided(true);
+        dependenciesFingerprintPublisher.setIncludeScopeRuntime(true);
+        dependenciesFingerprintPublisher.setIncludeScopeTest(true);
+
+        FindbugsAnalysisPublisher findBugsPublisher = new FindbugsAnalysisPublisher();
+        findBugsPublisher.setDisabled(true);
+        findBugsPublisher.setHealthy("5");
+        findBugsPublisher.setThresholdLimit("high");
+        findBugsPublisher.setUnHealthy("15");
+
+        GeneratedArtifactsPublisher generatedArtifactsPublisher = new GeneratedArtifactsPublisher();
+        generatedArtifactsPublisher.setDisabled(true);
+
+        InvokerRunsPublisher invokerRunsPublisher = new InvokerRunsPublisher();
+        invokerRunsPublisher.setDisabled(true);
+
+        JGivenTestsPublisher jGivenTestsPublisher = new JGivenTestsPublisher();
+        jGivenTestsPublisher.setDisabled(true);
+
+        JunitTestsPublisher junitTestsPublisher = new JunitTestsPublisher();
+        junitTestsPublisher.setDisabled(true);
+        junitTestsPublisher.setHealthScaleFactor(5.0);
+        junitTestsPublisher.setIgnoreAttachments(true);
+        junitTestsPublisher.setKeepLongStdio(true);
+
+        MavenLinkerPublisher2 mavenLinkerPublisher = new MavenLinkerPublisher2();
+        mavenLinkerPublisher.setDisabled(true);
+
+        TasksScannerPublisher tasksScannerPublisher = new TasksScannerPublisher();
+        tasksScannerPublisher.setDisabled(true);
+        tasksScannerPublisher.setAsRegexp(true);
+        tasksScannerPublisher.setExcludePattern("**/*.xml");
+        tasksScannerPublisher.setHealthy("5");
+        tasksScannerPublisher.setHighPriorityTaskIdentifiers("task1,task2");
+        tasksScannerPublisher.setIgnoreCase(true);
+        tasksScannerPublisher.setLowPriorityTaskIdentifiers("task4");
+        tasksScannerPublisher.setNormalPriorityTaskIdentifiers("task3");
+        tasksScannerPublisher.setPattern("**/*.java");
+        tasksScannerPublisher.setThresholdLimit("normal");
+        tasksScannerPublisher.setUnHealthy("15");
+
+        PipelineGraphPublisher pipelineGraphPublisher = new PipelineGraphPublisher();
+        pipelineGraphPublisher.setDisabled(true);
+        pipelineGraphPublisher.setIgnoreUpstreamTriggers(true);
+        pipelineGraphPublisher.setIncludeReleaseVersions(true);
+        pipelineGraphPublisher.setIncludeScopeCompile(true);
+        pipelineGraphPublisher.setIncludeScopeProvided(true);
+        pipelineGraphPublisher.setIncludeScopeRuntime(true);
+        pipelineGraphPublisher.setIncludeScopeTest(true);
+        pipelineGraphPublisher.setLifecycleThreshold("install");
+        pipelineGraphPublisher.setSkipDownstreamTriggers(true);
+
+        SpotBugsAnalysisPublisher spotBugsAnalysisPublisher = new SpotBugsAnalysisPublisher();
+        spotBugsAnalysisPublisher.setDisabled(true);
+        spotBugsAnalysisPublisher.setHealthy("5");
+        spotBugsAnalysisPublisher.setThresholdLimit("high");
+        spotBugsAnalysisPublisher.setUnHealthy("15");
+
+        c.setPublisherOptions(List.of(
+                concordionTestsPublisher,
+                dependenciesFingerprintPublisher,
+                findBugsPublisher,
+                generatedArtifactsPublisher,
+                invokerRunsPublisher,
+                jGivenTestsPublisher,
+                junitTestsPublisher,
+                mavenLinkerPublisher,
+                tasksScannerPublisher,
+                pipelineGraphPublisher,
+                spotBugsAnalysisPublisher));
+
+        j.configRoundtrip();
+
+        j.assertEqualDataBoundBeans(c, GlobalPipelineMavenConfig.get());
+    }
 
     @Test
     public void shouldBuildH2Dao() throws Exception {
