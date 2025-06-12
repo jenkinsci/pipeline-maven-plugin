@@ -6,6 +6,10 @@ tool:
     publisherOptions:
     - concordionPublisher:
         disabled: true
+    - coveragePublisher:
+        disabled: true
+        extraPattern: "patterns"
+        sourceCodeRetention: "NEVER"
     - dependenciesFingerprintPublisher:
         disabled: true
         includeReleaseVersions: true
