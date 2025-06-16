@@ -104,7 +104,7 @@
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.baseline>2.479</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
-    <junit.version>5.12.2</junit.version>
+    <junit.version>5.13.1</junit.version>
     <junit4.version>4.13.2</junit4.version>
     <mariadb-client.version>3.5.3</mariadb-client.version>
     <maven-dockerfile-plugin.version>1.4.13</maven-dockerfile-plugin.version>
