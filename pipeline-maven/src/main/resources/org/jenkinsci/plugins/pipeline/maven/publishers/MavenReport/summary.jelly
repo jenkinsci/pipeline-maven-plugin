@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:t="/lib/hudson">
 <j:if test="${!empty it.deployedArtifacts}">
-  <t:summary icon="symbol-apache-maven-rectangle plugin-pipeline-maven icon-lg">
+  <t:summary icon="symbol-apache-maven-rectangle-solid plugin-oss-symbols-api icon-lg icon-lg">
       ${%deployed_artifacts}
     <ul>
       <j:forEach var="artifact" items="${it.deployedArtifacts}">
