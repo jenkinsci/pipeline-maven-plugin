@@ -1,10 +1,12 @@
-package org.jenkinsci.plugins.pipeline.maven;
+package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import hudson.model.Fingerprint;
 import hudson.model.Result;
 import java.util.Hashtable;
+
+import org.jenkinsci.plugins.pipeline.maven.AbstractIntegrationTest;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.junit.jupiter.api.Test;
