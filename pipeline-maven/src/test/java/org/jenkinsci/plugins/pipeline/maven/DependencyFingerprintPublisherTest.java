@@ -39,7 +39,7 @@ public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest 
             "}";
         // @formatter:on
 
-        String commonsLang3version310Md5 = "3435b913691a5c1b173485a49850b1a8";
+        String commonsLang3version310Md5 = "48b9886957920a4cdb602780ca345087";
 
         WorkflowJob firstPipeline;
         { // first job using commons-lang3:3.5
@@ -51,7 +51,7 @@ public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest 
             assertThat(fingerprint).isNotNull();
 
             assertThat(fingerprint.getFileName())
-                    .isEqualTo("org/apache/commons/commons-lang3/3.13.0/commons-lang3-3.13.0.jar");
+                    .isEqualTo("org/apache/commons/commons-lang3/3.18.0/commons-lang3-3.18.0.jar");
             Fingerprint.BuildPtr original = fingerprint.getOriginal();
             assertThat(original).isNull();
             Hashtable<String, Fingerprint.RangeSet> usages = fingerprint.getUsages();
