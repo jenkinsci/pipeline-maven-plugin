@@ -1,5 +1,9 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
+import static org.springframework.util.ReflectionUtils.findMethod;
+import static org.springframework.util.ReflectionUtils.invokeMethod;
+import static org.springframework.util.ReflectionUtils.makeAccessible;
+
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Extension;
@@ -12,6 +16,7 @@ import io.jenkins.plugins.prism.SourceCodeDirectory;
 import io.jenkins.plugins.prism.SourceCodeRetention;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +31,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
+import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
@@ -36,24 +42,39 @@ public class CoveragePublisher extends MavenPublisher {
 
     private static final Logger LOGGER = Logger.getLogger(CoveragePublisher.class.getName());
 
+    private static final String COBERTURA_GROUP_ID = "org.codehaus.mojo";
+    private static final String COBERTURA_ID = "cobertura-maven-plugin";
+    private static final String COBERTURA_REPORT_GOAL = "cobertura";
+
     private static final String JACOCO_GROUP_ID = "org.jacoco";
     private static final String JACOCO_ID = "jacoco-maven-plugin";
-    private static final String REPORT_GOAL = "report";
+    private static final String JACOCO_REPORT_GOAL = "report";
 
-    private String extraPattern = StringUtils.EMPTY;
+    private String coberturaExtraPattern = StringUtils.EMPTY;
+    private String jacocoExtraPattern = StringUtils.EMPTY;
     private SourceCodeRetention sourceCodeRetention = SourceCodeRetention.MODIFIED;
 
     @DataBoundConstructor
     public CoveragePublisher() {}
 
     @DataBoundSetter
-    public void setExtraPattern(final String extraPattern) {
-        this.extraPattern = extraPattern;
+    public void setCoberturaExtraPattern(final String coberturaExtraPattern) {
+        this.coberturaExtraPattern = coberturaExtraPattern;
     }
 
     @CheckForNull
-    public String getExtraPattern() {
-        return extraPattern;
+    public String getCoberturaExtraPattern() {
+        return coberturaExtraPattern;
+    }
+
+    @DataBoundSetter
+    public void setJacocoExtraPattern(final String jacocoExtraPattern) {
+        this.jacocoExtraPattern = jacocoExtraPattern;
+    }
+
+    @CheckForNull
+    public String getJacocoExtraPattern() {
+        return jacocoExtraPattern;
     }
 
     @DataBoundSetter
@@ -70,11 +91,21 @@ public class CoveragePublisher extends MavenPublisher {
 
         TaskListener listener = context.get(TaskListener.class);
 
+        List<Element> coberturaReportEvents = XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt,
+                COBERTURA_GROUP_ID,
+                COBERTURA_ID,
+                COBERTURA_REPORT_GOAL,
+                "MojoSucceeded",
+                "MojoFailed");
         List<Element> jacocoReportEvents = XmlUtils.getExecutionEventsByPlugin(
-                mavenSpyLogsElt, JACOCO_GROUP_ID, JACOCO_ID, REPORT_GOAL, "MojoSucceeded", "MojoFailed");
+                mavenSpyLogsElt, JACOCO_GROUP_ID, JACOCO_ID, JACOCO_REPORT_GOAL, "MojoSucceeded", "MojoFailed");
 
-        if (jacocoReportEvents.isEmpty()) {
-            LOGGER.log(Level.FINE, "No " + JACOCO_GROUP_ID + ":" + JACOCO_ID + ":" + REPORT_GOAL + " execution found");
+        if (coberturaReportEvents.isEmpty() && jacocoReportEvents.isEmpty()) {
+            LOGGER.log(
+                    Level.FINE,
+                    "No " + COBERTURA_GROUP_ID + ":" + COBERTURA_ID + ":" + COBERTURA_REPORT_GOAL + " or "
+                            + JACOCO_GROUP_ID + ":" + JACOCO_ID + ":" + JACOCO_REPORT_GOAL + " execution found");
             return;
         }
 
@@ -84,15 +115,24 @@ public class CoveragePublisher extends MavenPublisher {
             listener.getLogger().print("[withMaven] Jenkins ");
             listener.hyperlink("https://plugins.jenkins.io/coverage/", "Coverage Plugin");
             listener.getLogger()
-                    .println(
-                            " not found, don't display org.jacoco:jacoco-maven-plugin:prepare-agent[-integration] results in pipeline screen.");
+                    .println(" not found, don't display " + COBERTURA_GROUP_ID + ":" + COBERTURA_ID + ":"
+                            + COBERTURA_REPORT_GOAL + " or " + JACOCO_GROUP_ID + ":" + JACOCO_ID + ":"
+                            + JACOCO_REPORT_GOAL + " results in pipeline screen.");
             return;
         }
 
-        CoverageTool tool = buildJacocoTool(context, jacocoReportEvents);
+        List<CoverageTool> tools = new ArrayList<>();
+        CoverageTool coberturaTool = buildCoberturaTool(context, coberturaReportEvents);
+        if (coberturaTool != null) {
+            tools.add(coberturaTool);
+        }
+        CoverageTool jacocoTool = buildJacocoTool(context, jacocoReportEvents);
+        if (jacocoTool != null) {
+            tools.add(jacocoTool);
+        }
 
         CoverageStep step = new CoverageStep();
-        step.setTools(List.of(tool));
+        step.setTools(tools);
         step.setSourceCodeRetention(getSourceCodeRetention());
         step.setSourceDirectories(jacocoReportEvents.stream()
                 .map(this::toSourceDirectory)
@@ -100,15 +140,37 @@ public class CoveragePublisher extends MavenPublisher {
                 .toList());
 
         try {
-            step.start(context).start();
+            StepExecution stepExecution = step.start(context);
+            Method method = findMethod(stepExecution.getClass(), "run");
+            if (method != null) {
+                makeAccessible(method);
+                invokeMethod(method, stepExecution);
+            }
         } catch (Exception e) {
-            listener.error("[withMaven] coveragePublisher - exception archiving JaCoCo results: " + e);
-            LOGGER.log(Level.WARNING, "Exception processing JaCoCo results", e);
-            throw new MavenPipelinePublisherException("coveragePublisher", "archiving JaCoCo results", e);
+            listener.error("[withMaven] coveragePublisher - exception archiving coverage results: " + e);
+            LOGGER.log(Level.WARNING, "Exception processing coverage results", e);
+            throw new MavenPipelinePublisherException("coveragePublisher", "archiving coverage results", e);
         }
     }
 
+    private CoverageTool buildCoberturaTool(StepContext context, List<Element> events)
+            throws IOException, InterruptedException {
+        return buildCoverageTool(
+                "Cobertura", "coverage.xml", Parser.COBERTURA, getCoberturaExtraPattern(), context, events);
+    }
+
     private CoverageTool buildJacocoTool(StepContext context, List<Element> events)
+            throws IOException, InterruptedException {
+        return buildCoverageTool("JaCoCo", "jacoco.xml", Parser.JACOCO, getJacocoExtraPattern(), context, events);
+    }
+
+    private CoverageTool buildCoverageTool(
+            String name,
+            String reportFilename,
+            Parser parser,
+            String extraPattern,
+            StepContext context,
+            List<Element> events)
             throws IOException, InterruptedException {
         TaskListener listener = context.get(TaskListener.class);
         FilePath workspace = context.get(FilePath.class);
@@ -138,55 +200,39 @@ public class CoveragePublisher extends MavenPublisher {
                                 + XmlUtils.toString(event));
                 continue;
             }
-            String outputDirectory = outputDirectoryElt.getTextContent().trim();
-            if (outputDirectory.contains("${project.build.directory}")) {
-                String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
-                if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
-                    listener.getLogger()
-                            .println("[withMaven] '${project.build.directory}' found for <project> in "
-                                    + XmlUtils.toString(event));
-                    continue;
-                }
-                outputDirectory = outputDirectory.replace("${project.build.directory}", projectBuildDirectory);
-
-            } else if (outputDirectory.contains("${project.reporting.outputDirectory}")) {
-                String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
-                if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
-                    listener.getLogger()
-                            .println("[withMaven] '${project.reporting.outputDirectory}' found for <project> in "
-                                    + XmlUtils.toString(event));
-                    continue;
-                }
-                outputDirectory = outputDirectory.replace(
-                        "${project.reporting.outputDirectory}", projectBuildDirectory + File.separator + "site");
-
-            } else if (outputDirectory.contains("${basedir}")) {
-                String baseDir = projectElt.getAttribute("baseDir");
-                if (baseDir.isEmpty()) {
-                    listener.getLogger()
-                            .println("[withMaven] '${basedir}' found for <project> in " + XmlUtils.toString(event));
-                    continue;
-                }
-                outputDirectory = outputDirectory.replace("${basedir}", baseDir);
+            String outputDirectory = XmlUtils.resolveMavenPlaceholders(outputDirectoryElt, projectElt);
+            if (outputDirectory == null) {
+                listener.getLogger()
+                        .println(
+                                "[withMaven] could not resolve placeholder '${project.build.directory}' or '${project.reporting.outputDirectory}' or '${basedir}' in "
+                                        + XmlUtils.toString(event));
+                continue;
             }
 
-            String resultFile = outputDirectory + File.separator + "jacoco.xml";
+            String resultFile = outputDirectory + File.separator + reportFilename;
             patterns.add(XmlUtils.getPathInWorkspace(resultFile, workspace));
 
             listener.getLogger()
-                    .println("[withMaven] coveragePublisher - Archive JaCoCo analysis results for Maven artifact "
+                    .println("[withMaven] coveragePublisher - Archive " + name + " analysis results for Maven artifact "
                             + mavenArtifact.toString() + " generated by " + pluginInvocation + ", resultFile: "
                             + resultFile);
         }
 
+        if (patterns.isEmpty() && StringUtils.isBlank(extraPattern)) {
+            return null;
+        }
+
         StringBuilder patternsAsString = new StringBuilder();
         patternsAsString.append(patterns.stream().collect(Collectors.joining(",")));
-        if (StringUtils.isNotBlank(getExtraPattern())) {
-            patternsAsString.append(",").append(getExtraPattern());
+        if (StringUtils.isNotBlank(extraPattern)) {
+            if (!patterns.isEmpty()) {
+                patternsAsString.append(",");
+            }
+            patternsAsString.append(extraPattern);
         }
 
         CoverageTool tool = new CoverageTool();
-        tool.setParser(Parser.JACOCO);
+        tool.setParser(parser);
         tool.setPattern(patternsAsString.toString());
         return tool;
     }

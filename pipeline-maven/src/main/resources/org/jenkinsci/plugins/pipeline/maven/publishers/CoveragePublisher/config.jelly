@@ -31,7 +31,11 @@ THE SOFTWARE.
     <f:select default="MODIFIED"/>
   </f:entry>
 
-  <f:entry title="${%title.extraPattern}" field="extraPattern" description="${%description.extraPattern('https://ant.apache.org/manual/Types/fileset.html')}">
+  <f:entry title="${%title.coberturaExtraPattern}" field="coberturaExtraPattern" description="${%description.coberturaExtraPattern('https://ant.apache.org/manual/Types/fileset.html')}">
+    <f:textbox/>
+  </f:entry>
+
+  <f:entry title="${%title.jacocoExtraPattern}" field="jacocoExtraPattern" description="${%description.jacocoExtraPattern('https://ant.apache.org/manual/Types/fileset.html')}">
     <f:textbox/>
   </f:entry>
 

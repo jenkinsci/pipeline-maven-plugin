@@ -26,24 +26,15 @@ package org.jenkinsci.plugins.pipeline.maven;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
-import com.cloudbees.plugins.credentials.Credentials;
-import com.cloudbees.plugins.credentials.CredentialsScope;
-import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
-import com.cloudbees.plugins.credentials.domains.Domain;
-import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.model.Fingerprint;
 import hudson.model.FingerprintMap;
 import hudson.model.JDK;
 import hudson.model.Result;
-import hudson.plugins.sshslaves.SSHLauncher;
-import hudson.slaves.DumbSlave;
-import hudson.slaves.RetentionStrategy;
 import hudson.tasks.Maven;
 import hudson.tools.ToolLocationNodeProperty;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -59,18 +50,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.jvnet.hudson.test.Issue;
-import org.testcontainers.containers.ExecConfig;
-import org.testcontainers.containers.ExecInContainerPattern;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.MountableFile;
 
 @Testcontainers(disabledWithoutDocker = true)
 public class WithMavenStepTest extends AbstractIntegrationTest {
 
-    private static final String SSH_CREDENTIALS_ID = "test";
-    private static final String AGENT_NAME = "remote";
-    private static final String SLAVE_BASE_PATH = "/home/test/slave";
     private static final String COMMONS_LANG3_FINGERPRINT = "780b5a8b72eebe6d0dbff1c11b5658fa";
 
     @Test
@@ -159,18 +144,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         try (GenericContainer<?> javasContainerRule = createContainer("javas")) {
             javasContainerRule.start();
             loadMonoDependencyMavenProjectInGitRepo(this.gitRepoRule);
-            String gitRepoPath = this.gitRepoRule.toString();
-            javasContainerRule.copyFileToContainer(MountableFile.forHostPath(gitRepoPath), "/tmp/gitrepo");
-            javasContainerRule.execInContainer("chmod", "-R", "777", "/tmp/gitrepo");
-            System.out.println(ExecInContainerPattern.execInContainer(
-                    javasContainerRule.getDockerClient(),
-                    javasContainerRule.getContainerInfo(),
-                    ExecConfig.builder()
-                            .user("test")
-                            .command(new String[] {
-                                "git", "config", "--global", "--add", "safe.directory", "/tmp/gitrepo/.git"
-                            })
-                            .build()));
+            String containerPath = exposeGitRepositoryIntoAgent(javasContainerRule);
             registerAgentForContainer(javasContainerRule);
             ToolLocationNodeProperty.ToolLocation toolLocation =
                     new ToolLocationNodeProperty.ToolLocation(new JDK.DescriptorImpl(), jdkName, jdkPath);
@@ -185,7 +159,7 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
             WorkflowRun run = runPipeline(
                 Result.SUCCESS,
                 "node('" + AGENT_NAME + "') {\n" +
-                "  git('/tmp/gitrepo')\n" +
+                "  git('" + containerPath + "')\n" +
                 "  withMaven(jdk: '" + jdkName + "') {\n" +
                 "    sh 'mvn package'\n" +
                 "  }\n" +
@@ -255,29 +229,5 @@ public class WithMavenStepTest extends AbstractIntegrationTest {
         FingerprintMap fingerprintMap = jenkinsRule.jenkins.getFingerprintMap();
         Fingerprint fingerprint = fingerprintMap.get(fingerprintAsString);
         assertThat(fingerprint).isNull();
-    }
-
-    private void registerAgentForContainer(GenericContainer<?> container) throws Exception {
-        addTestSshCredentials();
-        registerAgentForSlaveContainer(container);
-    }
-
-    private void addTestSshCredentials() throws Exception {
-        Credentials credentials =
-                new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, SSH_CREDENTIALS_ID, null, "test", "test");
-
-        SystemCredentialsProvider.getInstance()
-                .getDomainCredentialsMap()
-                .put(Domain.global(), Collections.singletonList(credentials));
-    }
-
-    private void registerAgentForSlaveContainer(GenericContainer<?> slaveContainer) throws Exception {
-        SSHLauncher sshLauncher =
-                new SSHLauncher(slaveContainer.getHost(), slaveContainer.getMappedPort(22), SSH_CREDENTIALS_ID);
-
-        DumbSlave agent = new DumbSlave(AGENT_NAME, SLAVE_BASE_PATH, sshLauncher);
-        agent.setNumExecutors(1);
-        agent.setRetentionStrategy(RetentionStrategy.INSTANCE);
-        jenkinsRule.jenkins.addNode(agent);
     }
 }

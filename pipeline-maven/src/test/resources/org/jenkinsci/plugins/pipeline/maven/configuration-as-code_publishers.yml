@@ -7,8 +7,9 @@ tool:
     - concordionPublisher:
         disabled: true
     - coveragePublisher:
+        coberturaExtraPattern: "coberturaPatterns"
         disabled: true
-        extraPattern: "patterns"
+        jacocoExtraPattern: "jacocoPatterns"
         sourceCodeRetention: "NEVER"
     - dependenciesFingerprintPublisher:
         disabled: true

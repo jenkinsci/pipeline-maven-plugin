@@ -144,7 +144,8 @@ public class ConfigurationAsCodeTest {
         CoveragePublisher coveragePublisher =
                 (CoveragePublisher) config.getPublisherOptions().get(1);
         assertThat(coveragePublisher.isDisabled()).isTrue();
-        assertThat(coveragePublisher.getExtraPattern()).isEqualTo("patterns");
+        assertThat(coveragePublisher.getCoberturaExtraPattern()).isEqualTo("coberturaPatterns");
+        assertThat(coveragePublisher.getJacocoExtraPattern()).isEqualTo("jacocoPatterns");
         assertThat(coveragePublisher.getSourceCodeRetention()).isEqualTo(SourceCodeRetention.NEVER);
 
         assertThat(config.getPublisherOptions().get(2)).isInstanceOf(DependenciesFingerprintPublisher.class);

@@ -130,6 +130,27 @@ public class XmlUtilsTest {
     }
 
     @Test
+    public void test_resolveMavenPlaceholders_projectReportDir_not_found() throws Exception {
+        Element dirElement = toXml("<directory>/${project.reporting.outputDirectory}</directory>");
+        Element projectElement = toXml("<project></project>");
+
+        String result = XmlUtils.resolveMavenPlaceholders(dirElement, projectElement);
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    public void test_resolveMavenPlaceholders_projectReportDir() throws Exception {
+        Element dirElement = toXml("<directory>/${project.reporting.outputDirectory}</directory>");
+        Element projectElement =
+                toXml("<project baseDir=\"projectBaseDir\"><build directory=\"projectBuildDir\"/></project>");
+
+        String result = XmlUtils.resolveMavenPlaceholders(dirElement, projectElement);
+
+        assertThat(result).isEqualTo("/projectBuildDir/site");
+    }
+
+    @Test
     public void test_resolveMavenPlaceholders_projectBaseDir_not_found() throws Exception {
         Element dirElement = toXml("<directory>/${basedir}</directory>");
         Element projectElement = toXml("<project></project>");

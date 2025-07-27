@@ -79,7 +79,8 @@ public class GlobalPipelineMavenConfigTest {
 
         CoveragePublisher coveragePublisher = new CoveragePublisher();
         coveragePublisher.setDisabled(true);
-        coveragePublisher.setExtraPattern("patterns");
+        coveragePublisher.setCoberturaExtraPattern("coberturaPatterns");
+        coveragePublisher.setJacocoExtraPattern("jacocoPatterns");
         coveragePublisher.setSourceCodeRetention(SourceCodeRetention.NEVER);
 
         DependenciesFingerprintPublisher dependenciesFingerprintPublisher = new DependenciesFingerprintPublisher();
