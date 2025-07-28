@@ -52,7 +52,6 @@
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
       <artifactId>maven-plugin</artifactId>
-      <version>${jenkins-plugin-maven.version}</version>
       <!--
       Discussed on https://github.com/jenkinsci/pipeline-maven-plugin/pull/48
       Keep the dependency optional
@@ -136,7 +135,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>flaky-test-handler</artifactId>
-      <version>${jenkins-plugin-flaky-test.version}</version>
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -282,13 +280,11 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>h2-api</artifactId>
-      <version>${jenkins-plugin-h2.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>mysql-api</artifactId>
-      <version>${jenkins-plugin-mysql.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -300,7 +296,6 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>postgresql-api</artifactId>
-      <version>${jenkins-plugin-postgresql.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -324,7 +319,6 @@
     <dependency>
       <groupId>org.jenkins-ci.plugins</groupId>
       <artifactId>pipeline-maven-database</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

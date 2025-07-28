@@ -92,13 +92,8 @@
     <hikaricp.version>6.3.2</hikaricp.version>
     <jansi.version>2.4.0</jansi.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
-    <jenkins-plugin-flaky-test.version>1.3.168.v9b_0b_fd020db_8</jenkins-plugin-flaky-test.version>
-    <jenkins-plugin-h2.version>11.1.4.199-36.vb_ee07e965744</jenkins-plugin-h2.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
     <jenkins-plugin-maven-invoker.version>2.5</jenkins-plugin-maven-invoker.version>
-    <jenkins-plugin-maven.version>3.26</jenkins-plugin-maven.version>
-    <jenkins-plugin-mysql.version>8.4.0-31.va_b_5ce7933762</jenkins-plugin-mysql.version>
-    <jenkins-plugin-postgresql.version>42.7.7-67.v70a_30b_84f58b_</jenkins-plugin-postgresql.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
     <jenkins-tools-bom.version>4948.vcf1d17350668</jenkins-tools-bom.version>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
