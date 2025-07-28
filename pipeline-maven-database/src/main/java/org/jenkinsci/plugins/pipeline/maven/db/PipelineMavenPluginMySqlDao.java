@@ -89,7 +89,7 @@ public class PipelineMavenPluginMySqlDao extends AbstractPipelineMavenPluginDao 
 
     @Override
     protected void handleDatabaseInitialisationException(SQLException e) {
-        if (MysqlErrorNumbers.SQL_STATE_ILLEGAL_ARGUMENT.equals(e.getSQLState())) {
+        if (MysqlErrorNumbers.SQLSTATE_CONNJ_ILLEGAL_ARGUMENT.equals(e.getSQLState())) {
             LOGGER.log(Level.FINE, "Ignore sql exception " + e.getErrorCode() + " - " + e.getSQLState(), e);
         } else if (MysqlErrorNumbers.ER_EMPTY_QUERY == e.getErrorCode()) {
             LOGGER.log(Level.FINE, "Ignore sql exception " + e.getErrorCode() + " - " + e.getSQLState(), e);
