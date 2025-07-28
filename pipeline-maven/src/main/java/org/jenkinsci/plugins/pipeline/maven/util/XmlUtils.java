@@ -347,8 +347,7 @@ public class XmlUtils {
             if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
                 return null;
             }
-            result = result.replace(
-                    "${project.reporting.outputDirectory}", projectBuildDirectory + separator + "site");
+            result = result.replace("${project.reporting.outputDirectory}", projectBuildDirectory + separator + "site");
         } else if (result.contains("${basedir}")) {
             String baseDir = projectElt.getAttribute("baseDir");
             if (baseDir.isEmpty()) {
