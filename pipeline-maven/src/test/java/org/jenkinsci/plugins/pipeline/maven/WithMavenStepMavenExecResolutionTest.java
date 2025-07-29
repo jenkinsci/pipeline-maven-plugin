@@ -25,16 +25,8 @@ package org.jenkinsci.plugins.pipeline.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.cloudbees.plugins.credentials.Credentials;
-import com.cloudbees.plugins.credentials.CredentialsScope;
-import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
-import com.cloudbees.plugins.credentials.domains.Domain;
-import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.model.DownloadService;
 import hudson.model.Result;
-import hudson.plugins.sshslaves.SSHLauncher;
-import hudson.slaves.DumbSlave;
-import hudson.slaves.RetentionStrategy;
 import hudson.tasks.Maven;
 import hudson.tasks.Maven.MavenInstallation;
 import hudson.tools.InstallSourceProperty;
@@ -51,10 +43,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Issue("JENKINS-43651")
 public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTest {
 
-    private static final String SSH_CREDENTIALS_ID = "test";
-    private static final String AGENT_NAME = "remote";
     private static final String MAVEN_GLOBAL_TOOL_NAME = "maven";
-    private static final String SLAVE_BASE_PATH = "/home/test/slave";
 
     @Test
     public void testMavenNotInstalledInDockerImage() throws Exception {
@@ -177,31 +166,6 @@ public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTes
         p.setDefinition(new CpsFlowDefinition(pipelineScript, true));
 
         return jenkinsRule.assertBuildStatus(Result.SUCCESS, p.scheduleBuild2(0));
-    }
-
-    private void registerAgentForContainer(GenericContainer<?> slaveContainer) throws Exception {
-        addTestSshCredentials();
-        registerAgentForSlaveContainer(slaveContainer);
-    }
-
-    private void addTestSshCredentials() throws Exception {
-        Credentials credentials =
-                new UsernamePasswordCredentialsImpl(CredentialsScope.GLOBAL, SSH_CREDENTIALS_ID, null, "test", "test");
-
-        SystemCredentialsProvider.getInstance()
-                .getDomainCredentialsMap()
-                .put(Domain.global(), Collections.singletonList(credentials));
-    }
-
-    private void registerAgentForSlaveContainer(GenericContainer<?> slaveContainer) throws Exception {
-        SSHLauncher sshLauncher =
-                new SSHLauncher(slaveContainer.getHost(), slaveContainer.getMappedPort(22), SSH_CREDENTIALS_ID);
-
-        DumbSlave agent = new DumbSlave(AGENT_NAME, SLAVE_BASE_PATH, sshLauncher);
-        agent.setNumExecutors(1);
-        agent.setRetentionStrategy(RetentionStrategy.INSTANCE);
-
-        jenkinsRule.jenkins.addNode(agent);
     }
 
     private String registerLatestMavenVersionAsGlobalTool() throws Exception {

@@ -4,13 +4,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runAfterMethod;
 import static org.jenkinsci.plugins.pipeline.maven.TestUtils.runBeforeMethod;
 
+import com.cloudbees.plugins.credentials.Credentials;
+import com.cloudbees.plugins.credentials.CredentialsScope;
+import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
+import com.cloudbees.plugins.credentials.domains.Domain;
+import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.model.Fingerprint;
+import hudson.plugins.sshslaves.SSHLauncher;
+import hudson.slaves.DumbSlave;
+import hudson.slaves.RetentionStrategy;
 import hudson.tasks.Fingerprinter;
 import hudson.tasks.Maven;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import jenkins.model.Jenkins;
@@ -29,8 +38,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
+import org.testcontainers.containers.ExecConfig;
+import org.testcontainers.containers.ExecInContainerPattern;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.images.builder.ImageFromDockerfile;
+import org.testcontainers.utility.MountableFile;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -53,6 +65,10 @@ public abstract class AbstractIntegrationTest {
                         .withTarget(target))
                 .withExposedPorts(22);
     }
+
+    protected static final String SSH_CREDENTIALS_ID = "test";
+    protected static final String AGENT_NAME = "remote";
+    protected static final String SLAVE_BASE_PATH = "/home/test/slave";
 
     @BeforeAll
     public static void setupWatcher() {
@@ -116,6 +132,24 @@ public abstract class AbstractIntegrationTest {
         GitSampleRepoRuleUtils.addFilesAndCommit(mavenProjectRoot, gitRepo);
     }
 
+    protected String exposeGitRepositoryIntoAgent(GenericContainer<?> container)
+            throws UnsupportedOperationException, IOException, InterruptedException {
+        String containerPath = "/tmp/gitrepo";
+        String gitRepoPath = this.gitRepoRule.toString();
+        container.copyFileToContainer(MountableFile.forHostPath(gitRepoPath), containerPath);
+        container.execInContainer("chmod", "-R", "777", containerPath);
+        System.out.println(ExecInContainerPattern.execInContainer(
+                container.getDockerClient(),
+                container.getContainerInfo(),
+                ExecConfig.builder()
+                        .user(SSH_CREDENTIALS_ID)
+                        .command(new String[] {
+                            "git", "config", "--global", "--add", "safe.directory", containerPath + "/.git"
+                        })
+                        .build()));
+        return containerPath;
+    }
+
     protected void verifyFileIsFingerPrinted(WorkflowJob pipeline, WorkflowRun build, String fileName)
             throws java.io.IOException {
         Fingerprinter.FingerprintAction fingerprintAction = build.getAction(Fingerprinter.FingerprintAction.class);
@@ -128,5 +162,29 @@ public abstract class AbstractIntegrationTest {
         assertThat(jarFileFingerPrint.getFileName()).isEqualTo(fileName);
         assertThat(jarFileFingerPrint.getOriginal().getJob().getName()).isEqualTo(pipeline.getName());
         assertThat(jarFileFingerPrint.getOriginal().getNumber()).isEqualTo(build.getNumber());
+    }
+
+    protected void registerAgentForContainer(GenericContainer<?> container) throws Exception {
+        addTestSshCredentials();
+        registerAgentForSlaveContainer(container);
+    }
+
+    private void addTestSshCredentials() throws Exception {
+        Credentials credentials = new UsernamePasswordCredentialsImpl(
+                CredentialsScope.GLOBAL, SSH_CREDENTIALS_ID, null, SSH_CREDENTIALS_ID, SSH_CREDENTIALS_ID);
+
+        SystemCredentialsProvider.getInstance()
+                .getDomainCredentialsMap()
+                .put(Domain.global(), Collections.singletonList(credentials));
+    }
+
+    private void registerAgentForSlaveContainer(GenericContainer<?> slaveContainer) throws Exception {
+        SSHLauncher sshLauncher =
+                new SSHLauncher(slaveContainer.getHost(), slaveContainer.getMappedPort(22), SSH_CREDENTIALS_ID);
+
+        DumbSlave agent = new DumbSlave(AGENT_NAME, SLAVE_BASE_PATH, sshLauncher);
+        agent.setNumExecutors(1);
+        agent.setRetentionStrategy(RetentionStrategy.INSTANCE);
+        jenkinsRule.jenkins.addNode(agent);
     }
 }

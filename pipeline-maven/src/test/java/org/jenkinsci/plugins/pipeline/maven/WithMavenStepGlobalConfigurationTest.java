@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 import java.util.stream.Stream;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.CoveragePublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
@@ -172,6 +173,7 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
                 arguments(named("JGiven", new JGivenTestsPublisher.DescriptorImpl())),
                 arguments(named("Junit", new JunitTestsPublisher.DescriptorImpl())),
                 arguments(named("MavenLinker", new MavenLinkerPublisher2.DescriptorImpl())),
-                arguments(named("PipelineGraph", new PipelineGraphPublisher.DescriptorImpl())));
+                arguments(named("PipelineGraph", new PipelineGraphPublisher.DescriptorImpl())),
+                arguments(named("Coverage", new CoveragePublisher.DescriptorImpl())));
     }
 }

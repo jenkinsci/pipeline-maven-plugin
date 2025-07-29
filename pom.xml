@@ -102,6 +102,7 @@
     <junit.version>5.13.4</junit.version>
     <junit4.version>4.13.2</junit4.version>
     <mariadb-client.version>3.5.4</mariadb-client.version>
+    <maven-cobertura-plugin.version>2.7</maven-cobertura-plugin.version>
     <maven-dockerfile-plugin.version>1.4.13</maven-dockerfile-plugin.version>
     <maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>
     <maven-findbugs-plugin.version>3.0.5</maven-findbugs-plugin.version>

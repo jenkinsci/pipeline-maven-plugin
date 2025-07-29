@@ -18,6 +18,7 @@ public class JacocoReportPublisherTest extends AbstractIntegrationTest {
         // @formatter:off
         String pipelineScript = "node() {\n" +
                 "    git($/" + gitRepoRule.toString() + "/$)\n" +
+                "    writeFile(encoding: 'UTF-8', file: '.skip-publish-coverage-results', text: '')\n" +
                 "    withMaven() {\n" +
                 "        if (isUnix()) {\n" +
                 "            sh 'mvn package verify'\n" +

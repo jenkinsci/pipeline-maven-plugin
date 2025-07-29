@@ -334,6 +334,7 @@ public class XmlUtils {
     @Nullable
     public static String resolveMavenPlaceholders(String target, Element projectElt) {
         String result = target;
+        char separator = FileUtils.isWindows(result) ? '\\' : '/';
         if (result.contains("${project.build.directory}")) {
             String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
             if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
@@ -341,7 +342,12 @@ public class XmlUtils {
             }
 
             result = result.replace("${project.build.directory}", projectBuildDirectory);
-
+        } else if (result.contains("${project.reporting.outputDirectory}")) {
+            String projectBuildDirectory = XmlUtils.getProjectBuildDirectory(projectElt);
+            if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
+                return null;
+            }
+            result = result.replace("${project.reporting.outputDirectory}", projectBuildDirectory + separator + "site");
         } else if (result.contains("${basedir}")) {
             String baseDir = projectElt.getAttribute("baseDir");
             if (baseDir.isEmpty()) {
@@ -350,7 +356,6 @@ public class XmlUtils {
 
             result = result.replace("${basedir}", baseDir);
         } else if (!FileUtils.isAbsolutePath(result)) {
-            char separator = FileUtils.isWindows(result) ? '\\' : '/';
             String baseDir = projectElt.getAttribute("baseDir");
             if (baseDir.isEmpty()) {
                 return null;

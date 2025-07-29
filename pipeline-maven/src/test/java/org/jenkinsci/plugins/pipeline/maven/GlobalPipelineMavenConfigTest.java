@@ -8,6 +8,7 @@ import com.mysql.cj.jdbc.ConnectionImpl;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariProxyConnection;
 import hudson.ExtensionList;
+import io.jenkins.plugins.prism.SourceCodeRetention;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
@@ -20,6 +21,7 @@ import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginH2Dao;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginMySqlDao;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginPostgreSqlDao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.CoveragePublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
@@ -74,6 +76,12 @@ public class GlobalPipelineMavenConfigTest {
 
         ConcordionTestsPublisher concordionTestsPublisher = new ConcordionTestsPublisher();
         concordionTestsPublisher.setDisabled(true);
+
+        CoveragePublisher coveragePublisher = new CoveragePublisher();
+        coveragePublisher.setDisabled(true);
+        coveragePublisher.setCoberturaExtraPattern("coberturaPatterns");
+        coveragePublisher.setJacocoExtraPattern("jacocoPatterns");
+        coveragePublisher.setSourceCodeRetention(SourceCodeRetention.NEVER);
 
         DependenciesFingerprintPublisher dependenciesFingerprintPublisher = new DependenciesFingerprintPublisher();
         dependenciesFingerprintPublisher.setDisabled(true);
@@ -139,6 +147,7 @@ public class GlobalPipelineMavenConfigTest {
 
         c.setPublisherOptions(List.of(
                 concordionTestsPublisher,
+                coveragePublisher,
                 dependenciesFingerprintPublisher,
                 findBugsPublisher,
                 generatedArtifactsPublisher,

@@ -2,6 +2,11 @@ globalTraceability: false
 publisherOptions:
 - concordionPublisher:
     disabled: true
+- coveragePublisher:
+    coberturaExtraPattern: "coberturaPatterns"
+    disabled: true
+    jacocoExtraPattern: "jacocoPatterns"
+    sourceCodeRetention: NEVER
 - dependenciesFingerprintPublisher:
     disabled: true
     includeReleaseVersions: true

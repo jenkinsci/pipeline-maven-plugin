@@ -9,7 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
+import io.jenkins.plugins.prism.SourceCodeRetention;
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.CoveragePublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
@@ -131,16 +133,24 @@ public class ConfigurationAsCodeTest {
         GlobalPipelineMavenConfig config =
                 r.jenkins.getExtensionList(GlobalPipelineMavenConfig.class).get(0);
 
-        assertThat(config.getPublisherOptions()).hasSize(11);
+        assertThat(config.getPublisherOptions()).hasSize(12);
 
         assertThat(config.getPublisherOptions().get(0)).isInstanceOf(ConcordionTestsPublisher.class);
         ConcordionTestsPublisher concordionPublisher =
                 (ConcordionTestsPublisher) config.getPublisherOptions().get(0);
         assertThat(concordionPublisher.isDisabled()).isTrue();
 
-        assertThat(config.getPublisherOptions().get(1)).isInstanceOf(DependenciesFingerprintPublisher.class);
+        assertThat(config.getPublisherOptions().get(1)).isInstanceOf(CoveragePublisher.class);
+        CoveragePublisher coveragePublisher =
+                (CoveragePublisher) config.getPublisherOptions().get(1);
+        assertThat(coveragePublisher.isDisabled()).isTrue();
+        assertThat(coveragePublisher.getCoberturaExtraPattern()).isEqualTo("coberturaPatterns");
+        assertThat(coveragePublisher.getJacocoExtraPattern()).isEqualTo("jacocoPatterns");
+        assertThat(coveragePublisher.getSourceCodeRetention()).isEqualTo(SourceCodeRetention.NEVER);
+
+        assertThat(config.getPublisherOptions().get(2)).isInstanceOf(DependenciesFingerprintPublisher.class);
         DependenciesFingerprintPublisher dependenciesFingerprintPublisher =
-                (DependenciesFingerprintPublisher) config.getPublisherOptions().get(1);
+                (DependenciesFingerprintPublisher) config.getPublisherOptions().get(2);
         assertThat(dependenciesFingerprintPublisher.isDisabled()).isTrue();
         assertThat(dependenciesFingerprintPublisher.isIncludeReleaseVersions()).isTrue();
         assertThat(dependenciesFingerprintPublisher.isIncludeScopeCompile()).isFalse();
@@ -148,45 +158,45 @@ public class ConfigurationAsCodeTest {
         assertThat(dependenciesFingerprintPublisher.isIncludeScopeRuntime()).isTrue();
         assertThat(dependenciesFingerprintPublisher.isIncludeScopeTest()).isTrue();
 
-        assertThat(config.getPublisherOptions().get(2)).isInstanceOf(FindbugsAnalysisPublisher.class);
+        assertThat(config.getPublisherOptions().get(3)).isInstanceOf(FindbugsAnalysisPublisher.class);
         FindbugsAnalysisPublisher findBugsPublisher =
-                (FindbugsAnalysisPublisher) config.getPublisherOptions().get(2);
+                (FindbugsAnalysisPublisher) config.getPublisherOptions().get(3);
         assertThat(findBugsPublisher.isDisabled()).isTrue();
         assertThat(findBugsPublisher.getHealthy()).isEqualTo("5");
         assertThat(findBugsPublisher.getThresholdLimit()).isEqualTo("high");
         assertThat(findBugsPublisher.getUnHealthy()).isEqualTo("15");
 
-        assertThat(config.getPublisherOptions().get(3)).isInstanceOf(GeneratedArtifactsPublisher.class);
+        assertThat(config.getPublisherOptions().get(4)).isInstanceOf(GeneratedArtifactsPublisher.class);
         GeneratedArtifactsPublisher generatedArtifactsPublisher =
-                (GeneratedArtifactsPublisher) config.getPublisherOptions().get(3);
+                (GeneratedArtifactsPublisher) config.getPublisherOptions().get(4);
         assertThat(generatedArtifactsPublisher.isDisabled()).isTrue();
 
-        assertThat(config.getPublisherOptions().get(4)).isInstanceOf(InvokerRunsPublisher.class);
+        assertThat(config.getPublisherOptions().get(5)).isInstanceOf(InvokerRunsPublisher.class);
         InvokerRunsPublisher invokerRunsPublisher =
-                (InvokerRunsPublisher) config.getPublisherOptions().get(4);
+                (InvokerRunsPublisher) config.getPublisherOptions().get(5);
         assertThat(invokerRunsPublisher.isDisabled()).isTrue();
 
-        assertThat(config.getPublisherOptions().get(5)).isInstanceOf(JGivenTestsPublisher.class);
+        assertThat(config.getPublisherOptions().get(6)).isInstanceOf(JGivenTestsPublisher.class);
         JGivenTestsPublisher jGivenTestsPublisher =
-                (JGivenTestsPublisher) config.getPublisherOptions().get(5);
+                (JGivenTestsPublisher) config.getPublisherOptions().get(6);
         assertThat(jGivenTestsPublisher.isDisabled()).isTrue();
 
-        assertThat(config.getPublisherOptions().get(6)).isInstanceOf(JunitTestsPublisher.class);
+        assertThat(config.getPublisherOptions().get(7)).isInstanceOf(JunitTestsPublisher.class);
         JunitTestsPublisher junitTestsPublisher =
-                (JunitTestsPublisher) config.getPublisherOptions().get(6);
+                (JunitTestsPublisher) config.getPublisherOptions().get(7);
         assertThat(junitTestsPublisher.isDisabled()).isTrue();
         assertThat(junitTestsPublisher.getHealthScaleFactor()).isEqualTo(5.0);
         assertThat(junitTestsPublisher.getIgnoreAttachments()).isTrue();
         assertThat(junitTestsPublisher.isKeepLongStdio()).isTrue();
 
-        assertThat(config.getPublisherOptions().get(7)).isInstanceOf(MavenLinkerPublisher2.class);
+        assertThat(config.getPublisherOptions().get(8)).isInstanceOf(MavenLinkerPublisher2.class);
         MavenLinkerPublisher2 mavenLinkerPublisher =
-                (MavenLinkerPublisher2) config.getPublisherOptions().get(7);
+                (MavenLinkerPublisher2) config.getPublisherOptions().get(8);
         assertThat(mavenLinkerPublisher.isDisabled()).isTrue();
 
-        assertThat(config.getPublisherOptions().get(8)).isInstanceOf(TasksScannerPublisher.class);
+        assertThat(config.getPublisherOptions().get(9)).isInstanceOf(TasksScannerPublisher.class);
         TasksScannerPublisher tasksScannerPublisher =
-                (TasksScannerPublisher) config.getPublisherOptions().get(8);
+                (TasksScannerPublisher) config.getPublisherOptions().get(9);
         assertThat(tasksScannerPublisher.isDisabled()).isTrue();
         assertThat(tasksScannerPublisher.isAsRegexp()).isTrue();
         assertThat(tasksScannerPublisher.getExcludePattern()).isEqualTo("**/*.xml");
@@ -199,9 +209,9 @@ public class ConfigurationAsCodeTest {
         assertThat(tasksScannerPublisher.getThresholdLimit()).isEqualTo("normal");
         assertThat(tasksScannerPublisher.getUnHealthy()).isEqualTo("15");
 
-        assertThat(config.getPublisherOptions().get(9)).isInstanceOf(PipelineGraphPublisher.class);
+        assertThat(config.getPublisherOptions().get(10)).isInstanceOf(PipelineGraphPublisher.class);
         PipelineGraphPublisher pipelineGraphPublisher =
-                (PipelineGraphPublisher) config.getPublisherOptions().get(9);
+                (PipelineGraphPublisher) config.getPublisherOptions().get(10);
         assertThat(pipelineGraphPublisher.isDisabled()).isTrue();
         assertThat(pipelineGraphPublisher.isIgnoreUpstreamTriggers()).isTrue();
         assertThat(pipelineGraphPublisher.isIncludeReleaseVersions()).isTrue();
@@ -212,9 +222,9 @@ public class ConfigurationAsCodeTest {
         assertThat(pipelineGraphPublisher.getLifecycleThreshold()).isEqualTo("install");
         assertThat(pipelineGraphPublisher.isSkipDownstreamTriggers()).isTrue();
 
-        assertThat(config.getPublisherOptions().get(10)).isInstanceOf(SpotBugsAnalysisPublisher.class);
+        assertThat(config.getPublisherOptions().get(11)).isInstanceOf(SpotBugsAnalysisPublisher.class);
         SpotBugsAnalysisPublisher spotBugsAnalysisPublisher =
-                (SpotBugsAnalysisPublisher) config.getPublisherOptions().get(10);
+                (SpotBugsAnalysisPublisher) config.getPublisherOptions().get(11);
         assertThat(spotBugsAnalysisPublisher.isDisabled()).isTrue();
         assertThat(spotBugsAnalysisPublisher.getHealthy()).isEqualTo("5");
         assertThat(spotBugsAnalysisPublisher.getThresholdLimit()).isEqualTo("high");
