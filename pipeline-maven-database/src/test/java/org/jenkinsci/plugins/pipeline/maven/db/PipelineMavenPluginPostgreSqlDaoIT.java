@@ -57,7 +57,7 @@ public class PipelineMavenPluginPostgreSqlDaoIT extends PipelineMavenPluginDaoAb
 
     @Container
     public static PostgreSQLContainer<?> DB =
-            new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE).withImagePullPolicy(alwaysPull());
+            new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE + ":17").withImagePullPolicy(alwaysPull());
 
     @Override
     public DataSource before_newDataSource() throws Exception {
