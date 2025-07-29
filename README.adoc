@@ -535,7 +535,7 @@ By default, the Jenkins Pipeline Maven Plugin uses an H2 embedded database, but 
 Configuration steps to use a MySQL:
 
 * Create an empty MySQL database with a dedicated MySQL user with permissions for Data Manipulation Language actions (DML) and Data Definition Language (DDL) actions
-** Tested with MySQL up to 8.1, with MariaDB up to 11.1 and with Amazon Aurora MySQL 5.6
+** Tested with MySQL up to 9.4, with MariaDB up to 11.1 and with Amazon Aurora MySQL 5.6
 * Install the Jenkins `MySQL Database` plugin
 ** Navigate to `Manage Jenkins / Manage Plugins / Available`, select the `MySQL Database` plugin and click on `Download now and install after restart`
 *  Configure the Pipeline Maven Plugin to use the created MySQL database
@@ -564,7 +564,7 @@ By default, the Jenkins Pipeline Maven Plugin uses an H2 embedded database, but 
 Configuration steps to use a PostgreSQL:
 
 * Create an empty PostgreSQL database with a dedicated PostgreSQL user with permissions for Data Manipulation Language actions (DML) and Data Definition Language (DDL) actions
-** Tested with PostgreSQL up to 16
+** Tested with PostgreSQL up to 17
 * Install the Jenkins the https://plugins.jenkins.io/postgresql-api/[PostgreSQL API] plugin
 ** Navigate to `Manage Jenkins / Manage Plugins / Available`, select the `PostgreSQL API` plugin and click on `Download now and install after restart`.
 *  Configure the Pipeline Maven Plugin to use the created PostgreSQL database

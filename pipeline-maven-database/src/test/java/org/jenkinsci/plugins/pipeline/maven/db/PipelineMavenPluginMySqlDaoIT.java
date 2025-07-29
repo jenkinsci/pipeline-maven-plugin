@@ -56,7 +56,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
 
     @Container
-    public static MySQLContainer<?> DB = new MySQLContainer<>(MySQLContainer.NAME).withImagePullPolicy(alwaysPull());
+    public static LatestMySQLContainer DB = new LatestMySQLContainer().withImagePullPolicy(alwaysPull());
 
     @Override
     public DataSource before_newDataSource() {
@@ -110,6 +110,25 @@ public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstrac
             FormValidation result = dao.getBuilder().validateConfiguration(config);
 
             assertThat(result.toString()).isEqualTo("OK: MySQL " + version + " is a supported database");
+        }
+    }
+
+    // Need
+    // https://github.com/testcontainers/testcontainers-java/issues/10184
+    // https://github.com/testcontainers/testcontainers-java/pull/10185
+    // to be fixed
+    static class LatestMySQLContainer extends MySQLContainer<LatestMySQLContainer> {
+
+        public LatestMySQLContainer() {
+            super(MySQLContainer.NAME + ":9");
+        }
+
+        protected void configure() {
+            addEnv("MYSQL_DATABASE", getDatabaseName());
+            addEnv("MYSQL_USER", getUsername());
+            addEnv("MYSQL_PASSWORD", getPassword());
+            addEnv("MYSQL_ROOT_PASSWORD", getPassword());
+            setStartupAttempts(3);
         }
     }
 }
