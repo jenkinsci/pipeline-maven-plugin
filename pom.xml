@@ -95,7 +95,7 @@
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
     <jenkins-plugin-maven-invoker.version>2.5</jenkins-plugin-maven-invoker.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
-    <jenkins-tools-bom.version>5085.v05cc65a_936d3</jenkins-tools-bom.version>
+    <jenkins-tools-bom.version>5165.vdfd66a_57c648</jenkins-tools-bom.version>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.baseline>2.492</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
