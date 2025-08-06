@@ -30,6 +30,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
+import org.jenkinsci.plugins.variant.OptionalExtension;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -246,7 +247,7 @@ public class CoveragePublisher extends MavenPublisher {
     }
 
     @Symbol("coveragePublisher")
-    @Extension
+    @OptionalExtension(requirePlugins = "coverage")
     public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
         @NonNull
         @Override

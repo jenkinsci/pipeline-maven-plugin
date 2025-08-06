@@ -52,6 +52,7 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>coverage</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
