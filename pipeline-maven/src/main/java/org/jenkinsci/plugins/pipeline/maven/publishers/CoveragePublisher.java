@@ -6,7 +6,6 @@ import static org.springframework.util.ReflectionUtils.makeAccessible;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.TaskListener;
 import io.jenkins.plugins.coverage.metrics.steps.CoverageStep;
