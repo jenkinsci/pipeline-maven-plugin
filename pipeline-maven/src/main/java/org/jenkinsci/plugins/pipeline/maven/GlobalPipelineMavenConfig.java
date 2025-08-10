@@ -52,7 +52,6 @@ import jenkins.model.GlobalConfigurationCategory;
 import jenkins.model.Jenkins;
 import jenkins.tools.ToolConfigurationCategory;
 import net.sf.json.JSONObject;
-import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginNullDao;
@@ -111,7 +110,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
     private Optional<PipelineMavenPluginDao> findDaoFromExtension(String daoClass) {
         return ExtensionList.lookup(PipelineMavenPluginDao.class).stream()
                 .filter(pipelineMavenPluginDao ->
-                        StringUtils.equals(pipelineMavenPluginDao.getClass().getName(), daoClass))
+                        pipelineMavenPluginDao.getClass().getName().equals(daoClass))
                 .findFirst();
     }
 
@@ -226,7 +225,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
 
     @Override
     public boolean configure(StaplerRequest2 req, JSONObject json) throws FormException {
-        if (!StringUtils.equals(json.getString("daoClass"), daoClass)) {
+        if (!json.getString("daoClass").equals(daoClass)) {
             closeDatasource();
             this.dao = null;
         }
@@ -316,7 +315,7 @@ public class GlobalPipelineMavenConfig extends GlobalConfiguration {
             return FormValidation.ok("OK");
         }
 
-        if (StringUtils.isBlank(jdbcUrl)) {
+        if (jdbcUrl == null || jdbcUrl.isBlank()) {
             jdbcUrl = optionalPipelineMavenPluginDao.get().getDefaultJdbcUrl();
         }
 

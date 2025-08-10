@@ -12,9 +12,10 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
@@ -164,14 +165,22 @@ public class TasksScannerPublisher extends AbstractHealthAwarePublisher {
         }
 
         hudson.plugins.tasks.TasksPublisher tasksPublisher = new hudson.plugins.tasks.TasksPublisher();
-        String pattern =
-                StringUtils.isEmpty(this.pattern) ? XmlUtils.join(sourceDirectoriesPatterns, ",") : this.pattern;
+        String pattern = this.pattern == null || this.pattern.isEmpty()
+                ? XmlUtils.join(sourceDirectoriesPatterns, ",")
+                : this.pattern;
         tasksPublisher.setPattern(pattern);
-        tasksPublisher.setExcludePattern(StringUtils.trimToNull(this.excludePattern));
+        tasksPublisher.setExcludePattern(
+                Optional.ofNullable(this.excludePattern).map(String::trim).orElse(null));
 
-        tasksPublisher.setHigh(StringUtils.defaultIfEmpty(this.highPriorityTaskIdentifiers, "FIXME"));
-        tasksPublisher.setNormal(StringUtils.defaultIfEmpty(this.normalPriorityTaskIdentifiers, "TODO"));
-        tasksPublisher.setLow(StringUtils.trimToNull(this.lowPriorityTaskIdentifiers));
+        tasksPublisher.setHigh(Optional.ofNullable(this.highPriorityTaskIdentifiers)
+                .filter(Predicate.not(String::isEmpty))
+                .orElse("FIXME"));
+        tasksPublisher.setNormal(Optional.ofNullable(this.normalPriorityTaskIdentifiers)
+                .filter(Predicate.not(String::isEmpty))
+                .orElse("TODO"));
+        tasksPublisher.setLow(Optional.ofNullable(this.lowPriorityTaskIdentifiers)
+                .map(String::trim)
+                .orElse(null));
         tasksPublisher.setIgnoreCase(this.ignoreCase);
         tasksPublisher.setAsRegexp(this.asRegexp);
 
