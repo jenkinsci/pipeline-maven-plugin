@@ -21,7 +21,6 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 import static org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesLister.listDependencies;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
@@ -38,6 +37,7 @@ import org.jenkinsci.plugins.jgiven.JgivenReportGenerator;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
+import org.jenkinsci.plugins.variant.OptionalExtension;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
@@ -120,7 +120,7 @@ public class JGivenTestsPublisher extends MavenPublisher {
     }
 
     @Symbol("jgivenPublisher")
-    @Extension
+    @OptionalExtension(requirePlugins = "jgiven")
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @NonNull
         @Override

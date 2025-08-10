@@ -25,7 +25,6 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
@@ -40,6 +39,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
+import org.jenkinsci.plugins.variant.OptionalExtension;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
@@ -247,7 +247,7 @@ public class SpotBugsAnalysisPublisher extends AbstractHealthAwarePublisher {
     }
 
     @Symbol("spotbugsPublisher")
-    @Extension
+    @OptionalExtension(requirePlugins = "findbugs")
     public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
         @NonNull
         @Override
