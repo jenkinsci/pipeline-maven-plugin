@@ -11,15 +11,13 @@ import java.util.Map;
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.CoveragePublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsNgPublisher;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
@@ -38,16 +36,14 @@ public class MavenPublisherStrategyTest {
 
         List<MavenPublisher> mavenPublishers = MavenPublisherStrategy.IMPLICIT.buildPublishersList(
                 Collections.emptyList(), new StreamTaskListener(baos));
-        assertThat(mavenPublishers).hasSize(12);
+        assertThat(mavenPublishers).hasSize(10);
 
         Map<String, MavenPublisher> reportersByDescriptorId = new HashMap<>();
         for (MavenPublisher mavenPublisher : mavenPublishers) {
             reportersByDescriptorId.put(mavenPublisher.getDescriptor().getId(), mavenPublisher);
         }
-        assertThat(reportersByDescriptorId).containsKey(new FindbugsAnalysisPublisher.DescriptorImpl().getId());
-        assertThat(reportersByDescriptorId).containsKey(new SpotBugsAnalysisPublisher.DescriptorImpl().getId());
-        assertThat(reportersByDescriptorId).containsKey(new TasksScannerPublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new ConcordionTestsPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new CoveragePublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new DependenciesFingerprintPublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new GeneratedArtifactsPublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new InvokerRunsPublisher.DescriptorImpl().getId());
@@ -55,6 +51,6 @@ public class MavenPublisherStrategyTest {
         assertThat(reportersByDescriptorId).containsKey(new JunitTestsPublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new MavenLinkerPublisher2.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new PipelineGraphPublisher.DescriptorImpl().getId());
-        assertThat(reportersByDescriptorId).containsKey(new CoveragePublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new WarningsNgPublisher.DescriptorImpl().getId());
     }
 }

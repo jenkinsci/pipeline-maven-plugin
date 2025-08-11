@@ -35,15 +35,13 @@ import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.CoveragePublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsNgPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
@@ -163,9 +161,7 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
 
     private static Stream<Arguments> mavenPublisherDescriptors() {
         return Stream.of(
-                arguments(named("Findbugs", new FindbugsAnalysisPublisher.DescriptorImpl())),
-                arguments(named("SpotBugs", new SpotBugsAnalysisPublisher.DescriptorImpl())),
-                arguments(named("TasksScanner", new TasksScannerPublisher.DescriptorImpl())),
+                arguments(named("Coverage", new CoveragePublisher.DescriptorImpl())),
                 arguments(named("Concordion", new ConcordionTestsPublisher.DescriptorImpl())),
                 arguments(named("DependenciesFingerprint", new DependenciesFingerprintPublisher.DescriptorImpl())),
                 arguments(named("GeneratedArtifacts", new GeneratedArtifactsPublisher.DescriptorImpl())),
@@ -174,6 +170,6 @@ public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTes
                 arguments(named("Junit", new JunitTestsPublisher.DescriptorImpl())),
                 arguments(named("MavenLinker", new MavenLinkerPublisher2.DescriptorImpl())),
                 arguments(named("PipelineGraph", new PipelineGraphPublisher.DescriptorImpl())),
-                arguments(named("Coverage", new CoveragePublisher.DescriptorImpl())));
+                arguments(named("Warnings", new WarningsNgPublisher.DescriptorImpl())));
     }
 }

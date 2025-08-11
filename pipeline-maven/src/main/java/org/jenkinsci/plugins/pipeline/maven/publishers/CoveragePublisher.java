@@ -246,7 +246,7 @@ public class CoveragePublisher extends MavenPublisher {
 
     @Symbol("coveragePublisher")
     @OptionalExtension(requirePlugins = "coverage")
-    public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
+    public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @NonNull
         @Override
         public String getDisplayName() {

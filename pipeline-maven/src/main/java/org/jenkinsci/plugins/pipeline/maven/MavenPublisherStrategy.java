@@ -14,13 +14,29 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.Jenkins;
+import org.jenkinsci.plugins.pipeline.maven.publishers.CoveragePublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JacocoReportPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsNgPublisher;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 public enum MavenPublisherStrategy {
     IMPLICIT(Messages.publisher_strategy_implicit_description()) {
+
+        private static final Map<Class<? extends MavenPublisher.DescriptorImpl>, List<String>> DEPRECATED = Map.of(
+                JacocoReportPublisher.DescriptorImpl.class,
+                        List.of("Jacoco", new CoveragePublisher.DescriptorImpl().getDisplayName()),
+                FindbugsAnalysisPublisher.DescriptorImpl.class,
+                        List.of("Findbugs", new WarningsNgPublisher.DescriptorImpl().getDisplayName()),
+                SpotBugsAnalysisPublisher.DescriptorImpl.class,
+                        List.of("Findbugs", new WarningsNgPublisher.DescriptorImpl().getDisplayName()),
+                TasksScannerPublisher.DescriptorImpl.class,
+                        List.of("Tasks", new WarningsNgPublisher.DescriptorImpl().getDisplayName()));
+
         /**
          * <p>Build the list of {@link MavenPublisher}s that should be invoked for the build execution of the given {@link TaskListener}
          * with the desired configuration.
@@ -72,14 +88,20 @@ public enum MavenPublisherStrategy {
                     Jenkins.get().getDescriptorList(MavenPublisher.class);
             for (Descriptor<MavenPublisher> descriptor : descriptorList) {
                 try {
-                    if (JacocoReportPublisher.DescriptorImpl.class.isAssignableFrom(descriptor.getClass())) {
+                    if (DEPRECATED.keySet().contains(descriptor.getClass())) {
+                        String deprecatedPublisherName = descriptor.getDisplayName();
+                        String deprecatedPlugin =
+                                DEPRECATED.get(descriptor.getClass()).get(0);
+                        String replacementPublisherName =
+                                DEPRECATED.get(descriptor.getClass()).get(1);
                         listener.getLogger()
-                                .println(
-                                        """
-                        [withMaven] JacocoPublisher is no longer implicitly used with `withMaven` step.
-                        [withMaven] Jacoco plugin has been deprecated and should not be used anymore.
-                        [withMaven] CoveragePublisher will be used instead.
-                        """);
+                                .println("[withMaven] " + deprecatedPublisherName
+                                        + " is no longer implicitly used with `withMaven` step.");
+                        listener.getLogger()
+                                .println("[withMaven] " + deprecatedPlugin
+                                        + " plugin has been deprecated and should not be used anymore.");
+                        listener.getLogger()
+                                .println("[withMaven] " + replacementPublisherName + " will be used instead.");
                     } else {
                         defaultPublishersById.put(descriptor.getId(), descriptor.clazz.newInstance());
                     }
