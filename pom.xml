@@ -89,7 +89,7 @@
     <assertj.version>3.27.3</assertj.version>
     <changelist>999999-SNAPSHOT</changelist>
     <gson.version>2.10.1</gson.version>
-    <hikaricp.version>7.0.0</hikaricp.version>
+    <hikaricp.version>7.0.1</hikaricp.version>
     <jansi.version>2.4.0</jansi.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
