@@ -86,7 +86,7 @@
   </scm>
 
   <properties>
-    <assertj.version>3.27.3</assertj.version>
+    <assertj.version>3.27.4</assertj.version>
     <changelist>999999-SNAPSHOT</changelist>
     <gson.version>2.10.1</gson.version>
     <hikaricp.version>7.0.0</hikaricp.version>
