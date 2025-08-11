@@ -122,6 +122,7 @@ public class JacocoReportPublisher extends MavenPublisher {
 
     @Symbol("jacocoPublisher")
     @Extension
+    // @OptionalExtension(requirePlugins = "jacoco")
     public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
         @NonNull
         @Override

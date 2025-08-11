@@ -36,9 +36,8 @@ public class WithMavenStepNoOptionalsTest {
     @Rule
     public RealJenkinsRule jenkinsRule = new RealJenkinsRule()
             .omitPlugins(
-                    "mysql-api",
-                    "postgresql-api",
-                    "maven-plugin",
+                    "coverage",
+                    "findbugs",
                     "flaky-test-handler",
                     "htmlpublisher",
                     "jacoco",
@@ -47,8 +46,10 @@ public class WithMavenStepNoOptionalsTest {
                     "junit-attachments",
                     "matrix-project",
                     "maven-invoker-plugin",
+                    "maven-plugin",
+                    "mysql-api",
                     "pipeline-build-step",
-                    "findbugs",
+                    "postgresql-api",
                     "tasks");
 
     @Test

@@ -26,7 +26,6 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.Nullable;
-import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.model.Run;
@@ -46,6 +45,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
+import org.jenkinsci.plugins.variant.OptionalExtension;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -299,7 +299,7 @@ public class InvokerRunsPublisher extends MavenPublisher {
      * Don't use the symbol "junit", it would collide with hudson.tasks.junit.JUnitResultArchiver
      */
     @Symbol("invokerPublisher")
-    @Extension
+    @OptionalExtension(requirePlugins = "maven-invoker-plugin")
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @NonNull
         @Override
