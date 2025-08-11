@@ -41,7 +41,6 @@ import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.Jenkins;
-import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
@@ -133,7 +132,7 @@ public class DependenciesFingerprintPublisher extends MavenPublisher {
             }
 
             try {
-                if (StringUtils.isEmpty(dependency.getFile())) {
+                if (dependency.getFile() == null || dependency.getFile().isEmpty()) {
                     if (LOGGER.isLoggable(Level.FINER)) {
                         listener.getLogger()
                                 .println("[withMaven] Can't fingerprint maven dependency with no file attached: "

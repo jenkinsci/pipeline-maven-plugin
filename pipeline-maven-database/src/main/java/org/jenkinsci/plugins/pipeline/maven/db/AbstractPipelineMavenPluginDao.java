@@ -61,7 +61,7 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 import jenkins.model.Jenkins;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.h2.api.ErrorCode;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
@@ -118,8 +118,8 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
             PipelineMavenPluginDao dao;
             try {
                 String jdbcUrl = config.getJdbcUrl();
-                if (StringUtils.isBlank(jdbcUrl)) {
-                    // some dao such h2 can use default jdbc ur
+                if (jdbcUrl == null || jdbcUrl.isBlank()) {
+                    // some dao such h2 can use default jdbc url
                     Optional<PipelineMavenPluginDao> optionalPipelineMavenPluginDao =
                             ExtensionList.lookup(PipelineMavenPluginDao.class).stream()
                                     .filter(pipelineMavenPluginDao -> pipelineMavenPluginDao
@@ -133,12 +133,14 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 }
                 String jdbcUserName, jdbcPassword;
 
-                if (StringUtils.isBlank(config.getCredentialsId())
+                if ((config.getCredentialsId() == null
+                                || config.getCredentialsId().isBlank())
                         && !AbstractPipelineMavenPluginDao.this.acceptNoCredentials())
                     throw new IllegalStateException("No credentials defined for JDBC URL '" + jdbcUrl + "'");
 
                 UsernamePasswordCredentials jdbcCredentials = null;
-                if (!StringUtils.isBlank(config.getCredentialsId())) {
+                if (config.getCredentialsId() != null
+                        && !config.getCredentialsId().isBlank()) {
                     jdbcCredentials = (UsernamePasswordCredentials) CredentialsMatchers.firstOrNull(
                             CredentialsProvider.lookupCredentials(
                                     UsernamePasswordCredentials.class, j, ACL.SYSTEM, Collections.EMPTY_LIST),
@@ -221,15 +223,13 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
         @Override
         public FormValidation validateConfiguration(Config config) {
             String jdbcUrl = config.getJdbcUrl();
-            if (StringUtils.isBlank(jdbcUrl)) {
+            if (jdbcUrl == null || jdbcUrl.isBlank()) {
                 return FormValidation.ok();
             }
 
             String driverClass = null;
             try {
-                if (StringUtils.isBlank(jdbcUrl)) {
-                    driverClass = "org.h2.Driver";
-                } else if (jdbcUrl.startsWith("jdbc:h2")) {
+                if (jdbcUrl.startsWith("jdbc:h2")) {
                     driverClass = "org.h2.Driver";
                 } else if (jdbcUrl.startsWith("jdbc:mysql") || jdbcUrl.startsWith("jdbc:mariadb")) {
                     driverClass = "com.mysql.cj.jdbc.Driver";
@@ -259,7 +259,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                 String jdbcCredentialsId = config.getCredentialsId();
 
                 String jdbcUserName, jdbcPassword;
-                if (StringUtils.isEmpty(jdbcCredentialsId)) {
+                if (jdbcCredentialsId == null || jdbcCredentialsId.isEmpty()) {
                     if (AbstractPipelineMavenPluginDao.this.acceptNoCredentials()) {
                         // embedded database, assume OK
                         return FormValidation.ok();
@@ -454,7 +454,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
             // unsupported config
         }
 
-        if (StringUtils.isNotBlank(properties)) {
+        if (properties != null && !properties.isBlank()) {
             try {
                 p.load(new StringReader(properties));
             } catch (IOException e) {

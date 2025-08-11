@@ -211,9 +211,9 @@ public class XmlUtils {
             Node node = nodes.item(i);
             if (node instanceof Element) {
                 Element element = (Element) node;
-                if (StringUtils.equals(element.getNodeName(), "RepositoryEvent")) {
+                if ("RepositoryEvent".equals(element.getNodeName())) {
                     Attr type = element.getAttributeNode("type");
-                    if (null != type && StringUtils.equals(type.getValue(), "ARTIFACT_DEPLOYED")) {
+                    if (null != type && "ARTIFACT_DEPLOYED".equals(type.getValue())) {
                         elements.add(element);
                     }
                 }
@@ -541,7 +541,7 @@ public class XmlUtils {
                                         + XmlUtils.toString(artifactElt));
                     }
                 } else {
-                    mavenArtifact.setFile(StringUtils.trim(fileElt.getTextContent()));
+                    mavenArtifact.setFile(fileElt.getTextContent().trim());
 
                     artifactDeployedEvent =
                             XmlUtils.getArtifactDeployedEvent(artifactDeployedEvents, mavenArtifact.getFile());
@@ -577,7 +577,7 @@ public class XmlUtils {
                                             + attachedMavenArtifact + " in " + XmlUtils.toString(attachedArtifactElt));
                         }
                     } else {
-                        attachedMavenArtifact.setFile(StringUtils.trim(fileElt.getTextContent()));
+                        attachedMavenArtifact.setFile(fileElt.getTextContent().trim());
 
                         Element attachedArtifactDeployedEvent = XmlUtils.getArtifactDeployedEvent(
                                 artifactDeployedEvents, attachedMavenArtifact.getFile());

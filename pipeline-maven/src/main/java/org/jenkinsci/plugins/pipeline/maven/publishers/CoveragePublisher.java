@@ -22,7 +22,6 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
@@ -50,8 +49,8 @@ public class CoveragePublisher extends MavenPublisher {
     private static final String JACOCO_ID = "jacoco-maven-plugin";
     private static final String JACOCO_REPORT_GOAL = "report";
 
-    private String coberturaExtraPattern = StringUtils.EMPTY;
-    private String jacocoExtraPattern = StringUtils.EMPTY;
+    private String coberturaExtraPattern = "";
+    private String jacocoExtraPattern = "";
     private SourceCodeRetention sourceCodeRetention = SourceCodeRetention.MODIFIED;
 
     @DataBoundConstructor
@@ -218,13 +217,13 @@ public class CoveragePublisher extends MavenPublisher {
                             + resultFile);
         }
 
-        if (patterns.isEmpty() && StringUtils.isBlank(extraPattern)) {
+        if (patterns.isEmpty() && (extraPattern == null || extraPattern.isBlank())) {
             return null;
         }
 
         StringBuilder patternsAsString = new StringBuilder();
         patternsAsString.append(patterns.stream().collect(Collectors.joining(",")));
-        if (StringUtils.isNotBlank(extraPattern)) {
+        if (extraPattern != null && !extraPattern.isBlank()) {
             if (!patterns.isEmpty()) {
                 patternsAsString.append(",");
             }

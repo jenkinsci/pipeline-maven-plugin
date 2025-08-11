@@ -35,7 +35,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import javax.sql.DataSource;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.db.util.RuntimeSqlException;
 
 /**

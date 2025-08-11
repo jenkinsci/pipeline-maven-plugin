@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 import jenkins.model.ArtifactManager;
 import jenkins.model.Jenkins;
 import jenkins.util.BuildListenerAdapter;
-import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
@@ -67,7 +66,7 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
         Map<String, String> artifactsToFingerPrint = new HashMap<>(); // artifactPathInArchiveZone -> artifactMd5
         for (MavenArtifact mavenArtifact : join) {
             try {
-                if (StringUtils.isEmpty(mavenArtifact.getFile())) {
+                if (mavenArtifact.getFile() == null || mavenArtifact.getFile().isEmpty()) {
                     if (LOGGER.isLoggable(Level.FINER)) {
                         listener.getLogger()
                                 .println(
@@ -96,7 +95,7 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
 
                 String artifactPathInWorkspace = XmlUtils.getPathInWorkspace(mavenArtifact.getFile(), workspace)
                         .replace('\\', '/');
-                if (StringUtils.isEmpty(artifactPathInWorkspace)) {
+                if (artifactPathInWorkspace == null || artifactPathInWorkspace.isEmpty()) {
                     listener.error("[withMaven] artifactsPublisher - Invalid path in the workspace ("
                             + workspace.getRemote() + ") for artifact " + mavenArtifact);
                 } else if (Objects.equals(

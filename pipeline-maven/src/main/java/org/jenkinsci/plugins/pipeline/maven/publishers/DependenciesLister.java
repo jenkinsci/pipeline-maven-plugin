@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
@@ -50,7 +49,7 @@ public class DependenciesLister {
                             "listDependencies: no associated file found for " + dependencyArtifact + " in "
                                     + XmlUtils.toString(dependencyElt));
                 } else {
-                    dependencyArtifact.setFile(StringUtils.trim(fileElt.getTextContent()));
+                    dependencyArtifact.setFile(fileElt.getTextContent().trim());
                 }
 
                 result.add(dependencyArtifact);

@@ -82,7 +82,6 @@ import jenkins.mvn.FilePathSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.mvn.GlobalSettingsProvider;
 import jenkins.mvn.SettingsProvider;
-import org.apache.commons.lang3.StringUtils;
 import org.jenkinsci.lib.configprovider.model.Config;
 import org.jenkinsci.plugins.configfiles.ConfigFiles;
 import org.jenkinsci.plugins.configfiles.maven.GlobalMavenSettingsConfig;
@@ -307,7 +306,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
      */
     private void setupJDK() throws AbortException, IOException, InterruptedException {
         String jdkInstallationName = step.getJdk();
-        if (StringUtils.isEmpty(jdkInstallationName)) {
+        if (jdkInstallationName == null || jdkInstallationName.isEmpty()) {
             console.trace("[withMaven] using JDK installation provided by the build agent");
             return;
         }
@@ -379,7 +378,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         // JAVA_TOOL_OPTIONS
         // https://docs.oracle.com/javase/8/docs/technotes/guides/troubleshoot/envvars002.html
         String javaToolsOptions = env.get("JAVA_TOOL_OPTIONS", "");
-        if (StringUtils.isNotEmpty(javaToolsOptions)) {
+        if (javaToolsOptions != null && !javaToolsOptions.isEmpty()) {
             javaToolsOptions += " ";
         }
         javaToolsOptions += "-Dmaven.ext.class.path=\"" + mavenSpyJarPath.getRemote() + "\" "
@@ -403,13 +402,13 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             ifTraceabilityDisabled(() -> mavenConfig.append("--no-transfer-progress "));
         }
         ifTraceabilityEnabled(() -> mavenConfig.append("--show-version "));
-        if (StringUtils.isNotEmpty(settingsFilePath)) {
+        if (settingsFilePath != null && !settingsFilePath.isEmpty()) {
             // JENKINS-57324 escape '%' as '%%'. See
             // https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
             if (!isUnix) settingsFilePath = settingsFilePath.replace("%", "%%");
             mavenConfig.append("--settings \"").append(settingsFilePath).append("\" ");
         }
-        if (StringUtils.isNotEmpty(globalSettingsFilePath)) {
+        if (globalSettingsFilePath != null && !globalSettingsFilePath.isEmpty()) {
             // JENKINS-57324 escape '%' as '%%'. See
             // https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
             if (!isUnix) globalSettingsFilePath = globalSettingsFilePath.replace("%", "%%");
@@ -418,7 +417,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
                     .append(globalSettingsFilePath)
                     .append("\" ");
         }
-        if (StringUtils.isNotEmpty(mavenLocalRepo)) {
+        if (mavenLocalRepo != null && !mavenLocalRepo.isEmpty()) {
             // JENKINS-57324 escape '%' as '%%'. See
             // https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
             if (!isUnix) mavenLocalRepo = mavenLocalRepo.replace("%", "%%");
@@ -429,7 +428,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
 
         //
         // MAVEN_OPTS
-        if (StringUtils.isNotEmpty(step.getMavenOpts())) {
+        if (step.getMavenOpts() != null && !step.getMavenOpts().isEmpty()) {
             String mavenOpts = envOverride.expand(env.expand(step.getMavenOpts()));
 
             String mavenOpsOriginal = env.get(MAVEN_OPTS);
@@ -514,7 +513,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         StringBuilder consoleMessage = new StringBuilder("[withMaven]");
         String mvnExecPath;
 
-        if (StringUtils.isEmpty(mavenInstallationName)) {
+        if (mavenInstallationName == null || mavenInstallationName.isEmpty()) {
             // no maven installation name is passed, we will search for the Maven installation on the agent
             consoleMessage.append(" using Maven installation provided by the build agent");
         } else if (withContainer) {
@@ -540,7 +539,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             String mavenHome = readFromProcess("printenv", MAVEN_HOME);
             if (mavenHome == null) {
                 mavenHome = readFromProcess("printenv", M2_HOME);
-                if (StringUtils.isNotEmpty(mavenHome)) {
+                if (mavenHome != null && !mavenHome.isEmpty()) {
                     consoleMessage
                             .append(" with the environment variable M2_HOME=")
                             .append(mavenHome);
@@ -567,7 +566,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             String mavenHome = env.get(MAVEN_HOME);
             if (mavenHome == null) {
                 mavenHome = env.get(M2_HOME);
-                if (StringUtils.isNotEmpty(mavenHome)) {
+                if (mavenHome != null && !mavenHome.isEmpty()) {
                     consoleMessage
                             .append(" with the environment variable M2_HOME=")
                             .append(mavenHome);
@@ -791,7 +790,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
     @Nullable
     private String setupMavenLocalRepo() throws IOException, InterruptedException {
         String expandedMavenLocalRepo;
-        if (StringUtils.isEmpty(step.getMavenLocalRepo())) {
+        if (step.getMavenLocalRepo() == null || step.getMavenLocalRepo().isEmpty()) {
             expandedMavenLocalRepo = null;
         } else {
             // resolve relative/absolute with workspace as base
@@ -826,7 +825,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         final FilePath settingsDest = tempBinDir.child("settings.xml");
 
         // Settings from Config File Provider
-        if (StringUtils.isNotEmpty(step.getMavenSettingsConfig())) {
+        if (step.getMavenSettingsConfig() != null
+                && !step.getMavenSettingsConfig().isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 console.formatTrace(
                         "[withMaven] using Maven settings provided by the Jenkins Managed Configuration File '%s' %n",
@@ -838,7 +838,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         }
 
         // Settings from the file path
-        if (StringUtils.isNotEmpty(step.getMavenSettingsFilePath())) {
+        if (step.getMavenSettingsFilePath() != null
+                && !step.getMavenSettingsFilePath().isEmpty()) {
             String settingsPath = step.getMavenSettingsFilePath();
             FilePath settings;
 
@@ -972,7 +973,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         final FilePath settingsDest = tempBinDir.child("globalSettings.xml");
 
         // Global settings from Config File Provider
-        if (StringUtils.isNotEmpty(step.getGlobalMavenSettingsConfig())) {
+        if (step.getGlobalMavenSettingsConfig() != null
+                && !step.getGlobalMavenSettingsConfig().isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 console.formatTrace(
                         "[withMaven] using Maven global settings provided by the Jenkins Managed Configuration File '%s' %n",
@@ -984,7 +986,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         }
 
         // Global settings from the file path
-        if (StringUtils.isNotEmpty(step.getGlobalMavenSettingsFilePath())) {
+        if (step.getGlobalMavenSettingsFilePath() != null
+                && !step.getGlobalMavenSettingsFilePath().isEmpty()) {
             String settingsPath = step.getGlobalMavenSettingsFilePath();
             FilePath settings;
             if ((settings = ws.child(settingsPath)).exists()) {
@@ -1107,7 +1110,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             throw new AbortException("Could not find the Maven settings.xml config file id:" + mavenSettingsConfigId
                     + ". Make sure it exists on Managed Files");
         }
-        if (StringUtils.isBlank(c.content)) {
+        if (c.content == null || c.content.isBlank()) {
             throw new AbortException("Could not create Maven settings.xml config file id:" + mavenSettingsConfigId
                     + ". Content of the file is empty");
         }
@@ -1179,7 +1182,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             throw new AbortException("Could not find the Maven global settings.xml config file id:"
                     + mavenGlobalSettingsFile + ". Make sure it exists on Managed Files");
         }
-        if (StringUtils.isBlank(c.content)) {
+        if (c.content == null || c.content.isBlank()) {
             throw new AbortException("Could not create Maven global settings.xml config file id:"
                     + mavenGlobalSettingsFile + ". Content of the file is empty");
         }
@@ -1250,7 +1253,8 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
         List<ServerCredentialMapping> unresolvedServerCredentialsMappings = new ArrayList<>();
         for (ServerCredentialMapping serverCredentialMapping : serverCredentialMappings) {
 
-            List<DomainRequirement> domainRequirements = StringUtils.isBlank(serverCredentialMapping.getServerId())
+            List<DomainRequirement> domainRequirements = serverCredentialMapping.getServerId() == null
+                            || serverCredentialMapping.getServerId().isBlank()
                     ? Collections.emptyList()
                     : Collections.singletonList(new MavenServerIdRequirement(serverCredentialMapping.getServerId()));
             @Nullable
