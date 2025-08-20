@@ -71,11 +71,13 @@
     </developer>
   </developers>
 
+  <!-- Keep in sync with profile quick-build at the bottom -->
   <modules>
     <module>pipeline-maven</module>
     <module>pipeline-maven-api</module>
     <module>pipeline-maven-database</module>
     <module>pipeline-maven-spy</module>
+    <module>pipeline-maven-ui-tests</module>
   </modules>
 
   <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
@@ -88,9 +90,14 @@
   <properties>
     <assertj.version>3.27.4</assertj.version>
     <changelist>999999-SNAPSHOT</changelist>
+    <error-prone.version>2.36.0</error-prone.version>
     <gson.version>2.10.1</gson.version>
     <hikaricp.version>7.0.1</hikaricp.version>
+    <httpclient.version>4.5.14</httpclient.version>
+    <jackson.version>2.19.2</jackson.version>
     <jansi.version>2.4.0</jansi.version>
+    <javassist.version>3.30.2-GA</javassist.version>
+    <jenkins-acceptance-test-harness.version>6133.v358d9a_47674f</jenkins-acceptance-test-harness.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
     <jenkins-plugin-maven-invoker.version>2.5</jenkins-plugin-maven-invoker.version>
@@ -99,6 +106,8 @@
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.baseline>2.492</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
+    <json-smart.version>2.3</json-smart.version>
+    <json-unit-assertj.version>4.1.1</json-unit-assertj.version>
     <junit.version>5.13.4</junit.version>
     <junit4.version>4.13.2</junit4.version>
     <mariadb-client.version>3.5.5</mariadb-client.version>
@@ -114,6 +123,7 @@
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.8.8</maven.version>
+    <netty.version>4.2.3.Final</netty.version>
     <plexus-utils.version>3.6.0</plexus-utils.version>
     <plugin-exec.version>3.5.1</plugin-exec.version>
     <slf4j.version>2.0.17</slf4j.version>
@@ -307,4 +317,17 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>quick-build</id>
+      <modules>
+        <module>pipeline-maven</module>
+        <module>pipeline-maven-api</module>
+        <module>pipeline-maven-database</module>
+        <module>pipeline-maven-spy</module>
+      </modules>
+    </profile>
+  </profiles>
+
 </project>

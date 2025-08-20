@@ -8,6 +8,7 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.FilePath;
 import hudson.model.TaskListener;
+import hudson.util.ListBoxModel;
 import io.jenkins.plugins.coverage.metrics.steps.CoverageStep;
 import io.jenkins.plugins.coverage.metrics.steps.CoverageTool;
 import io.jenkins.plugins.coverage.metrics.steps.CoverageTool.Parser;
@@ -22,6 +23,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
@@ -33,6 +35,7 @@ import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.verb.POST;
 import org.w3c.dom.Element;
 
 public class CoveragePublisher extends MavenPublisher {
@@ -262,6 +265,14 @@ public class CoveragePublisher extends MavenPublisher {
         @Override
         public String getSkipFileName() {
             return ".skip-publish-coverage-results";
+        }
+
+        @POST
+        public ListBoxModel doFillSourceCodeRetentionItems() {
+            if (Jenkins.get().getACL().hasPermission(Jenkins.READ)) {
+                return SourceCodeRetention.fillItems();
+            }
+            return new ListBoxModel();
         }
     }
 }

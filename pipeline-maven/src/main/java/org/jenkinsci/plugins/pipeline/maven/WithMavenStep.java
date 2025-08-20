@@ -95,7 +95,8 @@ public class WithMavenStep extends Step {
 
     @DataBoundSetter
     public void setMavenSettingsConfig(String mavenSettingsConfig) {
-        this.mavenSettingsConfig = mavenSettingsConfig;
+        this.mavenSettingsConfig =
+                mavenSettingsConfig != null && !mavenSettingsConfig.isEmpty() ? mavenSettingsConfig : null;
     }
 
     public String getMavenSettingsFilePath() {
@@ -113,7 +114,9 @@ public class WithMavenStep extends Step {
 
     @DataBoundSetter
     public void setGlobalMavenSettingsConfig(String globalMavenSettingsConfig) {
-        this.globalMavenSettingsConfig = globalMavenSettingsConfig;
+        this.globalMavenSettingsConfig = globalMavenSettingsConfig != null && !globalMavenSettingsConfig.isEmpty()
+                ? globalMavenSettingsConfig
+                : null;
     }
 
     public String getGlobalMavenSettingsFilePath() {
@@ -131,7 +134,7 @@ public class WithMavenStep extends Step {
 
     @DataBoundSetter
     public void setMaven(String maven) {
-        this.maven = maven;
+        this.maven = maven != null && !maven.isEmpty() ? maven : null;
     }
 
     public String getMavenOpts() {
@@ -149,7 +152,7 @@ public class WithMavenStep extends Step {
 
     @DataBoundSetter
     public void setJdk(String jdk) {
-        this.jdk = jdk;
+        this.jdk = jdk != null && !jdk.isEmpty() ? jdk : null;
     }
 
     public String getMavenLocalRepo() {
@@ -245,16 +248,16 @@ public class WithMavenStep extends Step {
 
         @Restricted(NoExternalUse.class) // Only for UI calls
         public ListBoxModel doFillMavenItems(@AncestorInPath Item item) {
-            ListBoxModel r = new ListBoxModel();
-            if (item == null) {
-                return r; // it's empty
+            if (item != null && item.hasPermission(Item.EXTENDED_READ)
+                    || Jenkins.get().getACL().hasPermission(Jenkins.READ)) {
+                ListBoxModel items = new ListBoxModel();
+                items.add("--- " + Messages.settings_default_maven_description() + " ---", "");
+                for (MavenInstallation installation : getMavenDescriptor().getInstallations()) {
+                    items.add(installation.getName());
+                }
+                return items;
             }
-            item.checkPermission(Item.EXTENDED_READ);
-            r.add("--- " + Messages.settings_default_maven_description() + " ---", "");
-            for (MavenInstallation installation : getMavenDescriptor().getInstallations()) {
-                r.add(installation.getName());
-            }
-            return r;
+            return new ListBoxModel();
         }
 
         private JDK.DescriptorImpl getJDKDescriptor() {
@@ -263,59 +266,60 @@ public class WithMavenStep extends Step {
 
         @Restricted(NoExternalUse.class) // Only for UI calls
         public ListBoxModel doFillJdkItems(@AncestorInPath Item item) {
-            ListBoxModel r = new ListBoxModel();
-            if (item == null) {
-                return r; // it's empty
+            if (item != null && item.hasPermission(Item.EXTENDED_READ)
+                    || Jenkins.get().getACL().hasPermission(Jenkins.READ)) {
+                ListBoxModel items = new ListBoxModel();
+                items.add("--- " + Messages.settings_default_jdk_description() + " ---", "");
+                for (JDK installation : getJDKDescriptor().getInstallations()) {
+                    items.add(installation.getName());
+                }
+                return items;
             }
-            item.checkPermission(Item.EXTENDED_READ);
-            r.add("--- " + Messages.settings_default_jdk_description() + " ---", "");
-            for (JDK installation : getJDKDescriptor().getInstallations()) {
-                r.add(installation.getName());
-            }
-            return r;
+            return new ListBoxModel();
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
         public ListBoxModel doFillMavenSettingsConfigItems(
                 @AncestorInPath Item item, @AncestorInPath ItemGroup context) {
-            ListBoxModel r = new ListBoxModel();
-            if (item == null) {
-                return r; // it's empty
+            if (item != null && item.hasPermission(Item.EXTENDED_READ)
+                    || Jenkins.get().getACL().hasPermission(Jenkins.READ)) {
+                ListBoxModel items = new ListBoxModel();
+                items.add("--- " + Messages.settings_default_settings_description() + " ---", "");
+                for (Config config : ConfigFiles.getConfigsInContext(context, MavenSettingsConfigProvider.class)) {
+                    items.add(config.name, config.id);
+                }
+                return items;
             }
-            item.checkPermission(Item.EXTENDED_READ);
-            r.add("--- " + Messages.settings_default_settings_description() + " ---", "");
-            for (Config config : ConfigFiles.getConfigsInContext(context, MavenSettingsConfigProvider.class)) {
-                r.add(config.name, config.id);
-            }
-            return r;
+            return new ListBoxModel();
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
         public ListBoxModel doFillGlobalMavenSettingsConfigItems(
                 @AncestorInPath Item item, @AncestorInPath ItemGroup context) {
-            ListBoxModel r = new ListBoxModel();
-            if (item == null) {
-                return r; // it's empty
+            if (item != null && item.hasPermission(Item.EXTENDED_READ)
+                    || Jenkins.get().getACL().hasPermission(Jenkins.READ)) {
+                ListBoxModel items = new ListBoxModel();
+                items.add("--- " + Messages.settings_default_settings_description() + " ---", "");
+                for (Config config :
+                        ConfigFiles.getConfigsInContext(context, GlobalMavenSettingsConfigProvider.class)) {
+                    items.add(config.name, config.id);
+                }
+                return items;
             }
-            item.checkPermission(Item.EXTENDED_READ);
-            r.add("--- " + Messages.settings_default_settings_description() + " ---", "");
-            for (Config config : ConfigFiles.getConfigsInContext(context, GlobalMavenSettingsConfigProvider.class)) {
-                r.add(config.name, config.id);
-            }
-            return r;
+            return new ListBoxModel();
         }
 
         @Restricted(NoExternalUse.class) // Only for UI calls
         public ListBoxModel doFillPublisherStrategyItems(@AncestorInPath Item item, @AncestorInPath ItemGroup context) {
-            ListBoxModel r = new ListBoxModel();
-            if (item == null) {
-                return r; // it's empty
+            if (item != null && item.hasPermission(Item.EXTENDED_READ)
+                    || Jenkins.get().getACL().hasPermission(Jenkins.READ)) {
+                ListBoxModel items = new ListBoxModel();
+                for (MavenPublisherStrategy publisherStrategy : MavenPublisherStrategy.values()) {
+                    items.add(publisherStrategy.getDescription(), publisherStrategy.name());
+                }
+                return items;
             }
-            item.checkPermission(Item.EXTENDED_READ);
-            for (MavenPublisherStrategy publisherStrategy : MavenPublisherStrategy.values()) {
-                r.add(publisherStrategy.getDescription(), publisherStrategy.name());
-            }
-            return r;
+            return new ListBoxModel();
         }
 
         /**
