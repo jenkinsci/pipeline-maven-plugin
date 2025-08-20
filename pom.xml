@@ -77,7 +77,6 @@
     <module>pipeline-maven-api</module>
     <module>pipeline-maven-database</module>
     <module>pipeline-maven-spy</module>
-    <module>pipeline-maven-ui-tests</module>
   </modules>
 
   <scm child.scm.connection.inherit.append.path="false" child.scm.developerConnection.inherit.append.path="false" child.scm.url.inherit.append.path="false">
@@ -320,12 +319,18 @@
 
   <profiles>
     <profile>
-      <id>quick-build</id>
+      <id>ui-tests-on-ci</id>
+      <activation>
+        <property>
+          <name>maven.repo.local</name>
+        </property>
+      </activation>
       <modules>
         <module>pipeline-maven</module>
         <module>pipeline-maven-api</module>
         <module>pipeline-maven-database</module>
         <module>pipeline-maven-spy</module>
+        <module>pipeline-maven-ui-tests</module>
       </modules>
     </profile>
   </profiles>
