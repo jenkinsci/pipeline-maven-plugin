@@ -266,7 +266,7 @@ public class WithMaven extends PageAreaImpl {
         }
 
         public Publisher setLifecycleThreshold(LifecycleThreshold lifecycleThreshold) {
-            this.lifecycleThreshold.set(lifecycleThreshold.toString().toLowerCase());
+            this.lifecycleThreshold.select(lifecycleThreshold.toString().toLowerCase());
             return this;
         }
 

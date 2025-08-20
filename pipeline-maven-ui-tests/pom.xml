@@ -173,4 +173,18 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>no-ui-tests-on-windows</id>
+      <activation>
+        <os>
+          <family>windows</family>
+        </os>
+      </activation>
+      <properties>
+        <maven.test.skip>true</maven.test.skip>
+      </properties>
+    </profile>
+  </profiles>
+
 </project>
