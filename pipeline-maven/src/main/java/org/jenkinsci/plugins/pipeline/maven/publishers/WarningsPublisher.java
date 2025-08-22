@@ -18,6 +18,8 @@ import io.jenkins.plugins.analysis.core.util.ModelValidation;
 import io.jenkins.plugins.analysis.core.util.TrendChartType;
 import io.jenkins.plugins.analysis.core.util.WarningsQualityGate;
 import io.jenkins.plugins.analysis.core.util.WarningsQualityGate.QualityGateType;
+import io.jenkins.plugins.analysis.warnings.Java;
+import io.jenkins.plugins.analysis.warnings.JavaDoc;
 import io.jenkins.plugins.analysis.warnings.MavenConsole;
 import io.jenkins.plugins.analysis.warnings.SpotBugs;
 import io.jenkins.plugins.util.JenkinsFacade;
@@ -84,6 +86,7 @@ public class WarningsPublisher extends MavenPublisher {
         }
 
         perform(List.of(new MavenConsole()), context, listener, "Maven console");
+        perform(List.of(new Java(), new JavaDoc()), context, listener, "Java and JavaDoc");
         List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(
                 mavenSpyLogsElt, FINDBUGS_GROUP_ID, FINDBUGS_ID, FINDBUGS_GOAL, "MojoSucceeded", "MojoFailed");
         if (findbugsEvents.isEmpty()) {
