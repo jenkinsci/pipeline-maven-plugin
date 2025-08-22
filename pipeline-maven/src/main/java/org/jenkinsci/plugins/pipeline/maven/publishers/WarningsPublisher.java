@@ -89,6 +89,14 @@ public class WarningsPublisher extends MavenPublisher {
         perform(List.of(new MavenConsole()), context, listener, "Maven console");
         perform(List.of(new Java(), new JavaDoc()), context, listener, "Java and JavaDoc");
         perform(List.of(taskScanner()), context, listener, "Open tasks");
+        // TODO: PMD
+        /*
+        Map pmdArguments = [tool: pmdParser(pattern: '* * /target/* * /pmd.xml'),
+        */
+        // TODO: CPD
+        /*
+        Map cpdArguments = [tool: cpd(pattern: '* * /target/* * /cpd.xml'),
+        */
         List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(
                 mavenSpyLogsElt, FINDBUGS_GROUP_ID, FINDBUGS_ID, FINDBUGS_GOAL, "MojoSucceeded", "MojoFailed");
         if (findbugsEvents.isEmpty()) {
