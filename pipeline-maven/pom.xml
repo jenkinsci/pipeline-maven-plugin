@@ -40,6 +40,9 @@
   <url>https://github.com/jenkinsci/pipeline-maven-plugin/</url>
 
   <properties>
+    <!-- Breaking changes log
+      In 1333 we introduced the pipeline-database plugin, moving all DAO related stuff into it
+    -->
     <hpi.compatibleSinceVersion>1333</hpi.compatibleSinceVersion>
     <hpi.pluginChangelogUrl>https://github.com/jenkinsci/pipeline-maven-plugin/releases</hpi.pluginChangelogUrl>
   </properties>
