@@ -22,6 +22,7 @@ import io.jenkins.plugins.analysis.warnings.Java;
 import io.jenkins.plugins.analysis.warnings.JavaDoc;
 import io.jenkins.plugins.analysis.warnings.MavenConsole;
 import io.jenkins.plugins.analysis.warnings.SpotBugs;
+import io.jenkins.plugins.analysis.warnings.tasks.OpenTasks;
 import io.jenkins.plugins.util.JenkinsFacade;
 import io.jenkins.plugins.util.QualityGate.QualityGateCriticality;
 import io.jenkins.plugins.util.ValidationUtilities;
@@ -87,6 +88,7 @@ public class WarningsPublisher extends MavenPublisher {
 
         perform(List.of(new MavenConsole()), context, listener, "Maven console");
         perform(List.of(new Java(), new JavaDoc()), context, listener, "Java and JavaDoc");
+        perform(List.of(taskScanner()), context, listener, "Open tasks");
         List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(
                 mavenSpyLogsElt, FINDBUGS_GROUP_ID, FINDBUGS_ID, FINDBUGS_GOAL, "MojoSucceeded", "MojoFailed");
         if (findbugsEvents.isEmpty()) {
@@ -181,6 +183,13 @@ public class WarningsPublisher extends MavenPublisher {
             throw new MavenPipelinePublisherException(
                     "warningsPublisher", "archiving " + kind + " warnings results", e);
         }
+    }
+
+    private OpenTasks taskScanner() {
+        OpenTasks scanner = new OpenTasks();
+        scanner.setIncludePattern("**/*.java");
+        scanner.setExcludePattern("**/target/**");
+        return scanner;
     }
 
     private SpotBugs spotBugs(
