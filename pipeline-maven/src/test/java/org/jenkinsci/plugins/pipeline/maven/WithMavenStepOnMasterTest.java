@@ -31,7 +31,6 @@ import static org.junit.jupiter.api.condition.OS.LINUX;
 import com.cloudbees.hudson.plugins.folder.Folder;
 import com.google.common.base.Predicate;
 import hudson.model.Result;
-import hudson.plugins.tasks.TasksResultAction;
 import hudson.tasks.junit.CaseResult;
 import hudson.tasks.junit.TestResult;
 import hudson.tasks.junit.TestResultAction;
@@ -64,15 +63,13 @@ import org.jenkinsci.plugins.configfiles.maven.job.MvnSettingsProvider;
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.CoveragePublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsNgPublisher;
 import org.jenkinsci.plugins.workflow.actions.LabelAction;
 import org.jenkinsci.plugins.workflow.actions.ThreadNameAction;
 import org.jenkinsci.plugins.workflow.actions.WarningAction;
@@ -246,11 +243,13 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 build);
 
         // verify Task Scanner is called for jenkins.mvn.test:mono-module-maven-app
-        jenkinsRule.assertLogContains(
-                "[withMaven] openTasksPublisher - Scan Tasks for Maven artifact jenkins.mvn.test:mono-module-maven-app:jar:0.1-SNAPSHOT",
-                build);
-        TasksResultAction tasksResultAction = build.getAction(TasksResultAction.class);
-        assertThat(tasksResultAction.getProjectActions()).hasSize(1);
+        // TODO: replace with warningNG
+        // jenkinsRule.assertLogContains("[withMaven] openTasksPublisher - Scan Tasks
+        // for Maven artifact jenkins.mvn.test:mono-module-maven-app:jar:0.1-SNAPSHOT",
+        // build);
+        // TasksResultAction tasksResultAction =
+        // build.getAction(TasksResultAction.class);
+        // assertThat(tasksResultAction.getProjectActions()).hasSize(1);
     }
 
     @Issue("JENKINS-70543")
@@ -384,11 +383,13 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 build);
 
         // verify Task Scanner is called for jenkins.mvn.test:mono-module-maven-app
-        jenkinsRule.assertLogContains(
-                "[withMaven] openTasksPublisher - Scan Tasks for Maven artifact jenkins.mvn.test:mono-module-maven-app:jar:0.1-SNAPSHOT",
-                build);
-        TasksResultAction tasksResultAction = build.getAction(TasksResultAction.class);
-        assertThat(tasksResultAction.getProjectActions()).hasSize(1);
+        // TODO: replace with warningNg
+        // jenkinsRule.assertLogContains("[withMaven] openTasksPublisher - Scan Tasks
+        // for Maven artifact jenkins.mvn.test:mono-module-maven-app:jar:0.1-SNAPSHOT",
+        // build);
+        // TasksResultAction tasksResultAction =
+        // build.getAction(TasksResultAction.class);
+        // assertThat(tasksResultAction.getProjectActions()).hasSize(1);
     }
 
     @Issue("JENKINS-48264")
@@ -440,10 +441,8 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
     private static Stream<Arguments> mavenPublisherDescriptors() {
         return Stream.of(
-                Arguments.of(new FindbugsAnalysisPublisher.DescriptorImpl(), "findbugsPublisher"),
-                Arguments.of(new SpotBugsAnalysisPublisher.DescriptorImpl(), "spotbugsPublisher"),
-                Arguments.of(new TasksScannerPublisher.DescriptorImpl(), "openTasksPublisher"),
                 Arguments.of(new ConcordionTestsPublisher.DescriptorImpl(), "concordionPublisher"),
+                Arguments.of(new CoveragePublisher.DescriptorImpl(), "coveragePublisher"),
                 Arguments.of(new DependenciesFingerprintPublisher.DescriptorImpl(), "dependenciesFingerprintPublisher"),
                 Arguments.of(new GeneratedArtifactsPublisher.DescriptorImpl(), "artifactsPublisher"),
                 Arguments.of(new InvokerRunsPublisher.DescriptorImpl(), "invokerPublisher"),
@@ -451,7 +450,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 Arguments.of(new JunitTestsPublisher.DescriptorImpl(), "junitPublisher"),
                 Arguments.of(new MavenLinkerPublisher2.DescriptorImpl(), "mavenLinkerPublisher"),
                 Arguments.of(new PipelineGraphPublisher.DescriptorImpl(), "pipelineGraphPublisher"),
-                Arguments.of(new CoveragePublisher.DescriptorImpl(), "coveragePublisher"));
+                Arguments.of(new WarningsNgPublisher.DescriptorImpl(), "warningsNgPublisher"));
     }
 
     @ParameterizedTest
@@ -499,44 +498,6 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
         } finally {
             logger.setLevel(level);
         }
-    }
-
-    @Test
-    public void maven_build_jar_project_on_master_with_open_task_scanner_config_succeeds() throws Exception {
-
-        MavenPublisher.DescriptorImpl descriptor = new TasksScannerPublisher.DescriptorImpl();
-        String displayName = descriptor.getDisplayName();
-
-        Symbol symbolAnnotation = descriptor.getClass().getAnnotation(Symbol.class);
-        String[] symbols = symbolAnnotation.value();
-        assertThat(new String[] {"openTasksPublisher"}).isEqualTo(symbols);
-
-        loadMavenJarProjectInGitRepo(this.gitRepoRule);
-
-        // @formatter:off
-        String pipelineScript = "node() {\n" +
-            "    git($/" + gitRepoRule.toString() + "/$)\n" +
-            "    withMaven(options:[openTasksPublisher(" +
-            "        disabled:false, " +
-            "        pattern:'src/main/java', excludePattern:'a/path'," +
-            "        ignoreCase:true, asRegexp:false, " +
-            "        lowPriorityTaskIdentifiers:'minor', normalPriorityTaskIdentifiers:'todo', highPriorityTaskIdentifiers:'fixme')]) {\n" +
-            "            if (isUnix()) {\n" +
-            "                sh 'mvn package verify'\n" +
-            "            } else {\n" +
-            "                bat 'mvn package verify'\n" +
-            "            }\n" +
-            "    }\n" +
-            "}";
-        // @formatter:on
-
-        WorkflowJob pipeline =
-                jenkinsRule.createProject(WorkflowJob.class, "build-on-master-openTasksPublisher-publisher-config");
-        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
-        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
-
-        String message = "[withMaven] Skip '" + displayName + "' disabled by configuration";
-        jenkinsRule.assertLogNotContains(message, build);
     }
 
     @Test
@@ -605,9 +566,11 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
 
         // verify Task Scanner is called for
         // jenkins.mvn.test:maven-jar-with-flattened-pom
-        jenkinsRule.assertLogContains(
-                "[withMaven] openTasksPublisher - Scan Tasks for Maven artifact jenkins.mvn.test:maven-jar-with-flattened-pom:jar:0.1-SNAPSHOT in source directory",
-                build);
+        // TODO: replace with warningNgPUblisher
+        // jenkinsRule.assertLogContains("[withMaven] openTasksPublisher - Scan Tasks
+        // for Maven artifact
+        // jenkins.mvn.test:maven-jar-with-flattened-pom:jar:0.1-SNAPSHOT in source
+        // directory", build);
     }
 
     @Test
@@ -667,9 +630,10 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 build);
 
         // verify Task Scanner is called for jenkins.mvn.test:test-jenkins-hpi
-        jenkinsRule.assertLogContains(
-                "[withMaven] openTasksPublisher - Scan Tasks for Maven artifact jenkins.mvn.test:test-jenkins-hpi:hpi:0.1-SNAPSHOT in source directory",
-                build);
+        // TODO: replace with warningNgPublisher
+        // jenkinsRule.assertLogContains("[withMaven] openTasksPublisher - Scan Tasks
+        // for Maven artifact jenkins.mvn.test:test-jenkins-hpi:hpi:0.1-SNAPSHOT in
+        // source directory", build);
     }
 
     @Issue("JENKINS-43678")
