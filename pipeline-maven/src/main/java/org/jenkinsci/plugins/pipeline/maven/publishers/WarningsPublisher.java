@@ -10,9 +10,11 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import io.jenkins.plugins.analysis.core.model.Tool;
 import io.jenkins.plugins.analysis.core.steps.RecordIssuesStep;
+import io.jenkins.plugins.analysis.warnings.Cpd;
 import io.jenkins.plugins.analysis.warnings.Java;
 import io.jenkins.plugins.analysis.warnings.JavaDoc;
 import io.jenkins.plugins.analysis.warnings.MavenConsole;
+import io.jenkins.plugins.analysis.warnings.Pmd;
 import io.jenkins.plugins.analysis.warnings.SpotBugs;
 import io.jenkins.plugins.analysis.warnings.tasks.OpenTasks;
 import java.io.File;
@@ -44,6 +46,11 @@ public class WarningsPublisher extends MavenPublisher {
 
     private static final long serialVersionUID = 1L;
 
+    private static final String PMD_GROUP_ID = "org.apache.maven.plugins";
+    private static final String PMD_ID = "maven-pmd-plugin";
+    private static final String PMD_GOAL = "pmd";
+    private static final String CPD_GOAL = "cpd";
+
     private static final String FINDBUGS_GROUP_ID = "org.codehaus.mojo";
     private static final String FINDBUGS_ID = "findbugs-maven-plugin";
     private static final String FINDBUGS_GOAL = "findbugs";
@@ -74,6 +81,28 @@ public class WarningsPublisher extends MavenPublisher {
         perform(List.of(maven(context)), context, listener, "Maven console");
         perform(java(context), context, listener, "Java and JavaDoc");
         perform(List.of(taskScanner(context)), context, listener, "Open tasks");
+        List<Element> pmdEvents = XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt, PMD_GROUP_ID, PMD_ID, PMD_GOAL, "MojoSucceeded", "MojoFailed");
+        if (pmdEvents.isEmpty()) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                listener.getLogger()
+                        .println("[withMaven] warningsPublisher - No " + PMD_GROUP_ID + ":" + PMD_ID + ":" + PMD_GOAL
+                                + " execution found");
+            }
+        } else {
+            processPmd(pmdEvents, context, listener);
+        }
+        List<Element> cpdEvents = XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt, PMD_GROUP_ID, PMD_ID, CPD_GOAL, "MojoSucceeded", "MojoFailed");
+        if (cpdEvents.isEmpty()) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                listener.getLogger()
+                        .println("[withMaven] warningsPublisher - No " + PMD_GROUP_ID + ":" + PMD_ID + ":" + CPD_GOAL
+                                + " execution found");
+            }
+        } else {
+            processCpd(cpdEvents, context, listener);
+        }
         List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(
                 mavenSpyLogsElt, FINDBUGS_GROUP_ID, FINDBUGS_ID, FINDBUGS_GOAL, "MojoSucceeded", "MojoFailed");
         if (findbugsEvents.isEmpty()) {
@@ -96,6 +125,34 @@ public class WarningsPublisher extends MavenPublisher {
         } else {
             processBugs(spotbugsEvents, "spotbugs", "spotbugsXml.xml", context, listener);
         }
+    }
+
+    private void processPmd(List<Element> events, StepContext context, TaskListener listener)
+            throws IOException, InterruptedException {
+        FilePath workspace = context.get(FilePath.class);
+        List<Tool> tools = new ArrayList<>();
+        for (Element event : events) {
+            ResultFile result = extractResultFile(event, "targetDirectory", "pmd.xml", workspace, listener);
+            if (result != null) {
+                tools.add(
+                        pmd(context, result.getMavenArtifact(), result.getPluginInvocation(), result.getResultFile()));
+            }
+        }
+        perform(tools, context, listener, "pmd");
+    }
+
+    private void processCpd(List<Element> events, StepContext context, TaskListener listener)
+            throws IOException, InterruptedException {
+        FilePath workspace = context.get(FilePath.class);
+        List<Tool> tools = new ArrayList<>();
+        for (Element event : events) {
+            ResultFile result = extractResultFile(event, "targetDirectory", "cpd.xml", workspace, listener);
+            if (result != null) {
+                tools.add(
+                        cpd(context, result.getMavenArtifact(), result.getPluginInvocation(), result.getResultFile()));
+            }
+        }
+        perform(tools, context, listener, "cpd");
     }
 
     private void processBugs(
@@ -176,6 +233,34 @@ public class WarningsPublisher extends MavenPublisher {
         tool.setName(name);
         tool.setIncludePattern("**/*.java");
         tool.setExcludePattern("**/target/**");
+        return tool;
+    }
+
+    private Tool pmd(
+            StepContext context,
+            MavenArtifact mavenArtifact,
+            MavenSpyLogProcessor.PluginInvocation pluginInvocation,
+            String reportFile)
+            throws IOException, InterruptedException {
+        Pmd tool = new Pmd();
+        String name = computeName(tool, context) + " " + mavenArtifact.getId() + " " + pluginInvocation.getId();
+        tool.setId(toId(name));
+        tool.setName(name);
+        tool.setPattern(reportFile);
+        return tool;
+    }
+
+    private Tool cpd(
+            StepContext context,
+            MavenArtifact mavenArtifact,
+            MavenSpyLogProcessor.PluginInvocation pluginInvocation,
+            String reportFile)
+            throws IOException, InterruptedException {
+        Cpd tool = new Cpd();
+        String name = computeName(tool, context) + " " + mavenArtifact.getId() + " " + pluginInvocation.getId();
+        tool.setId(toId(name));
+        tool.setName(name);
+        tool.setPattern(reportFile);
         return tool;
     }
 
