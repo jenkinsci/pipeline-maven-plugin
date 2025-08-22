@@ -655,8 +655,7 @@ withMaven(options: [pipelineGraphPublisher(disabled: true, ignoreUpstreamTrigger
         snippetGenerator.selectWithMaven().addPublisher("Warnings Publisher");
 
         assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+                .isEqualTo("""
 withMaven(options: [warningsPublisher()], traceability: true) {
     // some block
 }""");
@@ -681,8 +680,7 @@ withMaven(options: [warningsPublisher()], traceability: true) {
                 .setTasksExcludePattern("**/target/**"));
 
         assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+                .isEqualTo("""
 withMaven(options: [warningsPublisher()], traceability: true) {
     // some block
 }""");
