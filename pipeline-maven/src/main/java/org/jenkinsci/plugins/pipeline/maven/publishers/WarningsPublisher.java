@@ -6,10 +6,20 @@ import static org.springframework.util.ReflectionUtils.makeAccessible;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.FilePath;
+import hudson.model.BuildableItem;
+import hudson.model.Item;
 import hudson.model.Run;
 import hudson.model.TaskListener;
+import hudson.util.ComboBoxModel;
+import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
+import io.jenkins.plugins.analysis.core.filter.ExcludeFile;
 import io.jenkins.plugins.analysis.core.model.Tool;
 import io.jenkins.plugins.analysis.core.steps.RecordIssuesStep;
+import io.jenkins.plugins.analysis.core.util.ModelValidation;
+import io.jenkins.plugins.analysis.core.util.TrendChartType;
+import io.jenkins.plugins.analysis.core.util.WarningsQualityGate;
+import io.jenkins.plugins.analysis.core.util.WarningsQualityGate.QualityGateType;
 import io.jenkins.plugins.analysis.warnings.CheckStyle;
 import io.jenkins.plugins.analysis.warnings.Cpd;
 import io.jenkins.plugins.analysis.warnings.Java;
@@ -18,6 +28,9 @@ import io.jenkins.plugins.analysis.warnings.MavenConsole;
 import io.jenkins.plugins.analysis.warnings.Pmd;
 import io.jenkins.plugins.analysis.warnings.SpotBugs;
 import io.jenkins.plugins.analysis.warnings.tasks.OpenTasks;
+import io.jenkins.plugins.util.JenkinsFacade;
+import io.jenkins.plugins.util.QualityGate.QualityGateCriticality;
+import io.jenkins.plugins.util.ValidationUtilities;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -28,6 +41,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import jenkins.model.Jenkins;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
@@ -38,7 +52,11 @@ import org.jenkinsci.plugins.variant.OptionalExtension;
 import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
+import org.kohsuke.stapler.AncestorInPath;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
+import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.verb.POST;
 import org.w3c.dom.Element;
 
 /**
@@ -67,8 +85,130 @@ public class WarningsPublisher extends MavenPublisher {
     private static final String SPOTBUGS_ID = "spotbugs-maven-plugin";
     private static final String SPOTBUGS_GOAL = "spotbugs";
 
+    private String sourceCodeEncoding = "UTF-8";
+    private boolean isEnabledForFailure = true;
+    private boolean isBlameDisabled = true;
+    private TrendChartType trendChartType = TrendChartType.TOOLS_ONLY;
+    private int qualityGateThreshold = 1;
+    private QualityGateType qualityGateType = QualityGateType.NEW;
+    private QualityGateCriticality qualityGateCriticality = QualityGateCriticality.UNSTABLE;
+    private String javaIgnorePatterns;
+    private String highPriorityTaskIdentifiers = "FIXME";
+    private String normalPriorityTaskIdentifiers = "TODO";
+    private String tasksIncludePattern = "**/*.java";
+    private String tasksExcludePattern = "**/target/**";
+
     @DataBoundConstructor
     public WarningsPublisher() {}
+
+    public String getSourceCodeEncoding() {
+        return sourceCodeEncoding;
+    }
+
+    @DataBoundSetter
+    public void setSourceCodeEncoding(final String sourceCodeEncoding) {
+        this.sourceCodeEncoding = sourceCodeEncoding;
+    }
+
+    public boolean isEnabledForFailure() {
+        return isEnabledForFailure;
+    }
+
+    @DataBoundSetter
+    public void setEnabledForFailure(final boolean enabledForFailure) {
+        isEnabledForFailure = enabledForFailure;
+    }
+
+    public boolean isSkipBlames() {
+        return isBlameDisabled;
+    }
+
+    @DataBoundSetter
+    public void setSkipBlames(final boolean skipBlames) {
+        isBlameDisabled = skipBlames;
+    }
+
+    public TrendChartType getTrendChartType() {
+        return trendChartType;
+    }
+
+    @DataBoundSetter
+    public void setTrendChartType(final TrendChartType trendChartType) {
+        this.trendChartType = trendChartType;
+    }
+
+    public int getQualityGateThreshold() {
+        return qualityGateThreshold;
+    }
+
+    @DataBoundSetter
+    public void setQualityGateThreshold(int qualityGateThreshold) {
+        this.qualityGateThreshold = qualityGateThreshold;
+    }
+
+    public QualityGateType getQualityGateType() {
+        return qualityGateType;
+    }
+
+    @DataBoundSetter
+    public void setQualityGateType(QualityGateType qualityGateType) {
+        this.qualityGateType = qualityGateType;
+    }
+
+    public QualityGateCriticality getQualityGateCriticality() {
+        return qualityGateCriticality;
+    }
+
+    @DataBoundSetter
+    public void setQualityGateCriticality(QualityGateCriticality qualityGateCriticality) {
+        this.qualityGateCriticality = qualityGateCriticality;
+    }
+
+    public String getJavaIgnorePatterns() {
+        return javaIgnorePatterns;
+    }
+
+    @DataBoundSetter
+    public void setJavaIgnorePatterns(String javaIgnorePatterns) {
+        this.javaIgnorePatterns =
+                javaIgnorePatterns != null && !javaIgnorePatterns.isEmpty() ? javaIgnorePatterns : null;
+    }
+
+    public String getHighPriorityTaskIdentifiers() {
+        return highPriorityTaskIdentifiers;
+    }
+
+    @DataBoundSetter
+    public void setHighPriorityTaskIdentifiers(String highPriorityTaskIdentifiers) {
+        this.highPriorityTaskIdentifiers = highPriorityTaskIdentifiers;
+    }
+
+    public String getNormalPriorityTaskIdentifiers() {
+        return normalPriorityTaskIdentifiers;
+    }
+
+    @DataBoundSetter
+    public void setNormalPriorityTaskIdentifiers(String normalPriorityTaskIdentifiers) {
+        this.normalPriorityTaskIdentifiers = normalPriorityTaskIdentifiers;
+    }
+
+    public String getTasksIncludePattern() {
+        return tasksIncludePattern;
+    }
+
+    @DataBoundSetter
+    public void setTasksIncludePattern(String tasksIncludePattern) {
+        this.tasksIncludePattern = tasksIncludePattern;
+    }
+
+    public String getTasksExcludePattern() {
+        return tasksExcludePattern;
+    }
+
+    @DataBoundSetter
+    public void setTasksExcludePattern(String tasksExcludePattern) {
+        this.tasksExcludePattern = tasksExcludePattern;
+    }
 
     @Override
     public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt)
@@ -86,9 +226,13 @@ public class WarningsPublisher extends MavenPublisher {
             return;
         }
 
-        perform(List.of(maven(context)), context, listener, "Maven console");
-        perform(java(context), context, listener, "Java and JavaDoc");
-        perform(List.of(taskScanner(context)), context, listener, "Open tasks");
+        perform(List.of(maven(context)), context, listener, "Maven console", step -> {});
+        perform(java(context), context, listener, "Java and JavaDoc", step -> {
+            if (javaIgnorePatterns != null && !javaIgnorePatterns.isEmpty()) {
+                step.setFilters(List.of(new ExcludeFile(javaIgnorePatterns)));
+            }
+        });
+        perform(List.of(taskScanner(context)), context, listener, "Open tasks", step -> {});
         List<Element> pmdEvents = XmlUtils.getExecutionEventsByPlugin(
                 mavenSpyLogsElt, PMD_GROUP_ID, PMD_ID, PMD_GOAL, "MojoSucceeded", "MojoFailed");
         if (pmdEvents.isEmpty()) {
@@ -163,7 +307,7 @@ public class WarningsPublisher extends MavenPublisher {
                         pmd(context, result.getMavenArtifact(), result.getPluginInvocation(), result.getResultFile()));
             }
         }
-        perform(tools, context, listener, "pmd");
+        perform(tools, context, listener, "pmd", this::configureQualityGate);
     }
 
     private void processCpd(List<Element> events, StepContext context, TaskListener listener)
@@ -183,7 +327,7 @@ public class WarningsPublisher extends MavenPublisher {
                         cpd(context, result.getMavenArtifact(), result.getPluginInvocation(), result.getResultFile()));
             }
         }
-        perform(tools, context, listener, "cpd");
+        perform(tools, context, listener, "cpd", this::configureQualityGate);
     }
 
     private void processCheckstyle(List<Element> events, StepContext context, TaskListener listener)
@@ -226,7 +370,7 @@ public class WarningsPublisher extends MavenPublisher {
                         context, result.getMavenArtifact(), result.getPluginInvocation(), result.getResultFile()));
             }
         }
-        perform(tools, context, listener, "findbugs");
+        perform(tools, context, listener, "findbugs", this::configureQualityGate);
     }
 
     private void processSpotBugs(List<Element> events, StepContext context, TaskListener listener)
@@ -247,10 +391,15 @@ public class WarningsPublisher extends MavenPublisher {
                         context, result.getMavenArtifact(), result.getPluginInvocation(), result.getResultFile()));
             }
         }
-        perform(tools, context, listener, "spotbugs");
+        perform(tools, context, listener, "spotbugs", this::configureQualityGate);
     }
 
-    private void perform(List<Tool> tools, StepContext context, TaskListener listener, String kind) {
+    private void perform(
+            List<Tool> tools,
+            StepContext context,
+            TaskListener listener,
+            String kind,
+            Consumer<RecordIssuesStep> stepConfigurer) {
 
         if (tools == null || tools.isEmpty()) {
             return;
@@ -259,6 +408,7 @@ public class WarningsPublisher extends MavenPublisher {
         listener.getLogger().println("[withMaven] warningsPublisher - Processing " + kind + " warnings");
         RecordIssuesStep step = new RecordIssuesStep();
         step.setTools(tools);
+        stepConfigurer.accept(step);
 
         try {
             StepExecution stepExecution = step.start(context);
@@ -311,8 +461,10 @@ public class WarningsPublisher extends MavenPublisher {
         String name = computeName(tool, context);
         tool.setId(toId(name));
         tool.setName(name);
-        tool.setIncludePattern("**/*.java");
-        tool.setExcludePattern("**/target/**");
+        tool.setIncludePattern(tasksIncludePattern);
+        tool.setExcludePattern(tasksExcludePattern);
+        tool.setHighTags(highPriorityTaskIdentifiers);
+        tool.setNormalTags(normalPriorityTaskIdentifiers);
         return tool;
     }
 
@@ -370,6 +522,15 @@ public class WarningsPublisher extends MavenPublisher {
         tool.setName(name);
         tool.setPattern(reportFile);
         return tool;
+    }
+
+    private void configureQualityGate(RecordIssuesStep step) {
+        step.setEnabledForFailure(isEnabledForFailure);
+        step.setSourceCodeEncoding(sourceCodeEncoding);
+        step.setSkipBlames(isBlameDisabled);
+        step.setTrendChartType(trendChartType);
+        step.setQualityGates(
+                List.of(new WarningsQualityGate(qualityGateThreshold, qualityGateType, qualityGateCriticality)));
     }
 
     private ResultFile extractResultFile(
@@ -465,6 +626,10 @@ public class WarningsPublisher extends MavenPublisher {
     @Symbol("warningsPublisher")
     @OptionalExtension(requirePlugins = "warnings-ng")
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
+        private static final ValidationUtilities VALIDATION_UTILITIES = new ValidationUtilities();
+        private static final JenkinsFacade JENKINS = new JenkinsFacade();
+        private final ModelValidation model = new ModelValidation();
+
         @NonNull
         @Override
         public String getDisplayName() {
@@ -480,6 +645,67 @@ public class WarningsPublisher extends MavenPublisher {
         @Override
         public String getSkipFileName() {
             return ".skip-publish-warnings";
+        }
+
+        @POST
+        public ComboBoxModel doFillSourceCodeEncodingItems(@AncestorInPath final BuildableItem project) {
+            if (JENKINS.hasPermission(Item.READ, project)) {
+                return VALIDATION_UTILITIES.getAllCharsets();
+            }
+            return new ComboBoxModel();
+        }
+
+        @POST
+        public FormValidation doCheckSourceCodeEncoding(
+                @AncestorInPath final BuildableItem project, @QueryParameter final String sourceCodeEncoding) {
+            if (!JENKINS.hasPermission(Item.CONFIGURE, project)) {
+                return FormValidation.ok();
+            }
+            return VALIDATION_UTILITIES.validateCharset(sourceCodeEncoding);
+        }
+
+        @POST
+        public ListBoxModel doFillTrendChartTypeItems() {
+            if (JENKINS.hasPermission(Jenkins.READ)) {
+                return model.getAllTrendChartTypes();
+            }
+            return new ListBoxModel();
+        }
+
+        @POST
+        public ListBoxModel doFillQualityGateTypeItems() {
+            var model = new ListBoxModel();
+            if (JENKINS.hasPermission(Jenkins.READ)) {
+                for (QualityGateType qualityGateType : QualityGateType.values()) {
+                    model.add(qualityGateType.getDisplayName(), qualityGateType.name());
+                }
+            }
+            return model;
+        }
+
+        @POST
+        public ListBoxModel doFillQualityGateCriticalityItems(@AncestorInPath final BuildableItem project) {
+            if (JENKINS.hasPermission(Jenkins.READ)) {
+                var options = new ListBoxModel();
+                options.add(Messages.QualityGate_UnstableStage(), QualityGateCriticality.NOTE.name());
+                options.add(Messages.QualityGate_UnstableRun(), QualityGateCriticality.UNSTABLE.name());
+                options.add(Messages.QualityGate_FailureStage(), QualityGateCriticality.ERROR.name());
+                options.add(Messages.QualityGate_FailureRun(), QualityGateCriticality.FAILURE.name());
+                return options;
+            }
+            return new ListBoxModel();
+        }
+
+        @POST
+        public FormValidation doCheckQualityGateThreshold(
+                @AncestorInPath final BuildableItem project, @QueryParameter final int qualityGateThreshold) {
+            if (!JENKINS.hasPermission(Item.CONFIGURE, project)) {
+                return FormValidation.ok();
+            }
+            if (qualityGateThreshold > 0) {
+                return FormValidation.ok();
+            }
+            return FormValidation.error(Messages.FieldValidator_Error_NegativeThreshold());
         }
     }
 }
