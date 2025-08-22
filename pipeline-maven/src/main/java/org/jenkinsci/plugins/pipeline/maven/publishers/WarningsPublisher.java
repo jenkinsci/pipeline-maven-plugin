@@ -97,6 +97,10 @@ public class WarningsPublisher extends MavenPublisher {
         /*
         Map cpdArguments = [tool: cpd(pattern: '* * /target/* * /cpd.xml'),
         */
+        // TODO: Checkstyle
+        /*
+        Map checkstyleArguments = [tool: checkStyle(pattern: '* * /target/* * /checkstyle-result.xml'),
+        */
         List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(
                 mavenSpyLogsElt, FINDBUGS_GROUP_ID, FINDBUGS_ID, FINDBUGS_GOAL, "MojoSucceeded", "MojoFailed");
         if (findbugsEvents.isEmpty()) {
