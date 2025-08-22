@@ -32,9 +32,9 @@ import org.w3c.dom.Element;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class WarningsNgPublisher extends MavenPublisher {
+public class WarningsPublisher extends MavenPublisher {
 
-    private static final Logger LOGGER = Logger.getLogger(WarningsNgPublisher.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(WarningsPublisher.class.getName());
 
     private static final long serialVersionUID = 1L;
 
@@ -43,7 +43,7 @@ public class WarningsNgPublisher extends MavenPublisher {
     private static final String SPOTBUGS_GOAL = "spotbugs";
 
     @DataBoundConstructor
-    public WarningsNgPublisher() {}
+    public WarningsPublisher() {}
 
     @Override
     public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt)
@@ -83,7 +83,7 @@ public class WarningsNgPublisher extends MavenPublisher {
         if (spotbugsEvents.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger()
-                        .println("[withMaven] warningsNgPublisher - No " + SPOTBUGS_GOAL + " execution found");
+                        .println("[withMaven] warningsPublisher - No " + SPOTBUGS_GOAL + " execution found");
             }
             return;
         }
@@ -104,7 +104,7 @@ public class WarningsNgPublisher extends MavenPublisher {
             if (xmlOutputDirectoryElt == null) {
                 listener.getLogger()
                         .println(
-                                "[withMaven] warningsNgPublisher - No <xmlOutputDirectoryElt> element found for <plugin> in "
+                                "[withMaven] warningsPublisher - No <xmlOutputDirectoryElt> element found for <plugin> in "
                                         + XmlUtils.toString(spotBugsTestEvent));
                 continue;
             }
@@ -114,7 +114,7 @@ public class WarningsNgPublisher extends MavenPublisher {
                 if (projectBuildDirectory == null || projectBuildDirectory.isEmpty()) {
                     listener.getLogger()
                             .println(
-                                    "[withMaven] warningsNgPublisher - '${project.build.directory}' found for <project> in "
+                                    "[withMaven] warningsPublisher - '${project.build.directory}' found for <project> in "
                                             + XmlUtils.toString(spotBugsTestEvent));
                     continue;
                 }
@@ -125,7 +125,7 @@ public class WarningsNgPublisher extends MavenPublisher {
                 String baseDir = projectElt.getAttribute("baseDir");
                 if (baseDir.isEmpty()) {
                     listener.getLogger()
-                            .println("[withMaven] warningsNgPublisher - '${basedir}' found for <project> in "
+                            .println("[withMaven] warningsPublisher - '${basedir}' found for <project> in "
                                     + XmlUtils.toString(spotBugsTestEvent));
                     continue;
                 }
@@ -159,7 +159,7 @@ public class WarningsNgPublisher extends MavenPublisher {
                     listener,
                     new PipelineResultHandler(run, context.get(FlowNode.class)));
         } catch (Exception ex) {
-            throw new MavenPipelinePublisherException("warningsNgPublisher", "archiving " + kind + " reports", ex);
+            throw new MavenPipelinePublisherException("warningsPublisher", "archiving " + kind + " reports", ex);
         }
     }
 
@@ -175,13 +175,13 @@ public class WarningsNgPublisher extends MavenPublisher {
         return spotBugs;
     }
 
-    @Symbol("warningsNgPublisher")
+    @Symbol("warningsPublisher")
     @OptionalExtension(requirePlugins = "warnings-ng")
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @NonNull
         @Override
         public String getDisplayName() {
-            return Messages.publisher_warningsng_description();
+            return Messages.publisher_warnings_description();
         }
 
         @Override
@@ -192,7 +192,7 @@ public class WarningsNgPublisher extends MavenPublisher {
         @NonNull
         @Override
         public String getSkipFileName() {
-            return ".skip-publish-warningsng";
+            return ".skip-publish-warnings";
         }
     }
 }

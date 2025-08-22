@@ -32,7 +32,7 @@ publisherOptions:
     includeScopeTest: true
     lifecycleThreshold: "install"
     skipDownstreamTriggers: true
-- warningsNgPublisher:
+- warningsPublisher:
     disabled: true
 triggerDownstreamUponResultAborted: false
 triggerDownstreamUponResultFailure: false

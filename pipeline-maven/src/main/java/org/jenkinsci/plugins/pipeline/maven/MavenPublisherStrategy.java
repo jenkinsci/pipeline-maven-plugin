@@ -19,7 +19,7 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher
 import org.jenkinsci.plugins.pipeline.maven.publishers.JacocoReportPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsNgPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsPublisher;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -31,11 +31,11 @@ public enum MavenPublisherStrategy {
                 JacocoReportPublisher.DescriptorImpl.class,
                         List.of("Jacoco", new CoveragePublisher.DescriptorImpl().getDisplayName()),
                 FindbugsAnalysisPublisher.DescriptorImpl.class,
-                        List.of("Findbugs", new WarningsNgPublisher.DescriptorImpl().getDisplayName()),
+                        List.of("Findbugs", new WarningsPublisher.DescriptorImpl().getDisplayName()),
                 SpotBugsAnalysisPublisher.DescriptorImpl.class,
-                        List.of("Findbugs", new WarningsNgPublisher.DescriptorImpl().getDisplayName()),
+                        List.of("Findbugs", new WarningsPublisher.DescriptorImpl().getDisplayName()),
                 TasksScannerPublisher.DescriptorImpl.class,
-                        List.of("Tasks", new WarningsNgPublisher.DescriptorImpl().getDisplayName()));
+                        List.of("Tasks", new WarningsPublisher.DescriptorImpl().getDisplayName()));
 
         /**
          * <p>Build the list of {@link MavenPublisher}s that should be invoked for the build execution of the given {@link TaskListener}

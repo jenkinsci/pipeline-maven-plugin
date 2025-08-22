@@ -29,7 +29,7 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsNgPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.FakeCredentialsProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -118,8 +118,8 @@ public class GlobalPipelineMavenConfigTest {
         pipelineGraphPublisher.setLifecycleThreshold("install");
         pipelineGraphPublisher.setSkipDownstreamTriggers(true);
 
-        WarningsNgPublisher warningsNgPublisher = new WarningsNgPublisher();
-        warningsNgPublisher.setDisabled(true);
+        WarningsPublisher warningsPublisher = new WarningsPublisher();
+        warningsPublisher.setDisabled(true);
 
         c.setPublisherOptions(List.of(
                 concordionTestsPublisher,
@@ -131,7 +131,7 @@ public class GlobalPipelineMavenConfigTest {
                 junitTestsPublisher,
                 mavenLinkerPublisher,
                 pipelineGraphPublisher,
-                warningsNgPublisher));
+                warningsPublisher));
 
         j.configRoundtrip();
 

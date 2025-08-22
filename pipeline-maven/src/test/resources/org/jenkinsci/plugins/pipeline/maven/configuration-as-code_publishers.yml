@@ -36,5 +36,5 @@ tool:
         includeScopeTest: true
         lifecycleThreshold: "install"
         skipDownstreamTriggers: true
-    - warningsNgPublisher:
+    - warningsPublisher:
         disabled: true

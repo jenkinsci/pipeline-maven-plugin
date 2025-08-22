@@ -19,7 +19,7 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsNgPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsPublisher;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
@@ -197,10 +197,10 @@ public class ConfigurationAsCodeTest {
         assertThat(pipelineGraphPublisher.getLifecycleThreshold()).isEqualTo("install");
         assertThat(pipelineGraphPublisher.isSkipDownstreamTriggers()).isTrue();
 
-        assertThat(config.getPublisherOptions().get(9)).isInstanceOf(WarningsNgPublisher.class);
-        WarningsNgPublisher warningsNgPublisher =
-                (WarningsNgPublisher) config.getPublisherOptions().get(9);
-        assertThat(warningsNgPublisher.isDisabled()).isTrue();
+        assertThat(config.getPublisherOptions().get(9)).isInstanceOf(WarningsPublisher.class);
+        WarningsPublisher warningsPublisher =
+                (WarningsPublisher) config.getPublisherOptions().get(9);
+        assertThat(warningsPublisher.isDisabled()).isTrue();
 
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);

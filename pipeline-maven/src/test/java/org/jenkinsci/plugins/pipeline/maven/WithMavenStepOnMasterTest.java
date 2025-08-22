@@ -69,7 +69,7 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsNgPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsPublisher;
 import org.jenkinsci.plugins.workflow.actions.LabelAction;
 import org.jenkinsci.plugins.workflow.actions.ThreadNameAction;
 import org.jenkinsci.plugins.workflow.actions.WarningAction;
@@ -450,7 +450,7 @@ public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
                 Arguments.of(new JunitTestsPublisher.DescriptorImpl(), "junitPublisher"),
                 Arguments.of(new MavenLinkerPublisher2.DescriptorImpl(), "mavenLinkerPublisher"),
                 Arguments.of(new PipelineGraphPublisher.DescriptorImpl(), "pipelineGraphPublisher"),
-                Arguments.of(new WarningsNgPublisher.DescriptorImpl(), "warningsNgPublisher"));
+                Arguments.of(new WarningsPublisher.DescriptorImpl(), "warningsPublisher"));
     }
 
     @ParameterizedTest

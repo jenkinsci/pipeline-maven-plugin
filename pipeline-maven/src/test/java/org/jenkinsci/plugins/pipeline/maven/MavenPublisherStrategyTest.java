@@ -17,7 +17,7 @@ import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsNgPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsPublisher;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
@@ -51,6 +51,6 @@ public class MavenPublisherStrategyTest {
         assertThat(reportersByDescriptorId).containsKey(new JunitTestsPublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new MavenLinkerPublisher2.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new PipelineGraphPublisher.DescriptorImpl().getId());
-        assertThat(reportersByDescriptorId).containsKey(new WarningsNgPublisher.DescriptorImpl().getId());
+        assertThat(reportersByDescriptorId).containsKey(new WarningsPublisher.DescriptorImpl().getId());
     }
 }

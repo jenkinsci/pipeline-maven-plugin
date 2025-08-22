@@ -58,7 +58,7 @@ public class FindbugsAnalysisPublisher extends MavenPublisher {
         throw new AbortException(
                 """
         The findbugsPublisher is deprecated as is the findbugs plugin and you should not use it.
-        Alternatively, you should rely on warningsNgPublisher.
+        Alternatively, you should rely on warningsPublisher.
         Or, if continuing to use the findbugs plugin for now, run it explicitly rather than expecting withMaven to run it implicitly.
         """);
     }

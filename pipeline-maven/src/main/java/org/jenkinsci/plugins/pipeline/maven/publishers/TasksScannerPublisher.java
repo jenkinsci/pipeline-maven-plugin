@@ -34,7 +34,7 @@ public class TasksScannerPublisher extends MavenPublisher {
         throw new AbortException(
                 """
         The openTasksPublisher is deprecated as is the tasks plugin and you should not use it.
-        Alternatively, you should rely on warningsNgPublisher.
+        Alternatively, you should rely on warningsPublisher.
         Or, if continuing to use the tasks plugin for now, run it explicitly rather than expecting withMaven to run it implicitly.
         """);
     }
