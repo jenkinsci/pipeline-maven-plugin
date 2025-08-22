@@ -6,10 +6,13 @@ import static io.jenkins.plugins.casc.misc.Util.toYamlString;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.jenkins.plugins.analysis.core.util.TrendChartType;
+import io.jenkins.plugins.analysis.core.util.WarningsQualityGate.QualityGateType;
 import io.jenkins.plugins.casc.ConfigurationAsCode;
 import io.jenkins.plugins.casc.ConfigurationContext;
 import io.jenkins.plugins.casc.ConfiguratorRegistry;
 import io.jenkins.plugins.prism.SourceCodeRetention;
+import io.jenkins.plugins.util.QualityGate.QualityGateCriticality;
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.CoveragePublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
@@ -201,6 +204,18 @@ public class ConfigurationAsCodeTest {
         WarningsPublisher warningsPublisher =
                 (WarningsPublisher) config.getPublisherOptions().get(9);
         assertThat(warningsPublisher.isDisabled()).isTrue();
+        assertThat(warningsPublisher.getSourceCodeEncoding()).isEqualTo("ISO-8859-15");
+        assertThat(warningsPublisher.isEnabledForFailure()).isFalse();
+        assertThat(warningsPublisher.isSkipBlames()).isFalse();
+        assertThat(warningsPublisher.getTrendChartType()).isEqualTo(TrendChartType.NONE);
+        assertThat(warningsPublisher.getQualityGateThreshold()).isEqualTo(10);
+        assertThat(warningsPublisher.getQualityGateType()).isEqualTo(QualityGateType.DELTA);
+        assertThat(warningsPublisher.getQualityGateCriticality()).isEqualTo(QualityGateCriticality.ERROR);
+        assertThat(warningsPublisher.getJavaIgnorePatterns()).isEqualTo("**/*Test.java");
+        assertThat(warningsPublisher.getHighPriorityTaskIdentifiers()).isEqualTo("FIX");
+        assertThat(warningsPublisher.getNormalPriorityTaskIdentifiers()).isEqualTo("TO-DO");
+        assertThat(warningsPublisher.getTasksIncludePattern()).isEqualTo("**/*.*");
+        assertThat(warningsPublisher.getTasksExcludePattern()).isEqualTo("**/target/*.*");
 
         ConfiguratorRegistry registry = ConfiguratorRegistry.get();
         ConfigurationContext context = new ConfigurationContext(registry);

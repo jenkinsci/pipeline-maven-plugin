@@ -38,3 +38,15 @@ tool:
         skipDownstreamTriggers: true
     - warningsPublisher:
         disabled: true
+        enabledForFailure: false
+        highPriorityTaskIdentifiers: "FIX"
+        javaIgnorePatterns: "**/*Test.java"
+        normalPriorityTaskIdentifiers: "TO-DO"
+        qualityGateCriticality: "ERROR"
+        qualityGateThreshold: 10
+        qualityGateType: "DELTA"
+        skipBlames: false
+        sourceCodeEncoding: "ISO-8859-15"
+        tasksExcludePattern: "**/target/*.*"
+        tasksIncludePattern: "**/*.*"
+        trendChartType: "NONE"

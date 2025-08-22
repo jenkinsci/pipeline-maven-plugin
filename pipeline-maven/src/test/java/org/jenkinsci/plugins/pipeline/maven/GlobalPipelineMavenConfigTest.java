@@ -8,7 +8,10 @@ import com.mysql.cj.jdbc.ConnectionImpl;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariProxyConnection;
 import hudson.ExtensionList;
+import io.jenkins.plugins.analysis.core.util.TrendChartType;
+import io.jenkins.plugins.analysis.core.util.WarningsQualityGate.QualityGateType;
 import io.jenkins.plugins.prism.SourceCodeRetention;
+import io.jenkins.plugins.util.QualityGate.QualityGateCriticality;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
@@ -120,6 +123,18 @@ public class GlobalPipelineMavenConfigTest {
 
         WarningsPublisher warningsPublisher = new WarningsPublisher();
         warningsPublisher.setDisabled(true);
+        warningsPublisher.setSourceCodeEncoding("ISO-8859-15");
+        warningsPublisher.setEnabledForFailure(false);
+        warningsPublisher.setSkipBlames(false);
+        warningsPublisher.setTrendChartType(TrendChartType.NONE);
+        warningsPublisher.setQualityGateThreshold(10);
+        warningsPublisher.setQualityGateType(QualityGateType.DELTA);
+        warningsPublisher.setQualityGateCriticality(QualityGateCriticality.ERROR);
+        warningsPublisher.setJavaIgnorePatterns("**/*Test.java");
+        warningsPublisher.setHighPriorityTaskIdentifiers("FIX");
+        warningsPublisher.setNormalPriorityTaskIdentifiers("TO-DO");
+        warningsPublisher.setTasksIncludePattern("**/*.*");
+        warningsPublisher.setTasksExcludePattern("**/target/*.*");
 
         c.setPublisherOptions(List.of(
                 concordionTestsPublisher,

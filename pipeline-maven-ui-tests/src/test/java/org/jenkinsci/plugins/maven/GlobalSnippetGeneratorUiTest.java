@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.jenkinsci.plugins.maven.WithMaven.LifecycleThreshold;
 import org.jenkinsci.plugins.maven.WithMaven.PublisherStrategy;
+import org.jenkinsci.plugins.maven.WithMaven.QualityGateCriticality;
+import org.jenkinsci.plugins.maven.WithMaven.QualityGateType;
 import org.jenkinsci.plugins.maven.WithMaven.SourceCodeRetention;
+import org.jenkinsci.plugins.maven.WithMaven.TrendChartType;
 import org.jenkinsci.test.acceptance.junit.AbstractJUnitTest;
 import org.jenkinsci.test.acceptance.junit.WithPlugins;
 import org.jenkinsci.test.acceptance.plugins.config_file_provider.ConfigFileProvider;
@@ -641,6 +644,72 @@ withMaven(options: [pipelineGraphPublisher()], traceability: true) {
                 .isEqualTo(
                         """
 withMaven(options: [pipelineGraphPublisher(disabled: true, ignoreUpstreamTriggers: true, includeReleaseVersions: true, includeScopeCompile: false, includeScopeProvided: false, includeScopeRuntime: false, includeScopeTest: true, includeSnapshotVersions: false, lifecycleThreshold: 'package', skipDownstreamTriggers: true)], traceability: true) {
+    // some block
+}""");
+    }
+
+    @Test
+    public void defaultWarningsPublisherTest() throws InterruptedException {
+        WithMavenSnippetGenerator snippetGenerator = createSnippetGenerator();
+
+        snippetGenerator.selectWithMaven().addPublisher("Warnings Publisher");
+
+        assertThat(snippetGenerator.generateScript())
+                .isEqualTo(
+                        """
+withMaven(options: [warningsPublisher()], traceability: true) {
+    // some block
+}""");
+    }
+
+    @Test
+    public void defaultWarningsPublisherExplicitTest() {
+        WithMavenSnippetGenerator snippetGenerator = createSnippetGenerator();
+
+        snippetGenerator.selectWithMaven().addPublisher("Warnings Publisher", p -> p.setDisabled(false)
+                .setSourceCodeEncoding("UTF-8")
+                .setIsEnabledForFailure(true)
+                .setIsBlameDisabled(true)
+                .setTrendChartType(TrendChartType.TOOLS_ONLY)
+                .setQualityGateThreshold(1)
+                .setQualityGateType(QualityGateType.NEW)
+                .setQualityGateCriticality(QualityGateCriticality.UNSTABLE)
+                .setJavaIgnorePatterns("")
+                .setHighPriorityTaskIdentifiers("FIXME")
+                .setNormalPriorityTaskIdentifiers("TODO")
+                .setTasksIncludePattern("**/*.java")
+                .setTasksExcludePattern("**/target/**"));
+
+        assertThat(snippetGenerator.generateScript())
+                .isEqualTo(
+                        """
+withMaven(options: [warningsPublisher()], traceability: true) {
+    // some block
+}""");
+    }
+
+    @Test
+    public void explicitWarningsPublisherTest() {
+        WithMavenSnippetGenerator snippetGenerator = createSnippetGenerator();
+
+        snippetGenerator.selectWithMaven().addPublisher("Warnings Publisher", p -> p.setDisabled(true)
+                .setSourceCodeEncoding("ISO-8859-1")
+                .setIsEnabledForFailure(false)
+                .setIsBlameDisabled(false)
+                .setTrendChartType(TrendChartType.NONE)
+                .setQualityGateThreshold(2)
+                .setQualityGateType(QualityGateType.DELTA)
+                .setQualityGateCriticality(QualityGateCriticality.FAILURE)
+                .setJavaIgnorePatterns("**/*Test.java")
+                .setHighPriorityTaskIdentifiers("FIX")
+                .setNormalPriorityTaskIdentifiers("TO-DO")
+                .setTasksIncludePattern("*.java")
+                .setTasksExcludePattern("target"));
+
+        assertThat(snippetGenerator.generateScript())
+                .isEqualTo(
+                        """
+withMaven(options: [warningsPublisher(disabled: true, enabledForFailure: false, highPriorityTaskIdentifiers: 'FIX', javaIgnorePatterns: '**/*Test.java', normalPriorityTaskIdentifiers: 'TO-DO', qualityGateCriticality: 'FAILURE', qualityGateThreshold: 2, qualityGateType: 'DELTA', skipBlames: false, sourceCodeEncoding: 'ISO-8859-1', tasksExcludePattern: 'target', tasksIncludePattern: '*.java', trendChartType: 'NONE')], traceability: true) {
     // some block
 }""");
     }
