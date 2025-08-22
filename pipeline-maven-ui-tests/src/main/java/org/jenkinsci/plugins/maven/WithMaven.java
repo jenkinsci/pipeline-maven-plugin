@@ -1,7 +1,6 @@
 package org.jenkinsci.plugins.maven;
 
 import java.util.function.Consumer;
-
 import org.jenkinsci.test.acceptance.po.Control;
 import org.jenkinsci.test.acceptance.po.Describable;
 import org.jenkinsci.test.acceptance.po.PageArea;
@@ -330,63 +329,63 @@ public class WithMaven extends PageAreaImpl {
         }
 
         public Publisher setSourceCodeEncoding(String sourceCodeEncoding) {
-			this.sourceCodeEncoding.set(sourceCodeEncoding);
+            this.sourceCodeEncoding.set(sourceCodeEncoding);
             return this;
-		}
+        }
 
         public Publisher setIsEnabledForFailure(boolean isEnabledForFailure) {
-			this.isEnabledForFailure.check(isEnabledForFailure);
+            this.isEnabledForFailure.check(isEnabledForFailure);
             return this;
-		}
+        }
 
         public Publisher setIsBlameDisabled(boolean isBlameDisabled) {
-			this.isBlameDisabled.check(isBlameDisabled);
+            this.isBlameDisabled.check(isBlameDisabled);
             return this;
-		}
+        }
 
         public Publisher setTrendChartType(TrendChartType trendChartType) {
-			this.trendChartType.select(trendChartType.toString());
+            this.trendChartType.select(trendChartType.toString());
             return this;
-		}
+        }
 
         public Publisher setQualityGateThreshold(int qualityGateThreshold) {
-			this.qualityGateThreshold.set(qualityGateThreshold);
+            this.qualityGateThreshold.set(qualityGateThreshold);
             return this;
-		}
+        }
 
         public Publisher setQualityGateType(QualityGateType qualityGateType) {
-			this.qualityGateType.select(qualityGateType.toString());
+            this.qualityGateType.select(qualityGateType.toString());
             return this;
-		}
+        }
 
         public Publisher setQualityGateCriticality(QualityGateCriticality qualityGateCriticality) {
-			this.qualityGateCriticality.select(qualityGateCriticality.toString());
+            this.qualityGateCriticality.select(qualityGateCriticality.toString());
             return this;
-		}
+        }
 
         public Publisher setJavaIgnorePatterns(String javaIgnorePatterns) {
-			this.javaIgnorePatterns.set(javaIgnorePatterns);
+            this.javaIgnorePatterns.set(javaIgnorePatterns);
             return this;
-		}
+        }
 
         public Publisher setHighPriorityTaskIdentifiers(String highPriorityTaskIdentifiers) {
-			this.highPriorityTaskIdentifiers.set(highPriorityTaskIdentifiers);
+            this.highPriorityTaskIdentifiers.set(highPriorityTaskIdentifiers);
             return this;
-		}
+        }
 
         public Publisher setNormalPriorityTaskIdentifiers(String normalPriorityTaskIdentifiers) {
-			this.normalPriorityTaskIdentifiers.set(normalPriorityTaskIdentifiers);
+            this.normalPriorityTaskIdentifiers.set(normalPriorityTaskIdentifiers);
             return this;
-		}
+        }
 
         public Publisher setTasksIncludePattern(String tasksIncludePattern) {
-			this.tasksIncludePattern.set(tasksIncludePattern);
+            this.tasksIncludePattern.set(tasksIncludePattern);
             return this;
-		}
+        }
 
         public Publisher setTasksExcludePattern(String tasksExcludePattern) {
-			this.tasksExcludePattern.set(tasksExcludePattern);
+            this.tasksExcludePattern.set(tasksExcludePattern);
             return this;
-		}
+        }
     }
 }

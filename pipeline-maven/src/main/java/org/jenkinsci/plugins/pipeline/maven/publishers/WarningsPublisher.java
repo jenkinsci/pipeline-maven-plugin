@@ -8,6 +8,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.FilePath;
 import hudson.model.BuildableItem;
 import hudson.model.Item;
+import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.util.ComboBoxModel;
 import hudson.util.FormValidation;
@@ -43,6 +44,7 @@ import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
 import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.variant.OptionalExtension;
+import org.jenkinsci.plugins.workflow.graph.FlowNode;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.jenkinsci.plugins.workflow.steps.StepExecution;
 import org.kohsuke.stapler.AncestorInPath;
@@ -210,13 +212,13 @@ public class WarningsPublisher extends MavenPublisher {
             return;
         }
 
-        perform(List.of(new MavenConsole()), context, listener, "Maven console", step -> {});
-        perform(List.of(new Java(), new JavaDoc()), context, listener, "Java and JavaDoc", step -> {
+        perform(List.of(maven(context)), context, listener, "Maven console", step -> {});
+        perform(java(context), context, listener, "Java and JavaDoc", step -> {
             if (javaIgnorePatterns != null && !javaIgnorePatterns.isEmpty()) {
                 step.setFilters(List.of(new ExcludeFile(javaIgnorePatterns)));
             }
         });
-        perform(List.of(taskScanner()), context, listener, "Open tasks", step -> {});
+        perform(List.of(taskScanner(context)), context, listener, "Open tasks", step -> {});
         // TODO: PMD
         /*
         Map pmdArguments = [tool: pmdParser(pattern: '* * /target/* * /pmd.xml'),
@@ -245,8 +247,8 @@ public class WarningsPublisher extends MavenPublisher {
         if (spotbugsEvents.isEmpty()) {
             if (LOGGER.isLoggable(Level.FINE)) {
                 listener.getLogger()
-                        .println("[withMaven] warningsPublisher - No " + SPOTBUGS_GROUP_ID + ":" + SPOTBUGS_ID + ":" + SPOTBUGS_GOAL
-                                + " execution found");
+                        .println("[withMaven] warningsPublisher - No " + SPOTBUGS_GROUP_ID + ":" + SPOTBUGS_ID + ":"
+                                + SPOTBUGS_GOAL + " execution found");
             }
         } else {
             processBugs(spotbugsEvents, "spotbugs", "spotbugsXml.xml", context, listener);
@@ -287,7 +289,8 @@ public class WarningsPublisher extends MavenPublisher {
             }
 
             String resultFile = xmlOutputDirectory + File.separator + reportFilename;
-            tools.add(spotBugs(mavenArtifact, pluginInvocation, XmlUtils.getPathInWorkspace(resultFile, workspace)));
+            tools.add(spotBugs(
+                    context, mavenArtifact, pluginInvocation, XmlUtils.getPathInWorkspace(resultFile, workspace)));
         }
 
         perform(tools, context, listener, kind, step -> {
@@ -342,25 +345,59 @@ public class WarningsPublisher extends MavenPublisher {
         }
     }
 
-    private OpenTasks taskScanner() {
-        OpenTasks scanner = new OpenTasks();
-        scanner.setIncludePattern(tasksIncludePattern);
-        scanner.setExcludePattern(tasksExcludePattern);
-        scanner.setHighTags(highPriorityTaskIdentifiers);
-        scanner.setNormalTags(normalPriorityTaskIdentifiers);
-        return scanner;
+    private MavenConsole maven(StepContext context) throws IOException, InterruptedException {
+        MavenConsole tool = new MavenConsole();
+        String name = computeName(tool, context);
+        tool.setId(toId(name));
+        tool.setName(name);
+        return tool;
+    }
+
+    private List<Tool> java(StepContext context) throws IOException, InterruptedException {
+        Java java = new Java();
+        String name = computeName(java, context);
+        java.setId(toId(name));
+        java.setName(name);
+        JavaDoc javadoc = new JavaDoc();
+        name = computeName(javadoc, context);
+        javadoc.setId(toId(name));
+        javadoc.setName(name);
+        return List.of(java, javadoc);
+    }
+
+    private OpenTasks taskScanner(StepContext context) throws IOException, InterruptedException {
+        OpenTasks tool = new OpenTasks();
+        String name = computeName(tool, context);
+        tool.setId(toId(name));
+        tool.setName(name);
+        tool.setIncludePattern(tasksIncludePattern);
+        tool.setExcludePattern(tasksExcludePattern);
+        tool.setHighTags(highPriorityTaskIdentifiers);
+        tool.setNormalTags(normalPriorityTaskIdentifiers);
+        return tool;
     }
 
     private SpotBugs spotBugs(
+            StepContext context,
             MavenArtifact mavenArtifact,
             MavenSpyLogProcessor.PluginInvocation pluginInvocation,
-            String spotBugsReportFile) {
-        SpotBugs spotBugs = new SpotBugs();
-        String name = spotBugs.getDescriptor().getName() + " " + mavenArtifact.getId() + " " + pluginInvocation.getId();
-        spotBugs.setId(name.replaceAll("[^\\p{Alnum}-_.]", "_"));
-        spotBugs.setName(name);
-        spotBugs.setPattern(spotBugsReportFile);
-        return spotBugs;
+            String spotBugsReportFile)
+            throws IOException, InterruptedException {
+        SpotBugs tool = new SpotBugs();
+        String name = computeName(tool, context) + " " + mavenArtifact.getId() + " " + pluginInvocation.getId();
+        tool.setId(toId(name));
+        tool.setName(name);
+        tool.setPattern(spotBugsReportFile);
+        return tool;
+    }
+
+    private String computeName(Tool tool, StepContext context) throws IOException, InterruptedException {
+        return tool.getDescriptor().getName() + " " + context.get(Run.class).toString() + " "
+                + context.get(FlowNode.class).getId();
+    }
+
+    private String toId(String name) {
+        return name.replaceAll("[^\\p{Alnum}-_.]", "_");
     }
 
     @Symbol("warningsPublisher")
