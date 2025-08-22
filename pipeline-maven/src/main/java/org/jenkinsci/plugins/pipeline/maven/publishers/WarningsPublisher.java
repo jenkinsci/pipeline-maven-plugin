@@ -10,6 +10,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import io.jenkins.plugins.analysis.core.model.Tool;
 import io.jenkins.plugins.analysis.core.steps.RecordIssuesStep;
+import io.jenkins.plugins.analysis.warnings.CheckStyle;
 import io.jenkins.plugins.analysis.warnings.Cpd;
 import io.jenkins.plugins.analysis.warnings.Java;
 import io.jenkins.plugins.analysis.warnings.JavaDoc;
@@ -22,6 +23,9 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jenkinsci.Symbol;
@@ -50,6 +54,10 @@ public class WarningsPublisher extends MavenPublisher {
     private static final String PMD_ID = "maven-pmd-plugin";
     private static final String PMD_GOAL = "pmd";
     private static final String CPD_GOAL = "cpd";
+
+    private static final String CHECKSTYLE_GROUP_ID = "org.apache.maven.plugins";
+    private static final String CHECKSTYLE_ID = "maven-checkstyle-plugin";
+    private static final String CHECKSTYLE_GOAL = "checkstyle";
 
     private static final String FINDBUGS_GROUP_ID = "org.codehaus.mojo";
     private static final String FINDBUGS_ID = "findbugs-maven-plugin";
@@ -103,6 +111,17 @@ public class WarningsPublisher extends MavenPublisher {
         } else {
             processCpd(cpdEvents, context, listener);
         }
+        List<Element> checkstyleEvents = XmlUtils.getExecutionEventsByPlugin(
+                mavenSpyLogsElt, CHECKSTYLE_GROUP_ID, CHECKSTYLE_ID, CHECKSTYLE_GOAL, "MojoSucceeded", "MojoFailed");
+        if (checkstyleEvents.isEmpty()) {
+            if (LOGGER.isLoggable(Level.FINE)) {
+                listener.getLogger()
+                        .println("[withMaven] warningsPublisher - No " + CHECKSTYLE_GROUP_ID + ":" + CHECKSTYLE_ID + ":"
+                                + CHECKSTYLE_GOAL + " execution found");
+            }
+        } else {
+            processCheckstyle(checkstyleEvents, context, listener);
+        }
         List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(
                 mavenSpyLogsElt, FINDBUGS_GROUP_ID, FINDBUGS_ID, FINDBUGS_GOAL, "MojoSucceeded", "MojoFailed");
         if (findbugsEvents.isEmpty()) {
@@ -112,7 +131,7 @@ public class WarningsPublisher extends MavenPublisher {
                                 + FINDBUGS_GOAL + " execution found");
             }
         } else {
-            processBugs(findbugsEvents, "findbugs", "findbugsXml.xml", context, listener);
+            processFindBugs(findbugsEvents, context, listener);
         }
         List<Element> spotbugsEvents = XmlUtils.getExecutionEventsByPlugin(
                 mavenSpyLogsElt, SPOTBUGS_GROUP_ID, SPOTBUGS_ID, SPOTBUGS_GOAL, "MojoSucceeded", "MojoFailed");
@@ -123,7 +142,7 @@ public class WarningsPublisher extends MavenPublisher {
                                 + SPOTBUGS_GOAL + " execution found");
             }
         } else {
-            processBugs(spotbugsEvents, "spotbugs", "spotbugsXml.xml", context, listener);
+            processSpotBugs(spotbugsEvents, context, listener);
         }
     }
 
@@ -132,7 +151,13 @@ public class WarningsPublisher extends MavenPublisher {
         FilePath workspace = context.get(FilePath.class);
         List<Tool> tools = new ArrayList<>();
         for (Element event : events) {
-            ResultFile result = extractResultFile(event, "targetDirectory", "pmd.xml", workspace, listener);
+            ResultFile result = extractResultFile(
+                    event,
+                    "targetDirectory",
+                    null,
+                    (dir, file) -> dir + File.separator + "pmd.xml",
+                    workspace,
+                    listener);
             if (result != null) {
                 tools.add(
                         pmd(context, result.getMavenArtifact(), result.getPluginInvocation(), result.getResultFile()));
@@ -146,7 +171,13 @@ public class WarningsPublisher extends MavenPublisher {
         FilePath workspace = context.get(FilePath.class);
         List<Tool> tools = new ArrayList<>();
         for (Element event : events) {
-            ResultFile result = extractResultFile(event, "targetDirectory", "cpd.xml", workspace, listener);
+            ResultFile result = extractResultFile(
+                    event,
+                    "targetDirectory",
+                    null,
+                    (dir, file) -> dir + File.separator + "cpd.xml",
+                    workspace,
+                    listener);
             if (result != null) {
                 tools.add(
                         cpd(context, result.getMavenArtifact(), result.getPluginInvocation(), result.getResultFile()));
@@ -155,19 +186,68 @@ public class WarningsPublisher extends MavenPublisher {
         perform(tools, context, listener, "cpd");
     }
 
-    private void processBugs(
-            List<Element> events, String kind, String reportFilename, StepContext context, TaskListener listener)
+    private void processCheckstyle(List<Element> events, StepContext context, TaskListener listener)
             throws IOException, InterruptedException {
         FilePath workspace = context.get(FilePath.class);
         List<Tool> tools = new ArrayList<>();
         for (Element event : events) {
-            ResultFile result = extractResultFile(event, "xmlOutputDirectory", reportFilename, workspace, listener);
+            ResultFile result = extractResultFile(
+                    event,
+                    null,
+                    "outputFile",
+                    (dir, file) -> file.contains("${checkstyle.output.file}")
+                            ? file.replace(
+                                    "${checkstyle.output.file}", "${project.build.directory}/checkstyle-result.xml")
+                            : file,
+                    workspace,
+                    listener);
+            if (result != null) {
+                tools.add(checkstyle(
+                        context, result.getMavenArtifact(), result.getPluginInvocation(), result.getResultFile()));
+            }
+        }
+        perform(tools, context, listener, "checkstyle", this::configureQualityGate);
+    }
+
+    private void processFindBugs(List<Element> events, StepContext context, TaskListener listener)
+            throws IOException, InterruptedException {
+        FilePath workspace = context.get(FilePath.class);
+        List<Tool> tools = new ArrayList<>();
+        for (Element event : events) {
+            ResultFile result = extractResultFile(
+                    event,
+                    "xmlOutputDirectory",
+                    null,
+                    (dir, file) -> dir + File.separator + "findbugsXml.xml",
+                    workspace,
+                    listener);
             if (result != null) {
                 tools.add(spotBugs(
                         context, result.getMavenArtifact(), result.getPluginInvocation(), result.getResultFile()));
             }
         }
-        perform(tools, context, listener, kind);
+        perform(tools, context, listener, "findbugs");
+    }
+
+    private void processSpotBugs(List<Element> events, StepContext context, TaskListener listener)
+            throws IOException, InterruptedException {
+        FilePath workspace = context.get(FilePath.class);
+        List<Tool> tools = new ArrayList<>();
+        for (Element event : events) {
+            ResultFile result = extractResultFile(
+                    event,
+                    "spotbugsXmlOutputDirectory",
+                    "spotbugsXmlOutputFilename",
+                    (dir, file) ->
+                            dir + File.separator + file.replace("${spotbugs.outputXmlFilename}", "spotbugsXml.xml"),
+                    workspace,
+                    listener);
+            if (result != null) {
+                tools.add(spotBugs(
+                        context, result.getMavenArtifact(), result.getPluginInvocation(), result.getResultFile()));
+            }
+        }
+        perform(tools, context, listener, "spotbugs");
     }
 
     private void perform(List<Tool> tools, StepContext context, TaskListener listener, String kind) {
@@ -264,6 +344,20 @@ public class WarningsPublisher extends MavenPublisher {
         return tool;
     }
 
+    private Tool checkstyle(
+            StepContext context,
+            MavenArtifact mavenArtifact,
+            MavenSpyLogProcessor.PluginInvocation pluginInvocation,
+            String reportFile)
+            throws IOException, InterruptedException {
+        CheckStyle tool = new CheckStyle();
+        String name = computeName(tool, context) + " " + mavenArtifact.getId() + " " + pluginInvocation.getId();
+        tool.setId(toId(name));
+        tool.setName(name);
+        tool.setPattern(reportFile);
+        return tool;
+    }
+
     private Tool spotBugs(
             StepContext context,
             MavenArtifact mavenArtifact,
@@ -280,8 +374,9 @@ public class WarningsPublisher extends MavenPublisher {
 
     private ResultFile extractResultFile(
             Element event,
-            String directoryAttributeName,
-            String reportFilename,
+            String reportDirectoryAttribute,
+            String reportFileAttribute,
+            BiFunction<String, String, String> reportFilepathBuilder,
             FilePath workspace,
             TaskListener listener) {
         String eventType = event.getAttribute("type");
@@ -290,19 +385,36 @@ public class WarningsPublisher extends MavenPublisher {
         }
 
         Element pluginElt = XmlUtils.getUniqueChildElement(event, "plugin");
-        Element outputDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, directoryAttributeName);
+        Element directoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, reportDirectoryAttribute);
+        Element fileElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, reportFileAttribute);
         Element projectElt = XmlUtils.getUniqueChildElement(event, "project");
         MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
         MavenSpyLogProcessor.PluginInvocation pluginInvocation = XmlUtils.newPluginInvocation(pluginElt);
 
-        if (outputDirectoryElt == null) {
+        if (reportDirectoryAttribute != null && !reportDirectoryAttribute.isEmpty() && directoryElt == null) {
             listener.getLogger()
-                    .println("[withMaven] warningsPublisher - No <xmlOutputDirectoryElt> element found for <plugin> in "
-                            + XmlUtils.toString(event));
+                    .println("[withMaven] warningsPublisher - No <" + reportDirectoryAttribute
+                            + "> element found for <plugin> in " + XmlUtils.toString(event));
             return null;
         }
-        String outputDirectory = XmlUtils.resolveMavenPlaceholders(outputDirectoryElt, projectElt);
-        if (outputDirectory == null) {
+        if (reportFileAttribute != null && !reportFileAttribute.isEmpty() && fileElt == null) {
+            listener.getLogger()
+                    .println("[withMaven] warningsPublisher - No <" + reportFileAttribute
+                            + "> element found for <plugin> in " + XmlUtils.toString(event));
+            return null;
+        }
+
+        String output = reportFilepathBuilder.apply(
+                Optional.ofNullable(directoryElt)
+                        .map(Element::getTextContent)
+                        .map(String::trim)
+                        .orElse(null),
+                Optional.ofNullable(fileElt)
+                        .map(Element::getTextContent)
+                        .map(String::trim)
+                        .orElse(null));
+        output = XmlUtils.resolveMavenPlaceholders(output, projectElt);
+        if (output == null) {
             listener.getLogger()
                     .println(
                             "[withMaven] could not resolve placeholder '${project.build.directory}' or '${project.reporting.outputDirectory}' or '${basedir}' in "
@@ -310,8 +422,7 @@ public class WarningsPublisher extends MavenPublisher {
             return null;
         }
 
-        String resultFile = outputDirectory + File.separator + reportFilename;
-        return new ResultFile(mavenArtifact, pluginInvocation, XmlUtils.getPathInWorkspace(resultFile, workspace));
+        return new ResultFile(mavenArtifact, pluginInvocation, XmlUtils.getPathInWorkspace(output, workspace));
     }
 
     private String computeName(Tool tool, StepContext context) throws IOException, InterruptedException {
