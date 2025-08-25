@@ -59,8 +59,9 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 /**
- * Configures maven environment to use within a pipeline job by calling <code>sh mvn</code> or <code>bat mvn</code>.
- * The selected maven installation will be configured and prepended to the path.
+ * Configures maven environment to use within a pipeline job by calling
+ * <code>sh mvn</code> or <code>bat mvn</code>. The selected maven installation
+ * will be configured and prepended to the path.
  */
 public class WithMavenStep extends Step {
 
@@ -326,7 +327,14 @@ public class WithMavenStep extends Step {
          * Return all the registered Maven publishers
          */
         public DescriptorExtensionList<MavenPublisher, MavenPublisher.DescriptorImpl> getOptionsDescriptors() {
-            return Jenkins.get().getDescriptorList(MavenPublisher.class);
+            DescriptorExtensionList<MavenPublisher, MavenPublisher.DescriptorImpl> result =
+                    Jenkins.get().getDescriptorList(MavenPublisher.class);
+            for (MavenPublisher.DescriptorImpl d : result) {
+                if (d.ordinal() < 0) {
+                    result.remove(d);
+                }
+            }
+            return result;
         }
     }
 }

@@ -147,6 +147,16 @@ public class CoveragePublisher extends MavenPublisher {
             if (method != null) {
                 makeAccessible(method);
                 invokeMethod(method, stepExecution);
+            } else {
+                listener.error(
+                        "[withMaven] coveragePublisher - error archiving coverage results: CoverageStep.Execution.run() method not found");
+                LOGGER.log(
+                        Level.WARNING,
+                        "Error processing coverage results: CoverageStep.Execution.run() method not found");
+                throw new MavenPipelinePublisherException(
+                        "coveragePublisher",
+                        "archiving coverage results",
+                        new RuntimeException("CoverageStep.Execution.run() method not found"));
             }
         } catch (Exception e) {
             listener.error("[withMaven] coveragePublisher - exception archiving coverage results: " + e);
@@ -249,7 +259,8 @@ public class CoveragePublisher extends MavenPublisher {
 
     @Symbol("coveragePublisher")
     @OptionalExtension(requirePlugins = "coverage")
-    public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
+    public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
+
         @NonNull
         @Override
         public String getDisplayName() {

@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  *
- * @deprecated since TODO
+ * @deprecated since 1563.v2e75645a_7d43
  */
 @Deprecated
 public class JacocoReportPublisher extends MavenPublisher {
@@ -104,8 +104,10 @@ public class JacocoReportPublisher extends MavenPublisher {
 
     /**
      * TODO only collect the jacoco report if unit tests have run
+     *
      * @param context
-     * @param mavenSpyLogsElt maven spy report. WARNING experimental structure for the moment, subject to change.
+     * @param mavenSpyLogsElt maven spy report. WARNING experimental structure for
+     *                        the moment, subject to change.
      * @throws IOException
      * @throws InterruptedException
      */
@@ -122,8 +124,10 @@ public class JacocoReportPublisher extends MavenPublisher {
 
     @Symbol("jacocoPublisher")
     @Extension
+    // should be OptionalExtension, and not Extension, but jacoco plugin is deprecated, no more available in update
+    // site, so we cannot install it automatically during test to enable this extension as optional
     // @OptionalExtension(requirePlugins = "jacoco")
-    public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
+    public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @NonNull
         @Override
         public String getDisplayName() {
@@ -132,7 +136,7 @@ public class JacocoReportPublisher extends MavenPublisher {
 
         @Override
         public int ordinal() {
-            return 20;
+            return -1;
         }
 
         @NonNull

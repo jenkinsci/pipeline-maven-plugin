@@ -33,7 +33,7 @@ public class JacocoReportPublisherTest extends AbstractIntegrationTest {
         pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
         WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
         jenkinsRule.assertLogContains(
-                "[withMaven] JacocoPublisher is no longer implicitly used with `withMaven` step.", build);
+                "[withMaven] Jacoco Publisher is no longer implicitly used with `withMaven` step.", build);
     }
 
     @Test
