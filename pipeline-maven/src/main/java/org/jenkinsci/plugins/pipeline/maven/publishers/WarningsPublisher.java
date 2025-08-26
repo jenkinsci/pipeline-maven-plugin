@@ -14,6 +14,7 @@ import io.jenkins.plugins.analysis.warnings.Java;
 import io.jenkins.plugins.analysis.warnings.JavaDoc;
 import io.jenkins.plugins.analysis.warnings.MavenConsole;
 import io.jenkins.plugins.analysis.warnings.SpotBugs;
+import io.jenkins.plugins.analysis.warnings.tasks.OpenTasks;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -72,6 +73,7 @@ public class WarningsPublisher extends MavenPublisher {
 
         perform(List.of(maven(context)), context, listener, "Maven console");
         perform(java(context), context, listener, "Java and JavaDoc");
+        perform(List.of(taskScanner(context)), context, listener, "Open tasks");
         List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(
                 mavenSpyLogsElt, FINDBUGS_GROUP_ID, FINDBUGS_ID, FINDBUGS_GOAL, "MojoSucceeded", "MojoFailed");
         if (findbugsEvents.isEmpty()) {
@@ -165,6 +167,16 @@ public class WarningsPublisher extends MavenPublisher {
         javadoc.setId(toId(name));
         javadoc.setName(name);
         return List.of(java, javadoc);
+    }
+
+    private Tool taskScanner(StepContext context) throws IOException, InterruptedException {
+        OpenTasks tool = new OpenTasks();
+        String name = computeName(tool, context);
+        tool.setId(toId(name));
+        tool.setName(name);
+        tool.setIncludePattern("**/*.java");
+        tool.setExcludePattern("**/target/**");
+        return tool;
     }
 
     private Tool spotBugs(
