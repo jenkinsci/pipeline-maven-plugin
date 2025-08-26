@@ -10,6 +10,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import io.jenkins.plugins.analysis.core.model.Tool;
 import io.jenkins.plugins.analysis.core.steps.RecordIssuesStep;
+import io.jenkins.plugins.analysis.warnings.MavenConsole;
 import io.jenkins.plugins.analysis.warnings.SpotBugs;
 import java.io.File;
 import java.io.IOException;
@@ -67,6 +68,7 @@ public class WarningsPublisher extends MavenPublisher {
             return;
         }
 
+        perform(List.of(maven(context)), context, listener, "Maven console");
         List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(
                 mavenSpyLogsElt, FINDBUGS_GROUP_ID, FINDBUGS_ID, FINDBUGS_GOAL, "MojoSucceeded", "MojoFailed");
         if (findbugsEvents.isEmpty()) {
@@ -140,6 +142,14 @@ public class WarningsPublisher extends MavenPublisher {
             throw new MavenPipelinePublisherException(
                     "warningsPublisher", "archiving " + kind + " warnings results", e);
         }
+    }
+
+    private Tool maven(StepContext context) throws IOException, InterruptedException {
+        MavenConsole tool = new MavenConsole();
+        String name = computeName(tool, context);
+        tool.setId(toId(name));
+        tool.setName(name);
+        return tool;
     }
 
     private Tool spotBugs(
