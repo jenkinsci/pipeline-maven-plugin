@@ -10,6 +10,8 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import io.jenkins.plugins.analysis.core.model.Tool;
 import io.jenkins.plugins.analysis.core.steps.RecordIssuesStep;
+import io.jenkins.plugins.analysis.warnings.Java;
+import io.jenkins.plugins.analysis.warnings.JavaDoc;
 import io.jenkins.plugins.analysis.warnings.MavenConsole;
 import io.jenkins.plugins.analysis.warnings.SpotBugs;
 import java.io.File;
@@ -69,6 +71,7 @@ public class WarningsPublisher extends MavenPublisher {
         }
 
         perform(List.of(maven(context)), context, listener, "Maven console");
+        perform(java(context), context, listener, "Java and JavaDoc");
         List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(
                 mavenSpyLogsElt, FINDBUGS_GROUP_ID, FINDBUGS_ID, FINDBUGS_GOAL, "MojoSucceeded", "MojoFailed");
         if (findbugsEvents.isEmpty()) {
@@ -150,6 +153,18 @@ public class WarningsPublisher extends MavenPublisher {
         tool.setId(toId(name));
         tool.setName(name);
         return tool;
+    }
+
+    private List<Tool> java(StepContext context) throws IOException, InterruptedException {
+        Java java = new Java();
+        String name = computeName(java, context);
+        java.setId(toId(name));
+        java.setName(name);
+        JavaDoc javadoc = new JavaDoc();
+        name = computeName(javadoc, context);
+        javadoc.setId(toId(name));
+        javadoc.setName(name);
+        return List.of(java, javadoc);
     }
 
     private Tool spotBugs(
