@@ -26,11 +26,11 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.AbortException;
-import hudson.Extension;
 import java.io.IOException;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
+import org.jenkinsci.plugins.variant.OptionalExtension;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
@@ -123,10 +123,7 @@ public class JacocoReportPublisher extends MavenPublisher {
     }
 
     @Symbol("jacocoPublisher")
-    @Extension
-    // should be OptionalExtension, and not Extension, but jacoco plugin is deprecated, no more available in update
-    // site, so we cannot install it automatically during test to enable this extension as optional
-    // @OptionalExtension(requirePlugins = "jacoco")
+    @OptionalExtension(requirePlugins = "jacoco")
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @NonNull
         @Override

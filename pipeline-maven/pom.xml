@@ -60,7 +60,6 @@
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>warnings-ng</artifactId>
-      <version>${jenkins-plugin-warningsng.version}</version>
       <optional>true</optional>
       <exclusions>
         <exclusion>
@@ -445,6 +444,49 @@
               </artifactItems>
             </configuration>
           </execution>
+          <execution>
+            <id>copy-old-plugins</id>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <phase>process-test-resources</phase>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.jenkins-ci.plugins</groupId>
+                  <artifactId>jacoco</artifactId>
+                  <version>3.3.7</version>
+                  <type>hpi</type>
+                  <outputDirectory>${project.build.directory}/test-classes/plugins</outputDirectory>
+                  <destFileName>jacoco.jpi</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jvnet.hudson.plugins</groupId>
+                  <artifactId>analysis-core</artifactId>
+                  <version>1.96</version>
+                  <type>hpi</type>
+                  <outputDirectory>${project.build.directory}/test-classes/plugins</outputDirectory>
+                  <destFileName>analysis-core.jpi</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jvnet.hudson.plugins</groupId>
+                  <artifactId>findbugs</artifactId>
+                  <version>5.0.0</version>
+                  <type>hpi</type>
+                  <outputDirectory>${project.build.directory}/test-classes/plugins</outputDirectory>
+                  <destFileName>findbugs.jpi</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jvnet.hudson.plugins</groupId>
+                  <artifactId>tasks</artifactId>
+                  <version>4.53</version>
+                  <type>hpi</type>
+                  <outputDirectory>${project.build.directory}/test-classes/plugins</outputDirectory>
+                  <destFileName>tasks.jpi</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -467,6 +509,30 @@
                   </bannedImports>
                 </RestrictImports>
               </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-old-plugins-dependencies</id>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <phase>process-test-classes</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/test-classes/plugins</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/test-classes/test-dependencies</directory>
+                  <includes>
+                    <include>*.hpi</include>
+                    <include>*.jpi</include>
+                  </includes>
+                </resource>
+              </resources>
             </configuration>
           </execution>
         </executions>

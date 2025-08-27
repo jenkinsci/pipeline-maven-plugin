@@ -26,12 +26,12 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.AbortException;
-import hudson.Extension;
 import java.io.IOException;
 import java.util.logging.Logger;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
+import org.jenkinsci.plugins.variant.OptionalExtension;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
@@ -77,10 +77,7 @@ public class FindbugsAnalysisPublisher extends MavenPublisher {
      * hudson.plugins.findbugs.FindBugsPublisher
      */
     @Symbol("findbugsPublisher")
-    @Extension
-    // should be OptionalExtension, and not Extension, but findbugs plugin is deprecated, no more available in update
-    // site, so we cannot install it automatically during test to enable this extension as optional
-    // @OptionalExtension(requirePlugins = "findbugs")
+    @OptionalExtension(requirePlugins = "findbugs")
     public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @NonNull
         @Override
