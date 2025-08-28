@@ -71,7 +71,8 @@ public class WithMavenStep extends Step {
     private String globalMavenSettingsConfig;
     private String globalMavenSettingsFilePath = "";
     private String maven;
-    private String mavenOpts = "";
+    private String mavenOpts =
+            "-Dmaven.test.failure.ignore -Dspotbugs.failOnError=false -Dcheckstyle.failOnViolation=false -Dcheckstyle.failsOnError=false -Dpmd.failOnViolation=false";
     private String jdk;
     private String mavenLocalRepo = "";
     private List<MavenPublisher> options = new ArrayList<>();

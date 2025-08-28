@@ -424,12 +424,6 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             mavenConfig.append("\"-Dmaven.repo.local=").append(mavenLocalRepo).append("\" ");
         }
 
-        // -Dmaven.test.failure.ignore
-        // -Dspotbugs.failOnError=false
-        // -Dcheckstyle.failOnViolation=false
-        // -Dcheckstyle.failsOnError=false
-        // -Dpmd.failOnViolation=false
-
         envOverride.put("MAVEN_CONFIG", mavenConfig.toString());
 
         //

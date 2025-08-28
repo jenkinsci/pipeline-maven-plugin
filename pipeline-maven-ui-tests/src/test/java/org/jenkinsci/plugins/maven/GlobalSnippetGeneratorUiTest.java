@@ -53,7 +53,8 @@ withMaven(traceability: true) {
                 .setMavenSettingsFilePath("")
                 .setGlobalMavenSettingsConfig("")
                 .setGlobalMavenSettingsFilePath("")
-                .setMavenOpts("")
+                .setMavenOpts(
+                        "-Dmaven.test.failure.ignore -Dspotbugs.failOnError=false -Dcheckstyle.failOnViolation=false -Dcheckstyle.failsOnError=false -Dpmd.failOnViolation=false")
                 .setTraceability(true)
                 .setMavenLocalRepo("")
                 .setPublisherStrategy(PublisherStrategy.IMPLICIT);
