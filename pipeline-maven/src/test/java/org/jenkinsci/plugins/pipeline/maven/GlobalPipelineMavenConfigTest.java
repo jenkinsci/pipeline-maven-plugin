@@ -8,7 +8,10 @@ import com.mysql.cj.jdbc.ConnectionImpl;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariProxyConnection;
 import hudson.ExtensionList;
+import io.jenkins.plugins.analysis.core.util.TrendChartType;
+import io.jenkins.plugins.analysis.core.util.WarningsQualityGate.QualityGateType;
 import io.jenkins.plugins.prism.SourceCodeRetention;
+import io.jenkins.plugins.util.QualityGate.QualityGateCriticality;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.sql.Connection;
@@ -23,15 +26,13 @@ import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginPostgreSqlDao;
 import org.jenkinsci.plugins.pipeline.maven.publishers.ConcordionTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.CoveragePublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.DependenciesFingerprintPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.GeneratedArtifactsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.InvokerRunsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JGivenTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.JunitTestsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.MavenLinkerPublisher2;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.SpotBugsAnalysisPublisher;
-import org.jenkinsci.plugins.pipeline.maven.publishers.TasksScannerPublisher;
+import org.jenkinsci.plugins.pipeline.maven.publishers.WarningsPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.FakeCredentialsProvider;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -91,12 +92,6 @@ public class GlobalPipelineMavenConfigTest {
         dependenciesFingerprintPublisher.setIncludeScopeRuntime(true);
         dependenciesFingerprintPublisher.setIncludeScopeTest(true);
 
-        FindbugsAnalysisPublisher findBugsPublisher = new FindbugsAnalysisPublisher();
-        findBugsPublisher.setDisabled(true);
-        findBugsPublisher.setHealthy("5");
-        findBugsPublisher.setThresholdLimit("high");
-        findBugsPublisher.setUnHealthy("15");
-
         GeneratedArtifactsPublisher generatedArtifactsPublisher = new GeneratedArtifactsPublisher();
         generatedArtifactsPublisher.setDisabled(true);
 
@@ -115,19 +110,6 @@ public class GlobalPipelineMavenConfigTest {
         MavenLinkerPublisher2 mavenLinkerPublisher = new MavenLinkerPublisher2();
         mavenLinkerPublisher.setDisabled(true);
 
-        TasksScannerPublisher tasksScannerPublisher = new TasksScannerPublisher();
-        tasksScannerPublisher.setDisabled(true);
-        tasksScannerPublisher.setAsRegexp(true);
-        tasksScannerPublisher.setExcludePattern("**/*.xml");
-        tasksScannerPublisher.setHealthy("5");
-        tasksScannerPublisher.setHighPriorityTaskIdentifiers("task1,task2");
-        tasksScannerPublisher.setIgnoreCase(true);
-        tasksScannerPublisher.setLowPriorityTaskIdentifiers("task4");
-        tasksScannerPublisher.setNormalPriorityTaskIdentifiers("task3");
-        tasksScannerPublisher.setPattern("**/*.java");
-        tasksScannerPublisher.setThresholdLimit("normal");
-        tasksScannerPublisher.setUnHealthy("15");
-
         PipelineGraphPublisher pipelineGraphPublisher = new PipelineGraphPublisher();
         pipelineGraphPublisher.setDisabled(true);
         pipelineGraphPublisher.setIgnoreUpstreamTriggers(true);
@@ -139,25 +121,32 @@ public class GlobalPipelineMavenConfigTest {
         pipelineGraphPublisher.setLifecycleThreshold("install");
         pipelineGraphPublisher.setSkipDownstreamTriggers(true);
 
-        SpotBugsAnalysisPublisher spotBugsAnalysisPublisher = new SpotBugsAnalysisPublisher();
-        spotBugsAnalysisPublisher.setDisabled(true);
-        spotBugsAnalysisPublisher.setHealthy("5");
-        spotBugsAnalysisPublisher.setThresholdLimit("high");
-        spotBugsAnalysisPublisher.setUnHealthy("15");
+        WarningsPublisher warningsPublisher = new WarningsPublisher();
+        warningsPublisher.setDisabled(true);
+        warningsPublisher.setSourceCodeEncoding("ISO-8859-15");
+        warningsPublisher.setEnabledForFailure(false);
+        warningsPublisher.setSkipBlames(false);
+        warningsPublisher.setTrendChartType(TrendChartType.NONE);
+        warningsPublisher.setQualityGateThreshold(10);
+        warningsPublisher.setQualityGateType(QualityGateType.DELTA);
+        warningsPublisher.setQualityGateCriticality(QualityGateCriticality.ERROR);
+        warningsPublisher.setJavaIgnorePatterns("**/*Test.java");
+        warningsPublisher.setHighPriorityTaskIdentifiers("FIX");
+        warningsPublisher.setNormalPriorityTaskIdentifiers("TO-DO");
+        warningsPublisher.setTasksIncludePattern("**/*.*");
+        warningsPublisher.setTasksExcludePattern("**/target/*.*");
 
         c.setPublisherOptions(List.of(
                 concordionTestsPublisher,
                 coveragePublisher,
                 dependenciesFingerprintPublisher,
-                findBugsPublisher,
                 generatedArtifactsPublisher,
                 invokerRunsPublisher,
                 jGivenTestsPublisher,
                 junitTestsPublisher,
                 mavenLinkerPublisher,
-                tasksScannerPublisher,
                 pipelineGraphPublisher,
-                spotBugsAnalysisPublisher));
+                warningsPublisher));
 
         j.configRoundtrip();
 

@@ -59,8 +59,9 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 /**
- * Configures maven environment to use within a pipeline job by calling <code>sh mvn</code> or <code>bat mvn</code>.
- * The selected maven installation will be configured and prepended to the path.
+ * Configures maven environment to use within a pipeline job by calling
+ * <code>sh mvn</code> or <code>bat mvn</code>. The selected maven installation
+ * will be configured and prepended to the path.
  */
 public class WithMavenStep extends Step {
 
@@ -70,7 +71,8 @@ public class WithMavenStep extends Step {
     private String globalMavenSettingsConfig;
     private String globalMavenSettingsFilePath = "";
     private String maven;
-    private String mavenOpts = "";
+    private String mavenOpts =
+            "-Dmaven.test.failure.ignore -Dspotbugs.failOnError=false -Dcheckstyle.failOnViolation=false -Dcheckstyle.failsOnError=false -Dpmd.failOnViolation=false";
     private String jdk;
     private String mavenLocalRepo = "";
     private List<MavenPublisher> options = new ArrayList<>();
@@ -326,7 +328,14 @@ public class WithMavenStep extends Step {
          * Return all the registered Maven publishers
          */
         public DescriptorExtensionList<MavenPublisher, MavenPublisher.DescriptorImpl> getOptionsDescriptors() {
-            return Jenkins.get().getDescriptorList(MavenPublisher.class);
+            DescriptorExtensionList<MavenPublisher, MavenPublisher.DescriptorImpl> result =
+                    Jenkins.get().getDescriptorList(MavenPublisher.class);
+            for (MavenPublisher.DescriptorImpl d : result) {
+                if (d.ordinal() < 0) {
+                    result.remove(d);
+                }
+            }
+            return result;
         }
     }
 }

@@ -1,0 +1,78 @@
+<!--
+The MIT License
+
+Copyright (c) 2004-2009, Sun Microsystems, Inc., Kohsuke Kawaguchi, Seiji Sogabe, Tom Huybrechts
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+-->
+
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
+
+  <st:include page="maven-publisher" class="${descriptor.clazz}"/>
+
+  <f:entry title="${%title.sourceCodeEncoding}" field="sourceCodeEncoding">
+    <f:combobox default="UTF-8"/>
+  </f:entry>
+
+  <f:entry field="enabledForFailure">
+    <f:checkbox default="true" title="${%title.enabledForFailure}"/>
+  </f:entry>
+
+  <f:entry field="skipBlames">
+    <f:checkbox default="true" title="${%title.blameDisabled}" />
+  </f:entry>
+
+  <f:entry title="${%title.trendChartType}" field="trendChartType">
+    <f:select default="TOOLS_ONLY"/>
+  </f:entry>
+
+  <f:entry title="${%title.qualityGateThreshold}" field="qualityGateThreshold" description="${%description.qualityGateThreshold}">
+    <f:number default="1"/>
+  </f:entry>
+
+  <f:entry title="${%title.qualityGateType}" field="qualityGateType" description="${%description.qualityGateType}">
+    <f:select default="NEW"/>
+  </f:entry>
+
+  <f:entry title="${%title.qualityGateCriticality}" field="qualityGateCriticality" description="${%description.qualityGateCriticality}">
+    <f:select default="UNSTABLE"/>
+  </f:entry>
+
+  <f:entry title="${%title.javaIgnorePatterns}" field="javaIgnorePatterns" description="${%description.javaIgnorePatterns('https://ant.apache.org/manual/Types/fileset.html')}">
+    <f:textbox/>
+  </f:entry>
+
+  <f:entry title="${%title.highPriorityTaskIdentifiers}" field="highPriorityTaskIdentifiers" description="${%description.highPriorityTaskIdentifiers}">
+    <f:textbox default="FIXME"/>
+  </f:entry>
+
+  <f:entry title="${%title.normalPriorityTaskIdentifiers}" field="normalPriorityTaskIdentifiers" description="${%description.normalPriorityTaskIdentifiers}">
+    <f:textbox default="TODO"/>
+  </f:entry>
+
+  <f:entry title="${%title.tasksIncludePattern}" field="tasksIncludePattern" description="${%description.tasksIncludePattern('https://ant.apache.org/manual/Types/fileset.html')}">
+    <f:textbox default="**/*.java"/>
+  </f:entry>
+
+  <f:entry title="${%title.tasksExcludePattern}" field="tasksExcludePattern" description="${%description.tasksExcludePattern('https://ant.apache.org/manual/Types/fileset.html')}">
+    <f:textbox default="**/target/**"/>
+  </f:entry>
+
+</j:jelly>

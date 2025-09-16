@@ -40,6 +40,9 @@
   <url>https://github.com/jenkinsci/pipeline-maven-plugin/</url>
 
   <properties>
+    <!-- Breaking changes log
+      In 1333 we introduced the pipeline-database plugin, moving all DAO related stuff into it
+    -->
     <hpi.compatibleSinceVersion>1333</hpi.compatibleSinceVersion>
     <hpi.pluginChangelogUrl>https://github.com/jenkinsci/pipeline-maven-plugin/releases</hpi.pluginChangelogUrl>
   </properties>
@@ -53,6 +56,25 @@
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>coverage</artifactId>
       <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>io.jenkins.plugins</groupId>
+      <artifactId>warnings-ng</artifactId>
+      <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>org.antlr</groupId>
+          <artifactId>antlr4-runtime</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.ow2.asm</groupId>
+          <artifactId>asm</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xml-apis</groupId>
+          <artifactId>xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.jenkins-ci.main</groupId>
@@ -227,42 +249,8 @@
       <artifactId>workflow-step-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.jvnet.hudson.plugins</groupId>
-      <artifactId>findbugs</artifactId>
-      <version>${jenkins-plugin-findbugs.version}</version>
-      <optional>true</optional>
-      <exclusions>
-        <exclusion>
-          <groupId>asm</groupId>
-          <artifactId>asm</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.commons</groupId>
-          <artifactId>commons-lang3</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jenkins-ci</groupId>
-          <artifactId>SECURITY-144-compat</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jvnet.hudson.plugins.findbugs</groupId>
-          <artifactId>library</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>xercesImpl</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>xml-apis</groupId>
-          <artifactId>xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.jvnet.hudson.plugins</groupId>
-      <artifactId>tasks</artifactId>
-      <version>${jenkins-plugin-tasks.version}</version>
-      <optional>true</optional>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
     </dependency>
 
     <dependency>
@@ -456,6 +444,49 @@
               </artifactItems>
             </configuration>
           </execution>
+          <execution>
+            <id>copy-old-plugins</id>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <phase>process-test-resources</phase>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.jenkins-ci.plugins</groupId>
+                  <artifactId>jacoco</artifactId>
+                  <version>3.3.7</version>
+                  <type>hpi</type>
+                  <outputDirectory>${project.build.directory}/test-classes/plugins</outputDirectory>
+                  <destFileName>jacoco.jpi</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jvnet.hudson.plugins</groupId>
+                  <artifactId>analysis-core</artifactId>
+                  <version>1.96</version>
+                  <type>hpi</type>
+                  <outputDirectory>${project.build.directory}/test-classes/plugins</outputDirectory>
+                  <destFileName>analysis-core.jpi</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jvnet.hudson.plugins</groupId>
+                  <artifactId>findbugs</artifactId>
+                  <version>5.0.0</version>
+                  <type>hpi</type>
+                  <outputDirectory>${project.build.directory}/test-classes/plugins</outputDirectory>
+                  <destFileName>findbugs.jpi</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.jvnet.hudson.plugins</groupId>
+                  <artifactId>tasks</artifactId>
+                  <version>4.53</version>
+                  <type>hpi</type>
+                  <outputDirectory>${project.build.directory}/test-classes/plugins</outputDirectory>
+                  <destFileName>tasks.jpi</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -478,6 +509,30 @@
                   </bannedImports>
                 </RestrictImports>
               </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-old-plugins-dependencies</id>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <phase>process-test-classes</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/test-classes/plugins</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>${project.build.directory}/test-classes/test-dependencies</directory>
+                  <includes>
+                    <include>*.hpi</include>
+                    <include>*.jpi</include>
+                  </includes>
+                </resource>
+              </resources>
             </configuration>
           </execution>
         </executions>
