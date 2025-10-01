@@ -15,7 +15,6 @@ import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.jenkinsci.plugins.pipeline.maven.MavenDependency;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.db.PipelineMavenPluginH2Dao;
-import org.jenkinsci.plugins.pipeline.maven.publishers.FindbugsAnalysisPublisher;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
@@ -55,11 +54,6 @@ public class DownstreamPipelineTriggerRunListenerIntegrationTest extends Abstrac
             publisher.setLifecycleThreshold("install");
             publisher.setIncludeReleaseVersions(true);
             publisher.setIncludeScopeTest(true);
-            publisherOptions.add(publisher);
-        }
-        {
-            FindbugsAnalysisPublisher publisher = new FindbugsAnalysisPublisher();
-            publisher.setDisabled(true);
             publisherOptions.add(publisher);
         }
     }
