@@ -25,31 +25,26 @@
 package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import hudson.FilePath;
-import hudson.Launcher;
-import hudson.model.Run;
-import hudson.model.StreamBuildListener;
-import hudson.model.TaskListener;
-import hudson.plugins.findbugs.FindBugsPublisher;
+import hudson.AbortException;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jenkinsci.Symbol;
-import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
-import org.jenkinsci.plugins.pipeline.maven.MavenSpyLogProcessor;
+import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
-import org.jenkinsci.plugins.pipeline.maven.util.XmlUtils;
 import org.jenkinsci.plugins.variant.OptionalExtension;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 import org.w3c.dom.Element;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
+ *
+ * @deprecated since TODO
  */
-public class FindbugsAnalysisPublisher extends AbstractHealthAwarePublisher {
+@Deprecated
+public class FindbugsAnalysisPublisher extends MavenPublisher {
+
     private static final Logger LOGGER = Logger.getLogger(FindbugsAnalysisPublisher.class.getName());
 
     private static final long serialVersionUID = 1L;
@@ -57,200 +52,33 @@ public class FindbugsAnalysisPublisher extends AbstractHealthAwarePublisher {
     @DataBoundConstructor
     public FindbugsAnalysisPublisher() {}
 
-    /*
-    <ExecutionEvent type="MojoStarted" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-05 19:46:26.956">
-        <project baseDir="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project" file="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project/pom.xml" groupId="com.example" name="demo-pom" artifactId="demo-pom" version="0.0.1-SNAPSHOT">
-          <build directory="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project/target"/>
-        </project>
-        <plugin executionId="findbugs" goal="findbugs" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
-          <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
-          <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
-          <debug>${findbugs.debug}</debug>
-          <effort>${findbugs.effort}</effort>
-          <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
-          <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
-          <failOnError>${findbugs.failOnError}</failOnError>
-          <findbugsXmlOutput>true</findbugsXmlOutput>
-          <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
-          <fork>${findbugs.fork}</fork>
-          <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
-          <includeTests>${findbugs.includeTests}</includeTests>
-          <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
-          <localRepository>${localRepository}</localRepository>
-          <maxHeap>${findbugs.maxHeap}</maxHeap>
-          <maxRank>${findbugs.maxRank}</maxRank>
-          <nested>${findbugs.nested}</nested>
-          <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
-          <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
-          <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
-          <outputEncoding>${outputEncoding}</outputEncoding>
-          <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
-          <pluginList>${findbugs.pluginList}</pluginList>
-          <project>${project}</project>
-          <relaxed>${findbugs.relaxed}</relaxed>
-          <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
-          <remoteRepositories>${project.remoteArtifactRepositories}</remoteRepositories>
-          <skip>${findbugs.skip}</skip>
-          <skipEmptyReport>${findbugs.skipEmptyReport}</skipEmptyReport>
-          <sourceEncoding>${encoding}</sourceEncoding>
-          <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
-          <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
-          <threshold>${findbugs.threshold}</threshold>
-          <timeout>${findbugs.timeout}</timeout>
-          <trace>${findbugs.trace}</trace>
-          <userPrefs>${findbugs.userPrefs}</userPrefs>
-          <visitors>${findbugs.visitors}</visitors>
-          <xmlEncoding>UTF-8</xmlEncoding>
-          <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
-          <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
-          <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
-          <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
-        </plugin>
-      </ExecutionEvent>
-    <ExecutionEvent type="MojoSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2017-02-05 19:46:28.108">
-        <project baseDir="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project" file="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project/pom.xml" groupId="com.example" name="demo-pom" artifactId="demo-pom" version="0.0.1-SNAPSHOT">
-          <build directory="/Users/cleclerc/git/cyrille-leclerc/multi-module-maven-project/target"/>
-        </project>
-        <plugin executionId="findbugs" goal="findbugs" groupId="org.codehaus.mojo" artifactId="findbugs-maven-plugin" version="3.0.4">
-          <classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
-          <compileSourceRoots>${project.compileSourceRoots}</compileSourceRoots>
-          <debug>${findbugs.debug}</debug>
-          <effort>${findbugs.effort}</effort>
-          <excludeBugsFile>${findbugs.excludeBugsFile}</excludeBugsFile>
-          <excludeFilterFile>${findbugs.excludeFilterFile}</excludeFilterFile>
-          <failOnError>${findbugs.failOnError}</failOnError>
-          <findbugsXmlOutput>true</findbugsXmlOutput>
-          <findbugsXmlOutputDirectory>${project.build.directory}</findbugsXmlOutputDirectory>
-          <fork>${findbugs.fork}</fork>
-          <includeFilterFile>${findbugs.includeFilterFile}</includeFilterFile>
-          <includeTests>${findbugs.includeTests}</includeTests>
-          <jvmArgs>${findbugs.jvmArgs}</jvmArgs>
-          <localRepository>${localRepository}</localRepository>
-          <maxHeap>${findbugs.maxHeap}</maxHeap>
-          <maxRank>${findbugs.maxRank}</maxRank>
-          <nested>${findbugs.nested}</nested>
-          <omitVisitors>${findbugs.omitVisitors}</omitVisitors>
-          <onlyAnalyze>${findbugs.onlyAnalyze}</onlyAnalyze>
-          <outputDirectory>${project.reporting.outputDirectory}</outputDirectory>
-          <outputEncoding>${outputEncoding}</outputEncoding>
-          <pluginArtifacts>${plugin.artifacts}</pluginArtifacts>
-          <pluginList>${findbugs.pluginList}</pluginList>
-          <project>${project}</project>
-          <relaxed>${findbugs.relaxed}</relaxed>
-          <remoteArtifactRepositories>${project.remoteArtifactRepositories}</remoteArtifactRepositories>
-          <remoteRepositories>${project.remoteArtifactRepositories}</remoteRepositories>
-          <skip>${findbugs.skip}</skip>
-          <skipEmptyReport>${findbugs.skipEmptyReport}</skipEmptyReport>
-          <sourceEncoding>${encoding}</sourceEncoding>
-          <testClassFilesDirectory>${project.build.testOutputDirectory}</testClassFilesDirectory>
-          <testSourceRoots>${project.testCompileSourceRoots}</testSourceRoots>
-          <threshold>${findbugs.threshold}</threshold>
-          <timeout>${findbugs.timeout}</timeout>
-          <trace>${findbugs.trace}</trace>
-          <userPrefs>${findbugs.userPrefs}</userPrefs>
-          <visitors>${findbugs.visitors}</visitors>
-          <xmlEncoding>UTF-8</xmlEncoding>
-          <xmlOutput>${findbugs.xmlOutput}</xmlOutput>
-          <xmlOutputDirectory>${project.build.directory}</xmlOutputDirectory>
-          <xrefLocation>${project.reporting.outputDirectory}/xref</xrefLocation>
-          <xrefTestLocation>${project.reporting.outputDirectory}/xref-test</xrefTestLocation>
-        </plugin>
-      </ExecutionEvent>
-         */
     @Override
     public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt)
             throws IOException, InterruptedException {
-
-        TaskListener listener = context.get(TaskListener.class);
-        if (listener == null) {
-            LOGGER.warning("TaskListener is NULL, default to stderr");
-            listener = new StreamBuildListener((OutputStream) System.err);
-        }
-        FilePath workspace = context.get(FilePath.class);
-        Run run = context.get(Run.class);
-        Launcher launcher = context.get(Launcher.class);
-
-        try {
-            Class.forName("hudson.plugins.findbugs.FindBugsPublisher");
-        } catch (ClassNotFoundException e) {
-            listener.getLogger().print("[withMaven] Jenkins ");
-            listener.hyperlink("https://wiki.jenkins-ci.org/display/JENKINS/FindBugs+Plugin", "FindBugs Plugin");
-            listener.getLogger()
-                    .println(
-                            " not found, don't display org.codehaus.mojo:findbugs-maven-plugin:findbugs results in pipeline screen.");
-            return;
-        }
-
-        List<Element> findbugsEvents = XmlUtils.getExecutionEventsByPlugin(
-                mavenSpyLogsElt,
-                "org.codehaus.mojo",
-                "findbugs-maven-plugin",
-                "findbugs",
-                "MojoSucceeded",
-                "MojoFailed");
-
-        if (findbugsEvents.isEmpty()) {
-            LOGGER.log(Level.FINE, "No org.codehaus.mojo:findbugs-maven-plugin:findbugs execution found");
-            return;
-        }
-
-        for (Element findBugsTestEvent : findbugsEvents) {
-
-            Element pluginElt = XmlUtils.getUniqueChildElement(findBugsTestEvent, "plugin");
-            Element xmlOutputDirectoryElt = XmlUtils.getUniqueChildElementOrNull(pluginElt, "xmlOutputDirectory");
-            Element projectElt = XmlUtils.getUniqueChildElement(findBugsTestEvent, "project");
-            MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(projectElt);
-            MavenSpyLogProcessor.PluginInvocation pluginInvocation = XmlUtils.newPluginInvocation(pluginElt);
-
-            if (xmlOutputDirectoryElt == null) {
-                listener.getLogger()
-                        .println("[withMaven] No <xmlOutputDirectoryElt> element found for <plugin> in "
-                                + XmlUtils.toString(findBugsTestEvent));
-                continue;
-            }
-            String xmlOutputDirectory = XmlUtils.resolveMavenPlaceholders(xmlOutputDirectoryElt, projectElt);
-            if (xmlOutputDirectory == null) {
-                listener.getLogger()
-                        .println(
-                                "[withMaven] could not resolve placeholder '${project.build.directory}' or '${basedir}' in "
-                                        + XmlUtils.toString(findBugsTestEvent));
-                continue;
-            }
-            xmlOutputDirectory = XmlUtils.getPathInWorkspace(xmlOutputDirectory, workspace);
-
-            String findBugsResultsFile = xmlOutputDirectory + "/findbugsXml.xml";
-            listener.getLogger()
-                    .println("[withMaven] findbugsPublisher - Archive FindBugs analysis results for Maven artifact "
-                            + mavenArtifact.toString() + " generated by " + pluginInvocation + ": "
-                            + findBugsResultsFile);
-            FindBugsPublisher findBugsPublisher = new FindBugsPublisher();
-
-            findBugsPublisher.setPattern(findBugsResultsFile);
-
-            setHealthAwarePublisherAttributes(findBugsPublisher);
-
-            try {
-                findBugsPublisher.perform(run, workspace, launcher, listener);
-            } catch (Exception e) {
-                listener.error(
-                        "[withMaven] findbugsPublisher - exception archiving FindBugs results for Maven artifact "
-                                + mavenArtifact.toString() + " generated by " + pluginInvocation + ": " + e);
-                LOGGER.log(Level.WARNING, "Exception processing " + XmlUtils.toString(findBugsTestEvent), e);
-                throw new MavenPipelinePublisherException(
-                        "findbugsPublisher",
-                        "archiving FindBugs results for Maven artifact " + mavenArtifact.getId() + " generated by "
-                                + pluginInvocation.getId(),
-                        e);
-            }
-        }
+        throw new AbortException(
+                """
+        The findbugsPublisher is deprecated as is the findbugs plugin and you should not use it.
+        Alternatively, you should rely on warningsPublisher.
+        Or, if continuing to use the findbugs plugin for now, run it explicitly rather than expecting withMaven to run it implicitly.
+        """);
     }
 
+    @DataBoundSetter
+    public void setHealthy(String healthy) {}
+
+    @DataBoundSetter
+    public void setUnHealthy(String unHealthy) {}
+
+    @DataBoundSetter
+    public void setThresholdLimit(String thresholdLimit) {}
+
     /**
-     * Don't use symbol "findbugs", it would collide with hudson.plugins.findbugs.FindBugsPublisher
+     * Don't use symbol "findbugs", it would collide with
+     * hudson.plugins.findbugs.FindBugsPublisher
      */
     @Symbol("findbugsPublisher")
     @OptionalExtension(requirePlugins = "findbugs")
-    public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
+    public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @NonNull
         @Override
         public String getDisplayName() {
@@ -259,7 +87,7 @@ public class FindbugsAnalysisPublisher extends AbstractHealthAwarePublisher {
 
         @Override
         public int ordinal() {
-            return 20;
+            return -1;
         }
 
         @NonNull
