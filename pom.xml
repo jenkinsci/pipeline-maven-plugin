@@ -107,7 +107,7 @@
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <json-smart.version>2.3</json-smart.version>
     <json-unit-assertj.version>4.1.1</json-unit-assertj.version>
-    <junit.version>5.13.4</junit.version>
+    <junit.version>5.14.0</junit.version>
     <junit4.version>4.13.2</junit4.version>
     <mariadb-client.version>3.5.6</mariadb-client.version>
     <maven-cobertura-plugin.version>2.7</maven-cobertura-plugin.version>
