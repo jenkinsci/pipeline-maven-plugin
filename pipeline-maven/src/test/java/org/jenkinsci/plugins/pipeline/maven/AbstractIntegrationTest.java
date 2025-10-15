@@ -38,6 +38,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.jvnet.hudson.test.BuildWatcher;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
+import org.testcontainers.containers.Container.ExecResult;
 import org.testcontainers.containers.ExecConfig;
 import org.testcontainers.containers.ExecInContainerPattern;
 import org.testcontainers.containers.GenericContainer;
@@ -138,7 +139,7 @@ public abstract class AbstractIntegrationTest {
         String gitRepoPath = this.gitRepoRule.toString();
         container.copyFileToContainer(MountableFile.forHostPath(gitRepoPath), containerPath);
         container.execInContainer("chmod", "-R", "777", containerPath);
-        System.out.println(ExecInContainerPattern.execInContainer(
+        ExecResult execResult = ExecInContainerPattern.execInContainer(
                 container.getDockerClient(),
                 container.getContainerInfo(),
                 ExecConfig.builder()
@@ -146,7 +147,8 @@ public abstract class AbstractIntegrationTest {
                         .command(new String[] {
                             "git", "config", "--global", "--add", "safe.directory", containerPath + "/.git"
                         })
-                        .build()));
+                        .build());
+        assertThat(execResult.getExitCode()).isZero();
         return containerPath;
     }
 
