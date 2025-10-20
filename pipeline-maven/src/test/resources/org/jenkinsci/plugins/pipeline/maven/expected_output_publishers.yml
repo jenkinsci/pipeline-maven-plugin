@@ -12,11 +12,6 @@ publisherOptions:
     includeReleaseVersions: true
     includeScopeCompile: false
     includeScopeTest: true
-- findbugsPublisher:
-    disabled: true
-    healthy: "5"
-    thresholdLimit: "high"
-    unHealthy: "15"
 - artifactsPublisher:
     disabled: true
 - invokerPublisher:
@@ -30,18 +25,6 @@ publisherOptions:
     keepLongStdio: true
 - mavenLinkerPublisher:
     disabled: true
-- openTasksPublisher:
-    asRegexp: true
-    disabled: true
-    excludePattern: "**/*.xml"
-    healthy: "5"
-    highPriorityTaskIdentifiers: "task1,task2"
-    ignoreCase: true
-    lowPriorityTaskIdentifiers: "task4"
-    normalPriorityTaskIdentifiers: "task3"
-    pattern: "**/*.java"
-    thresholdLimit: "normal"
-    unHealthy: "15"
 - pipelineGraphPublisher:
     disabled: true
     ignoreUpstreamTriggers: true
@@ -49,11 +32,20 @@ publisherOptions:
     includeScopeTest: true
     lifecycleThreshold: "install"
     skipDownstreamTriggers: true
-- spotbugsPublisher:
+- warningsPublisher:
     disabled: true
-    healthy: "5"
-    thresholdLimit: "high"
-    unHealthy: "15"
+    enabledForFailure: false
+    highPriorityTaskIdentifiers: "FIX"
+    javaIgnorePatterns: "**/*Test.java"
+    normalPriorityTaskIdentifiers: "TO-DO"
+    qualityGateCriticality: ERROR
+    qualityGateThreshold: 10
+    qualityGateType: DELTA
+    skipBlames: false
+    sourceCodeEncoding: "ISO-8859-15"
+    tasksExcludePattern: "**/target/*.*"
+    tasksIncludePattern: "**/*.*"
+    trendChartType: NONE
 triggerDownstreamUponResultAborted: false
 triggerDownstreamUponResultFailure: false
 triggerDownstreamUponResultNotBuilt: false

@@ -49,8 +49,8 @@ THE SOFTWARE.
         <f:textbox/>
     </f:entry>
 
-    <f:entry title="${%maven_jvm_opts}" field="mavenOpts">
-        <f:textbox/>
+    <f:entry title="${%maven_jvm_opts}" field="mavenOpts" description="${%description.maven_jvm_opts}">
+        <f:textbox default="-Dmaven.test.failure.ignore -Dspotbugs.failOnError=false -Dcheckstyle.failOnViolation=false -Dcheckstyle.failsOnError=false -Dpmd.failOnViolation=false"/>
     </f:entry>
 
     <f:entry title="${%maven_traceability}" field="traceability">

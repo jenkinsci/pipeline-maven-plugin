@@ -28,33 +28,4 @@ THE SOFTWARE.
 
     <st:include page="maven-publisher" class="${descriptor.clazz}"/>
 
-    <f:section title="${%cource_code}">
-        <f:entry title="${%pattern}" field="pattern">
-            <f:textbox/>
-        </f:entry>
-        <f:entry title="${%exclude_pattern}" field="excludePattern">
-            <f:textbox/>
-        </f:entry>
-    </f:section>
-
-    <f:section title="${%task_identifiers}">
-        <f:entry title="${%high_priority_tasks}" field="highPriorityTaskIdentifiers">
-            <f:textbox/>
-        </f:entry>
-        <f:entry title="${%normal_priority_tasks}" field="normalPriorityTaskIdentifiers">
-            <f:textbox/>
-        </f:entry>
-        <f:entry title="${%low_priority_tasks}" field="lowPriorityTaskIdentifiers">
-            <f:textbox/>
-        </f:entry>
-        <f:entry title="${%ignore_case}" field="ignoreCase">
-            <f:checkbox/>
-        </f:entry>
-        <f:entry title="${%as_regexp}" field="asRegexp">
-            <f:checkbox/>
-        </f:entry>
-    </f:section>
-
-    <st:include page="health" class="${descriptor.clazz}" />
-
 </j:jelly>

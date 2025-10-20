@@ -1,0 +1,18 @@
+<div>
+    Afin de simplifier l'interface utilisateur, il est possible de choisir la propriété qui sera comparée avec
+    le seuil spécifié. Il y a trois propriétés possibles :
+    <dl>
+        <dt>Total</dt>
+        <dd>Le nombre total de problèmes dans la construction courante.</dd>
+        <dt>New</dt>
+        <dd>Le nombre total de nouveaux problèmes dans la construction courante, par rapport à la construction de référence.
+            Les nouveaux problèmes sont déterminés par un algorithme sofistiqué qui tente de suivre les problèmes
+            d'une construction à une autre, même si le code source a été modifié.
+        </dd>
+        <dt>Delta</dt>
+        <dd>La différence entre le nombre totale de problèmes dans la construction courante et le nombre total de problèmes
+            dans la construction de référence. Il s'agit d'une simple soustraction, donc si une construction ajoute un nouveau
+            problème mais un corrige un autre, le résultat sera 0.
+        </dd>
+    </dl>
+</div>

@@ -26,11 +26,11 @@ package org.jenkinsci.plugins.pipeline.maven.publishers;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.AbortException;
-import hudson.Extension;
 import java.io.IOException;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.plugins.pipeline.maven.MavenPublisher;
 import org.jenkinsci.plugins.pipeline.maven.Messages;
+import org.jenkinsci.plugins.variant.OptionalExtension;
 import org.jenkinsci.plugins.workflow.steps.StepContext;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.w3c.dom.Element;
@@ -38,7 +38,7 @@ import org.w3c.dom.Element;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  *
- * @deprecated since TODO
+ * @deprecated since 1563.v2e75645a_7d43
  */
 @Deprecated
 public class JacocoReportPublisher extends MavenPublisher {
@@ -104,8 +104,10 @@ public class JacocoReportPublisher extends MavenPublisher {
 
     /**
      * TODO only collect the jacoco report if unit tests have run
+     *
      * @param context
-     * @param mavenSpyLogsElt maven spy report. WARNING experimental structure for the moment, subject to change.
+     * @param mavenSpyLogsElt maven spy report. WARNING experimental structure for
+     *                        the moment, subject to change.
      * @throws IOException
      * @throws InterruptedException
      */
@@ -121,9 +123,8 @@ public class JacocoReportPublisher extends MavenPublisher {
     }
 
     @Symbol("jacocoPublisher")
-    @Extension
-    // @OptionalExtension(requirePlugins = "jacoco")
-    public static class DescriptorImpl extends AbstractHealthAwarePublisher.DescriptorImpl {
+    @OptionalExtension(requirePlugins = "jacoco")
+    public static class DescriptorImpl extends MavenPublisher.DescriptorImpl {
         @NonNull
         @Override
         public String getDisplayName() {
@@ -132,7 +133,7 @@ public class JacocoReportPublisher extends MavenPublisher {
 
         @Override
         public int ordinal() {
-            return 20;
+            return -1;
         }
 
         @NonNull
