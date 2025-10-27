@@ -115,7 +115,7 @@
     <maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>
     <maven-findbugs-plugin.version>3.0.5</maven-findbugs-plugin.version>
     <maven-flatten-plugin.version>1.7.0</maven-flatten-plugin.version>
-    <maven-invoker-plugin.version>3.6.0</maven-invoker-plugin.version>
+    <maven-invoker-plugin.version>3.9.1</maven-invoker-plugin.version>
     <maven-jacoco-plugin.version>0.8.13</maven-jacoco-plugin.version>
     <maven-nbm-plugin.version>4.7</maven-nbm-plugin.version>
     <maven-plugin-plugin.version>3.9.0</maven-plugin-plugin.version>

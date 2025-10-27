@@ -134,7 +134,8 @@ public class WithMavenStepITest extends AbstractIntegrationTest {
                 arguments("jdk8", "/opt/java/jdk8"),
                 arguments("jdk11", "/opt/java/jdk11"),
                 arguments("jdk17", "/opt/java/jdk17"),
-                arguments("jdk21", "/opt/java/jdk21"));
+                arguments("jdk21", "/opt/java/jdk21"),
+                arguments("jdk25", "/opt/java/jdk25"));
     }
 
     @ParameterizedTest
