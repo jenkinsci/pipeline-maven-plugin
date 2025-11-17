@@ -127,7 +127,7 @@
     <plugin-exec.version>3.6.2</plugin-exec.version>
     <slf4j.version>2.0.17</slf4j.version>
     <spotless.check.skip>false</spotless.check.skip>
-    <testcontainers.version>1.21.3</testcontainers.version>
+    <testcontainers.version>2.0.2</testcontainers.version>
   </properties>
 
   <dependencyManagement>
