@@ -89,8 +89,12 @@
   <properties>
     <assertj.version>3.27.6</assertj.version>
     <changelist>999999-SNAPSHOT</changelist>
+    <commons-codec.version>1.20.0</commons-codec.version>
+    <commons-io.version>2.20.0</commons-io.version>
+    <crypto-util.version>1.11</crypto-util.version>
     <error-prone.version>2.44.0</error-prone.version>
     <gson.version>2.10.1</gson.version>
+    <guava.version>33.5.0-jre</guava.version>
     <hikaricp.version>7.0.2</hikaricp.version>
     <httpclient.version>4.5.14</httpclient.version>
     <jackson.version>2.20.1</jackson.version>
@@ -125,6 +129,8 @@
     <netty.version>4.2.7.Final</netty.version>
     <plexus-utils.version>3.6.0</plexus-utils.version>
     <plugin-exec.version>3.6.2</plugin-exec.version>
+    <remoting.version>3345.v03dee9b_f88fc</remoting.version>
+    <servlet-api.version>6.0.0</servlet-api.version>
     <slf4j.version>2.0.17</slf4j.version>
     <spotless.check.skip>false</spotless.check.skip>
     <testcontainers.version>1.21.3</testcontainers.version>
@@ -160,7 +166,26 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>${commons-codec.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${commons-io.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>${servlet-api.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
@@ -175,6 +200,17 @@
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
         <version>${plexus-utils.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.jenkins-ci</groupId>
+        <artifactId>crypto-util</artifactId>
+        <version>${crypto-util.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jenkins-ci.main</groupId>
+        <artifactId>remoting</artifactId>
+        <version>${remoting.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.plugins</groupId>
