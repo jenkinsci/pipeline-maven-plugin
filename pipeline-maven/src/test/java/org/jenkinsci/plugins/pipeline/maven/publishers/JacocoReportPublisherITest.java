@@ -7,7 +7,7 @@ import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.Test;
 
-public class JacocoReportPublisherTest extends AbstractIntegrationTest {
+public class JacocoReportPublisherITest extends AbstractIntegrationTest {
 
     @Test
     public void maven_build_jar_with_implicit_jacoco_success() throws Exception {

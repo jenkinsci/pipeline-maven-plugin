@@ -12,7 +12,7 @@ import org.jenkinsci.plugins.workflow.job.WorkflowRun;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.Issue;
 
-public class InvokerRunsPublisherTest extends AbstractIntegrationTest {
+public class InvokerRunsPublisherITest extends AbstractIntegrationTest {
 
     @Issue("JENKINS-70561")
     @Test

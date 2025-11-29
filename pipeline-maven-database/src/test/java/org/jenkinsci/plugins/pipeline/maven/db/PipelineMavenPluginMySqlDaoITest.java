@@ -53,7 +53,7 @@ import org.testcontainers.mysql.MySQLContainer;
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
 @Testcontainers(disabledWithoutDocker = true) // Testcontainers does not support docker on Windows 2019 servers
-public class PipelineMavenPluginMySqlDaoIT extends PipelineMavenPluginDaoAbstractTest {
+public class PipelineMavenPluginMySqlDaoITest extends PipelineMavenPluginDaoAbstractTest {
 
     @Container
     public static MySQLContainer DB = new MySQLContainer("mysql:9").withImagePullPolicy(alwaysPull());

@@ -114,7 +114,7 @@ public class WithMavenStepNoOptionalsTest {
 
     private void loadMavenJarProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {
         gitRepo.init();
-        Path mavenProjectRoot = Paths.get(WithMavenStepOnMasterTest.class
+        Path mavenProjectRoot = Paths.get(WithMavenStepNoOptionalsTest.class
                 .getResource("/org/jenkinsci/plugins/pipeline/maven/test/test_maven_projects/maven_jar_project/")
                 .toURI());
         if (!Files.exists(mavenProjectRoot)) {

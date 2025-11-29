@@ -20,7 +20,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers(disabledWithoutDocker = true)
-public class CoveragePublisherTest extends AbstractIntegrationTest {
+public class CoveragePublisherITest extends AbstractIntegrationTest {
 
     @Test
     public void maven_build_jar_with_jacoco_succeeds() throws Exception {

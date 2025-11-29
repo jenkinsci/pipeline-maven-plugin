@@ -125,7 +125,7 @@ public abstract class AbstractIntegrationTest {
     protected void loadSourceCodeInGitRepository(GitSampleRepoRule gitRepo, String name) throws Exception {
         gitRepo.init();
         Path mavenProjectRoot =
-                Paths.get(WithMavenStepOnMasterTest.class.getResource(name).toURI());
+                Paths.get(WithMavenStepOnMasterITest.class.getResource(name).toURI());
         if (!Files.exists(mavenProjectRoot)) {
             throw new IllegalStateException("Folder '" + mavenProjectRoot + "' not found");
         }

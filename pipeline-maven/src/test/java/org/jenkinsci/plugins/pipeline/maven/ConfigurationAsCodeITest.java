@@ -29,7 +29,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @Testcontainers(disabledWithoutDocker = true)
 @WithJenkins
-public class ConfigurationAsCodeNeedDockerTest {
+public class ConfigurationAsCodeITest {
 
     @Container
     public static MySQLContainer MYSQL_DB =

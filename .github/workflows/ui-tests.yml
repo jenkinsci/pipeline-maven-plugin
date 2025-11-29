@@ -3,7 +3,7 @@ name: 'UI Tests'
 on:
   push:
     branches:
-      - main
+      - master
   pull_request:
 
 jobs:
@@ -30,8 +30,8 @@ jobs:
         uses: stCarolas/setup-maven@v5
         with:
           maven-version: 3.9.11
-      - name: Build warnings plugin and download dependencies
-        run: mvn -V --color always -ntp verify -Pskip
+      - name: Build plugin and download dependencies
+        run: mvn -V --color always -ntp install -Pskip
       - name: Run UI tests ${{ matrix.test }} on ${{ matrix.browser }}
         env:
           BROWSER: ${{ matrix.browser }}

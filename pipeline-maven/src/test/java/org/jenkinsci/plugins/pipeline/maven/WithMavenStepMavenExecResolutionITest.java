@@ -41,7 +41,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers(disabledWithoutDocker = true)
 @Issue("JENKINS-43651")
-public class WithMavenStepMavenExecResolutionTest extends AbstractIntegrationTest {
+public class WithMavenStepMavenExecResolutionITest extends AbstractIntegrationTest {
 
     private static final String MAVEN_GLOBAL_TOOL_NAME = "maven";
 
