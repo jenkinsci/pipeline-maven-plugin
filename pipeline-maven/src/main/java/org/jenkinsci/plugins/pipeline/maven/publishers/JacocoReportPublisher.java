@@ -112,8 +112,7 @@ public class JacocoReportPublisher extends MavenPublisher {
     @Override
     public void process(@NonNull StepContext context, @NonNull Element mavenSpyLogsElt)
             throws IOException, InterruptedException {
-        throw new AbortException(
-                """
+        throw new AbortException("""
         The jacocoPublisher is deprecated as is the Jacoco plugin and you should not use it.
         Alternatively, you should rely on CoveragePublisher.
         Or, if continuing to use the JaCoCo plugin for now, run it explicitly rather than expecting withMaven to run it implicitly.

@@ -45,9 +45,9 @@ import org.jenkinsci.plugins.pipeline.maven.dao.PipelineMavenPluginDao;
 import org.jenkinsci.plugins.pipeline.maven.db.migration.MigrationStep;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.mariadb.MariaDBContainer;
 
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
@@ -56,8 +56,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 public class PipelineMavenPluginMariaDbDaoIT extends PipelineMavenPluginDaoAbstractTest {
 
     @Container
-    public static MariaDBContainer<?> DB =
-            new MariaDBContainer<>(MariaDBContainer.NAME).withImagePullPolicy(alwaysPull());
+    public static MariaDBContainer DB = new MariaDBContainer(MariaDBContainer.NAME).withImagePullPolicy(alwaysPull());
 
     @Override
     public DataSource before_newDataSource() {

@@ -37,21 +37,21 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.mysql.MySQLContainer;
+import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @Testcontainers(disabledWithoutDocker = true)
 @WithJenkins
 public class GlobalPipelineMavenConfigTest {
 
     @Container
-    public static MySQLContainer<?> MYSQL_DB =
-            new MySQLContainer<>("mysql:8.2.0").withUsername("aUser").withPassword("aPass");
+    public static MySQLContainer MYSQL_DB =
+            new MySQLContainer("mysql:8.2.0").withUsername("aUser").withPassword("aPass");
 
     @Container
-    public static PostgreSQLContainer<?> POSTGRE_DB = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE)
+    public static PostgreSQLContainer POSTGRE_DB = new PostgreSQLContainer(PostgreSQLContainer.IMAGE)
             .withUsername("aUser")
             .withPassword("aPass");
 

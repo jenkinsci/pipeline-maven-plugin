@@ -73,9 +73,7 @@ public enum MavenPublisherStrategy {
             for (Descriptor<MavenPublisher> descriptor : descriptorList) {
                 try {
                     if (JacocoReportPublisher.DescriptorImpl.class.isAssignableFrom(descriptor.getClass())) {
-                        listener.getLogger()
-                                .println(
-                                        """
+                        listener.getLogger().println("""
                         [withMaven] JacocoPublisher is no longer implicitly used with `withMaven` step.
                         [withMaven] Jacoco plugin has been deprecated and should not be used anymore.
                         [withMaven] CoveragePublisher will be used instead.
