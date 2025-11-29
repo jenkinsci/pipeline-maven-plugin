@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class DependencyFingerprintPublisherTest extends AbstractIntegrationTest {
+public class DependencyFingerprintPublisherITest extends AbstractIntegrationTest {
 
     /**
      * Two (2) pipeline maven jobs consume the same commons-lang3-3.5.jar
