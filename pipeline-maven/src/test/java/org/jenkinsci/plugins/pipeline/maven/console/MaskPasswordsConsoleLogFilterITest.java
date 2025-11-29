@@ -20,7 +20,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.jvnet.hudson.test.Issue;
 
-public class MaskPasswordsConsoleLogFilterTest extends AbstractIntegrationTest {
+public class MaskPasswordsConsoleLogFilterITest extends AbstractIntegrationTest {
 
     @Issue("SECURITY-3257")
     @ParameterizedTest

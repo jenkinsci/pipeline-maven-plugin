@@ -38,6 +38,13 @@
   <properties>
     <argLine>-Djava.awt.headless=true -Xmx1024m -Djenkins.test.timeout=1000 --add-opens java.base/sun.reflect.annotation=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED</argLine>
     <browser>firefox-container</browser>
+    <commons-codec.version>1.20.0</commons-codec.version>
+    <commons-io.version>2.20.0</commons-io.version>
+    <crypto-util.version>1.11</crypto-util.version>
+    <guava.version>33.5.0-jre</guava.version>
+    <maven.version>3.9.11</maven.version>
+    <remoting.version>3345.v03dee9b_f88fc</remoting.version>
+    <servlet-api.version>6.0.0</servlet-api.version>
   </properties>
 
   <dependencyManagement>
@@ -57,15 +64,36 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+
       <dependency>
         <groupId>com.google.errorprone</groupId>
         <artifactId>error_prone_annotations</artifactId>
         <version>${error-prone.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>${guava.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>${commons-codec.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>${commons-io.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>${servlet-api.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
-        <version>3.9.11</version>
+        <version>${maven.version}</version>
       </dependency>
       <dependency>
         <groupId>org.javassist</groupId>
@@ -73,9 +101,19 @@
         <version>${javassist.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.jenkins-ci</groupId>
+        <artifactId>crypto-util</artifactId>
+        <version>${crypto-util.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.jenkins-ci.main</groupId>
         <artifactId>jenkins-core</artifactId>
         <version>${jenkins.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jenkins-ci.main</groupId>
+        <artifactId>remoting</artifactId>
+        <version>${remoting.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -112,7 +150,6 @@
     <dependency>
       <groupId>org.junit.vintage</groupId>
       <artifactId>junit-vintage-engine</artifactId>
-      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

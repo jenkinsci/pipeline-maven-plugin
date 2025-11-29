@@ -37,8 +37,7 @@ public class JobSnippetGeneratorUiTest extends AbstractJUnitTest {
 
         snippetGenerator.selectWithMaven();
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(traceability: true) {
     // some block
 }""");
@@ -62,8 +61,7 @@ withMaven(traceability: true) {
                 .setMavenLocalRepo("")
                 .setPublisherStrategy(PublisherStrategy.IMPLICIT);
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(traceability: true) {
     // some block
 }""");
@@ -76,12 +74,10 @@ withMaven(traceability: true) {
 
         snippetGenerator.selectWithMaven().setMaven(MavenInstallation.DEFAULT_MAVEN_ID);
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(maven: '%s', traceability: true) {
     // some block
-}"""
-                        .formatted(MavenInstallation.DEFAULT_MAVEN_ID));
+}""".formatted(MavenInstallation.DEFAULT_MAVEN_ID));
     }
 
     @Test
@@ -94,8 +90,7 @@ withMaven(maven: '%s', traceability: true) {
         WithMavenSnippetGenerator snippetGenerator = createSnippetGenerator();
         snippetGenerator.selectWithMaven().setJDK("preinstalled");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(jdk: 'preinstalled', traceability: true) {
     // some block
 }""");
@@ -107,8 +102,7 @@ withMaven(jdk: 'preinstalled', traceability: true) {
 
         snippetGenerator.selectWithMaven().setTempBinDir("/path/to/tmp/dir");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(tempBinDir: '/path/to/tmp/dir', traceability: true) {
     // some block
 }""");
@@ -125,12 +119,10 @@ withMaven(tempBinDir: '/path/to/tmp/dir', traceability: true) {
 
         snippetGenerator.selectWithMaven().setMavenSettingsConfig("mvn settings");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(mavenSettingsConfig: '%s', traceability: true) {
     // some block
-}"""
-                        .formatted(mvnConfig.id()));
+}""".formatted(mvnConfig.id()));
     }
 
     @Test
@@ -139,9 +131,7 @@ withMaven(mavenSettingsConfig: '%s', traceability: true) {
 
         snippetGenerator.selectWithMaven().setMavenSettingsFilePath("settings path");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(mavenSettingsFilePath: 'settings path', traceability: true) {
     // some block
 }""");
@@ -157,12 +147,10 @@ withMaven(mavenSettingsFilePath: 'settings path', traceability: true) {
 
         snippetGenerator.selectWithMaven().setGlobalMavenSettingsConfig("global mvn settings");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(globalMavenSettingsConfig: '%s', traceability: true) {
     // some block
-}"""
-                        .formatted(mvnConfig.id()));
+}""".formatted(mvnConfig.id()));
     }
 
     @Test
@@ -171,9 +159,7 @@ withMaven(globalMavenSettingsConfig: '%s', traceability: true) {
 
         snippetGenerator.selectWithMaven().setGlobalMavenSettingsFilePath("global settings path");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(globalMavenSettingsFilePath: 'global settings path', traceability: true) {
     // some block
 }""");
@@ -185,8 +171,7 @@ withMaven(globalMavenSettingsFilePath: 'global settings path', traceability: tru
 
         snippetGenerator.selectWithMaven().setMavenOpts("some maven options");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(mavenOpts: 'some maven options', traceability: true) {
     // some block
 }""");
@@ -198,16 +183,14 @@ withMaven(mavenOpts: 'some maven options', traceability: true) {
 
         snippetGenerator.selectWithMaven().setTraceability(true);
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(traceability: true) {
     // some block
 }""");
 
         snippetGenerator.selectWithMaven().setTraceability(false);
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(traceability: false) {
     // some block
 }""");
@@ -219,9 +202,7 @@ withMaven(traceability: false) {
 
         snippetGenerator.selectWithMaven().setMavenLocalRepo("/path/to/m2/repo");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(mavenLocalRepo: '/path/to/m2/repo', traceability: true) {
     // some block
 }""");
@@ -233,8 +214,7 @@ withMaven(mavenLocalRepo: '/path/to/m2/repo', traceability: true) {
 
         snippetGenerator.selectWithMaven().setPublisherStrategy(PublisherStrategy.EXPLICIT);
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(publisherStrategy: 'EXPLICIT', traceability: true) {
     // some block
 }""");
@@ -246,9 +226,7 @@ withMaven(publisherStrategy: 'EXPLICIT', traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Concordion Publisher");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [concordionPublisher()], traceability: true) {
     // some block
 }""");
@@ -260,9 +238,7 @@ withMaven(options: [concordionPublisher()], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Concordion Publisher", p -> p.setDisabled(false));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [concordionPublisher()], traceability: true) {
     // some block
 }""");
@@ -274,9 +250,7 @@ withMaven(options: [concordionPublisher()], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Concordion Publisher", p -> p.setDisabled(true));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [concordionPublisher(disabled: true)], traceability: true) {
     // some block
 }""");
@@ -288,8 +262,7 @@ withMaven(options: [concordionPublisher(disabled: true)], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Coverage Publisher");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [coveragePublisher()], traceability: true) {
     // some block
 }""");
@@ -304,8 +277,7 @@ withMaven(options: [coveragePublisher()], traceability: true) {
                 .setCoberturaExtraPattern(null)
                 .setJacocoExtraPattern(null));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [coveragePublisher()], traceability: true) {
     // some block
 }""");
@@ -320,9 +292,7 @@ withMaven(options: [coveragePublisher()], traceability: true) {
                 .setCoberturaExtraPattern("extra cobertura pattern")
                 .setJacocoExtraPattern("extra jacoco pattern"));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [coveragePublisher(coberturaExtraPattern: 'extra cobertura pattern', disabled: true, jacocoExtraPattern: 'extra jacoco pattern', sourceCodeRetention: 'NEVER')], traceability: true) {
     // some block
 }""");
@@ -334,9 +304,7 @@ withMaven(options: [coveragePublisher(coberturaExtraPattern: 'extra cobertura pa
 
         snippetGenerator.selectWithMaven().addPublisher("Dependencies Fingerprint Publisher");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [dependenciesFingerprintPublisher()], traceability: true) {
     // some block
 }""");
@@ -354,9 +322,7 @@ withMaven(options: [dependenciesFingerprintPublisher()], traceability: true) {
                 .setIncludeScopeProvided(true)
                 .setIncludeScopeTest(false));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [dependenciesFingerprintPublisher()], traceability: true) {
     // some block
 }""");
@@ -374,9 +340,7 @@ withMaven(options: [dependenciesFingerprintPublisher()], traceability: true) {
                 .setIncludeScopeProvided(false)
                 .setIncludeScopeTest(true));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [dependenciesFingerprintPublisher(disabled: true, includeReleaseVersions: true, includeScopeCompile: false, includeScopeProvided: false, includeScopeRuntime: false, includeScopeTest: true, includeSnapshotVersions: false)], traceability: true) {
     // some block
 }""");
@@ -388,8 +352,7 @@ withMaven(options: [dependenciesFingerprintPublisher(disabled: true, includeRele
 
         snippetGenerator.selectWithMaven().addPublisher("Generated Artifacts Publisher");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [artifactsPublisher()], traceability: true) {
     // some block
 }""");
@@ -401,8 +364,7 @@ withMaven(options: [artifactsPublisher()], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Generated Artifacts Publisher", p -> p.setDisabled(false));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [artifactsPublisher()], traceability: true) {
     // some block
 }""");
@@ -414,9 +376,7 @@ withMaven(options: [artifactsPublisher()], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Generated Artifacts Publisher", p -> p.setDisabled(true));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [artifactsPublisher(disabled: true)], traceability: true) {
     // some block
 }""");
@@ -428,8 +388,7 @@ withMaven(options: [artifactsPublisher(disabled: true)], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Invoker Publisher");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [invokerPublisher()], traceability: true) {
     // some block
 }""");
@@ -441,8 +400,7 @@ withMaven(options: [invokerPublisher()], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Invoker Publisher", p -> p.setDisabled(false));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [invokerPublisher()], traceability: true) {
     // some block
 }""");
@@ -454,9 +412,7 @@ withMaven(options: [invokerPublisher()], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Invoker Publisher", p -> p.setDisabled(true));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [invokerPublisher(disabled: true)], traceability: true) {
     // some block
 }""");
@@ -468,8 +424,7 @@ withMaven(options: [invokerPublisher(disabled: true)], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("JGiven Publisher");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [jgivenPublisher()], traceability: true) {
     // some block
 }""");
@@ -481,8 +436,7 @@ withMaven(options: [jgivenPublisher()], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("JGiven Publisher", p -> p.setDisabled(false));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo("""
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [jgivenPublisher()], traceability: true) {
     // some block
 }""");
@@ -494,9 +448,7 @@ withMaven(options: [jgivenPublisher()], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("JGiven Publisher", p -> p.setDisabled(true));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [jgivenPublisher(disabled: true)], traceability: true) {
     // some block
 }""");
@@ -508,9 +460,7 @@ withMaven(options: [jgivenPublisher(disabled: true)], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Junit Publisher");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [junitPublisher(healthScaleFactor: 1.0)], traceability: true) {
     // some block
 }""");
@@ -525,9 +475,7 @@ withMaven(options: [junitPublisher(healthScaleFactor: 1.0)], traceability: true)
                 .setHealthScaleFactor("1.0")
                 .setKeepLongStdio(false));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [junitPublisher(healthScaleFactor: 1.0)], traceability: true) {
     // some block
 }""");
@@ -542,9 +490,7 @@ withMaven(options: [junitPublisher(healthScaleFactor: 1.0)], traceability: true)
                 .setHealthScaleFactor("5.0")
                 .setKeepLongStdio(true));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [junitPublisher(disabled: true, healthScaleFactor: 5.0, ignoreAttachments: true, keepLongStdio: true)], traceability: true) {
     // some block
 }""");
@@ -556,9 +502,7 @@ withMaven(options: [junitPublisher(disabled: true, healthScaleFactor: 5.0, ignor
 
         snippetGenerator.selectWithMaven().addPublisher("Maven Linker Publisher");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [mavenLinkerPublisher()], traceability: true) {
     // some block
 }""");
@@ -570,9 +514,7 @@ withMaven(options: [mavenLinkerPublisher()], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Maven Linker Publisher", p -> p.setDisabled(false));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [mavenLinkerPublisher()], traceability: true) {
     // some block
 }""");
@@ -584,9 +526,7 @@ withMaven(options: [mavenLinkerPublisher()], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Maven Linker Publisher", p -> p.setDisabled(true));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [mavenLinkerPublisher(disabled: true)], traceability: true) {
     // some block
 }""");
@@ -598,9 +538,7 @@ withMaven(options: [mavenLinkerPublisher(disabled: true)], traceability: true) {
 
         snippetGenerator.selectWithMaven().addPublisher("Pipeline Graph Publisher");
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [pipelineGraphPublisher()], traceability: true) {
     // some block
 }""");
@@ -621,9 +559,7 @@ withMaven(options: [pipelineGraphPublisher()], traceability: true) {
                 .setSkipDownstreamTriggers(false)
                 .setIgnoreUpstreamTriggers(false));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [pipelineGraphPublisher()], traceability: true) {
     // some block
 }""");
@@ -644,9 +580,7 @@ withMaven(options: [pipelineGraphPublisher()], traceability: true) {
                 .setSkipDownstreamTriggers(true)
                 .setIgnoreUpstreamTriggers(true));
 
-        assertThat(snippetGenerator.generateScript())
-                .isEqualTo(
-                        """
+        assertThat(snippetGenerator.generateScript()).isEqualTo("""
 withMaven(options: [pipelineGraphPublisher(disabled: true, ignoreUpstreamTriggers: true, includeReleaseVersions: true, includeScopeCompile: false, includeScopeProvided: false, includeScopeRuntime: false, includeScopeTest: true, includeSnapshotVersions: false, lifecycleThreshold: 'package', skipDownstreamTriggers: true)], traceability: true) {
     // some block
 }""");
