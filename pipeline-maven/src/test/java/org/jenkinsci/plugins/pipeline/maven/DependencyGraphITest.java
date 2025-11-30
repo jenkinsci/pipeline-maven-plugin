@@ -34,7 +34,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author <a href="mailto:cleclerc@cloudbees.com">Cyrille Le Clerc</a>
  */
-public class DependencyGraphTest extends AbstractIntegrationTest {
+public class DependencyGraphITest extends AbstractIntegrationTest {
 
     public GitSampleRepoRule downstreamArtifactRepoRule;
 

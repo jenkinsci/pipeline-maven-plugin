@@ -54,7 +54,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers(disabledWithoutDocker = true)
-public class WithMavenStepTest extends AbstractIntegrationTest {
+public class WithMavenStepITest extends AbstractIntegrationTest {
 
     private static final String COMMONS_LANG3_FINGERPRINT = "780b5a8b72eebe6d0dbff1c11b5658fa";
 

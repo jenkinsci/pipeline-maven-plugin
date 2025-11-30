@@ -53,10 +53,10 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 /**
- * TODO migrate to {@link WithMavenStepTest} once we have implemented a
+ * TODO migrate to {@link WithMavenStepITest} once we have implemented a
  * GitRepoRule that can be used on remote agents
  */
-public class WithMavenStepGlobalConfigurationTest extends AbstractIntegrationTest {
+public class WithMavenStepGlobalConfigurationITest extends AbstractIntegrationTest {
 
     @ParameterizedTest(name = "{0}")
     @DisplayName("Publisher disabled")

@@ -44,7 +44,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 
 @Testcontainers(disabledWithoutDocker = true)
 @WithJenkins
-public class GlobalPipelineMavenConfigTest {
+public class GlobalPipelineMavenConfigITest {
 
     @Container
     public static MySQLContainer MYSQL_DB =

@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers(disabledWithoutDocker = true)
-public class DockerDowstreamTest extends AbstractIntegrationTest {
+public class DockerDowstreamITest extends AbstractIntegrationTest {
 
     public GitSampleRepoRule downstreamArtifactRepoRule;
 

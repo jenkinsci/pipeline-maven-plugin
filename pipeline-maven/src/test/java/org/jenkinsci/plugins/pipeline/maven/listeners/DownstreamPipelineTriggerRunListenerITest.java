@@ -36,7 +36,7 @@ import org.junit.jupiter.api.condition.EnabledOnOs;
 @EnabledOnOs(
         value = LINUX,
         disabledReason = "'fatal error: aux_index does not match even or odd indices' on Windows JDK 19")
-public class DownstreamPipelineTriggerRunListenerIntegrationTest extends AbstractIntegrationTest {
+public class DownstreamPipelineTriggerRunListenerITest extends AbstractIntegrationTest {
 
     @BeforeEach
     public void setup() throws Exception {

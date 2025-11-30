@@ -33,7 +33,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers(disabledWithoutDocker = true)
-public class JavaGitContainerTest extends AbstractIntegrationTest {
+public class JavaGitContainerITest extends AbstractIntegrationTest {
 
     @Container
     public GenericContainer<?> containerRule = createContainer("java-git");

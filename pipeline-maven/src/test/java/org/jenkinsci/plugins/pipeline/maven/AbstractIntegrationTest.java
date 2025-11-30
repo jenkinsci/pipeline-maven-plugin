@@ -11,6 +11,7 @@ import com.cloudbees.plugins.credentials.domains.Domain;
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.model.Fingerprint;
 import hudson.plugins.sshslaves.SSHLauncher;
+import hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy;
 import hudson.slaves.DumbSlave;
 import hudson.slaves.RetentionStrategy;
 import hudson.tasks.Fingerprinter;
@@ -125,7 +126,7 @@ public abstract class AbstractIntegrationTest {
     protected void loadSourceCodeInGitRepository(GitSampleRepoRule gitRepo, String name) throws Exception {
         gitRepo.init();
         Path mavenProjectRoot =
-                Paths.get(WithMavenStepOnMasterTest.class.getResource(name).toURI());
+                Paths.get(WithMavenStepOnMasterITest.class.getResource(name).toURI());
         if (!Files.exists(mavenProjectRoot)) {
             throw new IllegalStateException("Folder '" + mavenProjectRoot + "' not found");
         }
@@ -181,6 +182,7 @@ public abstract class AbstractIntegrationTest {
     private void registerAgentForSlaveContainer(GenericContainer<?> slaveContainer) throws Exception {
         SSHLauncher sshLauncher =
                 new SSHLauncher(slaveContainer.getHost(), slaveContainer.getMappedPort(22), SSH_CREDENTIALS_ID);
+        sshLauncher.setSshHostKeyVerificationStrategy(new NonVerifyingKeyVerificationStrategy());
 
         DumbSlave agent = new DumbSlave(AGENT_NAME, SLAVE_BASE_PATH, sshLauncher);
         agent.setNumExecutors(1);

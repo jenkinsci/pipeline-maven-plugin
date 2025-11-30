@@ -96,10 +96,10 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.jvnet.hudson.test.Issue;
 
 /**
- * TODO migrate to {@link WithMavenStepTest} once we have implemented a
+ * TODO migrate to {@link WithMavenStepITest} once we have implemented a
  * GitRepoRule that can be used on remote agents
  */
-public class WithMavenStepOnMasterTest extends AbstractIntegrationTest {
+public class WithMavenStepOnMasterITest extends AbstractIntegrationTest {
 
     Logger logger;
     Level savedLevel;
