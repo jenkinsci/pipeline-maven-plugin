@@ -348,7 +348,7 @@
 
   <profiles>
     <profile>
-      <id>ci</id>
+      <id>ui-tests</id>
       <modules>
         <module>pipeline-maven</module>
         <module>pipeline-maven-api</module>

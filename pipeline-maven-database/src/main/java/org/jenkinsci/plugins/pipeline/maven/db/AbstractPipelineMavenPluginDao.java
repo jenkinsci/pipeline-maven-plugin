@@ -296,12 +296,12 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                                 metaData.getDatabaseProductName() + " " + metaData.getDatabaseProductVersion();
                         LOGGER.log(Level.INFO, "Checking JDBC connection against " + databaseVersionDescription);
                         String databaseRequirement =
-                                "MySQL Server up to 8.1 or Amazon Aurora MySQL 5.6+ or MariaDB up to 11.1 or PostgreSQL up to 17 is required";
+                                "MySQL Server up to 8.1 or Amazon Aurora MySQL 5.6+ or MariaDB up to 12.1 or PostgreSQL up to 18 is required";
                         if ("MariaDB".equals(metaData.getDatabaseProductName())) {
                             @Nullable
                             String mariaDbVersion = PipelineMavenPluginMySqlDao.extractMariaDbVersion(
                                     metaData.getDatabaseProductVersion());
-                            if (mariaDbVersion == null || !mariaDbVersion.matches("^(10|11)\\..*")) {
+                            if (mariaDbVersion == null || !mariaDbVersion.matches("^(10|11|12)\\..*")) {
                                 return FormValidation.warning("Non tested MariaDB version "
                                         + metaData.getDatabaseProductVersion() + ". " + databaseRequirement);
                             }
@@ -383,6 +383,7 @@ public abstract class AbstractPipelineMavenPluginDao implements PipelineMavenPlu
                                 }
                             }
                             switch (metaData.getDatabaseMajorVersion()) {
+                                case 18:
                                 case 17:
                                 case 16:
                                 case 15:
