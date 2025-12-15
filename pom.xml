@@ -121,7 +121,7 @@
     <maven-plugin-plugin.version>3.9.0</maven-plugin-plugin.version>
     <maven-plugin-sisu.version>0.3.5</maven-plugin-sisu.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
-    <maven.version>3.8.8</maven.version>
+    <maven.version>3.9.11</maven.version>
     <netty.version>4.2.8.Final</netty.version>
     <plexus-utils.version>3.6.0</plexus-utils.version>
     <plugin-exec.version>3.6.2</plugin-exec.version>
