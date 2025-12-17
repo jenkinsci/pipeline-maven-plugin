@@ -18,13 +18,11 @@ public class MavenConfigFolderOverrideProperty extends AbstractFolderProperty<Ab
     /**
      * Provides access to the settings.xml to be used for a build.
      */
-    @DataBoundSetter
     private SettingsProvider settings;
 
     /**
      * Provides access to the global settings.xml to be used for a build.
      */
-    @DataBoundSetter
     private GlobalSettingsProvider globalSettings;
 
     /**
@@ -51,7 +49,8 @@ public class MavenConfigFolderOverrideProperty extends AbstractFolderProperty<Ab
         return settings;
     }
 
-    protected void setSettings(SettingsProvider settings) {
+    @DataBoundSetter
+    public void setSettings(SettingsProvider settings) {
         this.settings = settings;
     }
 
@@ -59,7 +58,8 @@ public class MavenConfigFolderOverrideProperty extends AbstractFolderProperty<Ab
         return globalSettings;
     }
 
-    protected void setGlobalSettings(GlobalSettingsProvider globalSettings) {
+    @DataBoundSetter
+    public void setGlobalSettings(GlobalSettingsProvider globalSettings) {
         this.globalSettings = globalSettings;
     }
 
