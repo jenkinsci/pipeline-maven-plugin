@@ -109,7 +109,7 @@
     <json-unit-assertj.version>4.1.1</json-unit-assertj.version>
     <junit.version>5.14.1</junit.version>
     <junit4.version>4.13.2</junit4.version>
-    <mariadb-client.version>3.5.6</mariadb-client.version>
+    <mariadb-client.version>3.5.7</mariadb-client.version>
     <maven-cobertura-plugin.version>2.7</maven-cobertura-plugin.version>
     <maven-dockerfile-plugin.version>1.4.13</maven-dockerfile-plugin.version>
     <maven-failsafe-plugin.version>3.5.3</maven-failsafe-plugin.version>
