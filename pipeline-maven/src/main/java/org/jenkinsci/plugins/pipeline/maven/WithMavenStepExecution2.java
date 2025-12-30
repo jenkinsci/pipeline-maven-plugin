@@ -662,8 +662,10 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             try (ByteArrayOutputStream stdout = new ByteArrayOutputStream();
                     ByteArrayOutputStream stderr = new ByteArrayOutputStream()) {
                 ProcStarter ps = launcher.launch();
-                Proc p = launcher.launch(
-                        ps.cmds(mvnExecPath, "--version").stdout(stdout).stderr(stderr));
+                Proc p = launcher.launch(ps.cmds(mvnExecPath, "--version")
+                        .envs(env.overrideAll(envOverride))
+                        .stdout(stdout)
+                        .stderr(stderr));
                 int exitCode = p.join();
                 if (exitCode == 0) {
                     Optional<String> version = stdout.toString(getComputer().getDefaultCharset())
