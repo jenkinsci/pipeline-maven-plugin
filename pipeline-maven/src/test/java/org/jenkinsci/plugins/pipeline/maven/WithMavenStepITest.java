@@ -174,6 +174,9 @@ public class WithMavenStepITest extends AbstractIntegrationTest {
             assertThat(archives).hasSize(1);
             assertThat(archives.iterator().next().endsWith("mono-dependency-maven-project-0.1-SNAPSHOT.jar"))
                     .isTrue();
+            jenkinsRule.assertLogNotContains(
+                    "[withMaven] WARNING: You are running an old version of Maven (UNKNOWN), you should update to at least 3.8.x",
+                    run);
         }
     }
 
