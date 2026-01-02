@@ -88,6 +88,7 @@
 
   <properties>
     <assertj.version>3.27.7</assertj.version>
+    <ban-junit4-imports.skip>false</ban-junit4-imports.skip>
     <changelist>999999-SNAPSHOT</changelist>
     <error-prone.version>2.46.0</error-prone.version>
     <gson.version>2.10.1</gson.version>
