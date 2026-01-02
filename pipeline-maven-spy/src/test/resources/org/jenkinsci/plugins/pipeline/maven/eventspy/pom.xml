@@ -28,7 +28,7 @@ https://github.com/spring-projects/spring-petclinic/blob/80269539e27062592f4c28b
         <webjars-bootstrap.version>5.3.8</webjars-bootstrap.version>
         <webjars-jquery-ui.version>1.14.1</webjars-jquery-ui.version>
         <webjars-jquery.version>3.7.1</webjars-jquery.version>
-        <wro4j.version>1.10.1</wro4j.version>
+        <wro4j.version>2.1.1</wro4j.version>
 
         <thymeleaf.version>3.0.2.RELEASE</thymeleaf.version>
         <thymeleaf-layout-dialect.version>2.0.4</thymeleaf-layout-dialect.version>
