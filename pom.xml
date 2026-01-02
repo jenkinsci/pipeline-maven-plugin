@@ -106,7 +106,7 @@
     <jenkins.baseline>2.516</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <json-smart.version>2.3</json-smart.version>
-    <json-unit-assertj.version>4.1.1</json-unit-assertj.version>
+    <json-unit-assertj.version>5.1.0</json-unit-assertj.version>
     <junit.version>6.0.1</junit.version>
     <junit4.version>4.13.2</junit4.version>
     <mariadb-client.version>3.5.7</mariadb-client.version>
