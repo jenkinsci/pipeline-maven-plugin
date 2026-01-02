@@ -39,7 +39,7 @@
     <argLine>-Djava.awt.headless=true -Xmx1024m -Djenkins.test.timeout=1000 --add-opens java.base/sun.reflect.annotation=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED</argLine>
     <browser>firefox-container</browser>
     <commons-codec.version>1.20.0</commons-codec.version>
-    <commons-io.version>2.20.0</commons-io.version>
+    <commons-io.version>2.21.0</commons-io.version>
     <crypto-util.version>1.11</crypto-util.version>
     <guava.version>33.5.0-jre</guava.version>
     <maven.version>3.9.12</maven.version>
