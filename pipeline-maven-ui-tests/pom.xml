@@ -42,7 +42,7 @@
     <commons-io.version>2.20.0</commons-io.version>
     <crypto-util.version>1.11</crypto-util.version>
     <guava.version>33.5.0-jre</guava.version>
-    <maven.version>3.9.11</maven.version>
+    <maven.version>3.9.12</maven.version>
     <remoting.version>3345.v03dee9b_f88fc</remoting.version>
     <servlet-api.version>6.0.0</servlet-api.version>
   </properties>
