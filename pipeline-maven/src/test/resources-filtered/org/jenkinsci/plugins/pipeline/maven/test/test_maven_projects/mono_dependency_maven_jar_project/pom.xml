@@ -22,7 +22,7 @@
             Do not update, this project is used with old maven versions, for backward compatibility,
             and newer version of the plugin does not accept older maven versions.
           -->
-          <version>3.11.0</version>
+          <version>3.14.1</version>
         </plugin>
       </plugins>
     </pluginManagement>
