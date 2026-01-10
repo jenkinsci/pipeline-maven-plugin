@@ -10,6 +10,11 @@
   <packaging>hpi</packaging>
   <name>Pipeline Maven Plugin API</name>
 
+  <properties>
+    <hpi.bundledArtifacts />
+    <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>

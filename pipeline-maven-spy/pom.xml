@@ -37,6 +37,11 @@
   <description>Maven Spy injected with "-Dmaven.ext.class.path" to generatesMaven execution reports that are consumed by the
         Jenkins Pipeline withMaven(){} step.</description>
 
+  <properties>
+    <hpi.bundledArtifacts />
+    <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>javax.inject</groupId>
