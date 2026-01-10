@@ -10,6 +10,11 @@
   <packaging>hpi</packaging>
   <name>Pipeline Maven Plugin Database</name>
 
+  <properties>
+    <hpi.bundledArtifacts>HikariCP</hpi.bundledArtifacts>
+    <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>com.zaxxer</groupId>

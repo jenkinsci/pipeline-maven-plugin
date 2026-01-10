@@ -40,8 +40,10 @@
   <url>https://github.com/jenkinsci/pipeline-maven-plugin/</url>
 
   <properties>
+    <hpi.bundledArtifacts />
     <hpi.compatibleSinceVersion>1333</hpi.compatibleSinceVersion>
     <hpi.pluginChangelogUrl>https://github.com/jenkinsci/pipeline-maven-plugin/releases</hpi.pluginChangelogUrl>
+    <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
   </properties>
 
   <dependencies>

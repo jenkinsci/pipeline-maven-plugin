@@ -42,6 +42,8 @@
     <commons-io.version>2.21.0</commons-io.version>
     <crypto-util.version>1.11</crypto-util.version>
     <guava.version>33.5.0-jre</guava.version>
+    <hpi.bundledArtifacts />
+    <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
     <maven.version>3.9.12</maven.version>
     <remoting.version>3355.v388858a_47b_33</remoting.version>
     <servlet-api.version>6.1.0</servlet-api.version>
