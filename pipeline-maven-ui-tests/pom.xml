@@ -45,6 +45,7 @@
     <hpi.bundledArtifacts />
     <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
     <maven.version>3.9.12</maven.version>
+    <plexus-utils.version>3.6.0</plexus-utils.version>
     <remoting.version>3355.v388858a_47b_33</remoting.version>
     <servlet-api.version>6.1.0</servlet-api.version>
   </properties>
@@ -96,6 +97,11 @@
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
         <version>${maven.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.codehaus.plexus</groupId>
+        <artifactId>plexus-utils</artifactId>
+        <version>${plexus-utils.version}</version>
       </dependency>
       <dependency>
         <groupId>org.javassist</groupId>
