@@ -93,7 +93,7 @@
     <gson.version>2.10.1</gson.version>
     <hikaricp.version>7.0.2</hikaricp.version>
     <httpclient.version>4.5.14</httpclient.version>
-    <jackson.version>2.20.1</jackson.version>
+    <jackson.version>2.21.0</jackson.version>
     <jansi.version>2.4.0</jansi.version>
     <javassist.version>3.30.2-GA</javassist.version>
     <jenkins-acceptance-test-harness.version>6507.vef7dc6b_6f5c4</jenkins-acceptance-test-harness.version>
