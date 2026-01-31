@@ -44,10 +44,12 @@
     <guava.version>33.5.0-jre</guava.version>
     <hpi.bundledArtifacts />
     <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
+    <jna.version>5.18.1</jna.version>
     <maven.version>3.9.12</maven.version>
     <plexus-utils.version>3.6.0</plexus-utils.version>
     <remoting.version>3355.v388858a_47b_33</remoting.version>
     <servlet-api.version>6.1.0</servlet-api.version>
+    <version-number.version>1.14</version-number.version>
   </properties>
 
   <dependencyManagement>
@@ -94,6 +96,11 @@
         <version>${servlet-api.version}</version>
       </dependency>
       <dependency>
+        <groupId>net.java.dev.jna</groupId>
+        <artifactId>jna</artifactId>
+        <version>${jna.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-artifact</artifactId>
         <version>${maven.version}</version>
@@ -112,6 +119,11 @@
         <groupId>org.jenkins-ci</groupId>
         <artifactId>crypto-util</artifactId>
         <version>${crypto-util.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jenkins-ci</groupId>
+        <artifactId>version-number</artifactId>
+        <version>${version-number.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jenkins-ci.main</groupId>
