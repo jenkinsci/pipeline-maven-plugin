@@ -37,6 +37,7 @@
 
   <properties>
     <argLine>-Djava.awt.headless=true -Xmx1024m -Djenkins.test.timeout=1000 --add-opens java.base/sun.reflect.annotation=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.util.concurrent=ALL-UNNAMED</argLine>
+    <ban-junit4-imports.skip>true</ban-junit4-imports.skip>
     <browser>firefox-container</browser>
     <commons-codec.version>1.21.0</commons-codec.version>
     <commons-io.version>2.21.0</commons-io.version>

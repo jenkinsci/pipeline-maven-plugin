@@ -11,30 +11,29 @@ import jenkins.mvn.DefaultGlobalSettingsProvider;
 import jenkins.mvn.DefaultSettingsProvider;
 import jenkins.mvn.GlobalMavenConfig;
 import jenkins.plugins.git.GitSampleRepoRule;
+import jenkins.plugins.git.junit.jupiter.WithGitSampleRepo;
 import jenkins.scm.impl.mock.GitSampleRepoRuleUtils;
 import org.jenkinsci.plugins.pipeline.maven.publishers.PipelineGraphPublisher;
 import org.jenkinsci.plugins.pipeline.maven.util.MavenUtil;
 import org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition;
 import org.jenkinsci.plugins.workflow.job.WorkflowJob;
 import org.jenkinsci.plugins.workflow.job.WorkflowRun;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
-import org.jvnet.hudson.test.InboundAgentRule;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.jvnet.hudson.test.JenkinsRule;
-import org.jvnet.hudson.test.RealJenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.InboundAgentExtension;
+import org.jvnet.hudson.test.junit.jupiter.RealJenkinsExtension;
 
-// Migrate to full JUnit5 impossible because of RealJenkinsRule
-public class WithMavenStepNoOptionalsTest {
+@WithGitSampleRepo
+class WithMavenStepNoOptionalsTest {
 
-    @ClassRule
-    public static InboundAgentRule agentRule = new InboundAgentRule();
+    private static final String STATIC_AGENT_NAME = "mock";
 
-    @Rule
-    public GitSampleRepoRule gitRepoRule = new GitSampleRepoRule();
+    @RegisterExtension
+    private final InboundAgentExtension agentRule = new InboundAgentExtension();
 
-    @Rule
-    public RealJenkinsRule jenkinsRule = new RealJenkinsRule()
+    @RegisterExtension
+    private final RealJenkinsExtension jenkins = new RealJenkinsExtension()
             .omitPlugins(
                     "coverage",
                     "findbugs",
@@ -53,19 +52,51 @@ public class WithMavenStepNoOptionalsTest {
                     "tasks");
 
     @Test
-    public void maven_build_jar_project_on_master_succeeds() throws Throwable {
-        loadMavenJarProjectInGitRepo(gitRepoRule);
-        jenkinsRule
-                .extraEnv(
-                        "MAVEN_ZIP_PATH",
-                        Paths.get("target", "apache-maven-" + MavenUtil.MAVEN_VERSION + "-bin.zip")
-                                .toAbsolutePath()
-                                .toString())
-                .extraEnv("MAVEN_VERSION", MavenUtil.MAVEN_VERSION)
-                .then(WithMavenStepNoOptionalsTest::setup, new Build(gitRepoRule.toString()));
+    void maven_build_jar_project_on_master_succeeds(GitSampleRepoRule gitRepoRule) throws Throwable {
+        try {
+            loadMavenJarProjectInGitRepo(gitRepoRule);
+            jenkins.extraEnv(
+                            "MAVEN_ZIP_PATH",
+                            Paths.get("target", "apache-maven-" + MavenUtil.MAVEN_VERSION + "-bin.zip")
+                                    .toAbsolutePath()
+                                    .toString())
+                    .extraEnv("MAVEN_VERSION", MavenUtil.MAVEN_VERSION)
+                    .startJenkins();
+            InboundAgentExtension.Options.Builder options =
+                    InboundAgentExtension.Options.newBuilder().name(STATIC_AGENT_NAME);
+            agentRule.createAgent(jenkins, options.build());
+            jenkins.runRemotely(new Setup(), new Build(gitRepoRule.toString()));
+        } finally {
+            agentRule.stop(jenkins, STATIC_AGENT_NAME);
+        }
     }
 
-    private static class Build implements RealJenkinsRule.Step {
+    private static class Setup implements RealJenkinsExtension.Step {
+
+        private static final long serialVersionUID = -1267837785062116155L;
+
+        @Override
+        public void run(JenkinsRule r) throws Throwable {
+            Slave agent = (Slave) r.jenkins.getNode(STATIC_AGENT_NAME);
+            r.waitOnline(agent);
+            MavenUtil.configureDefaultMaven(agent.getRootPath());
+
+            GlobalMavenConfig globalMavenConfig = r.get(GlobalMavenConfig.class);
+            globalMavenConfig.setGlobalSettingsProvider(new DefaultGlobalSettingsProvider());
+            globalMavenConfig.setSettingsProvider(new DefaultSettingsProvider());
+
+            List<MavenPublisher> options = new ArrayList<>();
+            PipelineGraphPublisher graphPublisher = new PipelineGraphPublisher();
+            graphPublisher.setLifecycleThreshold("package");
+            options.add(graphPublisher);
+            GlobalPipelineMavenConfig pipelineConfig = r.get(GlobalPipelineMavenConfig.class);
+            pipelineConfig.setPublisherOptions(options);
+        }
+    }
+
+    private static class Build implements RealJenkinsExtension.Step {
+
+        private static final long serialVersionUID = 8694503255595143205L;
 
         private final String repoUrl;
 
@@ -93,23 +124,6 @@ public class WithMavenStepNoOptionalsTest {
             WorkflowRun build = r.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
             r.assertLogContains("BUILD SUCCESS", build);
         }
-    }
-
-    private static void setup(final JenkinsRule r) throws Throwable {
-        Slave agent = agentRule.createAgent(r, "mock");
-        r.waitOnline(agent);
-        MavenUtil.configureDefaultMaven(agent.getRootPath());
-
-        GlobalMavenConfig globalMavenConfig = r.get(GlobalMavenConfig.class);
-        globalMavenConfig.setGlobalSettingsProvider(new DefaultGlobalSettingsProvider());
-        globalMavenConfig.setSettingsProvider(new DefaultSettingsProvider());
-
-        List<MavenPublisher> options = new ArrayList<>();
-        PipelineGraphPublisher graphPublisher = new PipelineGraphPublisher();
-        graphPublisher.setLifecycleThreshold("package");
-        options.add(graphPublisher);
-        GlobalPipelineMavenConfig pipelineConfig = r.get(GlobalPipelineMavenConfig.class);
-        pipelineConfig.setPublisherOptions(options);
     }
 
     private void loadMavenJarProjectInGitRepo(GitSampleRepoRule gitRepo) throws Exception {

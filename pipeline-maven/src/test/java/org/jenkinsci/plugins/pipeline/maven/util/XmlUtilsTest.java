@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import junit.framework.AssertionFailedError;
 import org.jenkinsci.plugins.pipeline.maven.MavenArtifact;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -414,7 +413,7 @@ public class XmlUtilsTest {
                 assertThat(mavenArtifact.getExtension()).isEqualTo("jar");
                 assertThat(mavenArtifact.getClassifier()).isNullOrEmpty();
             } else {
-                throw new AssertionFailedError("Unsupported type for " + mavenArtifact);
+                fail("Unsupported type for " + mavenArtifact);
             }
         }
     }
@@ -516,7 +515,7 @@ public class XmlUtilsTest {
                 assertThat(mavenArtifact.getExtension()).isEqualTo("jar");
                 assertThat(mavenArtifact.getClassifier()).isEqualTo("sources");
             } else {
-                throw new AssertionFailedError("Unsupported type for " + mavenArtifact);
+                fail("Unsupported type for " + mavenArtifact);
             }
         }
     }
@@ -547,7 +546,7 @@ public class XmlUtilsTest {
                 assertThat(mavenArtifact.getExtension()).isEqualTo("ova");
                 assertThat(mavenArtifact.getClassifier()).isNullOrEmpty();
             } else {
-                throw new AssertionFailedError("Unsupported type for " + mavenArtifact);
+                fail("Unsupported type for " + mavenArtifact);
             }
         }
     }
