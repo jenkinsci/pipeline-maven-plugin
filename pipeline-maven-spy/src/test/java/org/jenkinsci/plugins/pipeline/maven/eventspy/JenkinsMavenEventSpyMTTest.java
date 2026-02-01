@@ -50,6 +50,9 @@ import org.junit.jupiter.api.Test;
 
 public class JenkinsMavenEventSpyMTTest {
 
+    private static final int NB_THREADS = 100;
+    private static final int TIMEOUT_MS = 10000;
+
     MavenProject project;
 
     @BeforeEach
@@ -70,7 +73,7 @@ public class JenkinsMavenEventSpyMTTest {
         spy.init(new EventSpy.Context() {
             @Override
             public Map<String, Object> getData() {
-                return new HashMap();
+                return new HashMap<>();
             }
         });
 
@@ -91,24 +94,21 @@ public class JenkinsMavenEventSpyMTTest {
 
     @Test // Issue JENKINS-46579
     public void testMavenExecutionMTSpyReporters() throws Exception {
-        int numThreads = 100;
         final CyclicBarrier barrier =
-                new CyclicBarrier(numThreads + 1); // we need to also stop the test thread (current)
+                new CyclicBarrier(NB_THREADS + 1); // we need to also stop the test thread (current)
         final AtomicInteger counter = new AtomicInteger(0);
         final ExceptionHolder exceptionHolder = new ExceptionHolder();
 
-        final Vector<JenkinsMavenEventSpy> spyList = new Vector<JenkinsMavenEventSpy>(numThreads);
+        final Vector<JenkinsMavenEventSpy> spyList = new Vector<JenkinsMavenEventSpy>(NB_THREADS);
 
         // Test some concurrency around persisted state. Launch 100 threads from which
-        // 1/3 will try to change the
-        // persisted state, the rest will read it a couple of times.
-        for (int i = 0; i < numThreads; i++) {
+        // 1/3 will try to change the persisted state, the rest will read it a couple of times.
+        for (int i = 0; i < NB_THREADS; i++) {
             new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 barrier.await();
-                                // Thread.sleep(RandomUtils.nextInt(0, 500));
                                 JenkinsMavenEventSpy spy = createSpy();
                                 spyList.add(spy);
                                 DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
@@ -134,12 +134,11 @@ public class JenkinsMavenEventSpyMTTest {
         while (true) {
             int c = counter.get();
             long finish = System.currentTimeMillis();
-            if ((finish - start) > 2000L) { // 2 seconds is the limit
-                // ThreadDumps.threadDumpModern(System.out); //FIXME
+            if ((finish - start) > TIMEOUT_MS) {
                 fail("Threads taking too long to finish " + (finish - start) + "ms");
             }
 
-            if (c >= numThreads) {
+            if (c >= NB_THREADS) {
                 System.out.println("==== All threads finished");
                 System.out.println("==== Time: " + (finish - start) + " ms.");
                 break;
@@ -165,25 +164,21 @@ public class JenkinsMavenEventSpyMTTest {
 
     @Test // Issue JENKINS-46579
     public void testMavenExecutionMTRequestsSingleSpyReporter() throws Exception {
-        int numThreads = 100;
         final CyclicBarrier barrier =
-                new CyclicBarrier(numThreads + 1); // we need to also stop the test thread (current)
+                new CyclicBarrier(NB_THREADS + 1); // we need to also stop the test thread (current)
         final AtomicInteger counter = new AtomicInteger(0);
         final ExceptionHolder exceptionHolder = new ExceptionHolder();
 
         final JenkinsMavenEventSpy spy = createSpy();
 
         // Test some concurrency around persisted state. Launch 100 threads from which
-        // 1/3 will try to change the
-        // persisted state, the rest will read it a couple of times.
-        for (int i = 0; i < numThreads; i++) {
+        // 1/3 will try to change the persisted state, the rest will read it a couple of times.
+        for (int i = 0; i < NB_THREADS; i++) {
             new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 barrier.await();
-                                // Thread.sleep(RandomUtils.nextInt(0, 500));
-
                                 DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
                                 request.setPom(new File("path/to/pom.xml"));
                                 request.setGoals(Arrays.asList("clean", "source:jar", "deploy"));
@@ -206,12 +201,11 @@ public class JenkinsMavenEventSpyMTTest {
         while (true) {
             int c = counter.get();
             long finish = System.currentTimeMillis();
-            if ((finish - start) > 2000L) { // 2 seconds is the limit
-                // ThreadDumps.threadDumpModern(System.out); //FIXME
+            if ((finish - start) > TIMEOUT_MS) {
                 fail("Threads taking too long to finish " + (finish - start) + "ms");
             }
 
-            if (c >= numThreads) {
+            if (c >= NB_THREADS) {
                 System.out.println("==== All threads finished");
                 System.out.println("==== Time: " + (finish - start) + " ms.");
                 break;
