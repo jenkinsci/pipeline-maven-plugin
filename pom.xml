@@ -97,7 +97,7 @@
     <jackson.version>2.21.1</jackson.version>
     <jansi.version>2.4.0</jansi.version>
     <javassist.version>3.30.2-GA</javassist.version>
-    <jenkins-acceptance-test-harness.version>6584.v099cc7d646fc</jenkins-acceptance-test-harness.version>
+    <jenkins-acceptance-test-harness.version>6587.v2a_7493c89346</jenkins-acceptance-test-harness.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
     <jenkins-plugin-maven-invoker.version>2.5</jenkins-plugin-maven-invoker.version>
