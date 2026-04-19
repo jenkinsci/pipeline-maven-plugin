@@ -10,7 +10,7 @@ ifdef::env-github[]
 :warning-caption: :warning:
 endif::[]
 
-link:https://ci.jenkins.io/job/Plugins/job/pipeline-maven-plugin/job/master/[image:https://ci.jenkins.io/job/Plugins/job/pipeline-maven-plugin/job/master/badge/icon[Build]]
+link:https://ci.jenkins.io/job/Plugins/job/pipeline-maven-plugin/job/master/[image:https://ci.jenkins.io/buildStatus/icon?job=Plugins%2Fpipeline-maven-plugin%2Fmaster[Build]]
 link:https://github.com/jenkinsci/pipeline-maven-plugin/graphs/contributors[image:https://img.shields.io/github/contributors/jenkinsci/pipeline-maven-plugin.svg?color=blue[Contributors]]
 link:https://plugins.jenkins.io/pipeline-maven/[image:https://img.shields.io/jenkins/plugin/i/pipeline-maven.svg?color=blue&label=installations[Jenkins Plugin Installs]]
 link:https://plugins.jenkins.io/pipeline-maven/[image:https://img.shields.io/jenkins/plugin/v/pipeline-maven.svg[Plugin]]
