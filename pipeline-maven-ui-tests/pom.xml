@@ -42,7 +42,7 @@
     <commons-codec.version>1.21.0</commons-codec.version>
     <commons-io.version>2.21.0</commons-io.version>
     <crypto-util.version>1.11</crypto-util.version>
-    <guava.version>33.5.0-jre</guava.version>
+    <guava.version>33.6.0-jre</guava.version>
     <hpi.bundledArtifacts />
     <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
     <jna.version>5.18.1</jna.version>
