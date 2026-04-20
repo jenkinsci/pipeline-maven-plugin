@@ -46,7 +46,7 @@
     <hpi.bundledArtifacts />
     <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
     <jna.version>5.18.1</jna.version>
-    <maven.version>3.9.14</maven.version>
+    <maven.version>3.9.15</maven.version>
     <plexus-utils.version>3.6.1</plexus-utils.version>
     <remoting.version>3355.v388858a_47b_33</remoting.version>
     <servlet-api.version>6.1.0</servlet-api.version>
