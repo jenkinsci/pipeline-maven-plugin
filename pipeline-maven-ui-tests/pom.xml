@@ -40,7 +40,7 @@
     <ban-junit4-imports.skip>true</ban-junit4-imports.skip>
     <browser>firefox-container</browser>
     <commons-codec.version>1.21.0</commons-codec.version>
-    <commons-io.version>2.21.0</commons-io.version>
+    <commons-io.version>2.22.0</commons-io.version>
     <crypto-util.version>1.11</crypto-util.version>
     <guava.version>33.6.0-jre</guava.version>
     <hpi.bundledArtifacts />
