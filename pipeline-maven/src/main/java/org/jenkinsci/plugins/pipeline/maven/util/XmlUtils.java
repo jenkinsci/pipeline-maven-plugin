@@ -519,6 +519,8 @@ public class XmlUtils {
             } else {
                 pomArtifact.setVersion(XmlUtils.getUniqueChildElement(artifactDeployedEvent, "artifact")
                         .getAttribute("version"));
+                pomArtifact.setRepositoryUrl(XmlUtils.getUniqueChildElement(artifactDeployedEvent, "repository")
+                        .getAttribute("url"));
             }
 
             result.add(pomArtifact);

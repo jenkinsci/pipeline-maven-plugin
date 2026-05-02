@@ -406,6 +406,7 @@ public class XmlUtilsTest {
         for (MavenArtifact mavenArtifact : generatedArtifacts) {
             assertThat(mavenArtifact.getGroupId()).isEqualTo("com.example");
             assertThat(mavenArtifact.getArtifactId()).isEqualTo("my-jar");
+            assertThat(mavenArtifact.isDeployed()).isTrue();
             if ("pom".equals(mavenArtifact.getType())) {
                 assertThat(mavenArtifact.getExtension()).isEqualTo("pom");
                 assertThat(mavenArtifact.getClassifier()).isNullOrEmpty();
@@ -505,6 +506,7 @@ public class XmlUtilsTest {
             assertThat(mavenArtifact.getBaseVersion()).isEqualTo("0.5-SNAPSHOT");
             assertThat(mavenArtifact.getVersion()).isEqualTo("0.5-20180304.184830-1");
             assertThat(mavenArtifact.isSnapshot()).isTrue();
+            assertThat(mavenArtifact.isDeployed()).isTrue();
             if ("pom".equals(mavenArtifact.getType())) {
                 assertThat(mavenArtifact.getExtension()).isEqualTo("pom");
                 assertThat(mavenArtifact.getClassifier()).isNullOrEmpty();
@@ -539,6 +541,7 @@ public class XmlUtilsTest {
             assertThat(mavenArtifact.getBaseVersion()).isEqualTo("0.5-SNAPSHOT");
             assertThat(mavenArtifact.getVersion()).isEqualTo("0.5-20180410.070244-14");
             assertThat(mavenArtifact.isSnapshot()).isTrue();
+            assertThat(mavenArtifact.isDeployed()).isTrue();
             if ("pom".equals(mavenArtifact.getType())) {
                 assertThat(mavenArtifact.getExtension()).isEqualTo("pom");
                 assertThat(mavenArtifact.getClassifier()).isNullOrEmpty();
