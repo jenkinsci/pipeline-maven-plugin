@@ -123,7 +123,7 @@
     <maven-plugin-sisu.version>1.0.0</maven-plugin-sisu.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.9.15</maven.version>
-    <netty.version>4.2.12.Final</netty.version>
+    <netty.version>4.2.13.Final</netty.version>
     <plexus-utils.version>4.1.1</plexus-utils.version>
     <plugin-exec.version>3.6.3</plugin-exec.version>
     <slf4j.version>2.0.17</slf4j.version>
