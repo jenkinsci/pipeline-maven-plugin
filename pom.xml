@@ -102,7 +102,7 @@
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
     <jenkins-plugin-maven-invoker.version>2.5</jenkins-plugin-maven-invoker.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
-    <jenkins-tools-bom.version>6398.v1d26a_dd495e2</jenkins-tools-bom.version>
+    <jenkins-tools-bom.version>6421.v4a_efb_4b_3a_61d</jenkins-tools-bom.version>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.baseline>2.528</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
@@ -123,7 +123,7 @@
     <maven-plugin-sisu.version>1.0.0</maven-plugin-sisu.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.9.15</maven.version>
-    <netty.version>4.2.12.Final</netty.version>
+    <netty.version>4.2.13.Final</netty.version>
     <plexus-utils.version>4.1.1</plexus-utils.version>
     <plugin-exec.version>3.6.3</plugin-exec.version>
     <slf4j.version>2.0.17</slf4j.version>
