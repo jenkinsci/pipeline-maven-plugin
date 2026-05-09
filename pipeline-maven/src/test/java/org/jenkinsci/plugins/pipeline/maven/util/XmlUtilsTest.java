@@ -401,6 +401,7 @@ public class XmlUtilsTest {
                 .parse(in)
                 .getDocumentElement();
         List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, false);
+
         assertThat(generatedArtifacts.size()).isEqualTo(2); // a jar file and a pom file are generated
 
         for (MavenArtifact mavenArtifact : generatedArtifacts) {
@@ -442,6 +443,7 @@ public class XmlUtilsTest {
         assertThat(generatedArtifacts.get(0).getType()).isEqualTo("pom");
         assertThat(generatedArtifacts.get(0).getVersion()).isEqualTo("1.0.2-20220904.210621-1");
         assertThat(generatedArtifacts.get(0).isSnapshot()).isTrue();
+        assertThat(generatedArtifacts.get(0).isDeployed()).isTrue();
 
         assertThat(generatedArtifacts.get(1).getGroupId()).isEqualTo("com.acme.maven.plugins");
         assertThat(generatedArtifacts.get(1).getArtifactId()).isEqualTo("postgresql-compare-maven-plugin");
@@ -451,6 +453,7 @@ public class XmlUtilsTest {
         assertThat(generatedArtifacts.get(1).getType()).isEqualTo("maven-plugin");
         assertThat(generatedArtifacts.get(1).getVersion()).isEqualTo("1.0.2-20220904.210621-1");
         assertThat(generatedArtifacts.get(1).isSnapshot()).isTrue();
+        assertThat(generatedArtifacts.get(1).isDeployed()).isTrue();
     }
 
     @Test
@@ -476,6 +479,7 @@ public class XmlUtilsTest {
         assertThat(generatedArtifacts.get(0).getType()).isEqualTo("pom");
         assertThat(generatedArtifacts.get(0).getVersion()).isEqualTo("1.0.2-20220904.210621-1");
         assertThat(generatedArtifacts.get(0).isSnapshot()).isTrue();
+        assertThat(generatedArtifacts.get(0).isDeployed()).isTrue();
 
         assertThat(generatedArtifacts.get(1).getGroupId()).isEqualTo("com.acme.maven.plugins");
         assertThat(generatedArtifacts.get(1).getArtifactId()).isEqualTo("postgresql-compare-maven-plugin");
@@ -485,6 +489,7 @@ public class XmlUtilsTest {
         assertThat(generatedArtifacts.get(1).getType()).isEqualTo("maven-plugin");
         assertThat(generatedArtifacts.get(1).getVersion()).isEqualTo("1.0.2-20220904.210621-1");
         assertThat(generatedArtifacts.get(1).isSnapshot()).isTrue();
+        assertThat(generatedArtifacts.get(1).isDeployed()).isTrue();
     }
 
     @Test
