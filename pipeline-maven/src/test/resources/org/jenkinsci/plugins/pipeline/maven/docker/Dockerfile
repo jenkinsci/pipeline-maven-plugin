@@ -46,7 +46,7 @@ FROM java-maven-git as javas
 COPY --from=eclipse-temurin:8u472-b08-jdk /opt/java/openjdk /opt/java/jdk8
 COPY --from=eclipse-temurin:11.0.31_11-jdk /opt/java/openjdk /opt/java/jdk11
 COPY --from=eclipse-temurin:17.0.19_10-jdk /opt/java/openjdk /opt/java/jdk17
-COPY --from=eclipse-temurin:21.0.10_7-jdk  /opt/java/openjdk /opt/java/jdk21
+COPY --from=eclipse-temurin:21.0.11_10-jdk  /opt/java/openjdk /opt/java/jdk21
 COPY --from=eclipse-temurin:25.0.2_10-jdk  /opt/java/openjdk /opt/java/jdk25
 
 FROM java-maven-git as maven-home
