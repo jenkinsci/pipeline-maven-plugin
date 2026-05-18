@@ -4,7 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Model;
@@ -14,7 +17,10 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
-import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositoryEvent;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.OutputStreamEventReporter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +53,7 @@ public class DeployDeployFileExecutionHandlerTest {
     public void testWithExistingLifecyclePhase() throws Exception {
         MojoExecution execution = new MojoExecution(this.createTestingMojoDescriptor());
         execution.setLifecyclePhase("install");
-        ExecutionEvent event = this.createTestDeployFileExecutionEvent(execution);
+        ExecutionEvent event = this.createTestDeployFileExecutionEvent(execution, ExecutionEvent.Type.MojoSucceeded);
 
         this.handler._handle(event);
 
@@ -61,7 +67,7 @@ public class DeployDeployFileExecutionHandlerTest {
     @Test
     public void testWithoutExistingLifecyclePhase() throws Exception {
         MojoExecution execution = new MojoExecution(this.createTestingMojoDescriptor());
-        ExecutionEvent event = this.createTestDeployFileExecutionEvent(execution);
+        ExecutionEvent event = this.createTestDeployFileExecutionEvent(execution, ExecutionEvent.Type.MojoSucceeded);
 
         this.handler._handle(event);
 
@@ -76,7 +82,7 @@ public class DeployDeployFileExecutionHandlerTest {
     public void testWithEmptyLifecyclePhase() throws Exception {
         MojoExecution execution = new MojoExecution(this.createTestingMojoDescriptor());
         execution.setLifecyclePhase("");
-        ExecutionEvent event = this.createTestDeployFileExecutionEvent(execution);
+        ExecutionEvent event = this.createTestDeployFileExecutionEvent(execution, ExecutionEvent.Type.MojoSucceeded);
 
         this.handler._handle(event);
 
@@ -91,7 +97,7 @@ public class DeployDeployFileExecutionHandlerTest {
     public void testWithNullLifecyclePhase() throws Exception {
         MojoExecution execution = new MojoExecution(this.createTestingMojoDescriptor());
         execution.setLifecyclePhase(null);
-        ExecutionEvent event = this.createTestDeployFileExecutionEvent(execution);
+        ExecutionEvent event = this.createTestDeployFileExecutionEvent(execution, ExecutionEvent.Type.MojoSucceeded);
 
         this.handler._handle(event);
 
@@ -102,18 +108,67 @@ public class DeployDeployFileExecutionHandlerTest {
         assertThat(plugin.getAttribute("lifecyclePhase")).isEqualTo("deploy");
     }
 
-    /**
-     * Creates a ExecutionEvent which describes a successfull invocation of passed
-     * MojoExecution on a dummy-project
-     *
-     * @param mojoExecution
-     * @return
-     */
-    private ExecutionEvent createTestDeployFileExecutionEvent(MojoExecution mojoExecution) {
+    @Test
+    public void testRepositoryEventsBufferedBetweenStartAndSucceeded() throws Exception {
+        MojoExecution execution = new MojoExecution(this.createTestingMojoDescriptor());
+
+        // MojoStarted opens the buffer; should not be consumed
+        ExecutionEvent startedEvent =
+                this.createTestDeployFileExecutionEvent(execution, ExecutionEvent.Type.MojoStarted);
+        boolean startedHandled = this.handler.handle(startedEvent);
+        assertThat(startedHandled).isFalse();
+
+        // ARTIFACT_DEPLOYED event during the execution window: buffered, not consumed
+        File deployedFile = new File("/tmp/mylib-1.0.jar");
+        RepositoryEvent repositoryEvent =
+                createArtifactDeployedEvent("com.example", "mylib", "1.0", "jar", "", deployedFile);
+        boolean repoEventHandled = this.handler.handle(repositoryEvent);
+        assertThat(repoEventHandled).isFalse();
+
+        // MojoSucceeded drains the buffer and attaches the artifact
+        ExecutionEvent succeededEvent =
+                this.createTestDeployFileExecutionEvent(execution, ExecutionEvent.Type.MojoSucceeded);
+        this.handler.handle(succeededEvent);
+
+        List<Artifact> attachedArtifacts = project.getAttachedArtifacts();
+        assertThat(attachedArtifacts).hasSize(1);
+        Artifact attached = attachedArtifacts.get(0);
+        assertThat(attached.getGroupId()).isEqualTo("com.example");
+        assertThat(attached.getArtifactId()).isEqualTo("mylib");
+        assertThat(attached.getVersion()).isEqualTo("1.0");
+        assertThat(attached.getFile()).isEqualTo(deployedFile);
+    }
+
+    @Test
+    public void testRepositoryEventsNotBufferedAfterMojoFailed() throws Exception {
+        MojoExecution execution = new MojoExecution(this.createTestingMojoDescriptor());
+
+        this.handler.handle(this.createTestDeployFileExecutionEvent(execution, ExecutionEvent.Type.MojoStarted));
+        this.handler.handle(this.createTestDeployFileExecutionEvent(execution, ExecutionEvent.Type.MojoFailed));
+
+        // After failure the buffer is gone; a subsequent RepositoryEvent must not be buffered
+        RepositoryEvent repositoryEvent =
+                createArtifactDeployedEvent("com.example", "mylib", "1.0", "jar", "", new File("/tmp/mylib-1.0.jar"));
+        boolean repoEventHandled = this.handler.handle(repositoryEvent);
+        assertThat(repoEventHandled).isFalse();
+        assertThat(project.getAttachedArtifacts()).isEmpty();
+    }
+
+    @Test
+    public void testRepositoryEventBeforeStartNotBuffered() throws Exception {
+        // No MojoStarted yet → RepositoryEvent must pass through unaffected
+        RepositoryEvent repositoryEvent =
+                createArtifactDeployedEvent("com.example", "mylib", "1.0", "jar", "", new File("/tmp/mylib-1.0.jar"));
+        boolean handled = this.handler.handle(repositoryEvent);
+        assertThat(handled).isFalse();
+        assertThat(project.getAttachedArtifacts()).isEmpty();
+    }
+
+    private ExecutionEvent createTestDeployFileExecutionEvent(MojoExecution mojoExecution, ExecutionEvent.Type type) {
         return new ExecutionEvent() {
             @Override
             public Type getType() {
-                return Type.MojoSucceeded;
+                return type;
             }
 
             @Override
@@ -139,7 +194,7 @@ public class DeployDeployFileExecutionHandlerTest {
     }
 
     /**
-     * Create a dummy Maven-Projet
+     * Create a dummy Maven-Project
      *
      * @return
      * @throws IOException
@@ -176,6 +231,19 @@ public class DeployDeployFileExecutionHandlerTest {
         desc.setGoal("deploy-file");
 
         return desc;
+    }
+
+    private RepositoryEvent createArtifactDeployedEvent(
+            String groupId, String artifactId, String version, String extension, String classifier, File file) {
+        org.eclipse.aether.artifact.Artifact artifact =
+                new DefaultArtifact(groupId, artifactId, classifier, extension, version).setFile(file);
+        RemoteRepository repository =
+                new RemoteRepository.Builder("central", "default", "https://repo.example.com/releases").build();
+        return new RepositoryEvent.Builder(
+                        new DefaultRepositorySystemSession(), RepositoryEvent.EventType.ARTIFACT_DEPLOYED)
+                .setArtifact(artifact)
+                .setRepository(repository)
+                .build();
     }
 
     /**
