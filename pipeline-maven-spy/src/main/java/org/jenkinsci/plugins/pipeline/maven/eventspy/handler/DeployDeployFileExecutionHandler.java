@@ -36,6 +36,10 @@ import org.jenkinsci.plugins.pipeline.maven.eventspy.reporter.MavenEventReporter
  */
 public class DeployDeployFileExecutionHandler extends AbstractExecutionHandler {
 
+    private static final String PLUGIN_GROUP_ID = "org.apache.maven.plugins";
+    private static final String PLUGIN_ARTIFACT_ID = "maven-deploy-plugin";
+    private static final String PLUGIN_GOAL = "deploy-file";
+
     /**
      * Repository events buffered per executionId while a {@code deploy-file} mojo is in flight.
      * Keyed by {@link MojoExecution#getExecutionId()}.
@@ -89,9 +93,9 @@ public class DeployDeployFileExecutionHandler extends AbstractExecutionHandler {
 
     private boolean isDeployFile(@Nullable MojoExecution mojoExecution) {
         return mojoExecution != null
-                && "org.apache.maven.plugins".equals(mojoExecution.getGroupId())
-                && "maven-deploy-plugin".equals(mojoExecution.getArtifactId())
-                && "deploy-file".equals(mojoExecution.getGoal());
+                && PLUGIN_GROUP_ID.equals(mojoExecution.getGroupId())
+                && PLUGIN_ARTIFACT_ID.equals(mojoExecution.getArtifactId())
+                && PLUGIN_GOAL.equals(mojoExecution.getGoal());
     }
 
     @Override
@@ -165,6 +169,6 @@ public class DeployDeployFileExecutionHandler extends AbstractExecutionHandler {
     @Nullable
     @Override
     protected String getSupportedPluginGoal() {
-        return "org.apache.maven.plugins:maven-deploy-plugin:deploy-file";
+        return String.join(":", PLUGIN_GROUP_ID, PLUGIN_ARTIFACT_ID, PLUGIN_GOAL);
     }
 }
