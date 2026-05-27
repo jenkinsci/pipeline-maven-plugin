@@ -11,6 +11,8 @@ import hudson.model.TaskListener;
 import hudson.tasks.Fingerprinter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +75,13 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                                         "[withMaven] artifactsPublisher - Can't archive maven artifact with no file attached: "
                                                 + mavenArtifact);
                     }
+                    continue;
+                    // Ignore artifacts which are not within workspace but in system temp dir
+                } else if (!workspace.child(mavenArtifact.getFile()).exists()
+                        && isUnderGlobalTempDir(mavenArtifact.getFile())) {
+                    listener.getLogger()
+                            .println("[withMaven] artifactsPublisher - Skip archiving for temporary artifact '"
+                                    + mavenArtifact.getFile() + "' in tmp dir");
                     continue;
                 } else if (!(mavenArtifact.getFile().endsWith("." + mavenArtifact.getExtension()))) {
                     FilePath mavenGeneratedArtifact =
@@ -168,6 +177,23 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                 fingerprintAction.add(artifactsToFingerPrint);
             }
         }
+    }
+
+    /**
+     * Returns {@code true} if the given artifact file is located under the global temporary directory
+     * ({@code java.io.tmpdir}) and should therefore be skipped during archiving.
+     *
+     * <p>The artifact path is compared as-is and is intentionally **not** resolved via
+     * {@link Path#toRealPath()}: {@link MavenArtifact#getFile()} may point to a file that no longer exists
+     * (e.g. a temporary file that has already been cleaned up), and {@code toRealPath()} would throw in that
+     * case. As a consequence, if the temporary directory is reached through a symlink (the canonicalized
+     * {@code globalTempPath}) while Maven reports the artifact through the unresolved symlink path, this check
+     * may not match.
+     * @throws IOException
+     */
+    static boolean isUnderGlobalTempDir(String artifactFile) throws IOException {
+        Path globalTempPath = Paths.get(System.getProperty("java.io.tmpdir")).toRealPath();
+        return Paths.get(artifactFile).startsWith(globalTempPath);
     }
 
     @Symbol("artifactsPublisher")
