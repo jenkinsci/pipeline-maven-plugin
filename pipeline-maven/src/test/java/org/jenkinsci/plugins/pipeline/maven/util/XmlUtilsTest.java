@@ -391,6 +391,20 @@ public class XmlUtilsTest {
     }
 
     @Test
+    public void test_listGeneratedArtifacts_skips_standalone_pom() throws Exception {
+        InputStream in = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("org/jenkinsci/plugins/pipeline/maven/maven-spy-standalone-pom.xml");
+        assertThat(in).isNotNull();
+        Element mavenSpyLogs = DocumentBuilderFactory.newInstance()
+                .newDocumentBuilder()
+                .parse(in)
+                .getDocumentElement();
+        List<MavenArtifact> generatedArtifacts = XmlUtils.listGeneratedArtifacts(mavenSpyLogs, false);
+        assertThat(generatedArtifacts).isEmpty();
+    }
+
+    @Test
     public void test_listGeneratedArtifacts() throws Exception {
         InputStream in = Thread.currentThread()
                 .getContextClassLoader()
