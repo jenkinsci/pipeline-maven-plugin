@@ -94,7 +94,7 @@
     <gson.version>2.10.1</gson.version>
     <hikaricp.version>7.0.2</hikaricp.version>
     <httpclient.version>4.5.14</httpclient.version>
-    <jackson.version>2.21.3</jackson.version>
+    <jackson.version>2.21.4</jackson.version>
     <jansi.version>2.4.0</jansi.version>
     <javassist.version>3.31.0-GA</javassist.version>
     <jenkins-acceptance-test-harness.version>6636.v677593f07fa_6</jenkins-acceptance-test-harness.version>
@@ -102,12 +102,12 @@
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
     <jenkins-plugin-maven-invoker.version>2.5</jenkins-plugin-maven-invoker.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
-    <jenkins-tools-bom.version>6486.v7c7b_3635dc42</jenkins-tools-bom.version>
+    <jenkins-tools-bom.version>6509.v993a_c958a_e35</jenkins-tools-bom.version>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
     <jenkins.baseline>2.528</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <json-smart.version>2.3</json-smart.version>
-    <json-unit-assertj.version>5.1.1</json-unit-assertj.version>
+    <json-unit-assertj.version>5.1.2</json-unit-assertj.version>
     <junit.version>6.1.0</junit.version>
     <junit4.version>4.13.2</junit4.version>
     <mariadb-client.version>3.5.8</mariadb-client.version>
