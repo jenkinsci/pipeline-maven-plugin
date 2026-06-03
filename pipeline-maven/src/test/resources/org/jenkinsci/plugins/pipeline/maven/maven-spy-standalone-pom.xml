@@ -1,0 +1,27 @@
+<mavenExecution _time="2026-05-27 23:32:32.56">
+    <context _time="2026-05-27 23:32:32.566">
+        <systemProperties/>
+        <userProperties/>
+        <plexus/>
+    </context>
+
+    <ExecutionEvent type="ProjectSucceeded" class="org.apache.maven.lifecycle.internal.DefaultExecutionEvent" _time="2026-05-27 23:32:33.902">
+        <project groupId="org.apache.maven" name="Maven Stub Project (No POM)" artifactId="standalone-pom" packaging="pom" version="1">
+            <build sourceDirectory="${project.basedir}/src/main/java" directory="${project.basedir}/target"/>
+        </project>
+        <no-execution-found/>
+        <artifact extension="pom" baseVersion="1" groupId="org.apache.maven" artifactId="standalone-pom" id="org.apache.maven:standalone-pom:pom:1" type="pom" version="1" snapshot="false">
+            <file/>
+        </artifact>
+        <attachedArtifacts/>
+    </ExecutionEvent>
+    <MavenExecutionResult class="org.apache.maven.execution.DefaultMavenExecutionResult" _time="2026-05-27 23:32:33.903">
+        <buildSummary groupId="org.apache.maven" name="Maven Stub Project (No POM)" artifactId="standalone-pom" packaging="pom" time="1089" version="1" class="org.apache.maven.execution.BuildSuccess">
+            <build sourceDirectory="${project.basedir}/src/main/java" directory="${project.basedir}/target"/>
+        </buildSummary>
+    </MavenExecutionResult>
+    <!-- 2026-05-27 23:32:33.903 - close:                                       -->
+    <!-- ignored:[org.apache.maven.settings.building.DefaultSettingsBuildingResult], -->
+    <!-- blackListed: []                                                        -->
+
+</mavenExecution>

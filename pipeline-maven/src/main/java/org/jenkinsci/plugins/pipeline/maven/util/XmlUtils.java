@@ -523,7 +523,14 @@ public class XmlUtils {
                         .getAttribute("url"));
             }
 
-            result.add(pomArtifact);
+            // Dont count Maven Stub Project POM as a generated artifacts
+            // These get created when maven gets executed without a project pom.xml
+            final boolean isMavenStubPomArtifact = ("org.apache.maven".equals(pomArtifact.getGroupId())
+                    && "standalone-pom".equals(pomArtifact.getArtifactId()));
+
+            if (!isMavenStubPomArtifact) {
+                result.add(pomArtifact);
+            }
 
             Element artifactElt = XmlUtils.getUniqueChildElement(projectSucceededElt, "artifact");
             MavenArtifact mavenArtifact = XmlUtils.newMavenArtifact(artifactElt);
