@@ -11,10 +11,13 @@ import hudson.model.TaskListener;
 import hudson.tasks.Fingerprinter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.ArtifactManager;
@@ -73,6 +76,13 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                                         "[withMaven] artifactsPublisher - Can't archive maven artifact with no file attached: "
                                                 + mavenArtifact);
                     }
+                    continue;
+                    // Ignore temporary GAV-Pom created by maven-deploy-plugin
+                    // https://github.com/jenkinsci/pipeline-maven-plugin/pull/1462
+                } else if (isTemporaryMavenDeployPom(mavenArtifact.getFile())) {
+                    listener.getLogger()
+                            .println("[withMaven] artifactsPublisher - Skip temporary maven deploy pom: "
+                                    + mavenArtifact.getFile());
                     continue;
                 } else if (!(mavenArtifact.getFile().endsWith("." + mavenArtifact.getExtension()))) {
                     FilePath mavenGeneratedArtifact =
@@ -168,6 +178,20 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                 fingerprintAction.add(artifactsToFingerPrint);
             }
         }
+    }
+
+    static boolean isTemporaryMavenDeployPom(@NonNull String artifactPath) {
+        Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
+        Path filePath = Paths.get(artifactPath);
+
+        if (!filePath.startsWith(tempDir)) {
+            return false;
+        }
+
+        return Optional.ofNullable(filePath.getFileName())
+                .map(Path::toString)
+                .map(f -> f.startsWith("mvndeploy") && f.endsWith(".pom"))
+                .orElse(false);
     }
 
     @Symbol("artifactsPublisher")
