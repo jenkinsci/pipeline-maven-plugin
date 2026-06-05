@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import jenkins.model.ArtifactManager;
@@ -76,12 +77,12 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
                                                 + mavenArtifact);
                     }
                     continue;
-                    // Ignore artifacts which are not within workspace but in system temp dir
-                } else if (!workspace.child(mavenArtifact.getFile()).exists()
-                        && isUnderGlobalTempDir(mavenArtifact.getFile())) {
+                    // Ignore temporary GAV-Pom created by maven-deploy-plugin
+                    // https://github.com/jenkinsci/pipeline-maven-plugin/pull/1462
+                } else if (isTemporaryMavenDeployPom(mavenArtifact.getFile())) {
                     listener.getLogger()
-                            .println("[withMaven] artifactsPublisher - Skip archiving for temporary artifact '"
-                                    + mavenArtifact.getFile() + "' in tmp dir");
+                            .println("[withMaven] artifactsPublisher - Skip temporary maven deploy pom: "
+                                    + mavenArtifact.getFile());
                     continue;
                 } else if (!(mavenArtifact.getFile().endsWith("." + mavenArtifact.getExtension()))) {
                     FilePath mavenGeneratedArtifact =
@@ -179,21 +180,18 @@ public class GeneratedArtifactsPublisher extends MavenPublisher {
         }
     }
 
-    /**
-     * Returns {@code true} if the given artifact file is located under the global temporary directory
-     * ({@code java.io.tmpdir}) and should therefore be skipped during archiving.
-     *
-     * <p>The artifact path is compared as-is and is intentionally **not** resolved via
-     * {@link Path#toRealPath()}: {@link MavenArtifact#getFile()} may point to a file that no longer exists
-     * (e.g. a temporary file that has already been cleaned up), and {@code toRealPath()} would throw in that
-     * case. As a consequence, if the temporary directory is reached through a symlink (the canonicalized
-     * {@code globalTempPath}) while Maven reports the artifact through the unresolved symlink path, this check
-     * may not match.
-     * @throws IOException
-     */
-    static boolean isUnderGlobalTempDir(String artifactFile) throws IOException {
-        Path globalTempPath = Paths.get(System.getProperty("java.io.tmpdir")).toRealPath();
-        return Paths.get(artifactFile).startsWith(globalTempPath);
+    static boolean isTemporaryMavenDeployPom(@NonNull String artifactPath) {
+        Path tempDir = Paths.get(System.getProperty("java.io.tmpdir"));
+        Path filePath = Paths.get(artifactPath);
+
+        if (!filePath.startsWith(tempDir)) {
+            return false;
+        }
+
+        return Optional.ofNullable(filePath.getFileName())
+                .map(Path::toString)
+                .map(f -> f.startsWith("mvndeploy") && f.endsWith(".pom"))
+                .orElse(false);
     }
 
     @Symbol("artifactsPublisher")
