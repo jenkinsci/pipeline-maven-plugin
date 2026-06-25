@@ -48,7 +48,7 @@
     <jna.version>5.19.1</jna.version>
     <maven.version>3.9.16</maven.version>
     <plexus-utils.version>3.6.1</plexus-utils.version>
-    <remoting.version>3355.v388858a_47b_33</remoting.version>
+    <remoting.version>3383.vc8881d4b_0e76</remoting.version>
     <servlet-api.version>6.1.0</servlet-api.version>
     <version-number.version>1.14</version-number.version>
   </properties>
