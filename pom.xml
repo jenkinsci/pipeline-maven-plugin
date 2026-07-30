@@ -28,7 +28,7 @@
   <parent>
     <groupId>org.jenkins-ci.plugins</groupId>
     <artifactId>plugin</artifactId>
-    <version>6.2189.v695a_c41f5249</version>
+    <version>6.2211.v27f680c93c53</version>
     <relativePath />
   </parent>
 
@@ -94,7 +94,7 @@
     <gson.version>2.10.1</gson.version>
     <hikaricp.version>7.1.0</hikaricp.version>
     <httpclient.version>4.5.14</httpclient.version>
-    <jackson.version>2.22.0</jackson.version>
+    <jackson.version>2.22.1</jackson.version>
     <jansi.version>2.4.0</jansi.version>
     <javassist.version>3.32.0-GA</javassist.version>
     <jenkins-acceptance-test-harness.version>6636.v677593f07fa_6</jenkins-acceptance-test-harness.version>
@@ -108,7 +108,7 @@
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <json-smart.version>2.3</json-smart.version>
     <json-unit-assertj.version>5.1.2</json-unit-assertj.version>
-    <junit.version>6.1.0</junit.version>
+    <junit.version>6.1.2</junit.version>
     <junit4.version>4.13.2</junit4.version>
     <mariadb-client.version>3.5.9</mariadb-client.version>
     <maven-cobertura-plugin.version>2.7</maven-cobertura-plugin.version>
@@ -120,10 +120,10 @@
     <maven-jacoco-plugin.version>0.8.13</maven-jacoco-plugin.version>
     <maven-nbm-plugin.version>4.7</maven-nbm-plugin.version>
     <maven-plugin-plugin.version>3.9.0</maven-plugin-plugin.version>
-    <maven-plugin-sisu.version>1.0.0</maven-plugin-sisu.version>
+    <maven-plugin-sisu.version>1.1.0</maven-plugin-sisu.version>
     <maven-shared-utils.version>3.4.2</maven-shared-utils.version>
     <maven.version>3.9.16</maven.version>
-    <netty.version>4.2.15.Final</netty.version>
+    <netty.version>4.2.16.Final</netty.version>
     <plexus-utils.version>4.1.1</plexus-utils.version>
     <plugin-exec.version>3.6.3</plugin-exec.version>
     <slf4j.version>2.0.18</slf4j.version>
