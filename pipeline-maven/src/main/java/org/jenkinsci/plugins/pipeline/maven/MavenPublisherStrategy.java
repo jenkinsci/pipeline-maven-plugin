@@ -47,7 +47,22 @@ public enum MavenPublisherStrategy {
                 if (mavenPublisher == null) {
                     // skip null publisher options injected by Jenkins pipeline, probably caused by a missing plugin
                 } else {
-                    configuredPublishersById.put(mavenPublisher.getDescriptor().getId(), mavenPublisher);
+                    try {
+                        configuredPublishersById.put(
+                                mavenPublisher.getDescriptor().getId(), mavenPublisher);
+                    } catch (AssertionError e) {
+                        // Descriptor missing — plugin uninstalled/deprecated
+                        listener.getLogger()
+                                .println("[withMaven] WARNING: Skipping publisher '"
+                                        + mavenPublisher.getClass().getSimpleName()
+                                        + "' as its descriptor is missing. "
+                                        + "The associated plugin may be uninstalled or deprecated.");
+                        LOGGER.log(
+                                Level.WARNING,
+                                "Skipping publisher with missing descriptor: "
+                                        + mavenPublisher.getClass().getName(),
+                                e);
+                    }
                 }
             }
 
@@ -62,8 +77,21 @@ public enum MavenPublisherStrategy {
                 globallyConfiguredPublishers = Collections.emptyList();
             }
             for (MavenPublisher mavenPublisher : globallyConfiguredPublishers) {
-                globallyConfiguredPublishersById.put(
-                        mavenPublisher.getDescriptor().getId(), mavenPublisher);
+                try {
+                    globallyConfiguredPublishersById.put(
+                            mavenPublisher.getDescriptor().getId(), mavenPublisher);
+                } catch (AssertionError e) {
+                    listener.getLogger()
+                            .println("[withMaven] WARNING: Skipping globally configured publisher '"
+                                    + mavenPublisher.getClass().getSimpleName()
+                                    + "' as its descriptor is missing. "
+                                    + "The associated plugin may be uninstalled or deprecated.");
+                    LOGGER.log(
+                            Level.WARNING,
+                            "Skipping globally configured publisher with missing descriptor: "
+                                    + mavenPublisher.getClass().getName(),
+                            e);
+                }
             }
 
             // mavenPublisher.descriptor.id -> mavenPublisher
