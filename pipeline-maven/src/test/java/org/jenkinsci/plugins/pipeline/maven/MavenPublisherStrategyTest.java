@@ -1,6 +1,8 @@
 package org.jenkinsci.plugins.pipeline.maven;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import hudson.util.StreamTaskListener;
 import java.io.ByteArrayOutputStream;
@@ -56,5 +58,19 @@ public class MavenPublisherStrategyTest {
         assertThat(reportersByDescriptorId).containsKey(new MavenLinkerPublisher2.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new PipelineGraphPublisher.DescriptorImpl().getId());
         assertThat(reportersByDescriptorId).containsKey(new CoveragePublisher.DescriptorImpl().getId());
+    }
+
+    @Test
+    public void buildPublishersListShouldSkipPublisherWithMissingDescriptor(JenkinsRule r) throws Exception {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+        MavenPublisher brokenPublisher = mock(MavenPublisher.class);
+        when(brokenPublisher.getDescriptor()).thenThrow(new AssertionError("Descriptor is missing!"));
+
+        List<MavenPublisher> result = MavenPublisherStrategy.IMPLICIT.buildPublishersList(
+                Collections.singletonList(brokenPublisher), new StreamTaskListener(baos));
+
+        assertThat(baos.toString()).contains("WARNING");
     }
 }
