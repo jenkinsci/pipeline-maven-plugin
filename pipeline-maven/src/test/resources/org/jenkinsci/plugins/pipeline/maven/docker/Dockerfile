@@ -44,7 +44,7 @@ RUN apt-get update && \
 FROM java-maven-git as javas
 
 COPY --from=eclipse-temurin:8u472-b08-jdk /opt/java/openjdk /opt/java/jdk8
-COPY --from=eclipse-temurin:11.0.31_11-jdk /opt/java/openjdk /opt/java/jdk11
+COPY --from=eclipse-temurin:11.0.32_9-jdk /opt/java/openjdk /opt/java/jdk11
 COPY --from=eclipse-temurin:17.0.19_10-jdk /opt/java/openjdk /opt/java/jdk17
 COPY --from=eclipse-temurin:21.0.11_10-jdk  /opt/java/openjdk /opt/java/jdk21
 COPY --from=eclipse-temurin:25.0.3_9-jdk  /opt/java/openjdk /opt/java/jdk25
