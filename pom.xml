@@ -125,7 +125,7 @@
     <maven.version>3.9.16</maven.version>
     <netty.version>4.2.17.Final</netty.version>
     <plexus-utils.version>4.2.0</plexus-utils.version>
-    <plugin-exec.version>3.6.3</plugin-exec.version>
+    <plugin-exec.version>3.6.4</plugin-exec.version>
     <slf4j.version>2.0.19</slf4j.version>
     <spotless.check.skip>false</spotless.check.skip>
     <testcontainers.version>2.0.5</testcontainers.version>
