@@ -116,6 +116,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
     private static final String M2_HOME = "M2_HOME";
     private static final String MAVEN_HOME = "MAVEN_HOME";
     private static final String MAVEN_OPTS = "MAVEN_OPTS";
+    private static final String MAVEN_ARGS = "MAVEN_ARGS";
     /**
      * Environment variable of the path to the wrapped "mvn" command, you can just invoke "$MVN_CMD clean package"
      */
@@ -424,7 +425,19 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             mavenConfig.append("\"-Dmaven.repo.local=").append(mavenLocalRepo).append("\" ");
         }
 
+        // Maven Wrapper < 3.3.0 reads MAVEN_CONFIG
         envOverride.put("MAVEN_CONFIG", mavenConfig.toString());
+
+        //
+        // MAVEN_ARGS
+        // Maven >= 3.9.0 reads MAVEN_ARGS, including when launched by Maven Wrapper >= 3.3.0 which ignores
+        // MAVEN_CONFIG. Appended to the original value, which therefore keeps precedence.
+        String mavenArgs = mavenConfig.toString();
+        String mavenArgsOriginal = env.get(MAVEN_ARGS);
+        if (mavenArgsOriginal != null && !mavenArgsOriginal.isEmpty()) {
+            mavenArgs = mavenArgsOriginal + " " + mavenArgs;
+        }
+        envOverride.put(MAVEN_ARGS, mavenArgs);
 
         //
         // MAVEN_OPTS

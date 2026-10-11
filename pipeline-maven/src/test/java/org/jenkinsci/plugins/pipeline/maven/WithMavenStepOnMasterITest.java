@@ -438,6 +438,30 @@ public class WithMavenStepOnMasterITest extends AbstractIntegrationTest {
         }
     }
 
+    @Issue("JENKINS-73829")
+    @Test
+    public void maven_args_are_appended_to_the_original_maven_args() throws Exception {
+        // @formatter:off
+        String pipelineScript = "node() {\n" +
+            "    withEnv(['MAVEN_ARGS=-Dfoo=bar']) {\n" +
+            "        withMaven(traceability: true) {\n" +
+            "            if (isUnix()) {\n" +
+            "                sh 'echo \"withMaven MAVEN_ARGS=$MAVEN_ARGS\"'\n" +
+            "            } else {\n" +
+            "                bat 'echo withMaven MAVEN_ARGS=%MAVEN_ARGS%'\n" +
+            "            }\n" +
+            "        }\n" +
+            "    }\n" +
+            "}";
+        // @formatter:on
+
+        WorkflowJob pipeline = jenkinsRule.createProject(WorkflowJob.class, "build-on-master-with-maven-args");
+        pipeline.setDefinition(new CpsFlowDefinition(pipelineScript, true));
+        WorkflowRun build = jenkinsRule.assertBuildStatus(Result.SUCCESS, pipeline.scheduleBuild2(0));
+
+        jenkinsRule.assertLogContains("withMaven MAVEN_ARGS=-Dfoo=bar --batch-mode --show-version ", build);
+    }
+
     private static Stream<Arguments> mavenPublisherDescriptors() {
         return Stream.of(
                 Arguments.of(new FindbugsAnalysisPublisher.DescriptorImpl(), "findbugsPublisher"),
