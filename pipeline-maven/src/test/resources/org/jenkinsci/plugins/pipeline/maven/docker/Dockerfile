@@ -1,4 +1,4 @@
-FROM ubuntu:noble as base
+FROM ubuntu:resolute as base
 
 # install SSHD
 RUN apt-get update -y && \
