@@ -104,7 +104,7 @@
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
     <jenkins-tools-bom.version>6607.v3ed3d8ddfed8</jenkins-tools-bom.version>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
-    <jenkins.baseline>2.528</jenkins.baseline>
+    <jenkins.baseline>2.555</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <json-smart.version>2.3</json-smart.version>
     <json-unit-assertj.version>6.4.0</json-unit-assertj.version>
