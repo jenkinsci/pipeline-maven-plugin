@@ -65,6 +65,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -116,6 +117,7 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
     private static final String M2_HOME = "M2_HOME";
     private static final String MAVEN_HOME = "MAVEN_HOME";
     private static final String MAVEN_OPTS = "MAVEN_OPTS";
+    private static final String MAVEN_ARGS = "MAVEN_ARGS";
     /**
      * Environment variable of the path to the wrapped "mvn" command, you can just invoke "$MVN_CMD clean package"
      */
@@ -402,29 +404,58 @@ class WithMavenStepExecution2 extends GeneralNonBlockingStepExecution {
             ifTraceabilityDisabled(() -> mavenConfig.append("--no-transfer-progress "));
         }
         ifTraceabilityEnabled(() -> mavenConfig.append("--show-version "));
+        // argument -> path
+        Map<String, String> pathArguments = new LinkedHashMap<>();
         if (settingsFilePath != null && !settingsFilePath.isEmpty()) {
             // JENKINS-57324 escape '%' as '%%'. See
             // https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
             if (!isUnix) settingsFilePath = settingsFilePath.replace("%", "%%");
-            mavenConfig.append("--settings \"").append(settingsFilePath).append("\" ");
+            pathArguments.put("--settings \"" + settingsFilePath + "\" ", settingsFilePath);
         }
         if (globalSettingsFilePath != null && !globalSettingsFilePath.isEmpty()) {
             // JENKINS-57324 escape '%' as '%%'. See
             // https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
             if (!isUnix) globalSettingsFilePath = globalSettingsFilePath.replace("%", "%%");
-            mavenConfig
-                    .append("--global-settings \"")
-                    .append(globalSettingsFilePath)
-                    .append("\" ");
+            pathArguments.put("--global-settings \"" + globalSettingsFilePath + "\" ", globalSettingsFilePath);
         }
         if (mavenLocalRepo != null && !mavenLocalRepo.isEmpty()) {
             // JENKINS-57324 escape '%' as '%%'. See
             // https://en.wikibooks.org/wiki/Windows_Batch_Scripting#Quoting_and_escaping
             if (!isUnix) mavenLocalRepo = mavenLocalRepo.replace("%", "%%");
-            mavenConfig.append("\"-Dmaven.repo.local=").append(mavenLocalRepo).append("\" ");
+            pathArguments.put("\"-Dmaven.repo.local=" + mavenLocalRepo + "\" ", mavenLocalRepo);
         }
 
+        //
+        // MAVEN_ARGS
+        // Maven >= 3.9.0 reads MAVEN_ARGS, including when launched by Maven Wrapper >= 3.3.0 which ignores
+        // MAVEN_CONFIG. On Unix, bin/mvn splits MAVEN_ARGS on whitespace, and Maven fails to rejoin a quoted
+        // argument split this way (https://github.com/apache/maven/issues/13413): an argument whose path contains
+        // whitespace is left out.
+        StringBuilder mavenArgsBuilder = new StringBuilder(mavenConfig);
+        List<String> omittedMavenArgs = new ArrayList<>();
+        pathArguments.forEach((argument, path) -> {
+            mavenConfig.append(argument);
+            if (isUnix && path.chars().anyMatch(Character::isWhitespace)) {
+                omittedMavenArgs.add(argument.trim());
+                return;
+            }
+            mavenArgsBuilder.append(argument);
+        });
+        if (!omittedMavenArgs.isEmpty()) {
+            console.println("[withMaven] WARNING: " + MAVEN_ARGS + " omits " + omittedMavenArgs
+                    + " as their path contains whitespace. Maven Wrapper >= 3.3.0 will not use them.");
+        }
+
+        // Maven Wrapper < 3.3.0 reads MAVEN_CONFIG
         envOverride.put("MAVEN_CONFIG", mavenConfig.toString());
+
+        // Appended to the original value, which therefore keeps precedence.
+        String mavenArgs = mavenArgsBuilder.toString();
+        String mavenArgsOriginal = env.get(MAVEN_ARGS);
+        if (mavenArgsOriginal != null && !mavenArgsOriginal.isEmpty()) {
+            mavenArgs = mavenArgsOriginal + " " + mavenArgs;
+        }
+        envOverride.put(MAVEN_ARGS, mavenArgs);
 
         //
         // MAVEN_OPTS
