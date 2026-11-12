@@ -96,15 +96,17 @@
     <httpclient.version>4.5.14</httpclient.version>
     <jackson.version>2.23.0</jackson.version>
     <jansi.version>2.4.0</jansi.version>
+    <java.version>21</java.version>
     <javassist.version>3.33.0-GA</javassist.version>
     <jenkins-acceptance-test-harness.version>6636.v677593f07fa_6</jenkins-acceptance-test-harness.version>
     <jenkins-plugin-findbugs.version>5.0.0</jenkins-plugin-findbugs.version>
     <jenkins-plugin-jgiven.version>0.15.1</jenkins-plugin-jgiven.version>
     <jenkins-plugin-maven-invoker.version>2.5</jenkins-plugin-maven-invoker.version>
+    <jenkins-plugin-maven.version>3.28</jenkins-plugin-maven.version>
     <jenkins-plugin-tasks.version>4.53</jenkins-plugin-tasks.version>
-    <jenkins-tools-bom.version>6607.v3ed3d8ddfed8</jenkins-tools-bom.version>
+    <jenkins-tools-bom.version>7280.ve2096dda_41b_9</jenkins-tools-bom.version>
     <!-- https://www.jenkins.io/doc/developer/plugin-development/choosing-jenkins-baseline/ -->
-    <jenkins.baseline>2.528</jenkins.baseline>
+    <jenkins.baseline>2.555</jenkins.baseline>
     <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     <json-smart.version>2.3</json-smart.version>
     <json-unit-assertj.version>6.4.0</json-unit-assertj.version>
@@ -308,6 +310,29 @@
             </toggleOffOn>
           </pom>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>display-info</id>
+            <configuration>
+              <rules>
+                <requireUpperBoundDeps>
+                  <level>WARN</level>
+                </requireUpperBoundDeps>
+                <enforceBytecodeVersion>
+                  <maxJdkVersion>${java.version}</maxJdkVersion>
+                </enforceBytecodeVersion>
+                <requireJavaVersion>
+                  <version>[21,22),[25,26)</version>
+                  <message>Java LTS 21 or 25 is required to build this project.</message>
+                </requireJavaVersion>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
